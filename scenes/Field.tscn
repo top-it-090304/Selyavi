@@ -13,7 +13,7 @@ region_enabled = true
 region_rect = Rect2( 0, 0, 1024, 600 )
 
 [node name="KinematicBody2D" parent="." instance=ExtResource( 2 )]
-position = Vector2( 512, 300 )
+position = Vector2( 528, 300 )
 
 [node name="wall" parent="." instance=ExtResource( 3 )]
 position = Vector2( -15, 0 )
