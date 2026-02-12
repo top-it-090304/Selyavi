@@ -11,7 +11,13 @@ config_version=4
 [application]
 
 config/name="Tanks 2026"
+run/main_scene="res://scenes/player.tscn"
 config/icon="res://icon.png"
+
+[display]
+
+window/stretch/mode="2d"
+window/stretch/aspect="keep_width"
 
 [gui]
 
