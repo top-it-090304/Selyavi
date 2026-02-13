@@ -2,8 +2,8 @@ abstract class Tanks{
 	float hp;
 	int speed;
 	
-	float move(){return 2f;}
-	void fire(){}
-	void destroyTank(){}
+	public abstract float move();
+	public abstract void fire();
+	public abstract void destroyTank();
 	
 }
