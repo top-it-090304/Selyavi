@@ -3,13 +3,23 @@ using System;
 
 public class Player : KinematicBody2D
 {
-	
+	#region private fields
 	private int _speed = 250;
 	private Vector2 _velocity = Vector2.Zero;
-	
 	private Position2D _bulletPosition;
 	private Timer _shootTimer;
+	#endregion
 	PackedScene bulletScene = (PackedScene)GD.Load("res://scenes/Bullet.tscn");
+	
+	public int Speed{
+		get => _speed;
+		set {
+			if(value > 0 && value <= 800){
+				_speed = value;
+			}
+		}
+	}
+
 	
 
 
