@@ -18,3 +18,13 @@ C:\Users\Пользователь\Desktop\tanks2026\Selyavi\.mono\temp\obj\Debug
 C:\Users\Пользователь\Desktop\tanks2026\Selyavi\.mono\temp\obj\Debug\Tanks 2026.sourcelink.json
 C:\Users\Пользователь\Desktop\tanks2026\Selyavi\.mono\temp\obj\Debug\Tanks 2026.dll
 C:\Users\Пользователь\Desktop\tanks2026\Selyavi\.mono\temp\obj\Debug\Tanks 2026.pdb
+C:\Users\Пользователь\Desktop\tanks 2026\.mono\temp\obj\Debug\Tanks 2026.csproj.AssemblyReference.cache
+C:\Users\Пользователь\Desktop\tanks 2026\.mono\temp\obj\Debug\Tanks 2026.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Пользователь\Desktop\tanks 2026\.mono\temp\obj\Debug\Tanks 2026.AssemblyInfoInputs.cache
+C:\Users\Пользователь\Desktop\tanks 2026\.mono\temp\obj\Debug\Tanks 2026.AssemblyInfo.cs
+C:\Users\Пользователь\Desktop\tanks 2026\.mono\temp\obj\Debug\Tanks 2026.csproj.CoreCompileInputs.cache
+C:\Users\Пользователь\Desktop\tanks 2026\.mono\temp\obj\Debug\Tanks 2026.sourcelink.json
+C:\Users\Пользователь\Desktop\tanks 2026\.mono\temp\obj\Debug\Tanks 2026.dll
+C:\Users\Пользователь\Desktop\tanks 2026\.mono\temp\obj\Debug\Tanks 2026.pdb
+C:\Users\Пользователь\Desktop\tanks 2026\.mono\temp\bin\Debug\Tanks 2026.dll
+C:\Users\Пользователь\Desktop\tanks 2026\.mono\temp\bin\Debug\Tanks 2026.pdb

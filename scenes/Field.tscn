@@ -1,9 +1,10 @@
-[gd_scene load_steps=5 format=2]
+[gd_scene load_steps=6 format=2]
 
 [ext_resource path="res://assets/backround/PNG/Tiles/Ground_Tile_01_A.png" type="Texture" id=1]
 [ext_resource path="res://scenes/Player.tscn" type="PackedScene" id=2]
 [ext_resource path="res://scenes/obtacles/wall.tscn" type="PackedScene" id=3]
-[ext_resource path="res://scenes/IngameWall.tscn" type="PackedScene" id=4]
+[ext_resource path="res://scenes/IndestructableWall.tscn" type="PackedScene" id=4]
+[ext_resource path="res://scenes/DestructibleWall.tscn" type="PackedScene" id=5]
 
 [node name="Field" type="Node2D"]
 
@@ -23,23 +24,35 @@ position = Vector2( -15, 0 )
 position = Vector2( 1039, 0 )
 
 [node name="wall3" parent="." instance=ExtResource( 3 )]
-position = Vector2( 1024, 650 )
+position = Vector2( 1040, 618 )
 rotation = 1.5708
 scale = Vector2( 1, 1.75 )
 
 [node name="wall4" parent="." instance=ExtResource( 3 )]
-position = Vector2( 1024, -24 )
+position = Vector2( 1036, -15 )
 rotation = 1.5708
 scale = Vector2( 1, 1.75 )
 
-[node name="Ingame Wall" parent="." instance=ExtResource( 4 )]
-position = Vector2( 958, 202 )
+[node name="DestructibleWall" parent="." instance=ExtResource( 5 )]
+position = Vector2( 906, 386 )
 
-[node name="Ingame Wall2" parent="." instance=ExtResource( 4 )]
-position = Vector2( 607, 70 )
+[node name="DestructibleWall" parent="DestructibleWall" instance=ExtResource( 5 )]
+position = Vector2( -893, 204 )
 
-[node name="Ingame Wall3" parent="." instance=ExtResource( 4 )]
-position = Vector2( 959, 68 )
+[node name="DestructibleWall2" parent="DestructibleWall" instance=ExtResource( 5 )]
+position = Vector2( -655, -266 )
 
-[node name="Ingame Wall4" parent="." instance=ExtResource( 4 )]
-position = Vector2( 222, 304 )
+[node name="IndestructibleWall2" parent="." instance=ExtResource( 5 )]
+position = Vector2( 906, 386 )
+
+[node name="IndestructableWall" parent="IndestructibleWall2" instance=ExtResource( 4 )]
+position = Vector2( 54, -183 )
+
+[node name="IndestructableWall2" parent="IndestructibleWall2" instance=ExtResource( 4 )]
+position = Vector2( 52, -317 )
+
+[node name="IndestructableWall3" parent="IndestructibleWall2" instance=ExtResource( 4 )]
+position = Vector2( -599, -187 )
+
+[node name="IndestructableWall4" parent="IndestructibleWall2" instance=ExtResource( 4 )]
+position = Vector2( -203, -315 )

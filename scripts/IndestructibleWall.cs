@@ -1,9 +1,9 @@
 using Godot;
 using System;
 
-public class IngameWall : StaticBody2D
+public class IndestroyableWall : StaticBody2D
 {
-	private bool _destroyable;
+	private bool _destroyable = false;
 	public void destroy(){
 		if (_destroyable){
 			QueueFree();

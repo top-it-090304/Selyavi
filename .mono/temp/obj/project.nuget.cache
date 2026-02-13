@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "Z8NPSMSErxg=",
+  "dgSpecHash": "foW/2DoQxfs=",
   "success": true,
-  "projectFilePath": "C:\\Users\\Пользователь\\Desktop\\tanks2026\\Selyavi\\Tanks 2026.csproj",
+  "projectFilePath": "C:\\Users\\Пользователь\\Desktop\\tanks 2026\\Tanks 2026.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\Пользователь\\.nuget\\packages\\microsoft.netframework.referenceassemblies\\1.0.3\\microsoft.netframework.referenceassemblies.1.0.3.nupkg.sha512",
     "C:\\Users\\Пользователь\\.nuget\\packages\\microsoft.netframework.referenceassemblies.net472\\1.0.3\\microsoft.netframework.referenceassemblies.net472.1.0.3.nupkg.sha512"
