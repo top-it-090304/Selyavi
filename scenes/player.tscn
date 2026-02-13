@@ -24,7 +24,7 @@ texture = ExtResource( 1 )
 texture = ExtResource( 2 )
 
 [node name="BulletPosition" type="Position2D" parent="BodyTank/Gun"]
-position = Vector2( 0, -20 )
+position = Vector2( 0, -100 )
 
 [node name="MovingSound" type="AudioStreamPlayer" parent="."]
 stream = ExtResource( 4 )

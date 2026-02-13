@@ -73,8 +73,6 @@ public class Bullet : Area2D
 	 move();
   }
 
-
-
 }
 
 
