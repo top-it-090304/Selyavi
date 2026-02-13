@@ -1,8 +1,9 @@
-[gd_scene load_steps=5 format=2]
+[gd_scene load_steps=6 format=2]
 
 [ext_resource path="res://assets/future_tanks/PNG/Hulls_Color_A/Hull_02.png" type="Texture" id=1]
 [ext_resource path="res://assets/future_tanks/PNG/Weapon_Color_A/Gun_01.png" type="Texture" id=2]
 [ext_resource path="res://scripts/Player.cs" type="Script" id=3]
+[ext_resource path="res://assets/sounds/tracks_rattle_slow_01.mp3" type="AudioStream" id=4]
 
 [sub_resource type="CapsuleShape2D" id=1]
 radius = 106.0
@@ -24,3 +25,6 @@ texture = ExtResource( 2 )
 
 [node name="BulletPosition" type="Position2D" parent="BodyTank/Gun"]
 position = Vector2( 0, -20 )
+
+[node name="MovingSound" type="AudioStreamPlayer" parent="."]
+stream = ExtResource( 4 )

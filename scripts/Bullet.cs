@@ -17,13 +17,14 @@ public class Bullet : Area2D
 			}
 		}
 	}
-
-
+	
+	
 
 	public override void _Ready()
 	{
 		_plasmaSound = GetNode<AudioStreamPlayer>("PlasmaGunSound");
 		_velocity = new Vector2(0, -1).Rotated(Rotation);
+		_plasmaSound.Play();
 	}
 	
 	private void move(){

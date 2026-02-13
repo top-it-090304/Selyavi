@@ -1,0 +1,15 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+path="res://.import/tracks_rattle_slow_01.mp3-cccd93a1bb42172f036f3aa7c56f2478.mp3str"
+
+[deps]
+
+source_file="res://assets/sounds/tracks_rattle_slow_01.mp3"
+dest_files=[ "res://.import/tracks_rattle_slow_01.mp3-cccd93a1bb42172f036f3aa7c56f2478.mp3str" ]
+
+[params]
+
+loop=true
+loop_offset=0

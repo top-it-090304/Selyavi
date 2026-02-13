@@ -11,5 +11,5 @@ dest_files=[ "res://.import/plasma_gun_06.mp3-866d42db4ab45df767cca38db106712d.m
 
 [params]
 
-loop=true
+loop=false
 loop_offset=0
