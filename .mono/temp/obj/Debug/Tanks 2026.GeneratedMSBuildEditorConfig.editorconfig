@@ -1,5 +1,8 @@
 is_global = true
 build_property.RootNamespace = Tanks2026
-build_property.ProjectDir = D:\Tanks_2026\
+build_property.ProjectDir = C:\Users\Пользователь\Desktop\tanks2026\Selyavi\
 build_property.EnableComHosting = 
 build_property.EnableGeneratedComInterfaceComImportInterop = 
+build_property.CsWinRTUseWindowsUIXamlProjections = false
+build_property.EffectiveAnalysisLevelStyle = 
+build_property.EnableCodeStyleSeverity = 

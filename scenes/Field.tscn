@@ -1,8 +1,9 @@
-[gd_scene load_steps=4 format=2]
+[gd_scene load_steps=5 format=2]
 
 [ext_resource path="res://assets/backround/PNG/Tiles/Ground_Tile_01_A.png" type="Texture" id=1]
 [ext_resource path="res://scenes/Player.tscn" type="PackedScene" id=2]
 [ext_resource path="res://scenes/obtacles/wall.tscn" type="PackedScene" id=3]
+[ext_resource path="res://scenes/IngameWall.tscn" type="PackedScene" id=4]
 
 [node name="Field" type="Node2D"]
 
@@ -30,3 +31,15 @@ scale = Vector2( 1, 1.75 )
 position = Vector2( 1024, -24 )
 rotation = 1.5708
 scale = Vector2( 1, 1.75 )
+
+[node name="Ingame Wall" parent="." instance=ExtResource( 4 )]
+position = Vector2( 958, 202 )
+
+[node name="Ingame Wall2" parent="." instance=ExtResource( 4 )]
+position = Vector2( 607, 70 )
+
+[node name="Ingame Wall3" parent="." instance=ExtResource( 4 )]
+position = Vector2( 959, 68 )
+
+[node name="Ingame Wall4" parent="." instance=ExtResource( 4 )]
+position = Vector2( 222, 304 )
