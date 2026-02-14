@@ -11,6 +11,7 @@ public class Player : KinematicBody2D
 	private Timer _shootTimer;
 	private AudioStreamPlayer _movingSound;
 	private Tween _tween;
+	private CanvasLayer _joystick;
 	#endregion
 	PackedScene bulletScene;
 	
@@ -28,6 +29,11 @@ public class Player : KinematicBody2D
 		bulletScene = (PackedScene)GD.Load("res://scenes/Bullet.tscn");
 		_bulletPosition = GetNode<Position2D>("BodyTank/Gun/BulletPosition");
 		_movingSound = GetNode<AudioStreamPlayer>("MovingSound");
+		_joystick = GetNode<CanvasLayer>("Joystick");
+		if (!_joystick.IsConnected("UseMoveVector", this, nameof(useMoveVector)))
+		{
+			_joystick.Connect("UseMoveVector", this, nameof(useMoveVector));
+		}
 		_tween = new Tween();
 		_shootTimer = new Timer();
 		_shootTimer.WaitTime = 3f; 
@@ -35,6 +41,11 @@ public class Player : KinematicBody2D
 		AddChild(_shootTimer);
 		AddChild(_tween);
 
+	}
+	
+	private void useMoveVector(Vector2 moveVector){
+		MoveAndSlide(moveVector * 200);
+		RotatePlayer(moveVector);
 	}
 	public override void _PhysicsProcess(float delta)
 	{
@@ -45,7 +56,6 @@ public class Player : KinematicBody2D
 	{
 		move();
 		fire();
-		
 	}
 	
 	private void move(){
@@ -149,3 +159,6 @@ public class Player : KinematicBody2D
 		
 	  }*/
 }
+
+
+
