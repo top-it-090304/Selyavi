@@ -11,7 +11,7 @@ public class MobileJoystick : CanvasLayer
 	private Vector2 moveVector = new Vector2(0, 0);
 	private bool _isJoystickActive = false;
 	private Sprite _innerCircle;
-	private float _joystickRadius = 100f; // Радиус кнопки (половина размера)
+	private float _joystickRadius = 100f; 
 	#endregion
 
 	public override void _Ready()
@@ -20,8 +20,7 @@ public class MobileJoystick : CanvasLayer
 		_innerCircle = GetNode<Sprite>("JoystickTipArrows");
 		ResetJoystick();
 		
-		// Можно автоматически определить радиус из размера текстуры
-		// _joystickRadius = _touchButton.Texture.GetSize().x / 2;
+		
 	}
 	
 	public override void _Input(InputEvent @event)

@@ -45,7 +45,7 @@ public class Player : KinematicBody2D
 	
 	private void useMoveVector(Vector2 moveVector){
 		MoveAndSlide(moveVector * 200);
-		RotatePlayer(moveVector);
+		RotatePlayerMobile(moveVector);
 	}
 	public override void _PhysicsProcess(float delta)
 	{
@@ -83,6 +83,10 @@ public class Player : KinematicBody2D
 			}
 
 		}
+	}
+	
+	private void RotatePlayerMobile(Vector2 direction){
+		RotationDegrees = Mathf.Rad2Deg(direction.Angle()) + 90;
 	}
 	
 	private void RotatePlayer(Vector2 direction){
