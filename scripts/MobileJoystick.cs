@@ -6,6 +6,9 @@ public class MobileJoystick : CanvasLayer
 	[Signal]
 	public delegate void UseMoveVector(Vector2 moveVector);
 	
+	[Signal]
+	public delegate void FireTouch();
+	
 	#region private fields
 	private TouchScreenButton _touchButton;
 	private Vector2 moveVector = new Vector2(0, 0);
@@ -13,13 +16,14 @@ public class MobileJoystick : CanvasLayer
 	private Sprite _innerCircle;
 	private float _joystickRadius = 100f; 
 	#endregion
+	
+	public bool isAim = false;
 
 	public override void _Ready()
 	{
 		_touchButton = GetNode<TouchScreenButton>("TouchScreenButton");
 		_innerCircle = GetNode<Sprite>("JoystickTipArrows");
 		ResetJoystick();
-		
 		
 	}
 	
@@ -31,8 +35,10 @@ public class MobileJoystick : CanvasLayer
 			{
 				Vector2 eventPosition = Vector2.Zero;
 				
-				if (@event is InputEventScreenTouch touchEvent)
+				if (@event is InputEventScreenTouch touchEvent){
 					eventPosition = touchEvent.Position;
+					EmitSignal(nameof(FireTouch));
+					}
 				else if (@event is InputEventScreenDrag dragEvent)
 					eventPosition = dragEvent.Position;
 				Vector2 buttonCenter = _touchButton.Position + new Vector2(_joystickRadius, _joystickRadius);
@@ -47,7 +53,9 @@ public class MobileJoystick : CanvasLayer
 			}
 			else 
 			{
-				ResetJoystick();
+				if(!isAim){
+					ResetJoystick();
+				}
 				_isJoystickActive = false;
 			}
 		}

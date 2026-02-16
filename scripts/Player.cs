@@ -12,6 +12,8 @@ public class Player : KinematicBody2D
 	private AudioStreamPlayer _movingSound;
 	private Tween _tween;
 	private CanvasLayer _joystick;
+	private Sprite _gun;
+	private MobileJoystick _aim;
 	#endregion
 	PackedScene bulletScene;
 	
@@ -29,10 +31,21 @@ public class Player : KinematicBody2D
 		bulletScene = (PackedScene)GD.Load("res://scenes/Bullet.tscn");
 		_bulletPosition = GetNode<Position2D>("BodyTank/Gun/BulletPosition");
 		_movingSound = GetNode<AudioStreamPlayer>("MovingSound");
+		_gun = GetNode<Sprite>("BodyTank/Gun");
 		_joystick = GetNode<CanvasLayer>("Joystick");
+		_aim = GetNode<MobileJoystick>("Aim");
+		_aim.isAim = true;
 		if (!_joystick.IsConnected("UseMoveVector", this, nameof(useMoveVector)))
 		{
 			_joystick.Connect("UseMoveVector", this, nameof(useMoveVector));
+		}
+		if (!_aim.IsConnected("UseMoveVector", this, nameof(useMoveVectorAim)))
+		{
+			_aim.Connect("UseMoveVector", this, nameof(useMoveVectorAim));
+		}
+		if (!_aim.IsConnected("FireTouch", this, nameof(FireTouch)))
+		{
+			_aim.Connect("FireTouch", this, nameof(FireTouch));
 		}
 		_tween = new Tween();
 		_shootTimer = new Timer();
@@ -47,6 +60,18 @@ public class Player : KinematicBody2D
 		MoveAndSlide(moveVector * 200);
 		RotatePlayerMobile(moveVector);
 	}
+	
+	private void FireTouch(){
+		var bullet = (Area2D)bulletScene.Instance();
+			bullet.GlobalPosition = _bulletPosition.GlobalPosition;
+			bullet.RotationDegrees = _gun.GlobalRotationDegrees;
+			bullet.GlobalPosition = _bulletPosition.GlobalPosition;
+			GetTree().Root.AddChild(bullet);
+			_shootTimer.Start();
+	}
+	private void useMoveVectorAim(Vector2 moveVector){
+		RotatePlayerMobileAim(moveVector);
+	}
 	public override void _PhysicsProcess(float delta)
 	{
 		GetInput();
@@ -55,7 +80,7 @@ public class Player : KinematicBody2D
 	private void GetInput()
 	{
 		move();
-		fire();
+		//fire();
 	}
 	
 	private void move(){
@@ -87,6 +112,10 @@ public class Player : KinematicBody2D
 	
 	private void RotatePlayerMobile(Vector2 direction){
 		RotationDegrees = Mathf.Rad2Deg(direction.Angle()) + 90;
+	}
+	
+	private void RotatePlayerMobileAim(Vector2 direction){
+		_gun.RotationDegrees = Mathf.Rad2Deg(direction.Angle()) + 90;
 	}
 	
 	private void RotatePlayer(Vector2 direction){
@@ -126,9 +155,8 @@ public class Player : KinematicBody2D
 		if(Input.IsActionJustPressed("fire")){
 			var bullet = (Area2D)bulletScene.Instance();
 			bullet.GlobalPosition = _bulletPosition.GlobalPosition;
-			bullet.RotationDegrees = RotationDegrees;
+			bullet.RotationDegrees = _gun.GlobalRotationDegrees;
 			bullet.GlobalPosition = _bulletPosition.GlobalPosition;
-			bullet.RotationDegrees = RotationDegrees; 
 			GetTree().Root.AddChild(bullet);
 			_shootTimer.Start();
 		}
