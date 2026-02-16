@@ -115,7 +115,7 @@ public class Player : KinematicBody2D
 	}
 	
 	private void RotatePlayerMobileAim(Vector2 direction){
-		_gun.RotationDegrees = Mathf.Rad2Deg(direction.Angle()) + 90;
+		_gun.GlobalRotationDegrees = Mathf.Rad2Deg(direction.Angle()) + 90;
 	}
 	
 	private void RotatePlayer(Vector2 direction){

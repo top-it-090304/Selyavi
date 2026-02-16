@@ -15,6 +15,8 @@ public class MobileJoystick : CanvasLayer
 	private bool _isJoystickActive = false;
 	private Sprite _innerCircle;
 	private float _joystickRadius = 100f; 
+	private Vector2 _lastValidDirection = Vector2.Zero;
+	private Vector2 _buttonCenter;
 	#endregion
 	
 	public bool isAim = false;
@@ -23,8 +25,8 @@ public class MobileJoystick : CanvasLayer
 	{
 		_touchButton = GetNode<TouchScreenButton>("TouchScreenButton");
 		_innerCircle = GetNode<Sprite>("JoystickTipArrows");
+		_buttonCenter = _touchButton.Position + new Vector2(_joystickRadius, _joystickRadius);
 		ResetJoystick();
-		
 	}
 	
 	public override void _Input(InputEvent @event)
@@ -38,17 +40,40 @@ public class MobileJoystick : CanvasLayer
 				if (@event is InputEventScreenTouch touchEvent){
 					eventPosition = touchEvent.Position;
 					EmitSignal(nameof(FireTouch));
-					}
+				}
 				else if (@event is InputEventScreenDrag dragEvent)
 					eventPosition = dragEvent.Position;
-				Vector2 buttonCenter = _touchButton.Position + new Vector2(_joystickRadius, _joystickRadius);
-				Vector2 direction = eventPosition - buttonCenter;
-				if (direction.Length() > _joystickRadius)
+				
+				Vector2 localEventPos = eventPosition - GetFinalTransform().origin;
+				Vector2 rawDirection = localEventPos - _buttonCenter;
+				Vector2 clampedDirection;
+				
+				if (rawDirection.Length() > _joystickRadius)
 				{
-					direction = direction.Normalized() * _joystickRadius;
+					clampedDirection = rawDirection.Normalized() * _joystickRadius;
 				}
-				_innerCircle.Position = buttonCenter + direction;
-				moveVector = direction / _joystickRadius;
+				else
+				{
+					clampedDirection = rawDirection;
+				}
+				
+				_innerCircle.Position = _buttonCenter + clampedDirection;
+				Vector2 newDirection = clampedDirection / _joystickRadius;
+				
+				if (isAim && _lastValidDirection != Vector2.Zero)
+				{
+					moveVector = _lastValidDirection.LinearInterpolate(newDirection, 0.3f);
+				}
+				else
+				{
+					moveVector = newDirection;
+				}
+				
+				if (newDirection.Length() > 0.1f)
+				{
+					_lastValidDirection = newDirection;
+				}
+				
 				_isJoystickActive = true;
 			}
 			else 
@@ -69,10 +94,10 @@ public class MobileJoystick : CanvasLayer
 		}
 	}
 	
-
 	private void ResetJoystick()
 	{
-		_innerCircle.Position = _touchButton.Position + new Vector2(_joystickRadius, _joystickRadius);
+		_innerCircle.Position = _buttonCenter;
 		moveVector = Vector2.Zero;
+		_lastValidDirection = Vector2.Zero;
 	}
 }
