@@ -28,29 +28,7 @@ public class Player : KinematicBody2D
 
 	public override void _Ready()
 	{
-		bulletScene = (PackedScene)GD.Load("res://scenes/Bullet.tscn");
-		_bulletPosition = GetNode<Position2D>("BodyTank/Gun/BulletPosition");
-		_movingSound = GetNode<AudioStreamPlayer>("MovingSound");
-		_gun = GetNode<Sprite>("BodyTank/Gun");
-		_joystick = GetNode<CanvasLayer>("Joystick");
-		_aim = GetNode<MobileJoystick>("Aim");
-		_aim.isAim = true;
-		if (!_joystick.IsConnected("UseMoveVector", this, nameof(useMoveVector)))
-		{
-			_joystick.Connect("UseMoveVector", this, nameof(useMoveVector));
-		}
-		if (!_aim.IsConnected("UseMoveVector", this, nameof(useMoveVectorAim)))
-		{
-			_aim.Connect("UseMoveVector", this, nameof(useMoveVectorAim));
-		}
-		if (!_aim.IsConnected("FireTouch", this, nameof(FireTouch)))
-		{
-			_aim.Connect("FireTouch", this, nameof(FireTouch));
-		}
-		_tween = new Tween();
-		_shootTimer = new Timer();
-		_shootTimer.WaitTime = 3f; 
-		_shootTimer.OneShot = true;
+		init();
 		AddChild(_shootTimer);
 		AddChild(_tween);
 
@@ -181,15 +159,65 @@ public class Player : KinematicBody2D
 	}
 	
 	private void onTweenComplete(Godot.Object obj, NodePath key)
-{
-	_movingSound.Stop();
-	_movingSound.VolumeDb = 0;
-}
+	{
+		_movingSound.Stop();
+		_movingSound.VolumeDb = 0;
+	}
 
-	  /*public override void _Process(float delta)
+	 public override void _Process(float delta)
 	  {
+		Update();
+	  }
+	
+	public override void _Draw()
+{
+	if(_aim.IsJoystickActive){
+		Vector2 globalMuzzlePos = _bulletPosition.GlobalPosition;
 		
-	  }*/
+		float gunAngle = _gun.GlobalRotation;
+		Vector2 direction = new Vector2(1, 0).Rotated(gunAngle);
+		
+		Vector2 perpendicular = new Vector2(direction.y, -direction.x);
+		
+		float rayLength = 1000f;
+		
+		Vector2 globalRayEnd = globalMuzzlePos + perpendicular * rayLength;
+		
+		Vector2 localMuzzlePos = ToLocal(globalMuzzlePos);
+		Vector2 localRayEnd = ToLocal(globalRayEnd);
+		
+		Color rayColor = Colors.Red;
+		float rayWidth = 2f;
+		DrawLine(localMuzzlePos, localRayEnd, rayColor, rayWidth);
+
+	}
+}
+	
+	private void init(){
+		bulletScene = (PackedScene)GD.Load("res://scenes/Bullet.tscn");
+		_bulletPosition = GetNode<Position2D>("BodyTank/Gun/BulletPosition");
+		_movingSound = GetNode<AudioStreamPlayer>("MovingSound");
+		_gun = GetNode<Sprite>("BodyTank/Gun");
+		_joystick = GetNode<CanvasLayer>("Joystick");
+		_aim = GetNode<MobileJoystick>("Aim");
+		_aim.isAim = true;
+		if (!_joystick.IsConnected("UseMoveVector", this, nameof(useMoveVector)))
+		{
+			_joystick.Connect("UseMoveVector", this, nameof(useMoveVector));
+		}
+		if (!_aim.IsConnected("UseMoveVector", this, nameof(useMoveVectorAim)))
+		{
+			_aim.Connect("UseMoveVector", this, nameof(useMoveVectorAim));
+		}
+		if (!_aim.IsConnected("FireTouch", this, nameof(FireTouch)))
+		{
+			_aim.Connect("FireTouch", this, nameof(FireTouch));
+		}
+		_tween = new Tween();
+		_shootTimer = new Timer();
+		_shootTimer.WaitTime = 3f; 
+		_shootTimer.OneShot = true;
+	}
 }
 
 
