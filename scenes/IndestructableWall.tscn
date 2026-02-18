@@ -1,0 +1,17 @@
+[gd_scene load_steps=3 format=2]
+
+[ext_resource path="res://assets/backround/PNG/Blocks/Block_C_02.png" type="Texture" id=2]
+
+[sub_resource type="RectangleShape2D" id=1]
+extents = Vector2( 63.5, 65.5 )
+
+[node name="IndestructableWall" type="StaticBody2D"]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2( 0, -1 )
+shape = SubResource( 1 )
+one_way_collision_margin = 0.0
+
+[node name="BlockC02" type="Sprite" parent="CollisionShape2D"]
+position = Vector2( -1, 0 )
+texture = ExtResource( 2 )
