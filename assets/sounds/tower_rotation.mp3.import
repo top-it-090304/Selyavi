@@ -1,0 +1,15 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+path="res://.import/tower_rotation.mp3-37929e66df2db058c84633600e96e0c6.mp3str"
+
+[deps]
+
+source_file="res://assets/sounds/tower_rotation.mp3"
+dest_files=[ "res://.import/tower_rotation.mp3-37929e66df2db058c84633600e96e0c6.mp3str" ]
+
+[params]
+
+loop=true
+loop_offset=0
