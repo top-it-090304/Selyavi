@@ -1,7 +1,2 @@
-<<<<<<< HEAD
-﻿54990
-E:/godot/Godot_v3.6.2-stable_mono_win64.exe
-=======
 ﻿60430
 D:/Godot_Mono/Godot_v3.6.2-stable_mono_win64/Godot_v3.6.2-stable_mono_win64/Godot_v3.6.2-stable_mono_win64.exe
->>>>>>> 2a85c0f2a7ac63b7b12b3e34b04d92d52a8f0f5c
