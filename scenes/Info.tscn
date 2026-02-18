@@ -34,67 +34,147 @@ margin_right = 1015.0
 margin_bottom = 592.0
 custom_colors/font_color_readonly = Color( 0.882353, 0.882353, 0.882353, 1 )
 custom_fonts/font = SubResource( 1 )
-text = "Вы любите розы?
- а я на них срал!
- стране нужны паровозы,
- нам нужен металл!
- товарищ!
- не охай,
- не ахай!
- не дёргай узду!
- коль выполнил план,
- посылай всех
- в пизdу
- не выполнил -
- сам
- иди
- на
- нахyй.
-Маяковский В. В.
-«Вы любите розы? А я на них срал»
+text = "[Intro]
+Ich will
+Ich will
+Ich will
+Ich will
+Ich will
+Ich will
+Ich will
 
-В.В. Маяковский \"Вы любите розы\"
-Вы любите розы?
- а я на них срал!
- стране нужны паровозы,
- нам нужен металл!
- товарищ!
- не охай,
- не ахай!
- не дёргай узду!
- коль выполнил план,
- посылай всех
- в пизdу
- не выполнил -
- сам
- иди
- на
- нахyй.
-Маяковский В. В.
-«Вы любите розы? А я на них срал»
+[Strophe 1]
+(Ich will) Ich will, dass ihr mir vertraut
+(Ich will) Ich will, dass ihr mir glaubt
+(Ich will) Ich will eure Blicke spüren
+(Ich will) Jeden Herzschlag kontrollieren
+(Ich will) Ich will eure Stimmen hören
+(Ich will) Ich will die Ruhe stören
+(Ich will) Ich will, dass ihr mich gut seht
+(Ich will) Ich will, dass ihr mich versteht
 
-В.В. Маяковский \"Вы любите розы\"
-Вы любите розы?
- а я на них срал!
- стране нужны паровозы,
- нам нужен металл!
- товарищ!
- не охай,
- не ахай!
- не дёргай узду!
- коль выполнил план,
- посылай всех
- в пизdу
- не выполнил -
- сам
- иди
- на
- нахyй.
-Маяковский В. В.
-«Вы любите розы? А я на них срал»
+[Strophe 2]
+(Ich will) Ich will eure Fantasie
+(Ich will) Ich will eure Energie
+(Ich will) Ich will eure Hände seh'n
+(Ich will) In Beifall untergeh'n
+You might also like
+Rammstein - Ich Will (English Translation)
+Genius English Translations
+Mein Herz brennt
+Rammstein
+Ohne dich
+Rammstein
+[Pre-Refrain]
+Seht ihr mich?
+Versteht ihr mich?
+Fühlt ihr mich?
+Hört ihr mich?
 
-В.В. Маяковский \"Вы любите розы\"
-"
+[Refrain]
+Könnt ihr mich hören? (Wir hören dich)
+Könnt ihr mich seh'n? (Wir sehen dich)
+Könnt ihr mich fühlen? (Wir fühlen dich)
+Ich versteh' euch nicht
+Könnt ihr mich hören? (Wir hören dich)
+Könnt ihr mich seh'n? (Wir sehen dich)
+Könnt ihr mich fühlen? (Wir fühlen dich)
+Ich versteh' euch nicht
+
+[Post-Refrain]
+Ich will
+Ich will
+Ich will
+Ich will
+
+[Bridge]
+Wir wollen, dass ihr uns vertraut
+Wir wollen, dass ihr uns alles glaubt
+Wir wollen eure Hände seh'n
+Wir wollen in Beifall untergeh'n, ja
+[Refrain]
+Könnt ihr mich hören? (Wir hören dich)
+Könnt ihr mich seh'n? (Wir sehen dich)
+Könnt ihr mich fühlen? (Wir fühlen dich)
+Ich versteh' euch nicht
+Könnt ihr uns hören? (Wir hören euch)
+Könnt ihr uns seh'n? (Wir sehen euch)
+Könnt ihr uns fühlen? (Wir fühlen euch)
+Wir versteh'n euch nicht
+
+[Outro]
+Ich will
+Ich will[Intro]
+Ich will
+Ich will
+Ich will
+Ich will
+Ich will
+Ich will
+Ich will
+
+[Strophe 1]
+(Ich will) Ich will, dass ihr mir vertraut
+(Ich will) Ich will, dass ihr mir glaubt
+(Ich will) Ich will eure Blicke spüren
+(Ich will) Jeden Herzschlag kontrollieren
+(Ich will) Ich will eure Stimmen hören
+(Ich will) Ich will die Ruhe stören
+(Ich will) Ich will, dass ihr mich gut seht
+(Ich will) Ich will, dass ihr mich versteht
+
+[Strophe 2]
+(Ich will) Ich will eure Fantasie
+(Ich will) Ich will eure Energie
+(Ich will) Ich will eure Hände seh'n
+(Ich will) In Beifall untergeh'n
+You might also like
+Rammstein - Ich Will (English Translation)
+Genius English Translations
+Mein Herz brennt
+Rammstein
+Ohne dich
+Rammstein
+[Pre-Refrain]
+Seht ihr mich?
+Versteht ihr mich?
+Fühlt ihr mich?
+Hört ihr mich?
+
+[Refrain]
+Könnt ihr mich hören? (Wir hören dich)
+Könnt ihr mich seh'n? (Wir sehen dich)
+Könnt ihr mich fühlen? (Wir fühlen dich)
+Ich versteh' euch nicht
+Könnt ihr mich hören? (Wir hören dich)
+Könnt ihr mich seh'n? (Wir sehen dich)
+Könnt ihr mich fühlen? (Wir fühlen dich)
+Ich versteh' euch nicht
+
+[Post-Refrain]
+Ich will
+Ich will
+Ich will
+Ich will
+
+[Bridge]
+Wir wollen, dass ihr uns vertraut
+Wir wollen, dass ihr uns alles glaubt
+Wir wollen eure Hände seh'n
+Wir wollen in Beifall untergeh'n, ja
+[Refrain]
+Könnt ihr mich hören? (Wir hören dich)
+Könnt ihr mich seh'n? (Wir sehen dich)
+Könnt ihr mich fühlen? (Wir fühlen dich)
+Ich versteh' euch nicht
+Könnt ihr uns hören? (Wir hören euch)
+Könnt ihr uns seh'n? (Wir sehen euch)
+Könnt ihr uns fühlen? (Wir fühlen euch)
+Wir versteh'n euch nicht
+
+[Outro]
+Ich will
+Ich will"
 readonly = true
 bookmark_gutter = true
 fold_gutter = true
