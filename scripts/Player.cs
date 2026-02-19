@@ -40,6 +40,9 @@ public class Player : KinematicBody2D
 	}
 	
 	private void FireTouch(){
+		if (_shootTimer.TimeLeft > 0)
+			return;
+			
 		var bullet = (Area2D)bulletScene.Instance();
 			bullet.GlobalPosition = _bulletPosition.GlobalPosition;
 			bullet.RotationDegrees = _gun.GlobalRotationDegrees;
@@ -200,7 +203,7 @@ public class Player : KinematicBody2D
 		_gun = GetNode<Sprite>("BodyTank/Gun");
 		_joystick = GetNode<CanvasLayer>("Joystick");
 		_aim = GetNode<MobileJoystick>("Aim");
-		_aim.isAim = true;
+		_aim.init(true);
 		if (!_joystick.IsConnected("UseMoveVector", this, nameof(useMoveVector)))
 		{
 			_joystick.Connect("UseMoveVector", this, nameof(useMoveVector));
@@ -215,7 +218,7 @@ public class Player : KinematicBody2D
 		}
 		_tween = new Tween();
 		_shootTimer = new Timer();
-		_shootTimer.WaitTime = 3f; 
+		_shootTimer.WaitTime = 1f; 
 		_shootTimer.OneShot = true;
 	}
 }
