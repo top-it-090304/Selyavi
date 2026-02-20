@@ -14,6 +14,7 @@ public class Player : KinematicBody2D
 	private CanvasLayer _joystick;
 	private Sprite _gun;
 	private MobileJoystick _aim;
+	private TypeBullet _typeBullet = TypeBullet.Plasma;
 	#endregion
 	PackedScene bulletScene;
 	
@@ -35,20 +36,63 @@ public class Player : KinematicBody2D
 	}
 	
 	private void useMoveVector(Vector2 moveVector){
-		MoveAndSlide(moveVector * 200);
+		Vector2 joystickVelocity = moveVector * 200;
+		MoveAndSlide(joystickVelocity);
 		RotatePlayerMobile(moveVector);
+		HandleMovementSound(joystickVelocity);
 	}
+	private void HandleMovementSound(Vector2 movementVelocity)
+{
+	bool isMovingNow = movementVelocity.Length() > 0.1f;
 	
+	if (isMovingNow)
+	{
+
+		if(!_isMoving)
+		{
+
+			if(_tween.IsActive())
+			{
+				_tween.StopAll();
+				_tween.RemoveAll(); 
+			}
+			
+
+			if (!_movingSound.Playing)
+			{
+				_movingSound.VolumeDb = 0;
+				_movingSound.Play();
+			}
+			
+			_isMoving = true;
+		}
+	} 
+	else 
+	{
+
+		if(_isMoving)
+		{
+			_isMoving = false;
+			
+
+			if (_movingSound.Playing)
+			{
+				fadeSound();
+			}
+		}
+	}
+}
 	private void FireTouch(){
 		if (_shootTimer.TimeLeft > 0)
 			return;
 			
-		var bullet = (Area2D)bulletScene.Instance();
-			bullet.GlobalPosition = _bulletPosition.GlobalPosition;
-			bullet.RotationDegrees = _gun.GlobalRotationDegrees;
-			bullet.GlobalPosition = _bulletPosition.GlobalPosition;
-			GetTree().Root.AddChild(bullet);
-			_shootTimer.Start();
+		var bullet = (Bullet)bulletScene.Instance();
+		bullet.GlobalPosition = _bulletPosition.GlobalPosition;
+		bullet.RotationDegrees = _gun.GlobalRotationDegrees;
+		bullet.GlobalPosition = _bulletPosition.GlobalPosition;
+		GetTree().Root.AddChild(bullet);
+		bullet.init(_typeBullet);
+		_shootTimer.Start();
 	}
 	private void useMoveVectorAim(Vector2 moveVector){
 		RotatePlayerMobileAim(moveVector);
@@ -61,35 +105,41 @@ public class Player : KinematicBody2D
 	private void GetInput()
 	{
 		move();
+		changeBullet();
 		//fire();
 	}
 	
-	private void move(){
-		_velocity.x = Input.GetActionStrength("move_right") - Input.GetActionStrength("move_left");
-		_velocity.y = Input.GetActionStrength("move_down") - Input.GetActionStrength("move_up");
-
-		if (_velocity.Length() > 0)
-		{
-			_velocity = _velocity.Normalized() * _speed;
-			RotatePlayer(_velocity);
-			if(!_isMoving){
-				if(_tween.IsActive()){
-					_tween.StopAll();
-					_tween.RemoveAll(); 
-					_movingSound.VolumeDb = 0;
-				}
-				_movingSound.VolumeDb = 0;
-				_movingSound.Play();
-				_isMoving = true;
+	private void changeBullet(){
+		if(Input.IsActionJustPressed("plasma")){
+			_typeBullet = TypeBullet.Plasma;
+		} else{
+			if(Input.IsActionJustPressed("medium_bullet")){
+				_typeBullet = TypeBullet.Medium;
 			}
-		} else {
-			if(_isMoving){
-				_isMoving = false;
-				fadeSound();
+			if(Input.IsActionJustPressed("light_bullet")){
+				_typeBullet = TypeBullet.Light;
 			}
-
 		}
 	}
+	
+	private void move(){
+	_velocity.x = Input.GetActionStrength("move_right") - Input.GetActionStrength("move_left");
+	_velocity.y = Input.GetActionStrength("move_down") - Input.GetActionStrength("move_up");
+
+	if (_velocity.Length() > 0)
+	{
+		_velocity = _velocity.Normalized() * _speed;
+		RotatePlayer(_velocity);
+		
+	  
+		HandleMovementSound(_velocity);
+	} 
+	else 
+	{
+	   
+		HandleMovementSound(Vector2.Zero);
+	}
+}
 	
 	private void RotatePlayerMobile(Vector2 direction){
 		RotationDegrees = Mathf.Rad2Deg(direction.Angle()) + 90;
@@ -148,6 +198,11 @@ public class Player : KinematicBody2D
 			{
 				_tween.Disconnect("tween_completed", this, nameof(onTweenComplete));
 			}
+		if (_tween.IsActive())
+		{
+			_tween.StopAll();
+			_tween.RemoveAll();
+		}
 		_tween.InterpolateProperty(
 			_movingSound,                    
 			"volume_db",                   
