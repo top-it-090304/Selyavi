@@ -32,7 +32,6 @@ public class Player : KinematicBody2D
 		init();
 		AddChild(_shootTimer);
 		AddChild(_tween);
-
 	}
 	
 	private void useMoveVector(Vector2 moveVector){
@@ -41,26 +40,21 @@ public class Player : KinematicBody2D
 		RotatePlayerMobile(moveVector);
 		HandleMovementSound(joystickVelocity);
 	}
-	private void HandleMovementSound(Vector2 movementVelocity)
-{
+	private void HandleMovementSound(Vector2 movementVelocity){
 	bool isMovingNow = movementVelocity.Length() > 0.1f;
 	
 	if (isMovingNow)
 	{
-
 		if(!_isMoving)
 		{
-
 			if(_tween.IsActive())
 			{
 				_tween.StopAll();
 				_tween.RemoveAll(); 
 			}
-			
-
 			if (!_movingSound.Playing)
 			{
-				_movingSound.VolumeDb = 0;
+				_movingSound.VolumeDb = -10;
 				_movingSound.Play();
 			}
 			
@@ -69,12 +63,10 @@ public class Player : KinematicBody2D
 	} 
 	else 
 	{
-
 		if(_isMoving)
 		{
 			_isMoving = false;
 			
-
 			if (_movingSound.Playing)
 			{
 				fadeSound();
@@ -110,35 +102,44 @@ public class Player : KinematicBody2D
 	}
 	
 	private void changeBullet(){
+		bool bulletChanged = false;
 		if(Input.IsActionJustPressed("plasma")){
 			_typeBullet = TypeBullet.Plasma;
+			bulletChanged = true;
 		} else{
 			if(Input.IsActionJustPressed("medium_bullet")){
 				_typeBullet = TypeBullet.Medium;
+				bulletChanged = true;
+			}else{
+				if(Input.IsActionJustPressed("light_bullet")){
+					_typeBullet = TypeBullet.Light;
+					bulletChanged = true;
+				}
 			}
-			if(Input.IsActionJustPressed("light_bullet")){
-				_typeBullet = TypeBullet.Light;
-			}
+		}
+		if (bulletChanged)
+   		{
+			_shootTimer.Start();
 		}
 	}
 	
 	private void move(){
-	_velocity.x = Input.GetActionStrength("move_right") - Input.GetActionStrength("move_left");
-	_velocity.y = Input.GetActionStrength("move_down") - Input.GetActionStrength("move_up");
+		_velocity.x = Input.GetActionStrength("move_right") - Input.GetActionStrength("move_left");
+		_velocity.y = Input.GetActionStrength("move_down") - Input.GetActionStrength("move_up");
 
-	if (_velocity.Length() > 0)
-	{
-		_velocity = _velocity.Normalized() * _speed;
-		RotatePlayer(_velocity);
-		
-	  
-		HandleMovementSound(_velocity);
-	} 
-	else 
-	{
-	   
-		HandleMovementSound(Vector2.Zero);
-	}
+		if (_velocity.Length() > 0)
+		{
+			_velocity = _velocity.Normalized() * _speed;
+			RotatePlayer(_velocity);
+			
+		  
+			HandleMovementSound(_velocity);
+		} 
+		else 
+		{
+		   
+			HandleMovementSound(Vector2.Zero);
+		}
 }
 	
 	private void RotatePlayerMobile(Vector2 direction){
@@ -219,7 +220,7 @@ public class Player : KinematicBody2D
 	private void onTweenComplete(Godot.Object obj, NodePath key)
 	{
 		_movingSound.Stop();
-		_movingSound.VolumeDb = 0;
+		_movingSound.VolumeDb = -10;
 	}
 
 	 public override void _Process(float delta)

@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Tanks 2026")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+acca7b1b431e855da2da53cd2f590c8678d896fe")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+3bb8e5f0e03fd4e5e34ba0b38b3ff8f567ff1894")]
 [assembly: System.Reflection.AssemblyProductAttribute("Tanks 2026")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Tanks 2026")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
