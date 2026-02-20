@@ -1,12 +1,21 @@
-[gd_scene load_steps=6 format=2]
+[gd_scene load_steps=10 format=2]
 
 [ext_resource path="res://assets/backround/PNG/Tiles/Ground_Tile_01_A.png" type="Texture" id=1]
 [ext_resource path="res://scenes/Player.tscn" type="PackedScene" id=2]
 [ext_resource path="res://scenes/obtacles/wall.tscn" type="PackedScene" id=3]
-[ext_resource path="res://scenes/IndestructableWall.tscn" type="PackedScene" id=4]
+[ext_resource path="res://scenes/IndestructibleWall.tscn" type="PackedScene" id=4]
 [ext_resource path="res://scenes/DestructibleWall.tscn" type="PackedScene" id=5]
+[ext_resource path="res://assets/Music/68. Sad Eyes.mp3" type="AudioStream" id=6]
+[ext_resource path="res://assets/fonts/ofont.ru_Shonen.ttf" type="DynamicFontData" id=7]
+[ext_resource path="res://scripts/Field.cs" type="Script" id=8]
+
+[sub_resource type="DynamicFont" id=1]
+size = 50
+use_filter = true
+font_data = ExtResource( 7 )
 
 [node name="Field" type="Node2D"]
+script = ExtResource( 8 )
 
 [node name="Backround" type="Sprite" parent="."]
 position = Vector2( 512, 300 )
@@ -33,26 +42,38 @@ position = Vector2( 1036, -15 )
 rotation = 1.5708
 scale = Vector2( 1, 1.75 )
 
-[node name="DestructibleWall" parent="." instance=ExtResource( 5 )]
-position = Vector2( 906, 386 )
+[node name="DestructibleWall" parent="." instance=ExtResource( 4 )]
+position = Vector2( 902, 119 )
 
-[node name="DestructibleWall" parent="DestructibleWall" instance=ExtResource( 5 )]
-position = Vector2( -893, 204 )
+[node name="DestructibleWall2" parent="." instance=ExtResource( 4 )]
+position = Vector2( 659, 119 )
 
-[node name="DestructibleWall2" parent="DestructibleWall" instance=ExtResource( 5 )]
-position = Vector2( -655, -266 )
+[node name="DestructibleWall3" parent="." instance=ExtResource( 4 )]
+position = Vector2( 903, 249 )
 
-[node name="IndestructibleWall2" parent="." instance=ExtResource( 5 )]
-position = Vector2( 906, 386 )
+[node name="DestructibleWall4" parent="." instance=ExtResource( 5 )]
+position = Vector2( 906, 378 )
 
-[node name="IndestructableWall" parent="IndestructibleWall2" instance=ExtResource( 4 )]
-position = Vector2( 54, -183 )
+[node name="DestructibleWall5" parent="." instance=ExtResource( 5 )]
+position = Vector2( 6, 589 )
 
-[node name="IndestructableWall2" parent="IndestructibleWall2" instance=ExtResource( 4 )]
-position = Vector2( 52, -317 )
+[node name="DestructibleWall6" parent="." instance=ExtResource( 4 )]
+position = Vector2( 176, 118 )
 
-[node name="IndestructableWall3" parent="IndestructibleWall2" instance=ExtResource( 4 )]
-position = Vector2( -599, -187 )
+[node name="DestructibleWall7" parent="." instance=ExtResource( 5 )]
+position = Vector2( 45, 119 )
 
-[node name="IndestructableWall4" parent="IndestructibleWall2" instance=ExtResource( 4 )]
-position = Vector2( -203, -315 )
+[node name="MusicPlayer" type="AudioStreamPlayer" parent="."]
+stream = ExtResource( 6 )
+volume_db = -20.712
+autoplay = true
+bus = "Music"
+
+[node name="Button" type="Button" parent="."]
+margin_left = 1.0
+margin_top = 2.0
+margin_right = 108.0
+margin_bottom = 103.0
+custom_fonts/font = SubResource( 1 )
+
+[connection signal="pressed" from="Button" to="." method="_on_Button_pressed"]

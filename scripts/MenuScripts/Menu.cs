@@ -8,9 +8,14 @@ public class Menu : Node2D
 		GetTree().ChangeScene("res://scenes/Field.tscn");
 	}
 	
+	private void _on_Settings_Button_pressed()
+	{
+		GetTree().ChangeScene("res://scenes/MenuScenes/Settings.tscn");
+	}
+
 	private void _on_Info_Button_pressed()
 	{
-		GetTree().ChangeScene("res://scenes/Info.tscn");
+		GetTree().ChangeScene("res://scenes/MenuScenes/Info.tscn");
 	}
 
 	private void _on_Quit_Button_pressed()
