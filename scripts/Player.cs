@@ -224,10 +224,10 @@ public class Player : KinematicBody2D
 	}
 
 	 public override void _Process(float delta)
-	  {
+	 {
 		Update();
-	  }
-	
+	 }
+
 	public override void _Draw()
 {
 	if(_aim.IsJoystickActive){
@@ -248,7 +248,6 @@ public class Player : KinematicBody2D
 		Color rayColor = Colors.Red;
 		float rayWidth = 2f;
 		DrawLine(localMuzzlePos, localRayEnd, rayColor, rayWidth);
-
 	}
 }
 	

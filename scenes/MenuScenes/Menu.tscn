@@ -1,0 +1,54 @@
+[gd_scene load_steps=4 format=2]
+
+[ext_resource path="res://scripts/MenuScripts/Menu.cs" type="Script" id=1]
+[ext_resource path="res://assets/fonts/ofont.ru_Shonen.ttf" type="DynamicFontData" id=2]
+
+[sub_resource type="DynamicFont" id=1]
+size = 50
+use_filter = true
+font_data = ExtResource( 2 )
+
+[node name="Menu" type="Node2D"]
+script = ExtResource( 1 )
+
+[node name="ColorRect" type="ColorRect" parent="."]
+margin_right = 1024.0
+margin_bottom = 601.0
+color = Color( 0.694118, 1, 0.443137, 1 )
+
+[node name="Play_Button" type="Button" parent="."]
+margin_left = 25.0
+margin_top = 20.0
+margin_right = 403.0
+margin_bottom = 141.0
+custom_fonts/font = SubResource( 1 )
+text = "Играть"
+
+[node name="Settings_Button" type="Button" parent="."]
+margin_left = 24.0
+margin_top = 165.0
+margin_right = 402.0
+margin_bottom = 286.0
+custom_fonts/font = SubResource( 1 )
+text = "Настройки"
+
+[node name="Info_Button" type="Button" parent="."]
+margin_left = 24.0
+margin_top = 309.0
+margin_right = 402.0
+margin_bottom = 430.0
+custom_fonts/font = SubResource( 1 )
+text = "Об игре"
+
+[node name="Quit_Button" type="Button" parent="."]
+margin_left = 24.0
+margin_top = 456.0
+margin_right = 402.0
+margin_bottom = 577.0
+custom_fonts/font = SubResource( 1 )
+text = "Выйти"
+
+[connection signal="pressed" from="Play_Button" to="." method="_on_Play_Button_pressed"]
+[connection signal="pressed" from="Settings_Button" to="." method="_on_Settings_Button_pressed"]
+[connection signal="pressed" from="Info_Button" to="." method="_on_Info_Button_pressed"]
+[connection signal="pressed" from="Quit_Button" to="." method="_on_Quit_Button_pressed"]

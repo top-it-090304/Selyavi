@@ -1,0 +1,15 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+path="res://.import/68. Sad Eyes.mp3-a7774432a32261a875dc6c53c0657c6b.mp3str"
+
+[deps]
+
+source_file="res://assets/Music/68. Sad Eyes.mp3"
+dest_files=[ "res://.import/68. Sad Eyes.mp3-a7774432a32261a875dc6c53c0657c6b.mp3str" ]
+
+[params]
+
+loop=true
+loop_offset=0
