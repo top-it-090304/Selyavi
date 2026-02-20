@@ -18,6 +18,7 @@ public class MobileJoystick : CanvasLayer
 	private float _joystickRadius = 100f; 
 	private Vector2 _lastValidDirection = Vector2.Zero;
 	private Vector2 _buttonCenter;
+	private Texture _joystickTexture;
 	#endregion
 	
 	
@@ -29,12 +30,28 @@ public class MobileJoystick : CanvasLayer
 
 	public override void _Ready()
 	{
+		Texture originalTexture = (Texture)GD.Load("res://assets/scope.png");
+		Image image = originalTexture.GetData();
+	
+		image.Resize(100, 100, Image.Interpolation.Bilinear);
+		ImageTexture resizedTexture = new ImageTexture();
+		resizedTexture.CreateFromImage(image);
+	
+		_joystickTexture = resizedTexture;
 		_touchButton = GetNode<TouchScreenButton>("TouchScreenButton");
 		_fireButton = GetNode<TouchScreenButton>("JoystickTipArrows/FireButton");
 		_innerCircle = GetNode<Sprite>("JoystickTipArrows");
 		_buttonCenter = _touchButton.Position + new Vector2(_joystickRadius, _joystickRadius);
 		ResetJoystick();
-		_fireButton.Connect("pressed", this, nameof(OnButtonFirePressed));
+		_fireButton.Connect("released", this, nameof(OnButtonFirePressed));
+
+	}
+	
+	public void init(bool aim){
+		isAim = aim;
+		if(isAim){
+			_innerCircle.Texture = _joystickTexture;
+		}
 	}
 	
 	public override void _Input(InputEvent @event)

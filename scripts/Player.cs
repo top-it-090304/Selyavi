@@ -14,6 +14,7 @@ public class Player : KinematicBody2D
 	private CanvasLayer _joystick;
 	private Sprite _gun;
 	private MobileJoystick _aim;
+	private TypeBullet _typeBullet = TypeBullet.Plasma;
 	#endregion
 	PackedScene bulletScene;
 	
@@ -31,21 +32,59 @@ public class Player : KinematicBody2D
 		init();
 		AddChild(_shootTimer);
 		AddChild(_tween);
-
 	}
 	
 	private void useMoveVector(Vector2 moveVector){
-		MoveAndSlide(moveVector * 200);
+		Vector2 joystickVelocity = moveVector * 200;
+		MoveAndSlide(joystickVelocity);
 		RotatePlayerMobile(moveVector);
+		HandleMovementSound(joystickVelocity);
 	}
+	private void HandleMovementSound(Vector2 movementVelocity){
+	bool isMovingNow = movementVelocity.Length() > 0.1f;
 	
+	if (isMovingNow)
+	{
+		if(!_isMoving)
+		{
+			if(_tween.IsActive())
+			{
+				_tween.StopAll();
+				_tween.RemoveAll(); 
+			}
+			if (!_movingSound.Playing)
+			{
+				_movingSound.VolumeDb = -10;
+				_movingSound.Play();
+			}
+			
+			_isMoving = true;
+		}
+	} 
+	else 
+	{
+		if(_isMoving)
+		{
+			_isMoving = false;
+			
+			if (_movingSound.Playing)
+			{
+				fadeSound();
+			}
+		}
+	}
+}
 	private void FireTouch(){
-		var bullet = (Area2D)bulletScene.Instance();
-			bullet.GlobalPosition = _bulletPosition.GlobalPosition;
-			bullet.RotationDegrees = _gun.GlobalRotationDegrees;
-			bullet.GlobalPosition = _bulletPosition.GlobalPosition;
-			GetTree().Root.AddChild(bullet);
-			_shootTimer.Start();
+		if (_shootTimer.TimeLeft > 0)
+			return;
+			
+		var bullet = (Bullet)bulletScene.Instance();
+		bullet.GlobalPosition = _bulletPosition.GlobalPosition;
+		bullet.RotationDegrees = _gun.GlobalRotationDegrees;
+		bullet.GlobalPosition = _bulletPosition.GlobalPosition;
+		GetTree().Root.AddChild(bullet);
+		bullet.init(_typeBullet);
+		_shootTimer.Start();
 	}
 	private void useMoveVectorAim(Vector2 moveVector){
 		RotatePlayerMobileAim(moveVector);
@@ -58,7 +97,30 @@ public class Player : KinematicBody2D
 	private void GetInput()
 	{
 		move();
+		changeBullet();
 		//fire();
+	}
+	
+	private void changeBullet(){
+		bool bulletChanged = false;
+		if(Input.IsActionJustPressed("plasma")){
+			_typeBullet = TypeBullet.Plasma;
+			bulletChanged = true;
+		} else{
+			if(Input.IsActionJustPressed("medium_bullet")){
+				_typeBullet = TypeBullet.Medium;
+				bulletChanged = true;
+			}else{
+				if(Input.IsActionJustPressed("light_bullet")){
+					_typeBullet = TypeBullet.Light;
+					bulletChanged = true;
+				}
+			}
+		}
+		if (bulletChanged)
+   		{
+			_shootTimer.Start();
+		}
 	}
 	
 	private void move(){
@@ -69,24 +131,16 @@ public class Player : KinematicBody2D
 		{
 			_velocity = _velocity.Normalized() * _speed;
 			RotatePlayer(_velocity);
-			if(!_isMoving){
-				if(_tween.IsActive()){
-					_tween.StopAll();
-					_tween.RemoveAll(); 
-					_movingSound.VolumeDb = 0;
-				}
-				_movingSound.VolumeDb = 0;
-				_movingSound.Play();
-				_isMoving = true;
-			}
-		} else {
-			if(_isMoving){
-				_isMoving = false;
-				fadeSound();
-			}
-
+			
+		  
+			HandleMovementSound(_velocity);
+		} 
+		else 
+		{
+		   
+			HandleMovementSound(Vector2.Zero);
 		}
-	}
+}
 	
 	private void RotatePlayerMobile(Vector2 direction){
 		RotationDegrees = Mathf.Rad2Deg(direction.Angle()) + 90;
@@ -145,6 +199,11 @@ public class Player : KinematicBody2D
 			{
 				_tween.Disconnect("tween_completed", this, nameof(onTweenComplete));
 			}
+		if (_tween.IsActive())
+		{
+			_tween.StopAll();
+			_tween.RemoveAll();
+		}
 		_tween.InterpolateProperty(
 			_movingSound,                    
 			"volume_db",                   
@@ -161,7 +220,7 @@ public class Player : KinematicBody2D
 	private void onTweenComplete(Godot.Object obj, NodePath key)
 	{
 		_movingSound.Stop();
-		_movingSound.VolumeDb = 0;
+		_movingSound.VolumeDb = -10;
 	}
 
 	 public override void _Process(float delta)
@@ -200,7 +259,7 @@ public class Player : KinematicBody2D
 		_gun = GetNode<Sprite>("BodyTank/Gun");
 		_joystick = GetNode<CanvasLayer>("Joystick");
 		_aim = GetNode<MobileJoystick>("Aim");
-		_aim.isAim = true;
+		_aim.init(true);
 		if (!_joystick.IsConnected("UseMoveVector", this, nameof(useMoveVector)))
 		{
 			_joystick.Connect("UseMoveVector", this, nameof(useMoveVector));
@@ -215,7 +274,7 @@ public class Player : KinematicBody2D
 		}
 		_tween = new Tween();
 		_shootTimer = new Timer();
-		_shootTimer.WaitTime = 3f; 
+		_shootTimer.WaitTime = 1f; 
 		_shootTimer.OneShot = true;
 	}
 }

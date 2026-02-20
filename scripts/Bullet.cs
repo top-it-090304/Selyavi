@@ -6,9 +6,11 @@ public class Bullet : Area2D
 	#region private fields
 	private int _bulletSpeed = 7;
 	private Vector2 _velocity = Vector2.Zero;
-	private AudioStreamPlayer _plasmaSound;
+	private AudioStreamPlayer _bulletSound;
 	private Tween _tweenBullet;
 	private VisibilityNotifier2D _visibilityBullet;
+	private TypeBullet _typeBullet;
+	private Sprite _bulletSprite;
 	#endregion
 	
 	public int BulletSpeed{
@@ -24,7 +26,8 @@ public class Bullet : Area2D
 
 	public override void _Ready()
 	{
-		_plasmaSound = GetNode<AudioStreamPlayer>("PlasmaGunSound");
+		_bulletSprite = GetNode<Sprite>("BulletSprite");
+		_bulletSound = GetNode<AudioStreamPlayer>("PlasmaGunSound");
 		_velocity = new Vector2(0, -1).Rotated(Rotation);
 		_visibilityBullet = GetNode<VisibilityNotifier2D>("VisibilityNotifier2D");
 		_tweenBullet = new Tween();
@@ -33,7 +36,7 @@ public class Bullet : Area2D
 			_visibilityBullet.Connect("screen_exited", this, nameof(onScreenExited));
 		}
 		AddChild(_tweenBullet);
-		_plasmaSound.Play();
+		//_bulletSound.Play();
 	}
 	
 	private void move(){
@@ -47,9 +50,9 @@ public class Bullet : Area2D
 				_tweenBullet.Disconnect("tween_completed", this, nameof(onTweenComplete));
 			}
 		_tweenBullet.InterpolateProperty(
-			_plasmaSound,                    
+			_bulletSound,                    
 			"volume_db",                   
-			_plasmaSound.VolumeDb,         
+			_bulletSound.VolumeDb,         
 			-80,                         
 			1f,                          
 			Tween.TransitionType.Linear,   
@@ -60,14 +63,40 @@ public class Bullet : Area2D
 	}
 	private void onTweenComplete(Godot.Object obj, NodePath key)
 	{
-		_plasmaSound.Stop();
-		_plasmaSound.VolumeDb = 0;
+		_bulletSound.Stop();
+		_bulletSound.VolumeDb = 0;
 		QueueFree();
 	}
 	private void onScreenExited(){
 		fadeSound();
 	}
-
+	
+	
+	
+	private void UpdateType(){
+		switch(_typeBullet){
+			case TypeBullet.Plasma:
+				_bulletSprite.Texture = (Texture)GD.Load("res://assets/future_tanks/PNG/Effects/Plasma.png");
+				_bulletSound.Stream = (AudioStream)GD.Load("res://assets/sounds/plasma_gun_06.mp3");
+				_bulletSpeed = 7;
+				break;
+			case TypeBullet.Medium:
+				_bulletSprite.Texture = (Texture)GD.Load("res://assets/future_tanks/PNG/Effects/Medium_Shell.png");
+				_bulletSound.Stream = (AudioStream)GD.Load("res://assets/sounds/vystrel-tanka.mp3");
+				_bulletSpeed = 4;
+				break;
+			case TypeBullet.Light:
+				_bulletSprite.Texture = (Texture)GD.Load("res://assets/future_tanks/PNG/Effects/Light_Shell.png");
+				_bulletSound.Stream = (AudioStream)GD.Load("res://assets/sounds/light_bullet.mp3");
+				_bulletSpeed = 5;
+				break;
+		}
+		_bulletSound.Play();
+	}
+	public void init(TypeBullet typeBullet){
+		_typeBullet = typeBullet;
+		UpdateType();
+	}
   public override void _Process(float delta)
   {
 	 move();
