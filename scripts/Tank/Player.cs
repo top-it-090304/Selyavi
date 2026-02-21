@@ -252,7 +252,7 @@ public class Player : KinematicBody2D
 }
 	
 	private void init(){
-		bulletScene = (PackedScene)GD.Load("res://scenes/Bullet.tscn");
+		bulletScene = (PackedScene)GD.Load("res://scenes/Tank/Bullet.tscn");
 		_bulletPosition = GetNode<Position2D>("BodyTank/Gun/BulletPosition");
 		_movingSound = GetNode<AudioStreamPlayer>("MovingSound");
 		_gun = GetNode<Sprite>("BodyTank/Gun");

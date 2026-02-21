@@ -1,13 +1,14 @@
-[gd_scene load_steps=10 format=2]
+[gd_scene load_steps=11 format=2]
 
 [ext_resource path="res://assets/backround/PNG/Tiles/Ground_Tile_01_A.png" type="Texture" id=1]
-[ext_resource path="res://scenes/Player.tscn" type="PackedScene" id=2]
+[ext_resource path="res://scenes/Tank/player.tscn" type="PackedScene" id=2]
 [ext_resource path="res://scenes/obtacles/wall.tscn" type="PackedScene" id=3]
 [ext_resource path="res://scenes/IndestructibleWall.tscn" type="PackedScene" id=4]
 [ext_resource path="res://scenes/DestructibleWall.tscn" type="PackedScene" id=5]
 [ext_resource path="res://assets/Music/68. Sad Eyes.mp3" type="AudioStream" id=6]
 [ext_resource path="res://assets/fonts/ofont.ru_Shonen.ttf" type="DynamicFontData" id=7]
 [ext_resource path="res://scripts/Field.cs" type="Script" id=8]
+[ext_resource path="res://scenes/Tank/Enemy.tscn" type="PackedScene" id=9]
 
 [sub_resource type="DynamicFont" id=1]
 size = 50
@@ -22,9 +23,6 @@ position = Vector2( 512, 300 )
 texture = ExtResource( 1 )
 region_enabled = true
 region_rect = Rect2( 0, 0, 1024, 600 )
-
-[node name="KinematicBody2D" parent="." instance=ExtResource( 2 )]
-position = Vector2( 528, 300 )
 
 [node name="wall" parent="." instance=ExtResource( 3 )]
 position = Vector2( -15, 0 )
@@ -75,5 +73,11 @@ margin_top = 2.0
 margin_right = 108.0
 margin_bottom = 103.0
 custom_fonts/font = SubResource( 1 )
+
+[node name="Enemy" parent="." instance=ExtResource( 9 )]
+position = Vector2( 148, 278 )
+
+[node name="PlayerTank" parent="." instance=ExtResource( 2 )]
+position = Vector2( 549, 318 )
 
 [connection signal="pressed" from="Button" to="." method="_on_Button_pressed"]

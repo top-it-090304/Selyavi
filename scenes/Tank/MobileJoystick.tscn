@@ -1,7 +1,7 @@
 [gd_scene load_steps=6 format=2]
 
 [ext_resource path="res://assets/joystick_base_outline.png" type="Texture" id=1]
-[ext_resource path="res://scripts/MobileJoystick.cs" type="Script" id=2]
+[ext_resource path="res://scripts/Tank/MobileJoystick.cs" type="Script" id=2]
 [ext_resource path="res://assets/joystick_tip_arrows.png" type="Texture" id=3]
 
 [sub_resource type="CircleShape2D" id=1]
