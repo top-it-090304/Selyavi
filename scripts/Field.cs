@@ -14,9 +14,15 @@ public class Field : Node2D
 			_musicPlayer.Play();
 		}
 	}
-	private void _on_Button_pressed()
+	//private void _on_Button_pressed()
+	//{
+	//	GetTree().ChangeScene("res://scenes/MenuScenes/Settings.tscn");
+	//}
+	private void _on_GoToSettingsButton_pressed()
 	{
 		GetTree().ChangeScene("res://scenes/MenuScenes/Settings.tscn");
 	}
-
 }
+
+
+
