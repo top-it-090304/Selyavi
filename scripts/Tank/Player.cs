@@ -1,10 +1,12 @@
 using Godot;
 using System;
 
+
 public class Player : KinematicBody2D
 {
 	#region private fields
 	private int _speed = 250;
+	private int _hp = 20;
 	private bool _isMoving = false;
 	private Vector2 _velocity = Vector2.Zero;
 	private Position2D _bulletPosition;
@@ -83,7 +85,7 @@ public class Player : KinematicBody2D
 		bullet.RotationDegrees = _gun.GlobalRotationDegrees;
 		bullet.GlobalPosition = _bulletPosition.GlobalPosition;
 		GetTree().Root.AddChild(bullet);
-		bullet.init(_typeBullet);
+		bullet.init(_typeBullet, true);
 		_shootTimer.Start();
 	}
 	private void useMoveVectorAim(Vector2 moveVector){
@@ -185,12 +187,13 @@ public class Player : KinematicBody2D
 	
 	private void fire(){
 		if(Input.IsActionJustPressed("fire")){
-			var bullet = (Area2D)bulletScene.Instance();
-			bullet.GlobalPosition = _bulletPosition.GlobalPosition;
-			bullet.RotationDegrees = _gun.GlobalRotationDegrees;
-			bullet.GlobalPosition = _bulletPosition.GlobalPosition;
-			GetTree().Root.AddChild(bullet);
-			_shootTimer.Start();
+			FireTouch();
+		}
+	}
+	public void TakeDamage(int damage){
+		_hp -= damage;
+		if(_hp <= 0){
+			QueueFree();
 		}
 	}
 	
@@ -250,6 +253,7 @@ public class Player : KinematicBody2D
 		DrawLine(localMuzzlePos, localRayEnd, rayColor, rayWidth);
 	}
 }
+
 	
 	private void init(){
 		bulletScene = (PackedScene)GD.Load("res://scenes/Tank/Bullet.tscn");

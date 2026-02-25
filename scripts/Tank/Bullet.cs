@@ -1,6 +1,7 @@
 using Godot;
 using System;
 
+
 public class Bullet : Area2D
 {
 	#region private fields
@@ -11,7 +12,11 @@ public class Bullet : Area2D
 	private VisibilityNotifier2D _visibilityBullet;
 	private TypeBullet _typeBullet;
 	private Sprite _bulletSprite;
+	private int _damage;
+	private bool _isPlayer;
 	#endregion
+	
+	
 	
 	public int BulletSpeed{
 		get => _bulletSpeed;
@@ -31,6 +36,7 @@ public class Bullet : Area2D
 		_velocity = new Vector2(0, -1).Rotated(Rotation);
 		_visibilityBullet = GetNode<VisibilityNotifier2D>("VisibilityNotifier2D");
 		_tweenBullet = new Tween();
+		Connect("body_entered", this, nameof(OnBodyEntered));
 		if (!_visibilityBullet.IsConnected("screen_exited", this, nameof(onScreenExited)))
 		{
 			_visibilityBullet.Connect("screen_exited", this, nameof(onScreenExited));
@@ -71,6 +77,29 @@ public class Bullet : Area2D
 		fadeSound();
 	}
 	
+	private void OnBodyEntered(Node body)
+	{
+	
+		if (body is Player player && !_isPlayer)
+		{
+			player.TakeDamage(_damage); 
+			Destroy();
+		}
+		else if (body is Enemy enemy && _isPlayer)
+		{
+			enemy.TakeDamage(_damage);
+			Destroy();
+		}
+		else if (body is StaticBody2D wall)
+		{
+			Destroy();
+		}
+	}
+	
+	private void Destroy()
+	{
+		QueueFree();
+	}
 	
 	
 	private void UpdateType(){
@@ -79,22 +108,26 @@ public class Bullet : Area2D
 				_bulletSprite.Texture = (Texture)GD.Load("res://assets/future_tanks/PNG/Effects/Plasma.png");
 				_bulletSound.Stream = (AudioStream)GD.Load("res://assets/sounds/plasma_gun_06.mp3");
 				_bulletSpeed = 7;
+				_damage = 5;
 				break;
 			case TypeBullet.Medium:
 				_bulletSprite.Texture = (Texture)GD.Load("res://assets/future_tanks/PNG/Effects/Medium_Shell.png");
 				_bulletSound.Stream = (AudioStream)GD.Load("res://assets/sounds/vystrel-tanka.mp3");
 				_bulletSpeed = 4;
+				_damage = 10;
 				break;
 			case TypeBullet.Light:
 				_bulletSprite.Texture = (Texture)GD.Load("res://assets/future_tanks/PNG/Effects/Light_Shell.png");
 				_bulletSound.Stream = (AudioStream)GD.Load("res://assets/sounds/light_bullet.mp3");
-				_bulletSpeed = 5;
+				_bulletSpeed = 6;
+				_damage = 7;
 				break;
 		}
 		_bulletSound.Play();
 	}
-	public void init(TypeBullet typeBullet){
+	public void init(TypeBullet typeBullet, bool isPlayer){
 		_typeBullet = typeBullet;
+		_isPlayer = isPlayer;
 		UpdateType();
 	}
   public override void _Process(float delta)
@@ -103,8 +136,6 @@ public class Bullet : Area2D
   }
 
 }
-
-
 
 
 
