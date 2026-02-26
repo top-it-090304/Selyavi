@@ -198,8 +198,12 @@ public class Enemy : KinematicBody2D
 	public void TakeDamage(int damage){
 		_hp -= damage;
 		if(_hp <= 0){
-			QueueFree();
+			Destroy();
 		}
+	}
+	
+	private void Destroy(){
+		QueueFree();
 	}
 	
 	private void FireOnPlayer(){

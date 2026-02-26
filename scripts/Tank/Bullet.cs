@@ -35,14 +35,18 @@ public class Bullet : Area2D
 		_bulletSound = GetNode<AudioStreamPlayer>("PlasmaGunSound");
 		_velocity = new Vector2(0, -1).Rotated(Rotation);
 		_visibilityBullet = GetNode<VisibilityNotifier2D>("VisibilityNotifier2D");
+		
+		// Создаем и сразу добавляем Tween
 		_tweenBullet = new Tween();
+		AddChild(_tweenBullet);  // Добавляем сразу
+		
 		Connect("body_entered", this, nameof(OnBodyEntered));
 		if (!_visibilityBullet.IsConnected("screen_exited", this, nameof(onScreenExited)))
 		{
 			_visibilityBullet.Connect("screen_exited", this, nameof(onScreenExited));
 		}
-		AddChild(_tweenBullet);
-		//_bulletSound.Play();
+		
+		// _bulletSound.Play();
 	}
 	
 	private void move(){
@@ -51,10 +55,21 @@ public class Bullet : Area2D
 		
 	}
 	private void fadeSound(){
+		if (_tweenBullet == null) return;
+		
+
+		if (!_tweenBullet.IsInsideTree())
+		{
+
+			QueueFree();
+			return;
+		}
+		
 		if (_tweenBullet.IsConnected("tween_completed", this, nameof(onTweenComplete)))
-			{
-				_tweenBullet.Disconnect("tween_completed", this, nameof(onTweenComplete));
-			}
+		{
+			_tweenBullet.Disconnect("tween_completed", this, nameof(onTweenComplete));
+		}
+		
 		_tweenBullet.InterpolateProperty(
 			_bulletSound,                    
 			"volume_db",                   
@@ -64,9 +79,10 @@ public class Bullet : Area2D
 			Tween.TransitionType.Linear,   
 			Tween.EaseType.InOut          
 		);
+		
 		_tweenBullet.Start();
 		_tweenBullet.Connect("tween_completed", this, nameof(onTweenComplete));
-	}
+}
 	private void onTweenComplete(Godot.Object obj, NodePath key)
 	{
 		_bulletSound.Stop();
