@@ -10,6 +10,7 @@ public class Player : KinematicBody2D
 	private Position2D _bulletPosition;
 	private Timer _shootTimer;
 	private AudioStreamPlayer _movingSound;
+	private AudioStreamPlayer2D _shootSound;
 	private Tween _tween;
 	private CanvasLayer _joystick;
 	private Sprite _gun;
@@ -32,6 +33,18 @@ public class Player : KinematicBody2D
 		init();
 		AddChild(_shootTimer);
 		AddChild(_tween);
+		ConfigureAudioPlayers();
+	}
+	
+	private void ConfigureAudioPlayers()
+	{
+		int sfxBusIndex = AudioServer.GetBusIndex("SFX");
+		
+		if (_movingSound != null)
+		{
+		_movingSound.Bus = "SFX";
+		}
+		
 	}
 	
 	private void useMoveVector(Vector2 moveVector){
@@ -40,6 +53,9 @@ public class Player : KinematicBody2D
 		RotatePlayerMobile(moveVector);
 		HandleMovementSound(joystickVelocity);
 	}
+	//public void getIsMovingNow(){
+	//	return isMovingNow;
+	//}
 	private void HandleMovementSound(Vector2 movementVelocity){
 	bool isMovingNow = movementVelocity.Length() > 0.1f;
 	
@@ -54,8 +70,9 @@ public class Player : KinematicBody2D
 			}
 			if (!_movingSound.Playing)
 			{
-				_movingSound.VolumeDb = -10;
-				_movingSound.Play();
+				//_movingSound.VolumeDb = -10;
+				//_movingSound.Play();
+				_movingSound.Play();	
 			}
 			
 			_isMoving = true;
@@ -220,7 +237,7 @@ public class Player : KinematicBody2D
 	private void onTweenComplete(Godot.Object obj, NodePath key)
 	{
 		_movingSound.Stop();
-		_movingSound.VolumeDb = -10;
+		_movingSound.VolumeDb = 1;
 	}
 
 	 public override void _Process(float delta)
