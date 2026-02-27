@@ -6,8 +6,8 @@
 [ext_resource path="res://scenes/IndestructibleWall.tscn" type="PackedScene" id=4]
 [ext_resource path="res://scenes/DestructibleWall.tscn" type="PackedScene" id=5]
 [ext_resource path="res://assets/Music/68. Sad Eyes.mp3" type="AudioStream" id=6]
-[ext_resource path="res://assets/ButtonSprites/SettingsButton.png" type="Texture" id=7]
 [ext_resource path="res://scripts/Field.cs" type="Script" id=8]
+[ext_resource path="res://assets/ButtonSprites/pause_594725.png" type="Texture" id=9]
 
 [node name="Field" type="Node2D"]
 script = ExtResource( 8 )
@@ -64,12 +64,11 @@ volume_db = -20.712
 autoplay = true
 bus = "Music"
 
-[node name="SettingsButton" type="CanvasLayer" parent="."]
+[node name="PauseButton" type="CanvasLayer" parent="."]
 
-[node name="GoToSettingsButton" type="TouchScreenButton" parent="SettingsButton"]
-position = Vector2( 3, 4 )
+[node name="PauseButton" type="TouchScreenButton" parent="PauseButton"]
+position = Vector2( 924, 4 )
 scale = Vector2( 0.177734, 0.177734 )
-normal = ExtResource( 7 )
-action = "go_to_settigs"
+normal = ExtResource( 9 )
 
-[connection signal="pressed" from="SettingsButton/GoToSettingsButton" to="." method="_on_GoToSettingsButton_pressed"]
+[connection signal="pressed" from="PauseButton/PauseButton" to="." method="_on_TouchScreenButton_pressed"]

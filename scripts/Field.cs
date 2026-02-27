@@ -16,11 +16,8 @@ public class Field : Node2D
 			_musicPlayer.Play();
 		}
 	}
-	private void _on_GoToSettingsButton_pressed()
+	private void _on_TouchScreenButton_pressed()
 	{
-		GetTree().ChangeScene("res://scenes/MenuScenes/Settings.tscn");
+		GetTree().ChangeScene("res://scenes/MenuScenes/PauseScreen.tscn");
 	}
 }
-
-
-
