@@ -91,6 +91,7 @@ public class Bullet : Area2D
 				_bulletSpeed = 5;
 				break;
 		}
+		_bulletSound.VolumeDb = -10f;
 		_bulletSound.Play();
 	}
 	public void init(TypeBullet typeBullet){

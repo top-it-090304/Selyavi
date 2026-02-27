@@ -4,20 +4,18 @@ using System;
 public class Field : Node2D
 {
 	private AudioStreamPlayer _musicPlayer;
-
+	//private AudioStreamPlayer _soundPlayer;
 	public override void _Ready()
 	{
 		_musicPlayer = GetNodeOrNull<AudioStreamPlayer>("MusicPlayer");
+		//_soundPlayer = GetNodeOrNull<AudioStreamPlayer>("SoundPlayer");
 		if (_musicPlayer != null)
 		{
+			//_soundPlayer.Bus = "SFX";
 			_musicPlayer.Bus = "Music";
 			_musicPlayer.Play();
 		}
 	}
-	//private void _on_Button_pressed()
-	//{
-	//	GetTree().ChangeScene("res://scenes/MenuScenes/Settings.tscn");
-	//}
 	private void _on_GoToSettingsButton_pressed()
 	{
 		GetTree().ChangeScene("res://scenes/MenuScenes/Settings.tscn");
