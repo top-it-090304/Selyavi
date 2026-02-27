@@ -42,9 +42,8 @@ public class Player : KinematicBody2D
 		
 		if (_movingSound != null)
 		{
-		_movingSound.Bus = "SFX";
+			_movingSound.Bus = "SFX";
 		}
-		
 	}
 	
 	private void useMoveVector(Vector2 moveVector){
@@ -53,44 +52,41 @@ public class Player : KinematicBody2D
 		RotatePlayerMobile(moveVector);
 		HandleMovementSound(joystickVelocity);
 	}
-	//public void getIsMovingNow(){
-	//	return isMovingNow;
-	//}
-	private void HandleMovementSound(Vector2 movementVelocity){
-	bool isMovingNow = movementVelocity.Length() > 0.1f;
 	
-	if (isMovingNow)
-	{
-		if(!_isMoving)
+	private void HandleMovementSound(Vector2 movementVelocity){
+		bool isMovingNow = movementVelocity.Length() > 0.1f;
+		
+		if (isMovingNow)
 		{
-			if(_tween.IsActive())
+			if(!_isMoving)
 			{
-				_tween.StopAll();
-				_tween.RemoveAll(); 
+				if(_tween.IsActive())
+				{
+					_tween.StopAll();
+					_tween.RemoveAll(); 
+				}
+				if (!_movingSound.Playing)
+				{
+					_movingSound.Play();	
+				}
+				
+				_isMoving = true;
 			}
-			if (!_movingSound.Playing)
-			{
-				//_movingSound.VolumeDb = -10;
-				//_movingSound.Play();
-				_movingSound.Play();	
-			}
-			
-			_isMoving = true;
-		}
-	} 
-	else 
-	{
-		if(_isMoving)
+		} 
+		else 
 		{
-			_isMoving = false;
-			
-			if (_movingSound.Playing)
+			if(_isMoving)
 			{
-				fadeSound();
+				_isMoving = false;
+				
+				if (_movingSound.Playing)
+				{
+					fadeSound();
+				}
 			}
 		}
 	}
-}
+	
 	private void FireTouch(){
 		if (_shootTimer.TimeLeft > 0)
 			return;
@@ -103,19 +99,21 @@ public class Player : KinematicBody2D
 		bullet.init(_typeBullet);
 		_shootTimer.Start();
 	}
+	
 	private void useMoveVectorAim(Vector2 moveVector){
 		RotatePlayerMobileAim(moveVector);
 	}
+	
 	public override void _PhysicsProcess(float delta)
 	{
 		GetInput();
 		_velocity = MoveAndSlide(_velocity);
 	}
+	
 	private void GetInput()
 	{
 		move();
 		changeBullet();
-		//fire();
 	}
 	
 	private void changeBullet(){
@@ -135,7 +133,7 @@ public class Player : KinematicBody2D
 			}
 		}
 		if (bulletChanged)
-   		{
+		{
 			_shootTimer.Start();
 		}
 	}
@@ -149,15 +147,13 @@ public class Player : KinematicBody2D
 			_velocity = _velocity.Normalized() * _speed;
 			RotatePlayer(_velocity);
 			
-		  
 			HandleMovementSound(_velocity);
 		} 
 		else 
 		{
-		   
 			HandleMovementSound(Vector2.Zero);
 		}
-}
+	}
 	
 	private void RotatePlayerMobile(Vector2 direction){
 		RotationDegrees = Mathf.Rad2Deg(direction.Angle()) + 90;
@@ -177,7 +173,6 @@ public class Player : KinematicBody2D
 				}
 				else RotationDegrees = 90;
 			}
-
 		} else if(direction.x < 0){
 			if(direction.y < 0){
 				RotationDegrees = 270 + 45;
@@ -187,7 +182,6 @@ public class Player : KinematicBody2D
 				}
 				else RotationDegrees = 270;
 			}
-
 		}
 		else if (direction.y > 0) 
 		{
@@ -197,7 +191,6 @@ public class Player : KinematicBody2D
 		{
 			RotationDegrees = 0;
 		}
-		
 	}
 	
 	private void fire(){
@@ -213,9 +206,9 @@ public class Player : KinematicBody2D
 	
 	private void fadeSound(){
 		if (_tween.IsConnected("tween_completed", this, nameof(onTweenComplete)))
-			{
-				_tween.Disconnect("tween_completed", this, nameof(onTweenComplete));
-			}
+		{
+			_tween.Disconnect("tween_completed", this, nameof(onTweenComplete));
+		}
 		if (_tween.IsActive())
 		{
 			_tween.StopAll();
@@ -237,36 +230,37 @@ public class Player : KinematicBody2D
 	private void onTweenComplete(Godot.Object obj, NodePath key)
 	{
 		_movingSound.Stop();
-		_movingSound.VolumeDb = 1;
+		_movingSound.VolumeDb = -10f;
 	}
 
-	 public override void _Process(float delta)
-	 {
+	public override void _Process(float delta)
+	{
 		Update();
-	 }
+	}
 
 	public override void _Draw()
-{
-	if(_aim.IsJoystickActive){
-		Vector2 globalMuzzlePos = _bulletPosition.GlobalPosition;
-		
-		float gunAngle = _gun.GlobalRotation;
-		Vector2 direction = new Vector2(1, 0).Rotated(gunAngle);
-		
-		Vector2 perpendicular = new Vector2(direction.y, -direction.x);
-		
-		float rayLength = 1000f;
-		
-		Vector2 globalRayEnd = globalMuzzlePos + perpendicular * rayLength;
-		
-		Vector2 localMuzzlePos = ToLocal(globalMuzzlePos);
-		Vector2 localRayEnd = ToLocal(globalRayEnd);
-		
-		Color rayColor = Colors.Red;
-		float rayWidth = 2f;
-		DrawLine(localMuzzlePos, localRayEnd, rayColor, rayWidth);
+	{
+		if(_aim.IsJoystickActive)
+		{
+			Vector2 globalMuzzlePos = _bulletPosition.GlobalPosition;
+			
+			float gunAngle = _gun.GlobalRotation;
+			Vector2 direction = new Vector2(1, 0).Rotated(gunAngle);
+			
+			Vector2 perpendicular = new Vector2(direction.y, -direction.x);
+			
+			float rayLength = 1000f;
+			
+			Vector2 globalRayEnd = globalMuzzlePos + perpendicular * rayLength;
+			
+			Vector2 localMuzzlePos = ToLocal(globalMuzzlePos);
+			Vector2 localRayEnd = ToLocal(globalRayEnd);
+			
+			Color rayColor = Colors.Red;
+			float rayWidth = 2f;
+			DrawLine(localMuzzlePos, localRayEnd, rayColor, rayWidth);
+		}
 	}
-}
 	
 	private void init(){
 		bulletScene = (PackedScene)GD.Load("res://scenes/Bullet.tscn");
@@ -294,6 +288,3 @@ public class Player : KinematicBody2D
 		_shootTimer.OneShot = true;
 	}
 }
-
-
-

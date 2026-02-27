@@ -21,6 +21,13 @@ region_rect = Rect2( 0, 0, 1024, 600 )
 [node name="KinematicBody2D" parent="." instance=ExtResource( 2 )]
 position = Vector2( 528, 300 )
 
+[node name="PauseButton" type="CanvasLayer" parent="KinematicBody2D"]
+
+[node name="PauseButton" type="TouchScreenButton" parent="KinematicBody2D/PauseButton"]
+position = Vector2( 924, 4 )
+scale = Vector2( 0.177734, 0.177734 )
+normal = ExtResource( 9 )
+
 [node name="wall" parent="." instance=ExtResource( 3 )]
 position = Vector2( -15, 0 )
 
@@ -37,38 +44,34 @@ position = Vector2( 1036, -15 )
 rotation = 1.5708
 scale = Vector2( 1, 1.75 )
 
-[node name="DestructibleWall" parent="." instance=ExtResource( 4 )]
-position = Vector2( 902, 119 )
-
-[node name="DestructibleWall2" parent="." instance=ExtResource( 4 )]
-position = Vector2( 659, 119 )
-
-[node name="DestructibleWall3" parent="." instance=ExtResource( 4 )]
-position = Vector2( 903, 249 )
-
-[node name="DestructibleWall4" parent="." instance=ExtResource( 5 )]
-position = Vector2( 906, 378 )
-
-[node name="DestructibleWall5" parent="." instance=ExtResource( 5 )]
-position = Vector2( 6, 589 )
-
-[node name="DestructibleWall6" parent="." instance=ExtResource( 4 )]
-position = Vector2( 176, 118 )
-
-[node name="DestructibleWall7" parent="." instance=ExtResource( 5 )]
-position = Vector2( 45, 119 )
-
 [node name="MusicPlayer" type="AudioStreamPlayer" parent="."]
 stream = ExtResource( 6 )
 volume_db = -20.712
 autoplay = true
 bus = "Music"
 
-[node name="PauseButton" type="CanvasLayer" parent="."]
+[node name="IndestructibleWall" parent="." instance=ExtResource( 4 )]
+position = Vector2( 14, 122 )
 
-[node name="PauseButton" type="TouchScreenButton" parent="PauseButton"]
-position = Vector2( 924, 4 )
-scale = Vector2( 0.177734, 0.177734 )
-normal = ExtResource( 9 )
+[node name="IndestructibleWall2" parent="." instance=ExtResource( 4 )]
+position = Vector2( 904, 115 )
 
-[connection signal="pressed" from="PauseButton/PauseButton" to="." method="_on_TouchScreenButton_pressed"]
+[node name="IndestructibleWall3" parent="." instance=ExtResource( 4 )]
+position = Vector2( 144, 117 )
+
+[node name="DestructibleWall" parent="." instance=ExtResource( 5 )]
+position = Vector2( 910, 322 )
+
+[node name="DestructibleWall2" parent="." instance=ExtResource( 5 )]
+position = Vector2( 777, 590 )
+
+[node name="DestructibleWall3" parent="." instance=ExtResource( 5 )]
+position = Vector2( 13, 590 )
+
+[node name="DestructibleWall4" parent="." instance=ExtResource( 5 )]
+position = Vector2( 12, 466 )
+
+[node name="DestructibleWall5" parent="." instance=ExtResource( 5 )]
+position = Vector2( 12, 337 )
+
+[connection signal="pressed" from="KinematicBody2D/PauseButton/PauseButton" to="." method="_on_TouchScreenButton_pressed"]

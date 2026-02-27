@@ -5,7 +5,7 @@ public class Settings : Node2D
 {
 	private Slider _musicSlider;
 	private Slider _soundSlider;
-
+	
 	public override void _Ready()
 	{
 		_musicSlider = GetNodeOrNull<Slider>("HSlider");
@@ -47,6 +47,3 @@ public class Settings : Node2D
 		GetTree().ChangeScene("res://scenes/MenuScenes/Menu.tscn");
 	}
 }
-
-
-

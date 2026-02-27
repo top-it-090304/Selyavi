@@ -34,7 +34,7 @@ public class IngameWall : StaticBody2D
 		_player_speed = player_speed;
 		_can_bullet_pass = canBulletPass;
 	}
-
+	
 	public IngameWall() : this(false, false, 0, false)
 	{
 	}

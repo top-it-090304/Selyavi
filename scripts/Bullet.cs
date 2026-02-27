@@ -37,12 +37,30 @@ public class Bullet : Area2D
 		}
 		AddChild(_tweenBullet);
 		//_bulletSound.Play();
+		
+		Connect("body_entered", this, nameof(OnBodyEntered));
 	}
 	
 	private void move(){
 		
 		Position += _velocity * _bulletSpeed;
-		
+	}
+	private void OnBodyEntered(Node body)
+	{
+		if (body is IngameWall wall)
+		{
+			if (wall.can_bullet_pass()){
+				
+			}
+			else if (wall.destroyable())
+			{
+				wall.destroy();
+				QueueFree();
+			}
+		}
+	}
+	private void on_hit(){
+		// 
 	}
 	private void fadeSound(){
 		if (_tweenBullet.IsConnected("tween_completed", this, nameof(onTweenComplete)))
@@ -104,8 +122,3 @@ public class Bullet : Area2D
   }
 
 }
-
-
-
-
-
