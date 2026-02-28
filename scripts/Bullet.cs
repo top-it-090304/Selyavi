@@ -57,6 +57,9 @@ public class Bullet : Area2D
 				wall.destroy();
 				QueueFree();
 			}
+			else{
+				QueueFree();
+			}
 		}
 	}
 	private void on_hit(){
