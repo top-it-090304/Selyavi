@@ -6,7 +6,6 @@ public class GameManager : Node
 	private static GameManager _instance;
 	public static GameManager Instance => _instance;
 	
-	// Сигнал для состояния прицела
 	[Signal] public delegate void ScopeToggled(bool enabled);
 	
 	private bool _scopeEnabled = true;
@@ -34,7 +33,6 @@ public class GameManager : Node
 		if (config.Load("user://settings.cfg") == Error.Ok)
 		{
 			_scopeEnabled = (bool)config.GetValue("game", "scope_enabled", true);
-			GD.Print($"GameManager загрузил состояние прицела: {_scopeEnabled}");
 		}
 	}
 	

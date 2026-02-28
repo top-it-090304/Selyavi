@@ -89,7 +89,8 @@ public class Bullet : Area2D
 		QueueFree();
 	}
 	private void onScreenExited(){
-		fadeSound();
+		//fadeSound();
+		QueueFree();
 	}
 	
 	
