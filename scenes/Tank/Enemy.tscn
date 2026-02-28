@@ -31,3 +31,7 @@ texture = ExtResource( 2 )
 
 [node name="BulletPosition" type="Position2D" parent="BodyTank/Gun"]
 position = Vector2( 0, -85 )
+
+[node name="NavigationAgent2D" type="NavigationAgent2D" parent="."]
+target_desired_distance = 22.23
+path_max_distance = 13.0
