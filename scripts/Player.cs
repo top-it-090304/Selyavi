@@ -6,6 +6,8 @@ public class Player : KinematicBody2D
 	#region private fields
 	private int _speed = 250;
 	private bool _isMoving = false;
+	private bool _isScopeEnadled = true;
+	private Settings SettingsCheckbox;
 	private Vector2 _velocity = Vector2.Zero;
 	private Position2D _bulletPosition;
 	private Timer _shootTimer;
@@ -27,15 +29,45 @@ public class Player : KinematicBody2D
 			}
 		}
 	}
-
+	
 	public override void _Ready()
 	{
 		init();
 		AddChild(_shootTimer);
 		AddChild(_tween);
 		ConfigureAudioPlayers();
+		if (GameManager.Instance != null)
+		{
+			if (!GameManager.Instance.IsConnected(nameof(GameManager.ScopeToggled), this, nameof(ToggleScope)))
+			{
+				GameManager.Instance.Connect(nameof(GameManager.ScopeToggled), this, nameof(ToggleScope));
+			}
+			_isScopeEnadled = GameManager.Instance.ScopeEnabled;
+			GD.Print($"Player загрузил состояние прицела: {_isScopeEnadled}");
+		}
+		else
+		{
+			GD.PrintErr("GameManager не найден! Добавьте его в автозагрузку.");
+			LoadInitialScopeState();
+		}
+	}
+	private void LoadInitialScopeState()
+	{
+		var config = new ConfigFile();
+		if (config.Load("user://settings.cfg") == Error.Ok)
+		{
+			_isScopeEnadled = (bool)config.GetValue("game", "scope_enabled", true);
+		}
+		else
+		{
+			_isScopeEnadled = true;
+		}
 	}
 	
+	private void ToggleScope(bool checkboxValue){
+		_isScopeEnadled = checkboxValue;
+		Update();
+	}
 	private void ConfigureAudioPlayers()
 	{
 		int sfxBusIndex = AudioServer.GetBusIndex("SFX");
@@ -247,7 +279,7 @@ public class Player : KinematicBody2D
 
 	public override void _Draw()
 {
-	if(_aim.IsJoystickActive){
+	if(_aim.IsJoystickActive && _isScopeEnadled){
 		Vector2 globalMuzzlePos = _bulletPosition.GlobalPosition;
 		
 		float gunAngle = _gun.GlobalRotation;
@@ -276,6 +308,18 @@ public class Player : KinematicBody2D
 		_joystick = GetNode<CanvasLayer>("Joystick");
 		_aim = GetNode<MobileJoystick>("Aim");
 		_aim.init(true);
+		if (_aim != null)
+		{
+			_aim.init(true);
+			if (!_aim.IsConnected("UseMoveVector", this, nameof(useMoveVectorAim)))
+			{
+				_aim.Connect("UseMoveVector", this, nameof(useMoveVectorAim));
+			}
+			if (!_aim.IsConnected("FireTouch", this, nameof(FireTouch)))
+			{
+				_aim.Connect("FireTouch", this, nameof(FireTouch));
+			}
+		}
 		if (!_joystick.IsConnected("UseMoveVector", this, nameof(useMoveVector)))
 		{
 			_joystick.Connect("UseMoveVector", this, nameof(useMoveVector));
@@ -294,6 +338,5 @@ public class Player : KinematicBody2D
 		_shootTimer.OneShot = true;
 	}
 }
-
 
 

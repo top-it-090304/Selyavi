@@ -1,7 +1,7 @@
 using Godot;
 using System;
 
-public class DestroyableWall : IngameWall
+public class DestructibleWall : IngameWall
 {
-	public DestroyableWall() : base(true, false, 0, false){}
+	public DestructibleWall() : base(true, false, 0, false){}
 }
