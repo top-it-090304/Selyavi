@@ -58,6 +58,7 @@ public class Enemy : KinematicBody2D
 				if (_player != null)
 				{
 					_nav2d.SetTargetLocation(_player.GlobalPosition);
+					FireOnPlayer();
 				}
 				break;
 		}
@@ -132,16 +133,13 @@ public class Enemy : KinematicBody2D
 	{
 		_nav2d = GetNode<NavigationAgent2D>("NavigationAgent2D");
 		
-		// Подключаем навигационную карту
+
 		Navigation2D navigation2D = GetNode<Navigation2D>("/root/Field/Navigation2D");
 		if (navigation2D != null)
 		{
 			_nav2d.SetNavigation(navigation2D);
 		}
-		else
-		{
-			GD.PrintErr("Navigation2D not found!");
-		}
+		
 		
 		_currentState = State.PATROL;
 		_detectionArea = GetNode<Area2D>("DetectionArea");
