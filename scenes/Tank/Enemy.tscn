@@ -5,7 +5,7 @@
 [ext_resource path="res://assets/future_tanks/PNG/Hulls_Color_D/Hull_01.png" type="Texture" id=3]
 
 [sub_resource type="CircleShape2D" id=1]
-radius = 200.0
+radius = 215.5
 
 [sub_resource type="CapsuleShape2D" id=2]
 radius = 65.14
@@ -17,6 +17,7 @@ script = ExtResource( 1 )
 [node name="DetectionArea" type="Area2D" parent="."]
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="DetectionArea"]
+position = Vector2( -6, -3 )
 shape = SubResource( 1 )
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
@@ -27,7 +28,7 @@ scale = Vector2( 0.5, 0.5 )
 texture = ExtResource( 3 )
 
 [node name="Gun" type="Sprite" parent="BodyTank"]
-position = Vector2( 0, 42 )
+position = Vector2( 2, 42 )
 texture = ExtResource( 2 )
 offset = Vector2( 0, -42 )
 

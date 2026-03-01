@@ -38,9 +38,9 @@ public class Enemy : KinematicBody2D
 	public override void _PhysicsProcess(float delta)
 	{
 		UpdateTarget();
-		MoveWithNavigation();
 		UpdateRayCast();
 		CheckAndFire();
+		MoveEnemy();
 		_velocity = MoveAndSlide(_velocity);
 	}
 
@@ -67,6 +67,42 @@ public class Enemy : KinematicBody2D
 					_nav2d.TargetLocation = _player.GlobalPosition;
 				}
 				break;
+		}
+	}
+	
+	private void MoveEnemy()
+	{
+		if (_nav2d == null) return;
+		
+		bool shouldMove = false;
+		
+		switch (_currentState)
+		{
+			case State.PATROL:
+				shouldMove = true;
+				break;
+				
+			case State.CHASE:
+				shouldMove = !IsTargetVisible();
+				break;
+		}
+		
+		if (shouldMove && !_nav2d.IsNavigationFinished())
+		{
+			Vector2 nextLocation = _nav2d.GetNextLocation();
+			Vector2 direction = (nextLocation - GlobalPosition).Normalized();
+			
+			float currentSpeed = _currentState == State.PATROL ? _patrolSpeed : _chaseSpeed;
+			_velocity = direction * currentSpeed;
+			
+			if (_velocity.Length() > 0.1f)
+			{
+				RotationDegrees = _velocity.Angle() * 180 / Mathf.Pi + 90;
+			}
+		}
+		else
+		{
+			_velocity = Vector2.Zero;
 		}
 	}
 
@@ -123,30 +159,9 @@ public class Enemy : KinematicBody2D
 		Node2D target = GetCurrentTarget();
 		if (target == null) return;
 		
-		if (!IsTargetVisible()) return;
-		
-		FireAtTarget(target);
-	}
-
-	private void MoveWithNavigation()
-	{
-		if (_nav2d == null) return;
-		
-		if (_nav2d.IsNavigationFinished())
+		if (IsTargetVisible())
 		{
-			_velocity = Vector2.Zero;
-			return;
-		}
-		
-		Vector2 nextLocation = _nav2d.GetNextLocation();
-		Vector2 direction = (nextLocation - GlobalPosition).Normalized();
-		
-		float currentSpeed = _currentState == State.PATROL ? _patrolSpeed : _chaseSpeed;
-		_velocity = direction * currentSpeed;
-		
-		if (_velocity.Length() > 0.1f)
-		{
-			RotationDegrees = _velocity.Angle() * 180 / Mathf.Pi + 90;
+			FireAtTarget(target);
 		}
 	}
 
@@ -184,20 +199,45 @@ public class Enemy : KinematicBody2D
 	}
 
 	private void FireAtTarget(Node2D target)
+{
+	if (_shootTimer.TimeLeft > 0)
+		return;
+		
+	var bullet = (Bullet)bulletScene.Instance();
+	
+	float distance = GlobalPosition.DistanceTo(target.GlobalPosition);
+	
+	float baseAccuracy = 0.9f; 
+	float distanceFactor = Mathf.Clamp(distance / 500f, 0f, 0.5f);
+	float finalAccuracy = baseAccuracy - distanceFactor;
+	
+	Vector2 directionToTarget = (target.GlobalPosition - GlobalPosition).Normalized();
+	float baseAngle = directionToTarget.Angle();
+	
+	float gunAngle = baseAngle + Mathf.Pi / 2;
+	
+	if (GD.Randf() > finalAccuracy) 
 	{
-		if (_shootTimer.TimeLeft > 0)
-			return;
-			
-		var bullet = (Bullet)bulletScene.Instance();
+		float missIntensity = 1f - finalAccuracy;
+		float maxAngleOffset = Mathf.Deg2Rad(30f) * missIntensity;
+		float randomOffset = (float)GD.RandRange(-maxAngleOffset, maxAngleOffset);
 		
-		bullet.GlobalPosition = _bulletPosition.GlobalPosition;
-		bullet.GlobalRotation = _bulletPosition.GlobalRotation;
-		
-		GetTree().Root.AddChild(bullet);
-		bullet.init(TypeBullet.Plasma, false);
-		_shootTimer.Start();
+		float finalAngle = gunAngle + randomOffset;
+		_gun.GlobalRotation = finalAngle;
+		bullet.GlobalRotation = _gun.GlobalRotation; 
 	}
-
+	else
+	{
+		_gun.GlobalRotation = gunAngle;
+		bullet.GlobalRotation = gunAngle; 
+	}
+	
+	bullet.GlobalPosition = _bulletPosition.GlobalPosition;
+	
+	GetTree().Root.AddChild(bullet);
+	bullet.init(TypeBullet.Plasma, false);
+	_shootTimer.Start();
+}
 	private void init()
 	{
 		_nav2d = GetNode<NavigationAgent2D>("NavigationAgent2D");
