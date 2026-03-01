@@ -18,6 +18,7 @@ public class Enemy : KinematicBody2D
 	private Timer _shootTimer;
 	private Sprite _gun;
 	private NavigationAgent2D _nav2d;
+	private RayCast2D _rayCast;
 	#endregion
 	PackedScene bulletScene;
 
@@ -38,6 +39,8 @@ public class Enemy : KinematicBody2D
 	{
 		UpdateTarget();
 		MoveWithNavigation();
+		UpdateRayCast();
+		CheckAndFire();
 		_velocity = MoveAndSlide(_velocity);
 	}
 
@@ -48,20 +51,81 @@ public class Enemy : KinematicBody2D
 		switch (_currentState)
 		{
 			case State.PATROL:
-				if (_base != null)
+				if (_base != null && Godot.Object.IsInstanceValid(_base))
 				{
-					_nav2d.SetTargetLocation(_base.GlobalPosition);
+					_nav2d.TargetLocation = _base.GlobalPosition;
+				}
+				else
+				{
+					Destroy();
 				}
 				break;
 				
 			case State.CHASE:
-				if (_player != null)
+				if (_player != null && Godot.Object.IsInstanceValid(_player))
 				{
-					_nav2d.SetTargetLocation(_player.GlobalPosition);
-					FireOnPlayer();
+					_nav2d.TargetLocation = _player.GlobalPosition;
 				}
 				break;
 		}
+	}
+
+	private void UpdateRayCast()
+	{
+		if (_rayCast == null) return;
+		
+		Node2D target = GetCurrentTarget();
+		if (target == null || !Godot.Object.IsInstanceValid(target)) return;
+		
+		Vector2 directionToTarget = (target.GlobalPosition - GlobalPosition).Normalized();
+		float distanceToTarget = GlobalPosition.DistanceTo(target.GlobalPosition);
+		
+		_rayCast.CastTo = directionToTarget * distanceToTarget;
+		_rayCast.Enabled = true;
+	}
+
+	private bool IsTargetVisible()
+	{
+		if (_rayCast == null) return false;
+		
+		if (_rayCast.IsColliding())
+		{
+			var collider = _rayCast.GetCollider();
+			
+			if (collider != null && Godot.Object.IsInstanceValid(collider))
+			{
+				if (collider == _player || collider == _base)
+				{
+					return true;
+				}
+			}
+			return false;
+		}
+		
+		Node2D target = GetCurrentTarget();
+		return target != null && Godot.Object.IsInstanceValid(target);
+	}
+
+	private Node2D GetCurrentTarget()
+	{
+		if (_currentState == State.CHASE)
+		{
+			return (_player != null && Godot.Object.IsInstanceValid(_player)) ? _player : null;
+		}
+		else
+		{
+			return (_base != null && Godot.Object.IsInstanceValid(_base)) ? _base : null;
+		}
+	}
+
+	private void CheckAndFire()
+	{
+		Node2D target = GetCurrentTarget();
+		if (target == null) return;
+		
+		if (!IsTargetVisible()) return;
+		
+		FireAtTarget(target);
 	}
 
 	private void MoveWithNavigation()
@@ -88,7 +152,7 @@ public class Enemy : KinematicBody2D
 
 	private void OnDetectionAreaEntered(Node body)
 	{
-		if (body == _player)
+		if (body == _player && Godot.Object.IsInstanceValid(_player))
 		{
 			_currentState = State.CHASE;
 		}
@@ -98,7 +162,10 @@ public class Enemy : KinematicBody2D
 	{
 		if (body == _player)
 		{
-			_currentState = State.PATROL;
+			if (_base != null && Godot.Object.IsInstanceValid(_base))
+			{
+				_currentState = State.PATROL;
+			}
 		}
 	}
 
@@ -116,14 +183,16 @@ public class Enemy : KinematicBody2D
 		QueueFree();
 	}
 
-	private void FireOnPlayer()
+	private void FireAtTarget(Node2D target)
 	{
 		if (_shootTimer.TimeLeft > 0)
 			return;
 			
 		var bullet = (Bullet)bulletScene.Instance();
+		
 		bullet.GlobalPosition = _bulletPosition.GlobalPosition;
-		bullet.RotationDegrees = _gun.GlobalRotationDegrees;
+		bullet.GlobalRotation = _bulletPosition.GlobalRotation;
+		
 		GetTree().Root.AddChild(bullet);
 		bullet.init(TypeBullet.Plasma, false);
 		_shootTimer.Start();
@@ -132,14 +201,13 @@ public class Enemy : KinematicBody2D
 	private void init()
 	{
 		_nav2d = GetNode<NavigationAgent2D>("NavigationAgent2D");
+		_rayCast = GetNode<RayCast2D>("RayCast2D"); 
 		
-
 		Navigation2D navigation2D = GetNode<Navigation2D>("/root/Field/Navigation2D");
 		if (navigation2D != null)
 		{
 			_nav2d.SetNavigation(navigation2D);
 		}
-		
 		
 		_currentState = State.PATROL;
 		_detectionArea = GetNode<Area2D>("DetectionArea");
