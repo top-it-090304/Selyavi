@@ -109,7 +109,7 @@ margin_right = 924.0
 margin_bottom = 242.0
 rect_pivot_offset = Vector2( -179, 98 )
 custom_fonts/font = SubResource( 6 )
-text = "Громкость звука"
+text = "Громкость танка"
 
 [node name="Label3" type="Label" parent="."]
 margin_left = 50.0
