@@ -7,6 +7,7 @@ public class Player : KinematicBody2D
 	private int _speed = 250;
 	private bool _isMoving = false;
 	private bool _isScopeEnadled = true;
+	private float _normalMovementVolume = 0f;
 	private Settings SettingsCheckbox;
 	private Vector2 _velocity = Vector2.Zero;
 	private Position2D _bulletPosition;
@@ -36,20 +37,41 @@ public class Player : KinematicBody2D
 		AddChild(_shootTimer);
 		AddChild(_tween);
 		ConfigureAudioPlayers();
-		if (GameManager.Instance != null)
-		{
-			if (!GameManager.Instance.IsConnected(nameof(GameManager.ScopeToggled), this, nameof(ToggleScope)))
+		if (_movingSound != null)
 			{
-				GameManager.Instance.Connect(nameof(GameManager.ScopeToggled), this, nameof(ToggleScope));
+				_normalMovementVolume = _movingSound.VolumeDb;
 			}
-			_isScopeEnadled = GameManager.Instance.ScopeEnabled;
-			GD.Print($"Player загрузил состояние прицела: {_isScopeEnadled}");
+			if (AudioManager.Instance != null)
+			{
+				if (!AudioManager.Instance.IsConnected(nameof(AudioManager.SfxVolumeChanged), this, nameof(OnSfxVolumeChanged)))
+				{
+					AudioManager.Instance.Connect(nameof(AudioManager.SfxVolumeChanged), this, nameof(OnSfxVolumeChanged));
+				}
+			}
+			
+			if (GameManager.Instance != null)
+			{
+				if (!GameManager.Instance.IsConnected(nameof(GameManager.ScopeToggled), this, nameof(ToggleScope)))
+				{
+					GameManager.Instance.Connect(nameof(GameManager.ScopeToggled), this, nameof(ToggleScope));
+				}
+				_isScopeEnadled = GameManager.Instance.ScopeEnabled;
+			}
+			else
+			{
+				LoadInitialScopeState();
+			}
 		}
-		else
+		
+		private void OnSfxVolumeChanged(float value)
 		{
-			GD.PrintErr("GameManager не найден! Добавьте его в автозагрузку.");
-			LoadInitialScopeState();
-		}
+			float dbValue = GD.Linear2Db(value);
+			_normalMovementVolume = dbValue;
+			if (_movingSound.Playing)
+			{
+				_movingSound.VolumeDb = dbValue;
+			}
+			GD.Print("Громкость SFX изменена: ", value, " (", dbValue, " dB)");
 	}
 	private void LoadInitialScopeState()
 	{
@@ -100,10 +122,9 @@ public class Player : KinematicBody2D
 				_tween.StopAll();
 				_tween.RemoveAll(); 
 			}
+			_movingSound.VolumeDb = _normalMovementVolume;
 			if (!_movingSound.Playing)
 			{
-				//_movingSound.VolumeDb = -10;
-				//_movingSound.Play();
 				_movingSound.Play();	
 			}
 			
@@ -253,12 +274,13 @@ public class Player : KinematicBody2D
 			_tween.StopAll();
 			_tween.RemoveAll();
 		}
+		float currentVolume = _movingSound.VolumeDb;
 		_tween.InterpolateProperty(
 			_movingSound,                    
 			"volume_db",                   
 			_movingSound.VolumeDb,         
 			-80,                         
-			0.5f,                          
+			0.3f,                          
 			Tween.TransitionType.Linear,   
 			Tween.EaseType.InOut          
 		);
@@ -269,7 +291,7 @@ public class Player : KinematicBody2D
 	private void onTweenComplete(Godot.Object obj, NodePath key)
 	{
 		_movingSound.Stop();
-		_movingSound.VolumeDb = 1;
+		_movingSound.VolumeDb = _normalMovementVolume;
 	}
 
 	 public override void _Process(float delta)
@@ -338,5 +360,4 @@ public class Player : KinematicBody2D
 		_shootTimer.OneShot = true;
 	}
 }
-
 

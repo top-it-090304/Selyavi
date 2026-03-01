@@ -1,5 +1,6 @@
 using Godot;
 using System;
+using System.Collections.Generic;
 
 public class AudioManager : Node
 {
@@ -10,7 +11,44 @@ public class AudioManager : Node
 	
 	private int _musicBusIndex;
 	private int _sfxBusIndex;
+	private Dictionary<TypeBullet, AudioStreamPlayer> _bulletSoundPlayers = new Dictionary<TypeBullet, AudioStreamPlayer>();
+	private Dictionary<TypeBullet, float> _bulletLastPlayTime = new Dictionary<TypeBullet, float>();
+	private float _minBulletInterval = 0.15f;
 
+	public void PlayBulletSound(TypeBullet type, Vector2 globalPosition)
+	{
+		float currentTime = Time.GetTicksMsec() / 1000f;
+		if (_bulletLastPlayTime.ContainsKey(type) && 
+			currentTime - _bulletLastPlayTime[type] < _minBulletInterval)
+		{
+			return;
+		}
+		_bulletLastPlayTime[type] = currentTime;
+		if (!_bulletSoundPlayers.ContainsKey(type))
+		{
+			AudioStreamPlayer sound = new AudioStreamPlayer();
+			sound.Bus = "SFX";
+			sound.VolumeDb = -15f;
+			
+			string path = "";
+			switch(type)
+			{
+				case TypeBullet.Plasma:
+					path = "res://assets/sounds/plasma_gun_06.mp3";
+					break;
+				case TypeBullet.Medium:
+					path = "res://assets/sounds/vystrel-tanka.mp3";
+					break;
+				case TypeBullet.Light:
+					path = "res://assets/sounds/light_bullet.mp3";
+					break;
+			}
+			sound.Stream = GD.Load<AudioStream>(path);
+			AddChild(sound);
+			_bulletSoundPlayers[type] = sound;
+		}
+		_bulletSoundPlayers[type].Play();
+	}
 	public override void _Ready()
 	{
 		Instance = this;
