@@ -1,7 +1,7 @@
-[gd_scene load_steps=15 format=2]
+[gd_scene load_steps=18 format=2]
 
 [ext_resource path="res://assets/backround/PNG/Tiles/Ground_Tile_01_A.png" type="Texture" id=1]
-[ext_resource path="res://scenes/Player.tscn" type="PackedScene" id=2]
+[ext_resource path="res://scenes/Tank/Player.tscn" type="PackedScene" id=2]
 [ext_resource path="res://scenes/obtacles/wall.tscn" type="PackedScene" id=3]
 [ext_resource path="res://scenes/IndestructibleWall.tscn" type="PackedScene" id=4]
 [ext_resource path="res://scenes/DestructibleWall.tscn" type="PackedScene" id=5]
@@ -13,6 +13,8 @@
 [ext_resource path="res://assets/backround/PNG/Tiles/Ground_Tile_01_B.png" type="Texture" id=11]
 [ext_resource path="res://assets/backround/PNG/Tiles/Ground_Tile_02_B.png" type="Texture" id=12]
 [ext_resource path="res://assets/backround/PNG/Tiles/Ground_Tile_02_A.png" type="Texture" id=13]
+[ext_resource path="res://scenes/Tank/Enemy.tscn" type="PackedScene" id=14]
+[ext_resource path="res://scenes/Base.tscn" type="PackedScene" id=15]
 
 [sub_resource type="TileSet" id=1]
 0/name = "Ground_Tile_02_C.png 0"
@@ -100,6 +102,11 @@
 5/shapes = [  ]
 5/z_index = 0
 
+[sub_resource type="NavigationPolygon" id=2]
+vertices = PoolVector2Array( 496, 236, 530, 115, 962, 116, 956, 569, 727, 578, 489, 362, 456, 208, 336, 145, 365, 212, 319, 507, 457, 380, 343, 372, 70, 406, 63, 222, 198, 190, 340, 300, 342, 236 )
+polygons = [ PoolIntArray( 0, 1, 2, 3, 4, 5 ), PoolIntArray( 1, 0, 6 ), PoolIntArray( 7, 1, 6, 8 ), PoolIntArray( 5, 4, 9, 10 ), PoolIntArray( 11, 10, 9, 12 ), PoolIntArray( 11, 12, 13, 14, 15 ), PoolIntArray( 16, 15, 14, 7 ), PoolIntArray( 7, 8, 16 ) ]
+outlines = [ PoolVector2Array( 336, 145, 198, 190, 63, 222, 70, 406, 319, 507, 727, 578, 956, 569, 962, 116, 530, 115 ), PoolVector2Array( 340, 300, 343, 372, 457, 380, 489, 362, 496, 236, 456, 208, 365, 212, 342, 236 ) ]
+
 [node name="Field" type="Node2D"]
 script = ExtResource( 8 )
 
@@ -115,32 +122,12 @@ texture = ExtResource( 1 )
 region_enabled = true
 region_rect = Rect2( 0, 0, 1024, 600 )
 
-[node name="KinematicBody2D" parent="." instance=ExtResource( 2 )]
-position = Vector2( 528, 300 )
+[node name="PlayerTank" parent="." instance=ExtResource( 2 )]
+position = Vector2( 549, 318 )
 
-[node name="Camera2D" type="Camera2D" parent="KinematicBody2D"]
-position = Vector2( -13, 1 )
-current = true
-zoom = Vector2( 1.2, 1.2 )
-limit_left = 0
-limit_top = 0
-limit_right = 1878
-limit_bottom = 1564
-limit_smoothed = true
-drag_margin_h_enabled = true
-drag_margin_v_enabled = true
-smoothing_enabled = true
-smoothing_speed = 10.0
-drag_margin_left = 0.15
-drag_margin_top = 0.05
-drag_margin_right = 0.15
-drag_margin_bottom = 0.05
-editor_draw_limits = true
-editor_draw_drag_margin = true
+[node name="PauseButton" type="CanvasLayer" parent="PlayerTank"]
 
-[node name="PauseButton" type="CanvasLayer" parent="KinematicBody2D"]
-
-[node name="PauseButton" type="TouchScreenButton" parent="KinematicBody2D/PauseButton"]
+[node name="PauseButton" type="TouchScreenButton" parent="PlayerTank/PauseButton"]
 position = Vector2( 924, 4 )
 scale = Vector2( 0.177734, 0.177734 )
 normal = ExtResource( 9 )
@@ -298,4 +285,16 @@ position = Vector2( 1036, -15 )
 rotation = 1.5708
 scale = Vector2( 1, 1.75 )
 
-[connection signal="pressed" from="KinematicBody2D/PauseButton/PauseButton" to="." method="_on_TouchScreenButton_pressed"]
+[node name="Enemy" parent="." instance=ExtResource( 14 )]
+position = Vector2( 148, 278 )
+
+[node name="Base" parent="." instance=ExtResource( 15 )]
+position = Vector2( 749, 280 )
+
+[node name="Navigation2D" type="Navigation2D" parent="."]
+
+[node name="NavigationPolygonInstance" type="NavigationPolygonInstance" parent="Navigation2D"]
+position = Vector2( 5, 0 )
+navpoly = SubResource( 2 )
+
+[connection signal="pressed" from="PlayerTank/PauseButton/PauseButton" to="." method="_on_TouchScreenButton_pressed"]

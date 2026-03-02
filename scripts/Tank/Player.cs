@@ -1,10 +1,13 @@
 using Godot;
 using System;
 
+
 public class Player : KinematicBody2D
 {
 	#region private fields
 	private int _speed = 250;
+	private int _hp;
+	private int _lives;
 	private bool _isMoving = false;
 	private bool _isScopeEnadled = true;
 	private float _normalMovementVolume = 0f;
@@ -19,6 +22,7 @@ public class Player : KinematicBody2D
 	private Sprite _gun;
 	private MobileJoystick _aim;
 	private TypeBullet _typeBullet = TypeBullet.Plasma;
+	private Vector2 _startPosition;
 	#endregion
 	PackedScene bulletScene;
 	
@@ -153,7 +157,7 @@ public class Player : KinematicBody2D
 		bullet.RotationDegrees = _gun.GlobalRotationDegrees;
 		bullet.GlobalPosition = _bulletPosition.GlobalPosition;
 		GetTree().Root.AddChild(bullet);
-		bullet.init(_typeBullet);
+		bullet.init(_typeBullet, true);
 		_shootTimer.Start();
 	}
 	private void useMoveVectorAim(Vector2 moveVector){
@@ -255,13 +259,26 @@ public class Player : KinematicBody2D
 	
 	private void fire(){
 		if(Input.IsActionJustPressed("fire")){
-			var bullet = (Area2D)bulletScene.Instance();
-			bullet.GlobalPosition = _bulletPosition.GlobalPosition;
-			bullet.RotationDegrees = _gun.GlobalRotationDegrees;
-			bullet.GlobalPosition = _bulletPosition.GlobalPosition;
-			GetTree().Root.AddChild(bullet);
-			_shootTimer.Start();
+			FireTouch();
 		}
+	}
+	public void TakeDamage(int damage){
+		_hp -= damage;
+		if(_hp <= 0){
+			Destroy();
+		}
+	}
+	
+	private void Destroy(){
+		_lives--;
+		if(_lives != 0)
+			Revive();
+		else QueueFree();
+	}
+	
+	private void Revive(){
+		_hp = 20;
+		GlobalPosition = _startPosition;
 	}
 	
 	private void fadeSound(){
@@ -321,14 +338,18 @@ public class Player : KinematicBody2D
 		DrawLine(localMuzzlePos, localRayEnd, rayColor, rayWidth);
 	}
 }
+
 	
 	private void init(){
-		bulletScene = (PackedScene)GD.Load("res://scenes/Bullet.tscn");
+		bulletScene = (PackedScene)GD.Load("res://scenes/Tank/Bullet.tscn");
+		_lives = 5;
+		_hp = 20;
 		_bulletPosition = GetNode<Position2D>("BodyTank/Gun/BulletPosition");
 		_movingSound = GetNode<AudioStreamPlayer>("MovingSound");
 		_gun = GetNode<Sprite>("BodyTank/Gun");
 		_joystick = GetNode<CanvasLayer>("Joystick");
 		_aim = GetNode<MobileJoystick>("Aim");
+		_startPosition = GlobalPosition;
 		_aim.init(true);
 		if (_aim != null)
 		{

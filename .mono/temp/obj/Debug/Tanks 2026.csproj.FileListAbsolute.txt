@@ -1,0 +1,10 @@
+D:\Tanks_2026\.mono\temp\bin\Debug\Tanks 2026.dll
+D:\Tanks_2026\.mono\temp\bin\Debug\Tanks 2026.pdb
+D:\Tanks_2026\.mono\temp\obj\Debug\Tanks 2026.csproj.AssemblyReference.cache
+D:\Tanks_2026\.mono\temp\obj\Debug\Tanks 2026.GeneratedMSBuildEditorConfig.editorconfig
+D:\Tanks_2026\.mono\temp\obj\Debug\Tanks 2026.AssemblyInfoInputs.cache
+D:\Tanks_2026\.mono\temp\obj\Debug\Tanks 2026.AssemblyInfo.cs
+D:\Tanks_2026\.mono\temp\obj\Debug\Tanks 2026.csproj.CoreCompileInputs.cache
+D:\Tanks_2026\.mono\temp\obj\Debug\Tanks 2026.sourcelink.json
+D:\Tanks_2026\.mono\temp\obj\Debug\Tanks 2026.dll
+D:\Tanks_2026\.mono\temp\obj\Debug\Tanks 2026.pdb
