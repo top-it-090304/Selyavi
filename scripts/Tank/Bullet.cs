@@ -101,7 +101,28 @@ public class Bullet : Area2D
 			enemy.TakeDamage(_damage);
 			Destroy();
 		}
-		else if (body is StaticBody2D wall)
+		else if (body is IngameWall ingameWall)
+		{
+			if (ingameWall.can_bullet_pass())
+			{
+				return;
+			}
+			else if (ingameWall.destroyable())
+			{
+				ingameWall.destroy();
+				Destroy();
+			}
+			
+			else
+			{
+				Destroy();
+			}
+		}
+		else if (body is Base baseObj)
+		{
+			Destroy();
+		}
+		else if (body is StaticBody2D staticWall)
 		{
 			Destroy();
 		}
@@ -128,7 +149,6 @@ public class Bullet : Area2D
 				break;
 			case TypeBullet.Light:
 				_bulletSprite.Texture = (Texture)GD.Load("res://assets/future_tanks/PNG/Effects/Light_Shell.png");
-				_bulletSound.Stream = (AudioStream)GD.Load("res://assets/sounds/light_bullet.mp3");
 				_bulletSpeed = 6;
 				_damage = 7;
 				break;

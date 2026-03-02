@@ -44,12 +44,13 @@ use_filter = true
 font_data = ExtResource( 2 )
 
 [node name="Settings" type="Node2D"]
+scale = Vector2( 1.282, 1.282 )
 script = ExtResource( 1 )
 
 [node name="ColorRect" type="ColorRect" parent="."]
-margin_left = -6.0
+margin_left = -0.780031
 margin_top = -2.0
-margin_right = 1028.0
+margin_right = 1002.22
 margin_bottom = 599.0
 color = Color( 0.85098, 0.478431, 0.478431, 1 )
 

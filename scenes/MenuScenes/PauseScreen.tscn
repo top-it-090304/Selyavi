@@ -13,38 +13,41 @@ font_data = ExtResource( 1 )
 script = ExtResource( 3 )
 
 [node name="Background" type="ColorRect" parent="."]
-margin_right = 1024.0
-margin_bottom = 599.0
+margin_right = 1281.0
+margin_bottom = 767.0
 color = Color( 0.827451, 0.686275, 0.819608, 1 )
 
 [node name="ReturnToGameButton" type="Button" parent="."]
-margin_left = 280.0
-margin_top = 117.0
-margin_right = 716.0
-margin_bottom = 258.0
+margin_left = 383.0
+margin_top = 166.0
+margin_right = 819.0
+margin_bottom = 307.0
+rect_scale = Vector2( 1.2, 1.2 )
 custom_fonts/font = ExtResource( 2 )
 text = "Продолжить"
 
 [node name="ReturnToSettingsButton" type="Button" parent="."]
-margin_left = 280.0
-margin_top = 277.0
-margin_right = 716.0
-margin_bottom = 418.0
+margin_left = 383.0
+margin_top = 353.0
+margin_right = 819.0
+margin_bottom = 494.0
+rect_scale = Vector2( 1.2, 1.2 )
 custom_fonts/font = ExtResource( 2 )
 text = "Настройки"
 
 [node name="ReturnToMenuButton" type="Button" parent="."]
-margin_left = 280.0
-margin_top = 436.0
-margin_right = 716.0
-margin_bottom = 577.0
+margin_left = 383.0
+margin_top = 544.0
+margin_right = 819.0
+margin_bottom = 685.0
+rect_scale = Vector2( 1.2, 1.2 )
 custom_fonts/font = ExtResource( 2 )
 text = "В Меню"
 
 [node name="Label" type="Label" parent="."]
-margin_left = 341.0
+margin_left = 481.0
 margin_top = 23.0
-margin_right = 664.0
+margin_right = 804.0
 margin_bottom = 92.0
 custom_fonts/font = SubResource( 1 )
 text = "Пауза"

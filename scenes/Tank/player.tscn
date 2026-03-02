@@ -34,9 +34,9 @@ stream = ExtResource( 2 )
 volume_db = -10.0
 
 [node name="Joystick" parent="." instance=ExtResource( 4 )]
-offset = Vector2( 50, 0 )
-transform = Transform2D( 1, 0, 0, 1, 50, 0 )
+offset = Vector2( 70, 180 )
+transform = Transform2D( 1, 0, 0, 1, 70, 180 )
 
 [node name="Aim" parent="." instance=ExtResource( 4 )]
-offset = Vector2( 774, 0 )
-transform = Transform2D( 1, 0, 0, 1, 774, 0 )
+offset = Vector2( 1000, 180 )
+transform = Transform2D( 1, 0, 0, 1, 1000, 180 )

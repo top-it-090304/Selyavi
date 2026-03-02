@@ -123,12 +123,27 @@ region_enabled = true
 region_rect = Rect2( 0, 0, 1024, 600 )
 
 [node name="PlayerTank" parent="." instance=ExtResource( 2 )]
-position = Vector2( 549, 318 )
+position = Vector2( 543, 318 )
+
+[node name="Camera2D" type="Camera2D" parent="PlayerTank"]
+current = true
+limit_left = 0
+limit_top = 0
+limit_right = 1800
+limit_bottom = 1600
+drag_margin_h_enabled = true
+drag_margin_v_enabled = true
+smoothing_enabled = true
+smoothing_speed = 10.0
+drag_margin_left = 0.1
+drag_margin_top = 0.1
+drag_margin_right = 0.1
+drag_margin_bottom = 0.1
 
 [node name="PauseButton" type="CanvasLayer" parent="PlayerTank"]
 
 [node name="PauseButton" type="TouchScreenButton" parent="PlayerTank/PauseButton"]
-position = Vector2( 924, 4 )
+position = Vector2( 1150, 4 )
 scale = Vector2( 0.177734, 0.177734 )
 normal = ExtResource( 9 )
 
