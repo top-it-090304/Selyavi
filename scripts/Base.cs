@@ -12,7 +12,7 @@ public class Base : Area2D
 	private Position2D _enemyPosition;
 	PackedScene enemyScene;
 	[Signal]
-	public delegate void BaseState(bool IsDestroy);
+	public delegate void BaseState();
 	
 	[Export]
 	public TypeBase typeBase;
@@ -44,9 +44,9 @@ public class Base : Area2D
 		}
 	}
 	
-	private void Destroy()
+	public void Destroy()
 	{
-		EmitSignal(nameof(BaseState), true);
+		EmitSignal(nameof(BaseState));
 		QueueFree();
 	}
 	
