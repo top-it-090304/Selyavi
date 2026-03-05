@@ -26,6 +26,9 @@ public class Bullet : Area2D
 			}
 		}
 	}
+	public bool IsPlayer{
+		get => _isPlayer;
+	}
 
 	public override void _Ready()
 	{

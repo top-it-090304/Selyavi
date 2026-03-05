@@ -37,7 +37,14 @@ public class Enemy : KinematicBody2D
 
 	public override void _PhysicsProcess(float delta)
 	{
+		if (!Godot.Object.IsInstanceValid(_base))
+		{
+			Destroy();
+			return;
+		}
+		
 		UpdateTarget();
+		AimGun();
 		UpdateRayCast();
 		CheckAndFire();
 		MoveEnemy();
@@ -68,6 +75,20 @@ public class Enemy : KinematicBody2D
 				}
 				break;
 		}
+	}
+	
+	private void AimGun()
+	{
+		if (_gun == null) return;
+		
+		Node2D target = GetCurrentTarget();
+		if (target == null || !Godot.Object.IsInstanceValid(target)) return;
+		
+		Vector2 directionToTarget = (target.GlobalPosition - _gun.GlobalPosition).Normalized();
+		float targetAngle = directionToTarget.Angle();
+		
+		float gunAngle = targetAngle + Mathf.Pi / 2;
+		_gun.GlobalRotation = gunAngle;
 	}
 	
 	private void MoveEnemy()
@@ -113,7 +134,7 @@ public class Enemy : KinematicBody2D
 		Node2D target = GetCurrentTarget();
 		if (target == null || !Godot.Object.IsInstanceValid(target)) return;
 		
-		Vector2 directionToTarget = (target.GlobalPosition - GlobalPosition).Normalized();
+		Vector2 directionToTarget = (target.GlobalPosition - _bulletPosition.GlobalPosition).Normalized();
 		float distanceToTarget = GlobalPosition.DistanceTo(target.GlobalPosition);
 		
 		_rayCast.CastTo = directionToTarget * distanceToTarget;
@@ -199,47 +220,46 @@ public class Enemy : KinematicBody2D
 	}
 
 	private void FireAtTarget(Node2D target)
-{
-	if (_shootTimer.TimeLeft > 0)
-		return;
-		
-	var bullet = (Bullet)bulletScene.Instance();
-	
-	float distance = GlobalPosition.DistanceTo(target.GlobalPosition);
-	
-	float baseAccuracy = 0.9f; 
-	float distanceFactor = Mathf.Clamp(distance / 500f, 0f, 0.5f);
-	float finalAccuracy = baseAccuracy - distanceFactor;
-	
-	Vector2 directionToTarget = (target.GlobalPosition - GlobalPosition).Normalized();
-	float baseAngle = directionToTarget.Angle();
-	
-	float gunAngle = baseAngle + Mathf.Pi / 2;
-	
-	if (GD.Randf() > finalAccuracy) 
 	{
-		float missIntensity = 1f - finalAccuracy;
-		float maxAngleOffset = Mathf.Deg2Rad(30f) * missIntensity;
-		float randomOffset = (float)GD.RandRange(-maxAngleOffset, maxAngleOffset);
+		if (_shootTimer.TimeLeft > 0)
+			return;
+			
+		var bullet = (Bullet)bulletScene.Instance();
 		
-		float finalAngle = gunAngle + randomOffset;
-		_gun.GlobalRotation = finalAngle;
-		bullet.GlobalRotation = _gun.GlobalRotation; 
-	}
-	else
-	{
-		_gun.GlobalRotation = gunAngle;
-		bullet.GlobalRotation = gunAngle; 
+		float distance = GlobalPosition.DistanceTo(target.GlobalPosition);
+		
+		float baseAccuracy = 0.9f; 
+		float distanceFactor = Mathf.Clamp(distance / 500f, 0f, 0.5f);
+		float finalAccuracy = baseAccuracy - distanceFactor;
+		
+		Vector2 directionToTarget = (target.GlobalPosition - _gun.GlobalPosition).Normalized();
+		float baseAngle = directionToTarget.Angle();
+		float gunAngle = baseAngle + Mathf.Pi / 2;
+		
+		if (GD.Randf() > finalAccuracy) 
+		{
+			float missIntensity = 1f - finalAccuracy;
+			float maxAngleOffset = Mathf.Deg2Rad(30f) * missIntensity;
+			float randomOffset = (float)GD.RandRange(-maxAngleOffset, maxAngleOffset);
+			
+			float finalAngle = gunAngle + randomOffset;
+			bullet.GlobalRotation = finalAngle; 
+		}
+		else
+		{
+			bullet.GlobalRotation = gunAngle; 
+		}
+		
+		bullet.GlobalPosition = _bulletPosition.GlobalPosition;
+		
+		GetTree().Root.AddChild(bullet);
+		bullet.init(TypeBullet.Plasma, false);
+		_shootTimer.Start();
 	}
 	
-	bullet.GlobalPosition = _bulletPosition.GlobalPosition;
-	
-	GetTree().Root.AddChild(bullet);
-	bullet.init(TypeBullet.Plasma, false);
-	_shootTimer.Start();
-}
 	private void init()
 	{
+		AddToGroup("enemies");
 		_nav2d = GetNode<NavigationAgent2D>("NavigationAgent2D");
 		_rayCast = GetNode<RayCast2D>("RayCast2D"); 
 		
