@@ -1,7 +1,7 @@
 using Godot;
 using System;
 
-public class Base : Area2D
+public partial class Base : Area2D
 {
 	public enum TypeBase{
 		Player,
@@ -9,7 +9,7 @@ public class Base : Area2D
 	}
 	
 	private Timer _spawnTimer;
-	private Position2D _enemyPosition;
+	private Marker2D _enemyPosition;
 	PackedScene enemyScene;
 	[Signal]
 	public delegate void BaseState();
@@ -23,9 +23,9 @@ public class Base : Area2D
 	
 	public override void _Ready()
 	{
-		Connect("area_entered", this, nameof(OnBodyEntered));
+		Connect("area_entered", new Callable(this, nameof(OnBodyEntered)));
 		enemyScene = (PackedScene)GD.Load("res://scenes/Tank/Enemy.tscn");
-		_enemyPosition = GetNode<Position2D>("EnemyPosition");
+		_enemyPosition = GetNode<Marker2D>("EnemyPosition");
 		
 		_spawnTimer = new Timer();
 		_spawnTimer.WaitTime = 3f;

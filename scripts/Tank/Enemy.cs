@@ -1,7 +1,7 @@
 using Godot;
 using System;
 
-public class Enemy : KinematicBody2D
+public partial class Enemy : CharacterBody2D
 {
 	private enum State { PATROL, CHASE }
 	
@@ -14,9 +14,9 @@ public class Enemy : KinematicBody2D
 	[Export] private int _patrolSpeed = 90;
 	[Export] private int _chaseSpeed = 100;
 	private Vector2 _velocity = Vector2.Zero;
-	private Position2D _bulletPosition;
+	private Marker2D _bulletPosition;
 	private Timer _shootTimer;
-	private Sprite _gun;
+	private Sprite2D _gun;
 	private NavigationAgent2D _nav2d;
 	private RayCast2D _rayCast;
 	#endregion
@@ -60,7 +60,7 @@ public class Enemy : KinematicBody2D
 			case State.PATROL:
 				if (_base != null && Godot.Object.IsInstanceValid(_base))
 				{
-					_nav2d.TargetLocation = _base.GlobalPosition;
+					_nav2d.TargetPosition = _base.GlobalPosition;
 				}
 				else
 				{
@@ -71,7 +71,7 @@ public class Enemy : KinematicBody2D
 			case State.CHASE:
 				if (_player != null && Godot.Object.IsInstanceValid(_player))
 				{
-					_nav2d.TargetLocation = _player.GlobalPosition;
+					_nav2d.TargetPosition = _player.GlobalPosition;
 				}
 				break;
 		}
@@ -110,7 +110,7 @@ public class Enemy : KinematicBody2D
 		
 		if (shouldMove && !_nav2d.IsNavigationFinished())
 		{
-			Vector2 nextLocation = _nav2d.GetNextLocation();
+			Vector2 nextLocation = _nav2d.GetNextPathPosition();
 			Vector2 direction = (nextLocation - GlobalPosition).Normalized();
 			
 			float currentSpeed = _currentState == State.PATROL ? _patrolSpeed : _chaseSpeed;
@@ -137,7 +137,7 @@ public class Enemy : KinematicBody2D
 		Vector2 directionToTarget = (target.GlobalPosition - _bulletPosition.GlobalPosition).Normalized();
 		float distanceToTarget = GlobalPosition.DistanceTo(target.GlobalPosition);
 		
-		_rayCast.CastTo = directionToTarget * distanceToTarget;
+		_rayCast.TargetPosition = directionToTarget * distanceToTarget;
 		_rayCast.Enabled = true;
 	}
 
@@ -239,8 +239,8 @@ public class Enemy : KinematicBody2D
 		if (GD.Randf() > finalAccuracy) 
 		{
 			float missIntensity = 1f - finalAccuracy;
-			float maxAngleOffset = Mathf.Deg2Rad(30f) * missIntensity;
-			float randomOffset = (float)GD.RandRange(-maxAngleOffset, maxAngleOffset);
+			float maxAngleOffset = Mathf.DegToRad(30f) * missIntensity;
+			float randomOffset = (float)GD.RandfRange(-maxAngleOffset, maxAngleOffset);
 			
 			float finalAngle = gunAngle + randomOffset;
 			bullet.GlobalRotation = finalAngle; 
@@ -273,11 +273,11 @@ public class Enemy : KinematicBody2D
 		_detectionArea = GetNode<Area2D>("DetectionArea");
 		_player = GetNode<Player>("/root/Field/PlayerTank");
 		_base = GetNode<Base>("/root/Field/Base");
-		_gun = GetNode<Sprite>("BodyTank/Gun");
-		_bulletPosition = GetNode<Position2D>("BodyTank/Gun/BulletPosition");
+		_gun = GetNode<Sprite2D>("BodyTank/Gun");
+		_bulletPosition = GetNode<Marker2D>("BodyTank/Gun/BulletPosition");
 		
-		_detectionArea.Connect("body_entered", this, nameof(OnDetectionAreaEntered));
-		_detectionArea.Connect("body_exited", this, nameof(OnDetectionAreaExited));
+		_detectionArea.Connect("body_entered", new Callable(this, nameof(OnDetectionAreaEntered)));
+		_detectionArea.Connect("body_exited", new Callable(this, nameof(OnDetectionAreaExited)));
 		
 		bulletScene = (PackedScene)GD.Load("res://scenes/Tank/Bullet.tscn");
 		_shootTimer = new Timer();

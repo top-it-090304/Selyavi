@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://cjg4kqcx5a8v5"]
+
+[ext_resource type="Script" uid="uid://cdjlhm13xtvnb" path="res://destructible_wall.gd" id="1_m83c8"]
+
+[node name="DestructibleWall" type="StaticBody2D"]
+script = ExtResource("1_m83c8")

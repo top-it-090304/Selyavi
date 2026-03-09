@@ -1,7 +1,7 @@
 using Godot;
 using System;
 
-public class Field : Node2D
+public partial class Field : Node2D
 {
 	#region private fields
 	private AudioStreamPlayer _musicPlayer;
@@ -26,7 +26,7 @@ public class Field : Node2D
 		_enemyBase = GetNode<Base>("EnemyBase");
 		_playerBase = GetNode<Base>("Base");
 		
-		_playerBase.Connect("BaseState", this, nameof(PlayerBaseDestroy));
+		_playerBase.Connect("BaseState", new Callable(this, nameof(PlayerBaseDestroy)));
 		
 		_pauseScene = GD.Load<PackedScene>("res://scenes/MenuScenes/PauseScreen.tscn");
 	}
@@ -35,7 +35,7 @@ public class Field : Node2D
 	}
 	private void _on_TouchScreenButton_pressed()
 	{
-		GetTree().ChangeScene("res://scenes/MenuScenes/PauseScreen.tscn");
+		GetTree().ChangeSceneToFile("res://scenes/MenuScenes/PauseScreen.tscn");
 		//if (_currentPause == null && _pauseScene != null)
 		//{
 		//	_currentPause = _pauseScene.Instance();

@@ -2,7 +2,7 @@ using Godot;
 using System;
 
 
-public class Player : KinematicBody2D
+public partial class Player : CharacterBody2D
 {
 	#region private fields
 	private int _speed = 250;
@@ -13,13 +13,13 @@ public class Player : KinematicBody2D
 	private float _normalMovementVolume = 0f;
 	private Settings SettingsCheckbox;
 	private Vector2 _velocity = Vector2.Zero;
-	private Position2D _bulletPosition;
+	private Marker2D _bulletPosition;
 	private Timer _shootTimer;
 	private AudioStreamPlayer _movingSound;
 	private AudioStreamPlayer2D _shootSound;
 	private Tween _tween;
 	private CanvasLayer _joystick;
-	private Sprite _gun;
+	private Sprite2D _gun;
 	private MobileJoystick _aim;
 	private TypeBullet _typeBullet = TypeBullet.Plasma;
 	private Vector2 _startPosition;
@@ -47,17 +47,17 @@ public class Player : KinematicBody2D
 			}
 			if (AudioManager.Instance != null)
 			{
-				if (!AudioManager.Instance.IsConnected(nameof(AudioManager.SfxVolumeChanged), this, nameof(OnSfxVolumeChanged)))
+				if (!AudioManager.Instance.IsConnected(nameof(AudioManager.SfxVolumeChanged), new Callable(this, nameof(OnSfxVolumeChanged))))
 				{
-					AudioManager.Instance.Connect(nameof(AudioManager.SfxVolumeChanged), this, nameof(OnSfxVolumeChanged));
+					AudioManager.Instance.Connect(nameof(AudioManager.SfxVolumeChanged), new Callable(this, nameof(OnSfxVolumeChanged)));
 				}
 			}
 			
 			if (GameManager.Instance != null)
 			{
-				if (!GameManager.Instance.IsConnected(nameof(GameManager.ScopeToggled), this, nameof(ToggleScope)))
+				if (!GameManager.Instance.IsConnected(nameof(GameManager.ScopeToggled), new Callable(this, nameof(ToggleScope))))
 				{
-					GameManager.Instance.Connect(nameof(GameManager.ScopeToggled), this, nameof(ToggleScope));
+					GameManager.Instance.Connect(nameof(GameManager.ScopeToggled), new Callable(this, nameof(ToggleScope)));
 				}
 				_isScopeEnadled = GameManager.Instance.ScopeEnabled;
 			}
@@ -69,7 +69,7 @@ public class Player : KinematicBody2D
 		
 		private void OnSfxVolumeChanged(float value)
 		{
-			float dbValue = GD.Linear2Db(value);
+			float dbValue = GD.LinearToDb(value);
 			_normalMovementVolume = dbValue;
 			if (_movingSound.Playing)
 			{
@@ -186,7 +186,7 @@ public class Player : KinematicBody2D
 				bulletChanged = true;
 			}else{
 				if(Input.IsActionJustPressed("light_bullet")){
-					_typeBullet = TypeBullet.Light;
+					_typeBullet = TypeBullet.Light3D;
 					bulletChanged = true;
 				}
 			}
@@ -217,11 +217,11 @@ public class Player : KinematicBody2D
 }
 	
 	private void RotatePlayerMobile(Vector2 direction){
-		RotationDegrees = Mathf.Rad2Deg(direction.Angle()) + 90;
+		RotationDegrees = Mathf.RadToDeg(direction.Angle()) + 90;
 	}
 	
 	private void RotatePlayerMobileAim(Vector2 direction){
-		_gun.GlobalRotationDegrees = Mathf.Rad2Deg(direction.Angle()) + 90;
+		_gun.GlobalRotationDegrees = Mathf.RadToDeg(direction.Angle()) + 90;
 	}
 	
 	private void RotatePlayer(Vector2 direction){
@@ -282,9 +282,9 @@ public class Player : KinematicBody2D
 	}
 	
 	private void fadeSound(){
-		if (_tween.IsConnected("tween_completed", this, nameof(onTweenComplete)))
+		if (_tween.IsConnected("tween_completed", new Callable(this, nameof(onTweenComplete))))
 			{
-				_tween.Disconnect("tween_completed", this, nameof(onTweenComplete));
+				_tween.Disconnect("tween_completed", new Callable(this, nameof(onTweenComplete)));
 			}
 		if (_tween.IsActive())
 		{
@@ -302,7 +302,7 @@ public class Player : KinematicBody2D
 			Tween.EaseType.InOut          
 		);
 		_tween.Start();
-		_tween.Connect("tween_completed", this, nameof(onTweenComplete));
+		_tween.Connect("tween_completed", new Callable(this, nameof(onTweenComplete)));
 	}
 	
 	private void onTweenComplete(Godot.Object obj, NodePath key)
@@ -344,9 +344,9 @@ public class Player : KinematicBody2D
 		bulletScene = (PackedScene)GD.Load("res://scenes/Tank/Bullet.tscn");
 		_lives = 5;
 		_hp = 20;
-		_bulletPosition = GetNode<Position2D>("BodyTank/Gun/BulletPosition");
+		_bulletPosition = GetNode<Marker2D>("BodyTank/Gun/BulletPosition");
 		_movingSound = GetNode<AudioStreamPlayer>("MovingSound");
-		_gun = GetNode<Sprite>("BodyTank/Gun");
+		_gun = GetNode<Sprite2D>("BodyTank/Gun");
 		_joystick = GetNode<CanvasLayer>("Joystick");
 		_aim = GetNode<MobileJoystick>("Aim");
 		_startPosition = GlobalPosition;
@@ -354,26 +354,26 @@ public class Player : KinematicBody2D
 		if (_aim != null)
 		{
 			_aim.init(true);
-			if (!_aim.IsConnected("UseMoveVector", this, nameof(useMoveVectorAim)))
+			if (!_aim.IsConnected("UseMoveVector", new Callable(this, nameof(useMoveVectorAim))))
 			{
-				_aim.Connect("UseMoveVector", this, nameof(useMoveVectorAim));
+				_aim.Connect("UseMoveVector", new Callable(this, nameof(useMoveVectorAim)));
 			}
-			if (!_aim.IsConnected("FireTouch", this, nameof(FireTouch)))
+			if (!_aim.IsConnected("FireTouch", new Callable(this, nameof(FireTouch))))
 			{
-				_aim.Connect("FireTouch", this, nameof(FireTouch));
+				_aim.Connect("FireTouch", new Callable(this, nameof(FireTouch)));
 			}
 		}
-		if (!_joystick.IsConnected("UseMoveVector", this, nameof(useMoveVector)))
+		if (!_joystick.IsConnected("UseMoveVector", new Callable(this, nameof(useMoveVector))))
 		{
-			_joystick.Connect("UseMoveVector", this, nameof(useMoveVector));
+			_joystick.Connect("UseMoveVector", new Callable(this, nameof(useMoveVector)));
 		}
-		if (!_aim.IsConnected("UseMoveVector", this, nameof(useMoveVectorAim)))
+		if (!_aim.IsConnected("UseMoveVector", new Callable(this, nameof(useMoveVectorAim))))
 		{
-			_aim.Connect("UseMoveVector", this, nameof(useMoveVectorAim));
+			_aim.Connect("UseMoveVector", new Callable(this, nameof(useMoveVectorAim)));
 		}
-		if (!_aim.IsConnected("FireTouch", this, nameof(FireTouch)))
+		if (!_aim.IsConnected("FireTouch", new Callable(this, nameof(FireTouch))))
 		{
-			_aim.Connect("FireTouch", this, nameof(FireTouch));
+			_aim.Connect("FireTouch", new Callable(this, nameof(FireTouch)));
 		}
 		_tween = new Tween();
 		_shootTimer = new Timer();

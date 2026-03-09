@@ -2,7 +2,7 @@ using Godot;
 using System;
 
 
-public class IngameWall : StaticBody2D
+public partial class IngameWall : StaticBody2D
 {
 	private bool _destroyable;
 	private bool _can_player_pass;

@@ -1,16 +1,16 @@
 using Godot;
 using System;
 
-public class Bullet : Area2D
+public partial class Bullet : Area2D
 {
 	#region private fields
 	private int _bulletSpeed = 7;
 	private Vector2 _velocity = Vector2.Zero;
 	private AudioStreamPlayer _bulletSound;
 	private Tween _tweenBullet;
-	private VisibilityNotifier2D _visibilityBullet;
+	private VisibleOnScreenNotifier2D _visibilityBullet;
 	private TypeBullet _typeBullet;
-	private Sprite _bulletSprite;
+	private Sprite2D _bulletSprite;
 	private int _damage;
 	private bool _isPlayer;
 	#endregion
@@ -32,17 +32,17 @@ public class Bullet : Area2D
 
 	public override void _Ready()
 	{
-		_bulletSprite = GetNode<Sprite>("BulletSprite");
+		_bulletSprite = GetNode<Sprite2D>("BulletSprite");
 		_bulletSound = GetNode<AudioStreamPlayer>("PlasmaGunSound");
 		_velocity = new Vector2(0, -1).Rotated(Rotation);
-		_visibilityBullet = GetNode<VisibilityNotifier2D>("VisibilityNotifier2D");
+		_visibilityBullet = GetNode<VisibleOnScreenNotifier2D>("VisibleOnScreenNotifier2D");
 		_tweenBullet = new Tween();
 		AddChild(_tweenBullet);
 
-		Connect("body_entered", this, nameof(OnBodyEntered));
-		if (!_visibilityBullet.IsConnected("screen_exited", this, nameof(onScreenExited)))
+		Connect("body_entered", new Callable(this, nameof(OnBodyEntered)));
+		if (!_visibilityBullet.IsConnected("screen_exited", new Callable(this, nameof(onScreenExited))))
 		{
-			_visibilityBullet.Connect("screen_exited", this, nameof(onScreenExited));
+			_visibilityBullet.Connect("screen_exited", new Callable(this, nameof(onScreenExited)));
 		}
 	}
 
@@ -61,9 +61,9 @@ public class Bullet : Area2D
 			return;
 		}
 
-		if (_tweenBullet.IsConnected("tween_completed", this, nameof(onTweenComplete)))
+		if (_tweenBullet.IsConnected("tween_completed", new Callable(this, nameof(onTweenComplete))))
 		{
-			_tweenBullet.Disconnect("tween_completed", this, nameof(onTweenComplete));
+			_tweenBullet.Disconnect("tween_completed", new Callable(this, nameof(onTweenComplete)));
 		}
 
 		_tweenBullet.InterpolateProperty(
@@ -77,7 +77,7 @@ public class Bullet : Area2D
 		);
 
 		_tweenBullet.Start();
-		_tweenBullet.Connect("tween_completed", this, nameof(onTweenComplete));
+		_tweenBullet.Connect("tween_completed", new Callable(this, nameof(onTweenComplete)));
 	}
 
 	private void onTweenComplete(Godot.Object obj, NodePath key)
@@ -141,17 +141,17 @@ public class Bullet : Area2D
 		switch (_typeBullet)
 		{
 			case TypeBullet.Plasma:
-				_bulletSprite.Texture = (Texture)GD.Load("res://assets/future_tanks/PNG/Effects/Plasma.png");
+				_bulletSprite.Texture2D = (Texture2D)GD.Load("res://assets/future_tanks/PNG/Effects/Plasma.png");
 				_bulletSpeed = 7;
 				_damage = 5;
 				break;
 			case TypeBullet.Medium:
-				_bulletSprite.Texture = (Texture)GD.Load("res://assets/future_tanks/PNG/Effects/Medium_Shell.png");
+				_bulletSprite.Texture2D = (Texture2D)GD.Load("res://assets/future_tanks/PNG/Effects/Medium_Shell.png");
 				_bulletSpeed = 4;
 				_damage = 10;
 				break;
-			case TypeBullet.Light:
-				_bulletSprite.Texture = (Texture)GD.Load("res://assets/future_tanks/PNG/Effects/Light_Shell.png");
+			case TypeBullet.Light3D:
+				_bulletSprite.Texture2D = (Texture2D)GD.Load("res://assets/future_tanks/PNG/Effects/Light_Shell.png");
 				_bulletSpeed = 6;
 				_damage = 7;
 				break;

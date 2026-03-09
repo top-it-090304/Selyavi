@@ -1,57 +1,6 @@
-[gd_scene load_steps=5 format=2]
+[gd_scene load_steps=2 format=3 uid="uid://bbheahphoibwi"]
 
-[ext_resource path="res://assets/fonts/ofont.ru_Shonen.ttf" type="DynamicFontData" id=1]
-[ext_resource path="res://assets/fonts/font.tres" type="DynamicFont" id=2]
-[ext_resource path="res://scripts/MenuScripts/PauseScreen.cs" type="Script" id=3]
-
-[sub_resource type="DynamicFont" id=1]
-size = 84
-use_filter = true
-font_data = ExtResource( 1 )
+[ext_resource type="Script" uid="uid://q5r6sg1tov20" path="res://pause_screen.gd" id="1_bosf4"]
 
 [node name="PauseScreen" type="Node2D"]
-script = ExtResource( 3 )
-
-[node name="Background" type="ColorRect" parent="."]
-margin_right = 1281.0
-margin_bottom = 767.0
-color = Color( 0.827451, 0.686275, 0.819608, 1 )
-
-[node name="ReturnToGameButton" type="Button" parent="."]
-margin_left = 383.0
-margin_top = 166.0
-margin_right = 819.0
-margin_bottom = 307.0
-rect_scale = Vector2( 1.2, 1.2 )
-custom_fonts/font = ExtResource( 2 )
-text = "Продолжить"
-
-[node name="ReturnToSettingsButton" type="Button" parent="."]
-margin_left = 383.0
-margin_top = 353.0
-margin_right = 819.0
-margin_bottom = 494.0
-rect_scale = Vector2( 1.2, 1.2 )
-custom_fonts/font = ExtResource( 2 )
-text = "Настройки"
-
-[node name="ReturnToMenuButton" type="Button" parent="."]
-margin_left = 383.0
-margin_top = 544.0
-margin_right = 819.0
-margin_bottom = 685.0
-rect_scale = Vector2( 1.2, 1.2 )
-custom_fonts/font = ExtResource( 2 )
-text = "В Меню"
-
-[node name="Label" type="Label" parent="."]
-margin_left = 481.0
-margin_top = 23.0
-margin_right = 804.0
-margin_bottom = 92.0
-custom_fonts/font = SubResource( 1 )
-text = "Пауза"
-
-[connection signal="pressed" from="ReturnToGameButton" to="." method="_on_ReturnToGameButton_pressed"]
-[connection signal="pressed" from="ReturnToSettingsButton" to="." method="_on_ReturnToSettingsButton_pressed"]
-[connection signal="pressed" from="ReturnToMenuButton" to="." method="_on_ReturnToMenuButton_pressed"]
+script = ExtResource("1_bosf4")

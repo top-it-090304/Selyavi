@@ -1,7 +1,7 @@
 using Godot;
 using System;
 
-public class Water : StaticBody2D
+public partial class Water : StaticBody2D
 {
     // Declare member variables here. Examples:
     // private int a = 2;

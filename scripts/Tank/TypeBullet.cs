@@ -2,5 +2,5 @@
 public enum TypeBullet{
 	Plasma,
 	Medium,
-	Light
+	Light3D
 }

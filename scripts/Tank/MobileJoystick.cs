@@ -1,7 +1,7 @@
 using Godot;
 using System;
 
-public class MobileJoystick : CanvasLayer
+public partial class MobileJoystick : CanvasLayer
 {
 	[Signal]
 	public delegate void UseMoveVector(Vector2 moveVector);
@@ -14,11 +14,11 @@ public class MobileJoystick : CanvasLayer
 	private TouchScreenButton _fireButton;
 	private Vector2 moveVector = new Vector2(0, 0);
 	private bool _isJoystickActive = false;
-	private Sprite _innerCircle;
+	private Sprite2D _innerCircle;
 	private float _joystickRadius = 100f; 
 	private Vector2 _lastValidDirection = Vector2.Zero;
 	private Vector2 _buttonCenter;
-	private Texture _joystickTexture;
+	private Texture2D _joystickTexture;
 	#endregion
 	
 	
@@ -30,7 +30,7 @@ public class MobileJoystick : CanvasLayer
 
 	public override void _Ready()
 	{
-		Texture originalTexture = (Texture)GD.Load("res://assets/scope.png");
+		Texture2D originalTexture = (Texture2D)GD.Load("res://assets/scope.png");
 		Image image = originalTexture.GetData();
 	
 		image.Resize(100, 100, Image.Interpolation.Bilinear);
@@ -40,17 +40,17 @@ public class MobileJoystick : CanvasLayer
 		_joystickTexture = resizedTexture;
 		_touchButton = GetNode<TouchScreenButton>("TouchScreenButton");
 		_fireButton = GetNode<TouchScreenButton>("JoystickTipArrows/FireButton");
-		_innerCircle = GetNode<Sprite>("JoystickTipArrows");
+		_innerCircle = GetNode<Sprite2D>("JoystickTipArrows");
 		_buttonCenter = _touchButton.Position + new Vector2(_joystickRadius, _joystickRadius);
 		ResetJoystick();
-		_fireButton.Connect("released", this, nameof(OnButtonFirePressed));
+		_fireButton.Connect("released", new Callable(this, nameof(OnButtonFirePressed)));
 
 	}
 	
 	public void init(bool aim){
 		isAim = aim;
 		if(isAim){
-			_innerCircle.Texture = _joystickTexture;
+			_innerCircle.Texture2D = _joystickTexture;
 		}
 	}
 	
@@ -86,7 +86,7 @@ public class MobileJoystick : CanvasLayer
 				
 				if (isAim && _lastValidDirection != Vector2.Zero)
 				{
-					moveVector = _lastValidDirection.LinearInterpolate(newDirection, 0.3f);
+					moveVector = _lastValidDirection.Lerp(newDirection, 0.3f);
 				}
 				else
 				{

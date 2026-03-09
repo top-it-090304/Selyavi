@@ -1,0 +1,6 @@
+Node
+CharacterBody2D
+CanvasLayer
+StaticBody2D
+Node2D
+Area2D

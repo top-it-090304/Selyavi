@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://code5q788lxog"]
+
+[ext_resource type="Script" uid="uid://cwm74seletfca" path="res://indestructible_wall.gd" id="1_tiau8"]
+
+[node name="IndestructibleWall" type="StaticBody2D"]
+script = ExtResource("1_tiau8")

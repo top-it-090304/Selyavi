@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class AudioManager : Node
+public partial class AudioManager : Node
 {
 	public static AudioManager Instance { get; private set; }
 	
@@ -39,7 +39,7 @@ public class AudioManager : Node
 				case TypeBullet.Medium:
 					path = "res://assets/sounds/vystrel-tanka.mp3";
 					break;
-				case TypeBullet.Light:
+				case TypeBullet.Light3D:
 					path = "res://assets/sounds/light_bullet.mp3";
 					break;
 			}
@@ -83,7 +83,7 @@ public class AudioManager : Node
 
 	public void SetMusicVolume(float value)
 	{
-		float dbValue = GD.Linear2Db(value);
+		float dbValue = GD.LinearToDb(value);
 		AudioServer.SetBusVolumeDb(_musicBusIndex, dbValue);
 		EmitSignal(nameof(MusicVolumeChanged), value);
 		SaveSetting("music_volume", value);
@@ -91,7 +91,7 @@ public class AudioManager : Node
 
 	public void SetSfxVolume(float value)
 	{
-		float dbValue = GD.Linear2Db(value);
+		float dbValue = GD.LinearToDb(value);
 		AudioServer.SetBusVolumeDb(_sfxBusIndex, dbValue);
 		EmitSignal(nameof(SfxVolumeChanged), value);
 		SaveSetting("sfx_volume", value);
@@ -100,14 +100,14 @@ public class AudioManager : Node
 	public float GetMusicVolume()
 	{
 		float dbValue = AudioServer.GetBusVolumeDb(_musicBusIndex);
-		float linear = GD.Db2Linear(dbValue);
+		float linear = GD.DbToLinear(dbValue);
 		return linear;
 	}
 
 	public float GetSfxVolume()
 	{
 		float dbValue = AudioServer.GetBusVolumeDb(_sfxBusIndex);
-		return GD.Db2Linear(dbValue);
+		return GD.DbToLinear(dbValue);
 	}
 
 	private void SaveSetting(string key, float value)

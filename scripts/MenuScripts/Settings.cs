@@ -1,7 +1,7 @@
 using Godot;
 using System;
 
-public class Settings : Node2D
+public partial class Settings : Node2D
 {
 	private Slider _musicSlider;
 	private Slider _soundSlider;
@@ -16,10 +16,10 @@ public class Settings : Node2D
 		LoadSettings();
 		
 		if (_soundSlider != null)
-			_soundSlider.Connect("value_changed", this, nameof(OnSoundSliderChanged));
+			_soundSlider.Connect("value_changed", new Callable(this, nameof(OnSoundSliderChanged)));
 		
 		if (_musicSlider != null)
-			_musicSlider.Connect("value_changed", this, nameof(OnMusicSliderChanged));
+			_musicSlider.Connect("value_changed", new Callable(this, nameof(OnMusicSliderChanged)));
 		
 		if (_scopeToggler != null)
 		{
@@ -28,7 +28,7 @@ public class Settings : Node2D
 				_scopeToggler.Pressed = GameManager.Instance.ScopeEnabled;
 			}
 			
-			_scopeToggler.Connect("toggled", this, nameof(_on_CheckButton_toggled));
+			_scopeToggler.Connect("toggled", new Callable(this, nameof(_on_CheckButton_toggled)));
 		}
 	}
 
@@ -47,7 +47,7 @@ public class Settings : Node2D
 	private void _on_Return_Button_pressed()
 	{
 		SaveSettings();
-		GetTree().ChangeScene("res://scenes/MenuScenes/Menu.tscn");
+		GetTree().ChangeSceneToFile("res://scenes/MenuScenes/Menu.tscn");
 	}
 	
 	private void _on_CheckButton_toggled(bool buttonPressed)
