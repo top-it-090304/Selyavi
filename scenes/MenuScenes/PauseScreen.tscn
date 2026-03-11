@@ -1,6 +1,7 @@
 [gd_scene load_steps=2 format=3 uid="uid://bbheahphoibwi"]
 
-[ext_resource type="Script" uid="uid://q5r6sg1tov20" path="res://pause_screen.gd" id="1_bosf4"]
+[ext_resource type="Script" uid="uid://q5r6sg1tov20" path="res://scripts/MenuScripts/pause_screen.gd" id="1_bosf4"]
+
 
 [node name="PauseScreen" type="Node2D"]
 script = ExtResource("1_bosf4")

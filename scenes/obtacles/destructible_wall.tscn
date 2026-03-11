@@ -1,6 +1,18 @@
-[gd_scene load_steps=2 format=3 uid="uid://cjg4kqcx5a8v5"]
+[gd_scene load_steps=4 format=3 uid="uid://cjg4kqcx5a8v5"]
 
-[ext_resource type="Script" uid="uid://cdjlhm13xtvnb" path="res://destructible_wall.gd" id="1_m83c8"]
+[ext_resource type="Script" uid="uid://cdjlhm13xtvnb" path="res://scripts/Obstacles/destructible_wall.gd" id="1_m83c8"]
+[ext_resource type="Texture2D" uid="uid://bkg0ohtj20hhe" path="res://assets/backround/PNG/Blocks/Block_A_02.png" id="2_p2j3e"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_ifwu5"]
+size = Vector2(127, 128.5)
 
 [node name="DestructibleWall" type="StaticBody2D"]
 script = ExtResource("1_m83c8")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(-2, 3.75)
+shape = SubResource("RectangleShape2D_ifwu5")
+
+[node name="BlockA02" type="Sprite2D" parent="."]
+position = Vector2(-2, 3)
+texture = ExtResource("2_p2j3e")

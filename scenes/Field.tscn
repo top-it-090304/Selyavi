@@ -1,6 +1,204 @@
-[gd_scene load_steps=2 format=3 uid="uid://cel1pa3btc1pd"]
+[gd_scene load_steps=18 format=3 uid="uid://cel1pa3btc1pd"]
 
-[ext_resource type="Script" uid="uid://dhy5vx4eoy2lh" path="res://field.gd" id="1_x2uev"]
+[ext_resource type="Script" uid="uid://dhy5vx4eoy2lh" path="res://scripts/field.gd" id="1_x2uev"]
+[ext_resource type="Texture2D" uid="uid://cl85gy565bjtu" path="res://assets/backround/PNG/Tiles/Ground_Tile_01_A.png" id="2_g4gdd"]
+[ext_resource type="Texture2D" uid="uid://cm4nv872v32tp" path="res://assets/backround/PNG/Tiles/Ground_Tile_01_B.png" id="3_rv7dt"]
+[ext_resource type="Texture2D" uid="uid://c1m6k8mciw4y7" path="res://assets/backround/PNG/Tiles/Ground_Tile_01_C.png" id="4_je2up"]
+[ext_resource type="Texture2D" uid="uid://cv4xp0phxf0s6" path="res://assets/backround/PNG/Tiles/Ground_Tile_02_A.png" id="5_54lmj"]
+[ext_resource type="Texture2D" uid="uid://cjv6hkk4x6g6a" path="res://assets/backround/PNG/Tiles/Ground_Tile_02_B.png" id="6_2828m"]
+[ext_resource type="Texture2D" uid="uid://03npverdr0i8" path="res://assets/backround/PNG/Tiles/Ground_Tile_02_C.png" id="7_jewf5"]
+[ext_resource type="PackedScene" uid="uid://cjg4kqcx5a8v5" path="res://scenes/obtacles/destructible_wall.tscn" id="8_g7og8"]
+[ext_resource type="PackedScene" uid="uid://code5q788lxog" path="res://scenes/obtacles/indestructible_wall.tscn" id="9_2i15a"]
+[ext_resource type="PackedScene" path="res://scenes/obtacles/wall.tscn" id="10_83lt2"]
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_covr1"]
+texture = ExtResource("2_g4gdd")
+0:0/size_in_atlas = Vector2i(16, 16)
+0:0/0 = 0
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_wg15x"]
+texture = ExtResource("3_rv7dt")
+0:0/size_in_atlas = Vector2i(16, 16)
+0:0/0 = 0
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_ek068"]
+texture = ExtResource("4_je2up")
+0:0/size_in_atlas = Vector2i(16, 16)
+0:0/0 = 0
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_n0sxv"]
+texture = ExtResource("5_54lmj")
+0:0/size_in_atlas = Vector2i(16, 16)
+0:0/0 = 0
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_mssve"]
+texture = ExtResource("6_2828m")
+0:0/size_in_atlas = Vector2i(16, 16)
+0:0/0 = 0
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_i1s7d"]
+texture = ExtResource("7_jewf5")
+0:0/size_in_atlas = Vector2i(16, 16)
+0:0/0 = 0
+
+[sub_resource type="TileSet" id="TileSet_slgcm"]
+tile_size = Vector2i(256, 256)
+sources/0 = SubResource("TileSetAtlasSource_covr1")
+sources/1 = SubResource("TileSetAtlasSource_wg15x")
+sources/2 = SubResource("TileSetAtlasSource_ek068")
+sources/3 = SubResource("TileSetAtlasSource_n0sxv")
+sources/4 = SubResource("TileSetAtlasSource_mssve")
+sources/5 = SubResource("TileSetAtlasSource_i1s7d")
 
 [node name="Field" type="Node2D"]
 script = ExtResource("1_x2uev")
+
+[node name="Background" type="TileMap" parent="."]
+tile_set = SubResource("TileSet_slgcm")
+format = 2
+layer_0/tile_data = PackedInt32Array(0, 3, 0, 1, 0, 0, 2, 0, 0, 3, 0, 0, 4, 0, 0, 65540, 3, 0, 65539, 0, 0, 65538, 0, 0, 65537, 0, 0, 65536, 0, 0, 131072, 5, 0, 131073, 0, 0, 131074, 3, 0, 131075, 3, 0, 131076, 0, 0, 196612, 3, 0, 196611, 0, 0, 196610, 0, 0, 196609, 3, 0, 196608, 2, 0, -65536, 0, 0, -65535, 0, 0, -65534, 3, 0, -65533, 0, 0, -65532, 3, 0, -1, 2, 0, 65535, 5, 0, 131071, 2, 0, 196607, 5, 0, 262143, 5, 0, 262142, 5, 0, 196606, 5, 0, 131070, 5, 0, 65534, 5, 0, -2, 5, 0, -3, 5, 0, 65533, 2, 0, 131069, 5, 0, 196605, 5, 0, 262141, 2, 0, 327677, 1, 0, 327678, 1, 0, 327679, 4, 0, 262144, 1, 0, 262145, 1, 0, 262146, 4, 0, 262147, 4, 0, 262148, 1, 0, 393214, 4, 0, 393215, 1, 0, 327680, 1, 0, 327681, 4, 0, 327682, 1, 0, 327683, 1, 0, 327684, 4, 0, 393213, 4, 0)
+
+[node name="ingameWalls" type="StaticBody2D" parent="."]
+
+[node name="DestructibleWalls" type="StaticBody2D" parent="ingameWalls"]
+
+[node name="DestructibleWall" parent="ingameWalls/DestructibleWalls" instance=ExtResource("8_g7og8")]
+position = Vector2(65, -182)
+
+[node name="DestructibleWall2" parent="ingameWalls/DestructibleWalls" instance=ExtResource("8_g7og8")]
+position = Vector2(186, -180)
+
+[node name="DestructibleWall3" parent="ingameWalls/DestructibleWalls" instance=ExtResource("8_g7og8")]
+position = Vector2(1203, -172)
+
+[node name="DestructibleWall4" parent="ingameWalls/DestructibleWalls" instance=ExtResource("8_g7og8")]
+position = Vector2(1049, -172)
+
+[node name="DestructibleWall5" parent="ingameWalls/DestructibleWalls" instance=ExtResource("8_g7og8")]
+position = Vector2(962, 282)
+
+[node name="DestructibleWall6" parent="ingameWalls/DestructibleWalls" instance=ExtResource("8_g7og8")]
+position = Vector2(-494, 627)
+
+[node name="DestructibleWall7" parent="ingameWalls/DestructibleWalls" instance=ExtResource("8_g7og8")]
+position = Vector2(-620, 397)
+
+[node name="DestructibleWall8" parent="ingameWalls/DestructibleWalls" instance=ExtResource("8_g7og8")]
+position = Vector2(-730, 200)
+
+[node name="DestructibleWall9" parent="ingameWalls/DestructibleWalls" instance=ExtResource("8_g7og8")]
+position = Vector2(-510, 52)
+
+[node name="DestructibleWall10" parent="ingameWalls/DestructibleWalls" instance=ExtResource("8_g7og8")]
+position = Vector2(-716, -205)
+
+[node name="DestructibleWall11" parent="ingameWalls/DestructibleWalls" instance=ExtResource("8_g7og8")]
+position = Vector2(-153, -20)
+
+[node name="DestructibleWall12" parent="ingameWalls/DestructibleWalls" instance=ExtResource("8_g7og8")]
+position = Vector2(1201, 105)
+
+[node name="DestructibleWall13" parent="ingameWalls/DestructibleWalls" instance=ExtResource("8_g7og8")]
+position = Vector2(-152, 1138)
+
+[node name="DestructibleWall14" parent="ingameWalls/DestructibleWalls" instance=ExtResource("8_g7og8")]
+position = Vector2(674, 1235)
+
+[node name="DestructibleWall15" parent="ingameWalls/DestructibleWalls" instance=ExtResource("8_g7og8")]
+position = Vector2(-154, 1429)
+
+[node name="DestructibleWall16" parent="ingameWalls/DestructibleWalls" instance=ExtResource("8_g7og8")]
+position = Vector2(1035, 1438)
+
+[node name="IndestructibleWalls" type="StaticBody2D" parent="ingameWalls"]
+
+[node name="IndestructibleWall" parent="ingameWalls/IndestructibleWalls" instance=ExtResource("9_2i15a")]
+position = Vector2(108, 428)
+
+[node name="IndestructibleWall2" parent="ingameWalls/IndestructibleWalls" instance=ExtResource("9_2i15a")]
+position = Vector2(301, 725)
+
+[node name="IndestructibleWall3" parent="ingameWalls/IndestructibleWalls" instance=ExtResource("9_2i15a")]
+position = Vector2(919, -178)
+
+[node name="IndestructibleWall4" parent="ingameWalls/IndestructibleWalls" instance=ExtResource("9_2i15a")]
+position = Vector2(794, -187)
+
+[node name="IndestructibleWall5" parent="ingameWalls/IndestructibleWalls" instance=ExtResource("9_2i15a")]
+position = Vector2(674, -173)
+
+[node name="IndestructibleWall8" parent="ingameWalls/IndestructibleWalls" instance=ExtResource("9_2i15a")]
+position = Vector2(1042, 617)
+
+[node name="IndestructibleWall9" parent="ingameWalls/IndestructibleWalls" instance=ExtResource("9_2i15a")]
+position = Vector2(188, 1345)
+
+[node name="IndestructibleWall10" parent="ingameWalls/IndestructibleWalls" instance=ExtResource("9_2i15a")]
+position = Vector2(-451, 1345)
+
+[node name="IndestructibleWall6" parent="ingameWalls/IndestructibleWalls" instance=ExtResource("9_2i15a")]
+position = Vector2(928, 34)
+
+[node name="IndestructibleWall7" parent="ingameWalls/IndestructibleWalls" instance=ExtResource("9_2i15a")]
+position = Vector2(-607, 1093)
+
+[node name="IndestructibleWall11" parent="ingameWalls/IndestructibleWalls" instance=ExtResource("9_2i15a")]
+position = Vector2(443, 433)
+
+[node name="IndestructibleWall12" parent="ingameWalls/IndestructibleWalls" instance=ExtResource("9_2i15a")]
+position = Vector2(964, 964)
+
+[node name="IndestructibleWall13" parent="ingameWalls/IndestructibleWalls" instance=ExtResource("9_2i15a")]
+position = Vector2(727, 762)
+
+[node name="Walls" type="StaticBody2D" parent="ingameWalls"]
+
+[node name="wall" parent="ingameWalls/Walls" instance=ExtResource("10_83lt2")]
+position = Vector2(-785, -268)
+
+[node name="wall2" parent="ingameWalls/Walls" instance=ExtResource("10_83lt2")]
+position = Vector2(-785, 334)
+
+[node name="wall3" parent="ingameWalls/Walls" instance=ExtResource("10_83lt2")]
+position = Vector2(-788, 933)
+
+[node name="wall4" parent="ingameWalls/Walls" instance=ExtResource("10_83lt2")]
+position = Vector2(1303, -268)
+
+[node name="wall5" parent="ingameWalls/Walls" instance=ExtResource("10_83lt2")]
+position = Vector2(1303, 334)
+
+[node name="wall6" parent="ingameWalls/Walls" instance=ExtResource("10_83lt2")]
+position = Vector2(1300, 933)
+
+[node name="wall7" parent="ingameWalls/Walls" instance=ExtResource("10_83lt2")]
+position = Vector2(-176, -276)
+rotation = 1.5708
+
+[node name="wall8" parent="ingameWalls/Walls" instance=ExtResource("10_83lt2")]
+position = Vector2(423, -274)
+rotation = 1.5708
+
+[node name="wall9" parent="ingameWalls/Walls" instance=ExtResource("10_83lt2")]
+position = Vector2(1025, -274)
+rotation = 1.5708
+
+[node name="wall10" parent="ingameWalls/Walls" instance=ExtResource("10_83lt2")]
+position = Vector2(1310, -274)
+rotation = 1.5708
+
+[node name="wall11" parent="ingameWalls/Walls" instance=ExtResource("10_83lt2")]
+position = Vector2(-176, 1541)
+rotation = 1.5708
+
+[node name="wall12" parent="ingameWalls/Walls" instance=ExtResource("10_83lt2")]
+position = Vector2(423, 1543)
+rotation = 1.5708
+
+[node name="wall13" parent="ingameWalls/Walls" instance=ExtResource("10_83lt2")]
+position = Vector2(1025, 1543)
+rotation = 1.5708
+
+[node name="wall14" parent="ingameWalls/Walls" instance=ExtResource("10_83lt2")]
+position = Vector2(1310, 1543)
+rotation = 1.5708

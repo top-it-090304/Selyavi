@@ -1,13 +1,11 @@
-[gd_scene load_steps=3 format=3 uid="uid://ingame_wall_scene"]
+[gd_scene load_steps=3 format=3 uid="uid://dkh3geuwx1oxy"]
 
-[ext_resource type="Script" path="res://scripts/IngameWall.cs" id="1_ingame_wall_script"]
+[ext_resource type="Script" uid="uid://eqgdrcl3agfa" path="res://scripts/Obstacles/ingame_wall.gd" id="1_6dawc"]
 
-[sub_resource type="RectangleShape2D" id="1_wall_shape"]
-size = Vector2(129, 128)
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_8k4wc"]
 
 [node name="IngameWall" type="StaticBody2D"]
-script = ExtResource("1_ingame_wall_script")
+script = ExtResource("1_6dawc")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-position = Vector2(54.5, -54)
-shape = SubResource("1_wall_shape")
+shape = SubResource("RectangleShape2D_8k4wc")

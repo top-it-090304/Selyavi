@@ -1,6 +1,18 @@
-[gd_scene load_steps=2 format=3 uid="uid://code5q788lxog"]
+[gd_scene load_steps=4 format=3 uid="uid://code5q788lxog"]
 
-[ext_resource type="Script" uid="uid://cwm74seletfca" path="res://indestructible_wall.gd" id="1_tiau8"]
+[ext_resource type="Script" uid="uid://cwm74seletfca" path="res://scripts/Obstacles/indestructible_wall.gd" id="1_tiau8"]
+[ext_resource type="Texture2D" uid="uid://dxgq3yu56ergh" path="res://assets/backround/PNG/Blocks/Block_C_02.png" id="2_0toht"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_s68cw"]
+size = Vector2(129, 130)
 
 [node name="IndestructibleWall" type="StaticBody2D"]
 script = ExtResource("1_tiau8")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(0.5, 4)
+shape = SubResource("RectangleShape2D_s68cw")
+
+[node name="BlockC02" type="Sprite2D" parent="."]
+position = Vector2(0, 4)
+texture = ExtResource("2_0toht")

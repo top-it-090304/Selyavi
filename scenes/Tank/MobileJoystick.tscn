@@ -1,6 +1,7 @@
 [gd_scene load_steps=2 format=3 uid="uid://bhqh6wbowk5b1"]
 
-[ext_resource type="Script" uid="uid://cxnrkuck3iva1" path="res://mobile_joystick.gd" id="1_yfs06"]
+[ext_resource type="Script" uid="uid://cxnrkuck3iva1" path="res://scripts/mobile_joystick.gd" id="1_yfs06"]
+
 
 [node name="MobileJoystick" type="CanvasLayer"]
 script = ExtResource("1_yfs06")
