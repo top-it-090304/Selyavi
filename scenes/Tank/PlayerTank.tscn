@@ -1,0 +1,16 @@
+[gd_scene load_steps=4 format=2]
+
+[ext_resource path="res://scenes/Tank/Tank.tscn" type="PackedScene" id=1]
+[ext_resource path="res://scenes/Tank/PlayerTank.cs" type="Script" id=2]
+[ext_resource path="res://scenes/Tank/MobileJoystick.tscn" type="PackedScene" id=3]
+
+[node name="PlayerTank" instance=ExtResource( 1 )]
+script = ExtResource( 2 )
+
+[node name="Joystick" parent="." index="3" instance=ExtResource( 3 )]
+offset = Vector2( 70, 180 )
+transform = Transform2D( 1, 0, 0, 1, 70, 180 )
+
+[node name="Aim" parent="." index="4" instance=ExtResource( 3 )]
+offset = Vector2( 1000, 180 )
+transform = Transform2D( 1, 0, 0, 1, 1000, 180 )
