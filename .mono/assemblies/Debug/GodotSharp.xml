@@ -16395,13 +16395,6 @@
             <para>Returns an image of the same size as the bitmap and with a <see cref="T:Godot.Image.Format"/> of type <c>FORMAT_L8</c>. <c>true</c> bits of the bitmap are being converted into white pixels, and <c>false</c> bits into black.</para>
             </summary>
         </member>
-        <member name="M:Godot.BitMap.OpaqueToPolygons(Godot.Rect2,System.Single)">
-            <summary>
-            <para>Generates polygon outlines from the opaque (non-transparent) areas of the <see cref="T:Godot.BitMap"/> using a Marching Squares algorithm.</para>
-            <para>Returns an <see cref="T:Godot.Collections.Array"/> of <see cref="T:Godot.Vector2"/>, where each <see cref="T:Godot.Vector2"/> represents a polygon outline. These outlines can be directly assigned to the <c>polygon</c> property of nodes like <see cref="T:Godot.CollisionPolygon2D"/> or <see cref="T:Godot.OccluderPolygon2D"/>.</para>
-            <para>The <c>epsilon</c> parameter controls polygon simplification. A lower value produces more accurate polygons, but at the cost of increased polygon size and potential performance impact. A higher value simplifies the polygons, reducing their size and improving performance, but with less accuracy.</para>
-            </summary>
-        </member>
         <member name="T:Godot.BitmapFont">
             <summary>
             <para>Renders text using <c>*.fnt</c> fonts containing texture atlases. Supports distance fields. For using vector font files like TTF directly, see <see cref="T:Godot.DynamicFont"/>.</para>
@@ -47448,7 +47441,6 @@
         <member name="P:Godot.TextureProgress.RadialInitialAngle">
             <summary>
             <para>Starting angle for the fill of <see cref="P:Godot.TextureProgress.TextureProgress_"/> if <see cref="P:Godot.TextureProgress.FillMode"/> is <see cref="F:Godot.TextureProgress.FillModeEnum.Clockwise"/> or <see cref="F:Godot.TextureProgress.FillModeEnum.CounterClockwise"/>. When the node's <c>value</c> is equal to its <c>min_value</c>, the texture doesn't show up at all. When the <c>value</c> increases, the texture fills and tends towards <see cref="P:Godot.TextureProgress.RadialFillDegrees"/>.</para>
-            <para>Note: <see cref="P:Godot.TextureProgress.RadialInitialAngle"/> is wrapped between <c>0</c> and <c>360</c> degrees (inclusive).</para>
             </summary>
         </member>
         <member name="P:Godot.TextureProgress.RadialFillDegrees">
@@ -47460,7 +47452,6 @@
         <member name="P:Godot.TextureProgress.RadialCenterOffset">
             <summary>
             <para>Offsets <see cref="P:Godot.TextureProgress.TextureProgress_"/> if <see cref="P:Godot.TextureProgress.FillMode"/> is <see cref="F:Godot.TextureProgress.FillModeEnum.Clockwise"/> or <see cref="F:Godot.TextureProgress.FillModeEnum.CounterClockwise"/>.</para>
-            <para>Note: The effective radial center always stays within the <see cref="P:Godot.TextureProgress.TextureProgress_"/> bounds. If you need to move it outside the texture's bounds, modify the <see cref="P:Godot.TextureProgress.TextureProgress_"/> to contain additional empty space where needed.</para>
             </summary>
         </member>
         <member name="P:Godot.TextureProgress.NinePatchStretch">
@@ -48848,7 +48839,6 @@
             <summary>
             <para>If <c>true</c>, the timer will automatically start when entering the scene tree.</para>
             <para>Note: This property is automatically set to <c>false</c> after the timer enters the scene tree and starts.</para>
-            <para>Note: This property does nothing when the timer is running in the editor.</para>
             </summary>
         </member>
         <member name="P:Godot.Timer.Paused">

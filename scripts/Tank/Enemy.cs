@@ -21,6 +21,10 @@ public class Enemy : KinematicBody2D
 	private NavigationAgent2D _nav2d;
 	private RayCast2D _rayCast;
 	private TypeEnemy _typeEnemy;
+	private AudioStreamPlayer _movingSound;
+	private Tween _tween;
+	private bool _isMoving = false;
+	private float _normalMovementVolume = -20f;
 	#endregion
 	PackedScene bulletScene;
 	private enum TypeEnemy{
@@ -33,6 +37,7 @@ public class Enemy : KinematicBody2D
 	{
 		init();
 		AddChild(_shootTimer);
+		AddChild(_tween);
 		
 		if (_nav2d != null)
 		{
@@ -41,7 +46,21 @@ public class Enemy : KinematicBody2D
 			_nav2d.PathDesiredDistance = 5f;
 		}
 		
+		ConfigureAudioPlayers();
+		if (_movingSound != null)
+		{
+			_normalMovementVolume = _movingSound.VolumeDb;
+		}
+	}
+
+	private void ConfigureAudioPlayers()
+	{
+		int sfxBusIndex = AudioServer.GetBusIndex("SFX");
 		
+		if (_movingSound != null)
+		{
+			_movingSound.Bus = "SFX";
+		}
 	}
 
 	public override void _PhysicsProcess(float delta)
@@ -60,6 +79,44 @@ public class Enemy : KinematicBody2D
 		_velocity = MoveAndSlide(_velocity);
 	}
 
+	private void HandleMovementSound(Vector2 movementVelocity)
+	{
+		bool isMovingNow = movementVelocity.Length() > 0.1f;
+		
+		if (isMovingNow)
+		{
+			if(!_isMoving)
+			{
+				if(_tween.IsActive())
+				{
+					_tween.StopAll();
+					_tween.RemoveAll(); 
+				}
+				if (_movingSound != null)
+				{
+					_movingSound.VolumeDb = _normalMovementVolume;
+					if (!_movingSound.Playing)
+					{
+						_movingSound.Play();	
+					}
+				}
+				_isMoving = true;
+			}
+		} 
+		else 
+		{
+			if(_isMoving)
+			{
+				_isMoving = false;
+				
+				if (_movingSound != null && _movingSound.Playing)
+				{
+					fadeSound();
+				}
+			}
+		}
+	}
+	
 	private void UpdateTarget()
 	{
 		if (_nav2d == null) return;
@@ -129,10 +186,13 @@ public class Enemy : KinematicBody2D
 			{
 				RotationDegrees = _velocity.Angle() * 180 / Mathf.Pi + 90;
 			}
+			
+			HandleMovementSound(_velocity);
 		}
 		else
 		{
 			_velocity = Vector2.Zero;
+			HandleMovementSound(Vector2.Zero);
 		}
 	}
 
@@ -266,6 +326,35 @@ public class Enemy : KinematicBody2D
 		_shootTimer.Start();
 	}
 	
+	private void fadeSound(){
+		if (_tween.IsConnected("tween_completed", this, nameof(onTweenComplete)))
+		{
+			_tween.Disconnect("tween_completed", this, nameof(onTweenComplete));
+		}
+		if (_tween.IsActive())
+		{
+			_tween.StopAll();
+			_tween.RemoveAll();
+		}
+		_tween.InterpolateProperty(
+			_movingSound,                    
+			"volume_db",                   
+			_movingSound.VolumeDb,         
+			-80,                         
+			0.3f,                          
+			Tween.TransitionType.Linear,   
+			Tween.EaseType.InOut          
+		);
+		_tween.Start();
+		_tween.Connect("tween_completed", this, nameof(onTweenComplete));
+	}
+	
+	private void onTweenComplete(Godot.Object obj, NodePath key)
+	{
+		_movingSound.Stop();
+		_movingSound.VolumeDb = _normalMovementVolume;
+	}
+	
 	private void init()
 	{
 		AddToGroup("enemies");
@@ -273,6 +362,8 @@ public class Enemy : KinematicBody2D
 		_rayCast = GetNode<RayCast2D>("RayCast2D"); 
 		_gun = GetNode<Sprite>("BodyTank/Gun");
 		_body = GetNode<Sprite>("BodyTank");
+		_movingSound = GetNode<AudioStreamPlayer>("MovingSound");
+		_tween = new Tween();
 		Navigation2D navigation2D = GetNode<Navigation2D>("/root/Field/Navigation2D");
 		if (navigation2D != null)
 		{
@@ -320,8 +411,8 @@ public class Enemy : KinematicBody2D
 	}
 	
 	private void RandomizeEnemyType(){
-	Array values = Enum.GetValues(typeof(TypeEnemy));
-	Random random = new Random();
-	_typeEnemy = (TypeEnemy)values.GetValue(random.Next(values.Length));
+		Array values = Enum.GetValues(typeof(TypeEnemy));
+		Random random = new Random();
+		_typeEnemy = (TypeEnemy)values.GetValue(random.Next(values.Length));
 	}
 }

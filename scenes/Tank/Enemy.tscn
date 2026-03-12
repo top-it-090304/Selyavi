@@ -1,8 +1,9 @@
-[gd_scene load_steps=6 format=2]
+[gd_scene load_steps=7 format=2]
 
 [ext_resource path="res://scripts/Tank/Enemy.cs" type="Script" id=1]
 [ext_resource path="res://assets/future_tanks/PNG/Weapon_Color_D/Gun_03.png" type="Texture" id=2]
 [ext_resource path="res://assets/future_tanks/PNG/Hulls_Color_D/Hull_01.png" type="Texture" id=3]
+[ext_resource path="res://assets/sounds/tracks_rattle_slow_01.mp3" type="AudioStream" id=4]
 
 [sub_resource type="CircleShape2D" id=1]
 radius = 215.5
@@ -45,3 +46,7 @@ enabled = true
 cast_to = Vector2( 0, 200 )
 
 [node name="NavigationObstacle2D" type="NavigationObstacle2D" parent="."]
+
+[node name="MovingSound" type="AudioStreamPlayer" parent="."]
+stream = ExtResource( 4 )
+volume_db = -20.0
