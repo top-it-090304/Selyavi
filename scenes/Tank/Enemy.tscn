@@ -43,3 +43,5 @@ path_max_distance = 13.0
 position = Vector2( 0, -200 )
 enabled = true
 cast_to = Vector2( 0, 200 )
+
+[node name="NavigationObstacle2D" type="NavigationObstacle2D" parent="."]

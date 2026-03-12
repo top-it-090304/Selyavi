@@ -71,7 +71,7 @@ public class AudioManager : Node
 	
 	private int FindBusIndex(string busName)
 	{
-		for (int i = 0; i < AudioServer.GetBusCount(); i++)
+		for (int i = 0; i < AudioServer.BusCount; i++)
 		{
 			if (AudioServer.GetBusName(i) == busName)
 			{

@@ -286,6 +286,7 @@ public class Enemy : KinematicBody2D
 				_hp = 10;
 				_body.Texture = (Texture)GD.Load("res://assets/future_tanks/PNG/Hulls_Color_D/Hull_08.png");
 				_gun.Texture = (Texture)GD.Load("res://assets/future_tanks/PNG/Weapon_Color_D/Gun_05.png");
+				_gun.Position += new Vector2(0, -35);
 				break;
 			case TypeEnemy.Medium:
 				_patrolSpeed = 100;
