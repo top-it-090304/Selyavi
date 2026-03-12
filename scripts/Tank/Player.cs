@@ -174,7 +174,22 @@ public class Player : KinematicBody2D
 		changeBullet();
 		//fire();
 	}
-	
+	private void _on_Plasma_pressed()
+	{
+		_typeBullet = TypeBullet.Plasma;
+	}
+
+
+	private void _on_SmallShell_pressed()
+	{
+		_typeBullet = TypeBullet.Light;
+	}
+
+
+	private void _on_MediumShell_pressed()
+	{
+		_typeBullet = TypeBullet.Medium;
+	}
 	private void changeBullet(){
 		bool bulletChanged = false;
 		if(Input.IsActionJustPressed("plasma")){
@@ -381,4 +396,3 @@ public class Player : KinematicBody2D
 		_shootTimer.OneShot = true;
 	}
 }
-
