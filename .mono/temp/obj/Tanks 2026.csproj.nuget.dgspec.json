@@ -1,31 +1,25 @@
 {
   "format": 1,
   "restore": {
-    "D:\\Tanks_2026\\Tanks 2026.csproj": {}
+    "C:\\Users\\Пользователь\\Desktop\\tanks 2026\\Tanks 2026.csproj": {}
   },
   "projects": {
-    "D:\\Tanks_2026\\Tanks 2026.csproj": {
+    "C:\\Users\\Пользователь\\Desktop\\tanks 2026\\Tanks 2026.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\Tanks_2026\\Tanks 2026.csproj",
+        "projectUniqueName": "C:\\Users\\Пользователь\\Desktop\\tanks 2026\\Tanks 2026.csproj",
         "projectName": "Tanks 2026",
-        "projectPath": "D:\\Tanks_2026\\Tanks 2026.csproj",
-        "packagesPath": "C:\\Users\\Stalnodg\\.nuget\\packages\\",
-        "outputPath": "D:\\Tanks_2026\\.mono\\temp\\obj\\",
+        "projectPath": "C:\\Users\\Пользователь\\Desktop\\tanks 2026\\Tanks 2026.csproj",
+        "packagesPath": "C:\\Users\\Пользователь\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\Пользователь\\Desktop\\tanks 2026\\.mono\\temp\\obj\\",
         "projectStyle": "PackageReference",
-        "fallbackFolders": [
-          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
-        ],
         "configFilePaths": [
-          "C:\\Users\\Stalnodg\\AppData\\Roaming\\NuGet\\NuGet.Config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+          "C:\\Users\\Пользователь\\AppData\\Roaming\\NuGet\\NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net472"
         ],
         "sources": {
-          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
@@ -49,7 +43,15 @@
       "frameworks": {
         "net472": {
           "targetAlias": "net472",
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.101\\RuntimeIdentifierGraph.json"
+          "dependencies": {
+            "Microsoft.NETFramework.ReferenceAssemblies": {
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[1.0.3, )",
+              "autoReferenced": true
+            }
+          },
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.103\\RuntimeIdentifierGraph.json"
         }
       }
     }
