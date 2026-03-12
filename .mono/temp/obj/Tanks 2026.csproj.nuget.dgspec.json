@@ -10,11 +10,15 @@
         "projectUniqueName": "D:\\Tanks_2026\\Tanks 2026.csproj",
         "projectName": "Tanks 2026",
         "projectPath": "D:\\Tanks_2026\\Tanks 2026.csproj",
-        "packagesPath": "C:\\Users\\markc\\.nuget\\packages\\",
+        "packagesPath": "C:\\Users\\Stalnodg\\.nuget\\packages\\",
         "outputPath": "D:\\Tanks_2026\\.mono\\temp\\obj\\",
         "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+        ],
         "configFilePaths": [
-          "C:\\Users\\markc\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\Stalnodg\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -39,12 +43,13 @@
           "enableAudit": "true",
           "auditLevel": "low",
           "auditMode": "direct"
-        }
+        },
+        "SdkAnalysisLevel": "10.0.100"
       },
       "frameworks": {
         "net472": {
           "targetAlias": "net472",
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.303\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.101\\RuntimeIdentifierGraph.json"
         }
       }
     }

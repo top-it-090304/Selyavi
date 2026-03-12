@@ -17,10 +17,17 @@ public class Enemy : KinematicBody2D
 	private Position2D _bulletPosition;
 	private Timer _shootTimer;
 	private Sprite _gun;
+	private Sprite _body;
 	private NavigationAgent2D _nav2d;
 	private RayCast2D _rayCast;
+	private TypeEnemy _typeEnemy;
 	#endregion
 	PackedScene bulletScene;
+	private enum TypeEnemy{
+		Light,
+		Medium,
+		Heavy
+	}
 
 	public override void _Ready()
 	{
@@ -33,6 +40,8 @@ public class Enemy : KinematicBody2D
 			_nav2d.TargetDesiredDistance = 10f;
 			_nav2d.PathDesiredDistance = 5f;
 		}
+		
+		
 	}
 
 	public override void _PhysicsProcess(float delta)
@@ -262,18 +271,42 @@ public class Enemy : KinematicBody2D
 		AddToGroup("enemies");
 		_nav2d = GetNode<NavigationAgent2D>("NavigationAgent2D");
 		_rayCast = GetNode<RayCast2D>("RayCast2D"); 
-		
+		_gun = GetNode<Sprite>("BodyTank/Gun");
+		_body = GetNode<Sprite>("BodyTank");
 		Navigation2D navigation2D = GetNode<Navigation2D>("/root/Field/Navigation2D");
 		if (navigation2D != null)
 		{
 			_nav2d.SetNavigation(navigation2D);
+		}
+		RandomizeEnemyType();
+		switch(_typeEnemy){
+			case TypeEnemy.Light:
+				_patrolSpeed = 110;
+				_chaseSpeed = 120;
+				_hp = 10;
+				_body.Texture = (Texture)GD.Load("res://assets/future_tanks/PNG/Hulls_Color_D/Hull_08.png");
+				_gun.Texture = (Texture)GD.Load("res://assets/future_tanks/PNG/Weapon_Color_D/Gun_05.png");
+				break;
+			case TypeEnemy.Medium:
+				_patrolSpeed = 100;
+				_chaseSpeed = 105;
+				_hp = 15;
+				_body.Texture = (Texture)GD.Load("res://assets/future_tanks/PNG/Hulls_Color_D/Hull_01.png");
+				_gun.Texture = (Texture)GD.Load("res://assets/future_tanks/PNG/Weapon_Color_D/Gun_03.png");
+				break;
+			case TypeEnemy.Heavy:
+				_patrolSpeed = 90;
+				_chaseSpeed = 100;
+				_hp = 20;
+				_body.Texture = (Texture)GD.Load("res://assets/future_tanks/PNG/Hulls_Color_D/Hull_02.png");
+				_gun.Texture = (Texture)GD.Load("res://assets/future_tanks/PNG/Weapon_Color_D/Gun_08.png");
+				break;
 		}
 		
 		_currentState = State.PATROL;
 		_detectionArea = GetNode<Area2D>("DetectionArea");
 		_player = GetNode<Player>("/root/Field/PlayerTank");
 		_base = GetNode<Base>("/root/Field/Base");
-		_gun = GetNode<Sprite>("BodyTank/Gun");
 		_bulletPosition = GetNode<Position2D>("BodyTank/Gun/BulletPosition");
 		
 		_detectionArea.Connect("body_entered", this, nameof(OnDetectionAreaEntered));
@@ -283,5 +316,11 @@ public class Enemy : KinematicBody2D
 		_shootTimer = new Timer();
 		_shootTimer.WaitTime = 1f;
 		_shootTimer.OneShot = true;
+	}
+	
+	private void RandomizeEnemyType(){
+	Array values = Enum.GetValues(typeof(TypeEnemy));
+	Random random = new Random();
+	_typeEnemy = (TypeEnemy)values.GetValue(random.Next(values.Length));
 	}
 }
