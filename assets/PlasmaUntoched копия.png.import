@@ -2,15 +2,15 @@
 
 importer="texture"
 type="StreamTexture"
-path="res://.import/Medium_Shell.png-012eeb831c3bacf1e39f33ed273e3aaa.stex"
+path="res://.import/PlasmaUntoched копия.png-b7c0d68de726c4db960193a54b06bd29.stex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/Medium_Shell.png"
-dest_files=[ "res://.import/Medium_Shell.png-012eeb831c3bacf1e39f33ed273e3aaa.stex" ]
+source_file="res://assets/PlasmaUntoched копия.png"
+dest_files=[ "res://.import/PlasmaUntoched копия.png-b7c0d68de726c4db960193a54b06bd29.stex" ]
 
 [params]
 
