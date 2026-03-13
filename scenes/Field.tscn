@@ -1,4 +1,4 @@
-[gd_scene load_steps=23 format=2]
+[gd_scene load_steps=26 format=2]
 
 [ext_resource path="res://assets/backround/PNG/Tiles/Ground_Tile_01_A.png" type="Texture" id=1]
 [ext_resource path="res://scenes/Tank/Player.tscn" type="PackedScene" id=2]
@@ -13,10 +13,13 @@
 [ext_resource path="res://assets/backround/PNG/Tiles/Ground_Tile_01_B.png" type="Texture" id=11]
 [ext_resource path="res://assets/backround/PNG/Tiles/Ground_Tile_02_B.png" type="Texture" id=12]
 [ext_resource path="res://assets/backround/PNG/Tiles/Ground_Tile_02_A.png" type="Texture" id=13]
-[ext_resource path="res://assets/Plasma.png" type="Texture" id=14]
+[ext_resource path="res://assets/MediumBulletToched.png" type="Texture" id=14]
 [ext_resource path="res://scenes/Base.tscn" type="PackedScene" id=15]
-[ext_resource path="res://assets/Medium_Shell.png" type="Texture" id=16]
-[ext_resource path="res://assets/Light_Shell.png" type="Texture" id=17]
+[ext_resource path="res://assets/LightBulletUntoched.png" type="Texture" id=16]
+[ext_resource path="res://assets/PlasmaToched.png" type="Texture" id=17]
+[ext_resource path="res://assets/PlasmaUntoched копия.png" type="Texture" id=18]
+[ext_resource path="res://assets/LightBulletToched.png" type="Texture" id=19]
+[ext_resource path="res://assets/MediumBulletUntoched.png" type="Texture" id=20]
 
 [sub_resource type="TileSet" id=1]
 0/name = "Ground_Tile_02_C.png 0"
@@ -105,13 +108,13 @@
 5/z_index = 0
 
 [sub_resource type="CircleShape2D" id=3]
-radius = 40.0
+radius = 306.08
 
 [sub_resource type="CircleShape2D" id=4]
-radius = 40.0
+radius = 306.08
 
 [sub_resource type="CircleShape2D" id=5]
-radius = 40.0
+radius = 306.08
 
 [sub_resource type="NavigationPolygon" id=2]
 vertices = PoolVector2Array( 530, 115, 1874, 19, 1736, 1042, 496, 236, 456, 208, 336, 145, 365, 212, 489, 362, 457, 380, 157, 1062, 66, 697, 343, 372, 70, 406, 63, 222, 198, 190, 340, 300, 342, 236 )
@@ -160,46 +163,25 @@ normal = ExtResource( 9 )
 
 [node name="CanvasLayer" type="CanvasLayer" parent="PlayerTank"]
 
-[node name="ColorRect" type="ColorRect" parent="PlayerTank/CanvasLayer"]
-visible = false
-margin_left = 313.0
-margin_top = 590.0
-margin_right = 478.0
-margin_bottom = 763.0
-color = Color( 0.25098, 0.25098, 0.25098, 0.803922 )
-
-[node name="ColorRect2" type="ColorRect" parent="PlayerTank/CanvasLayer"]
-visible = false
-margin_left = 521.0
-margin_top = 590.0
-margin_right = 701.0
-margin_bottom = 763.0
-color = Color( 0.0941176, 0.0941176, 0.0941176, 0.788235 )
-
-[node name="ColorRect3" type="ColorRect" parent="PlayerTank/CanvasLayer"]
-visible = false
-margin_left = 720.0
-margin_top = 590.0
-margin_right = 900.0
-margin_bottom = 763.0
-color = Color( 0.0941176, 0.0941176, 0.0941176, 0.788235 )
-
 [node name="Plasma" type="TouchScreenButton" parent="PlayerTank/CanvasLayer"]
-position = Vector2( 310, 561 )
-scale = Vector2( 2, 2 )
-normal = ExtResource( 14 )
+position = Vector2( 340, 596 )
+scale = Vector2( 0.273927, 0.273927 )
+normal = ExtResource( 18 )
+pressed = ExtResource( 17 )
 shape = SubResource( 3 )
 
 [node name="SmallShell" type="TouchScreenButton" parent="PlayerTank/CanvasLayer"]
-position = Vector2( 510, 557 )
-scale = Vector2( 2, 2 )
-normal = ExtResource( 17 )
+position = Vector2( 557, 596 )
+scale = Vector2( 0.274, 0.274 )
+normal = ExtResource( 16 )
+pressed = ExtResource( 19 )
 shape = SubResource( 4 )
 
 [node name="MediumShell" type="TouchScreenButton" parent="PlayerTank/CanvasLayer"]
-position = Vector2( 708.482, 553 )
-scale = Vector2( 2, 2 )
-normal = ExtResource( 16 )
+position = Vector2( 757, 596 )
+scale = Vector2( 0.274, 0.274 )
+normal = ExtResource( 20 )
+pressed = ExtResource( 14 )
 shape = SubResource( 5 )
 
 [node name="MusicPlayer" type="AudioStreamPlayer" parent="."]
@@ -294,11 +276,23 @@ position = Vector2( 1422, 119 )
 [node name="IndestructibleWall13" parent="IngameWalls" instance=ExtResource( 4 )]
 position = Vector2( 1765, 616 )
 
+[node name="IndestructibleWall4" parent="IngameWalls" instance=ExtResource( 4 )]
+position = Vector2( 753, 1425 )
+
 [node name="DestructibleWall20" parent="IngameWalls" instance=ExtResource( 5 )]
 position = Vector2( 1684, 321 )
 
 [node name="DestructibleWall21" parent="IngameWalls" instance=ExtResource( 5 )]
 position = Vector2( 1324, 404 )
+
+[node name="IndestructibleWall5" parent="IngameWalls" instance=ExtResource( 4 )]
+position = Vector2( 751, 1548 )
+
+[node name="IndestructibleWall6" parent="IngameWalls" instance=ExtResource( 4 )]
+position = Vector2( 610, 1254 )
+
+[node name="IndestructibleWall7" parent="IngameWalls" instance=ExtResource( 4 )]
+position = Vector2( 468, 1235 )
 
 [node name="BorderWalls" type="Node" parent="."]
 
@@ -354,7 +348,7 @@ position = Vector2( 28, -17 )
 navpoly = SubResource( 2 )
 
 [node name="EnemyBase" parent="." instance=ExtResource( 15 )]
-position = Vector2( 455, 549 )
+position = Vector2( 593, 1428 )
 typeBase = 1
 
 [connection signal="pressed" from="PlayerTank/PauseButton/PauseButton" to="." method="_on_TouchScreenButton_pressed"]

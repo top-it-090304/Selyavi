@@ -2,15 +2,15 @@
 
 importer="texture"
 type="StreamTexture"
-path="res://.import/Light_Shell.png-ffc8f94479699db919701e795fc2c965.stex"
+path="res://.import/PlasmaToched.png-b669f78c8bf8cebb0192cca30b77cb60.stex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/Light_Shell.png"
-dest_files=[ "res://.import/Light_Shell.png-ffc8f94479699db919701e795fc2c965.stex" ]
+source_file="res://assets/PlasmaToched.png"
+dest_files=[ "res://.import/PlasmaToched.png-b669f78c8bf8cebb0192cca30b77cb60.stex" ]
 
 [params]
 
