@@ -148,16 +148,22 @@ public class Player : KinematicBody2D
 		}
 	}
 }
-	private void FireTouch(){
+	private void FireTouch()
+	{
 		if (_shootTimer.TimeLeft > 0)
 			return;
 			
+		// Создаем пулю
 		var bullet = (Bullet)bulletScene.Instance();
 		bullet.GlobalPosition = _bulletPosition.GlobalPosition;
 		bullet.RotationDegrees = _gun.GlobalRotationDegrees;
-		bullet.GlobalPosition = _bulletPosition.GlobalPosition;
 		GetTree().Root.AddChild(bullet);
 		bullet.init(_typeBullet, true);
+		var muzzleFlash = GetNode<AnimatedSprite>("ShotAnimation");
+		Vector2 flashPosition = _bulletPosition.GlobalPosition;
+		muzzleFlash.GlobalPosition = flashPosition;
+		muzzleFlash.Frame = 0;
+		muzzleFlash.Play("Fire");
 		_shootTimer.Start();
 	}
 	private void useMoveVectorAim(Vector2 moveVector){

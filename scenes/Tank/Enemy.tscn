@@ -1,8 +1,15 @@
-[gd_scene load_steps=6 format=2]
+[gd_scene load_steps=14 format=2]
 
 [ext_resource path="res://scripts/Tank/Enemy.cs" type="Script" id=1]
 [ext_resource path="res://assets/future_tanks/PNG/Weapon_Color_D/Gun_03.png" type="Texture" id=2]
 [ext_resource path="res://assets/future_tanks/PNG/Hulls_Color_D/Hull_01.png" type="Texture" id=3]
+[ext_resource path="res://assets/future_tanks/PNG/Effects/Explosion_C.png" type="Texture" id=4]
+[ext_resource path="res://assets/future_tanks/PNG/Effects/Explosion_B.png" type="Texture" id=5]
+[ext_resource path="res://assets/future_tanks/PNG/Effects/Explosion_H.png" type="Texture" id=6]
+[ext_resource path="res://assets/future_tanks/PNG/Effects/Explosion_G.png" type="Texture" id=7]
+[ext_resource path="res://assets/future_tanks/PNG/Effects/Explosion_D.png" type="Texture" id=8]
+[ext_resource path="res://assets/future_tanks/PNG/Effects/Explosion_E.png" type="Texture" id=9]
+[ext_resource path="res://assets/future_tanks/PNG/Effects/Explosion_F.png" type="Texture" id=10]
 
 [sub_resource type="CircleShape2D" id=1]
 radius = 215.5
@@ -10,6 +17,14 @@ radius = 215.5
 [sub_resource type="CapsuleShape2D" id=2]
 radius = 65.14
 height = 16.0
+
+[sub_resource type="SpriteFrames" id=3]
+animations = [ {
+"frames": [ null, ExtResource( 5 ), ExtResource( 4 ), ExtResource( 8 ), ExtResource( 9 ), ExtResource( 10 ), ExtResource( 7 ), ExtResource( 6 ), null ],
+"loop": false,
+"name": "Fire",
+"speed": 25.0
+} ]
 
 [node name="Enemy" type="KinematicBody2D"]
 script = ExtResource( 1 )
@@ -43,3 +58,9 @@ path_max_distance = 13.0
 position = Vector2( 0, -200 )
 enabled = true
 cast_to = Vector2( 0, 200 )
+
+[node name="ShotAnimation" type="AnimatedSprite" parent="."]
+scale = Vector2( 0.3, 0.3 )
+frames = SubResource( 3 )
+animation = "Fire"
+offset = Vector2( -90, -50 )
