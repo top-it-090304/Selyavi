@@ -60,7 +60,7 @@ public class AudioManager : Node
 	
 	private void CheckAllBuses()
 	{
-		for (int i = 0; i < AudioServer.GetBusCount(); i++)
+		for (int i = 0; i < AudioServer.BusCount; i++)
 		{
 			string busName = AudioServer.GetBusName(i);
 			float volume = AudioServer.GetBusVolumeDb(i);
@@ -71,7 +71,7 @@ public class AudioManager : Node
 	
 	private int FindBusIndex(string busName)
 	{
-		for (int i = 0; i < AudioServer.GetBusCount(); i++)
+		for (int i = 0; i < AudioServer.BusCount; i++)
 		{
 			if (AudioServer.GetBusName(i) == busName)
 			{
