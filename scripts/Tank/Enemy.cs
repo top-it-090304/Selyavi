@@ -323,8 +323,22 @@ public class Enemy : KinematicBody2D
 		
 		GetTree().Root.AddChild(bullet);
 		bullet.init(TypeBullet.Plasma, false);
+		var muzzleFlash = GetNode<AnimatedSprite>("ShotAnimation");
+		if (muzzleFlash != null)
+		{
+			// Используем направление полета пули (bullet.GlobalRotation)
+			Vector2 bulletDirection = new Vector2(1, 0).Rotated(bullet.GlobalRotation);
+			
+			// Смещаем вспышку вперед по направлению полета пули
+			Vector2 flashPosition = _bulletPosition.GlobalPosition + bulletDirection * 25;
+			
+			muzzleFlash.GlobalPosition = flashPosition;
+			muzzleFlash.Frame = 0;
+			muzzleFlash.Play("Fire");
+		}
+		
 		_shootTimer.Start();
-	}
+		}
 	
 	private void fadeSound(){
 		if (_tween.IsConnected("tween_completed", this, nameof(onTweenComplete)))
