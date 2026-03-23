@@ -131,7 +131,7 @@ public abstract class Tank : KinematicBody2D
 		bullet.GlobalPosition = _bulletPosition.GlobalPosition;
 		bullet.GlobalRotation = _gun.GlobalRotation;
 		GetTree().Root.AddChild(bullet);
-		bullet.init(type, isPlayer);
+		bullet.init(type, isPlayer, 20);
 		_shootTimer.Start();
 	}
 

@@ -163,8 +163,9 @@ public class Bullet : Area2D
 		}
 	}
 
-	public void init(TypeBullet typeBullet, bool isPlayer)
+	public void init(TypeBullet typeBullet, bool isPlayer, int damage)
 	{
+		_damage = damage;
 		_typeBullet = typeBullet;
 		_isPlayer = isPlayer;
 		UpdateType();

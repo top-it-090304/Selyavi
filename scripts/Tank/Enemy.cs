@@ -18,6 +18,7 @@ public class Enemy : KinematicBody2D
 	private Timer _shootTimer;
 	private Sprite _gun;
 	private Sprite _body;
+	private int _damage = 20;
 	private NavigationAgent2D _nav2d;
 	private RayCast2D _rayCast;
 	private TypeEnemy _typeEnemy;
@@ -322,14 +323,13 @@ public class Enemy : KinematicBody2D
 		bullet.GlobalPosition = _bulletPosition.GlobalPosition;
 		
 		GetTree().Root.AddChild(bullet);
-		bullet.init(TypeBullet.Plasma, false);
+		bullet.init(TypeBullet.Plasma, false, _damage);
 		var muzzleFlash = GetNode<AnimatedSprite>("ShotAnimation");
 		if (muzzleFlash != null)
 		{
-			// Используем направление полета пули (bullet.GlobalRotation)
+	
 			Vector2 bulletDirection = new Vector2(1, 0).Rotated(bullet.GlobalRotation);
 			
-			// Смещаем вспышку вперед по направлению полета пули
 			Vector2 flashPosition = _bulletPosition.GlobalPosition + bulletDirection * 25;
 			
 			muzzleFlash.GlobalPosition = flashPosition;
@@ -388,7 +388,8 @@ public class Enemy : KinematicBody2D
 			case TypeEnemy.Light:
 				_patrolSpeed = 110;
 				_chaseSpeed = 120;
-				_hp = 10;
+				_hp = 50;
+				_damage = 10;
 				_body.Texture = (Texture)GD.Load("res://assets/future_tanks/PNG/Hulls_Color_D/Hull_08.png");
 				_gun.Texture = (Texture)GD.Load("res://assets/future_tanks/PNG/Weapon_Color_D/Gun_05.png");
 				_gun.Position += new Vector2(0, -35);
@@ -396,14 +397,16 @@ public class Enemy : KinematicBody2D
 			case TypeEnemy.Medium:
 				_patrolSpeed = 100;
 				_chaseSpeed = 105;
-				_hp = 15;
+				_hp = 70;
+				_damage = 25;
 				_body.Texture = (Texture)GD.Load("res://assets/future_tanks/PNG/Hulls_Color_D/Hull_01.png");
 				_gun.Texture = (Texture)GD.Load("res://assets/future_tanks/PNG/Weapon_Color_D/Gun_03.png");
 				break;
 			case TypeEnemy.Heavy:
 				_patrolSpeed = 90;
 				_chaseSpeed = 100;
-				_hp = 20;
+				_hp = 100;
+				_damage = 35;
 				_body.Texture = (Texture)GD.Load("res://assets/future_tanks/PNG/Hulls_Color_D/Hull_02.png");
 				_gun.Texture = (Texture)GD.Load("res://assets/future_tanks/PNG/Weapon_Color_D/Gun_08.png");
 				break;

@@ -11,6 +11,7 @@ public class Player : KinematicBody2D
 	private bool _isMoving = false;
 	private bool _isScopeEnadled = true;
 	private float _normalMovementVolume = 0f;
+	private int _damage = 30;
 	private Settings SettingsCheckbox;
 	private Vector2 _velocity = Vector2.Zero;
 	private Position2D _bulletPosition;
@@ -157,12 +158,11 @@ public class Player : KinematicBody2D
 		if (_shootTimer.TimeLeft > 0)
 			return;
 			
-		// Создаем пулю
 		var bullet = (Bullet)bulletScene.Instance();
 		bullet.GlobalPosition = _bulletPosition.GlobalPosition;
 		bullet.RotationDegrees = _gun.GlobalRotationDegrees;
 		GetTree().Root.AddChild(bullet);
-		bullet.init(_typeBullet, true);
+		bullet.init(_typeBullet, true, _damage);
 		var muzzleFlash = GetNode<AnimatedSprite>("ShotAnimation");
 		Vector2 flashPosition = _bulletPosition.GlobalPosition;
 		muzzleFlash.GlobalPosition = flashPosition;
@@ -423,21 +423,27 @@ public class Player : KinematicBody2D
 		{
 			case BodyEnum.Light:
 				_hp = 80;
+				_damage = 20;
 				break;
 			case BodyEnum.Medium:
 				_hp = 100;
+				_damage = 30;
 				break;
 			case BodyEnum.Heavy:
 				_hp = 150;
+				_damage = 50;
 				break;
 			case BodyEnum.LMedium:
 				_hp = 120;
+				_damage = 25;
 				break;
 			case BodyEnum.MHeavy:
 				_hp = 130;
+				_damage = 40;
 				break;
 			default:
 				_hp = 100;
+				_damage = 30;
 				break;
 		}
 	}
