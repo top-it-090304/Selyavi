@@ -408,71 +408,96 @@ public class Player : KinematicBody2D
 	}
 	
 	public void SelectType(BodyEnum bodyType, GunEnum gunType, ColorEnum colorType)
-{
-	_typeBody = bodyType;
-	_typeGun = gunType;
-	_color = colorType;
-	
-	UpdateTankAppearance();
-}
-
-private void UpdateTankAppearance()
-{
-	string colorFolder = GetColorFolder();
-	string bodyFileName = GetBodyFileName();
-	string gunFileName = GetGunFileName();
-	
-	string bodyPath = $"res://assets/future_tanks/PNG/Hulls_{colorFolder}/{bodyFileName}.png";
-	string gunPath = $"res://assets/future_tanks/PNG/Weapon_{colorFolder}/{gunFileName}.png";
-	
-	var bodyTexture = (Texture)GD.Load(bodyPath);
-	var gunTexture = (Texture)GD.Load(gunPath);
-	
-	if (bodyTexture != null)
-		_body.Texture = bodyTexture;
-	else
-		GD.PrintErr($"Body texture not found: {bodyPath}");
-	
-	if (gunTexture != null)
-		_gun.Texture = gunTexture;
-	else
-		GD.PrintErr($"Gun texture not found: {gunPath}");
-}
-
-private string GetColorFolder()
-{
-	switch (_color)
 	{
-		case ColorEnum.Brown: return "Color_A";
-		case ColorEnum.Green: return "Color_B";
-		case ColorEnum.Azure: return "Color_C";
-		default: return "Color_A";
+		_typeBody = bodyType;
+		_typeGun = gunType;
+		_color = colorType;
+		
+		UpdateTankAppearance();
+		UpdateStats();
 	}
-}
 
-private string GetBodyFileName()
-{
-	switch (_typeBody)
+	private void UpdateStats()
 	{
-		case BodyEnum.Light: return "Hull_05";
-		case BodyEnum.Medium: return "Hull_02";
-		case BodyEnum.Heavy: return "Hull_06";
-		case BodyEnum.LMedium: return "Hull_01";
-		case BodyEnum.MHeavy: return "Hull_03";
-		default: return "Hull_02";
+		switch (_typeBody)
+		{
+			case BodyEnum.Light:
+				_hp = 80;
+				break;
+			case BodyEnum.Medium:
+				_hp = 100;
+				break;
+			case BodyEnum.Heavy:
+				_hp = 150;
+				break;
+			case BodyEnum.LMedium:
+				_hp = 120;
+				break;
+			case BodyEnum.MHeavy:
+				_hp = 130;
+				break;
+			default:
+				_hp = 100;
+				break;
+		}
 	}
-}
 
-private string GetGunFileName()
-{
-	switch (_typeGun)
+	private string GetBodyFileName()
 	{
-		case GunEnum.Light: return "Gun_01";
-		case GunEnum.Medium: return "Gun_03";
-		case GunEnum.Heavy: return "Gun_08";
-		case GunEnum.LMedium: return "Gun_04";
-		case GunEnum.MHeavy: return "Gun_07";
-		default: return "Gun_01";
+		switch (_typeBody)
+		{
+			case BodyEnum.Light: return "Hull_05";
+			case BodyEnum.Medium: return "Hull_02";
+			case BodyEnum.Heavy: return "Hull_06";
+			case BodyEnum.LMedium: return "Hull_01";
+			case BodyEnum.MHeavy: return "Hull_03";
+			default: return "Hull_02";
+		}
 	}
-}
+
+	private string GetGunFileName()
+	{
+		switch (_typeGun)
+		{
+			case GunEnum.Light: return "Gun_01";
+			case GunEnum.Medium: return "Gun_03";
+			case GunEnum.Heavy: return "Gun_08";
+			case GunEnum.LMedium: return "Gun_04";
+			case GunEnum.MHeavy: return "Gun_07";
+			default: return "Gun_01";
+		}
+	}
+		private void UpdateTankAppearance()
+	{
+		string colorFolder = GetColorFolder();
+		string bodyFileName = GetBodyFileName();
+		string gunFileName = GetGunFileName();
+		
+		string bodyPath = $"res://assets/future_tanks/PNG/Hulls_{colorFolder}/{bodyFileName}.png";
+		string gunPath = $"res://assets/future_tanks/PNG/Weapon_{colorFolder}/{gunFileName}.png";
+		
+		var bodyTexture = (Texture)GD.Load(bodyPath);
+		var gunTexture = (Texture)GD.Load(gunPath);
+		
+		if (bodyTexture != null)
+			_body.Texture = bodyTexture;
+		else
+			GD.PrintErr($"Body texture not found: {bodyPath}");
+		
+		if (gunTexture != null)
+			_gun.Texture = gunTexture;
+		else
+			GD.PrintErr($"Gun texture not found: {gunPath}");
+	}
+
+	private string GetColorFolder()
+	{
+		switch (_color)
+		{
+			case ColorEnum.Brown: return "Color_A";
+			case ColorEnum.Green: return "Color_B";
+			case ColorEnum.Azure: return "Color_C";
+			default: return "Color_A";
+		}
+	}
 }
