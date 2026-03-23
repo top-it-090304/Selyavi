@@ -19,6 +19,7 @@ public class Player : KinematicBody2D
 	private AudioStreamPlayer2D _shootSound;
 	private Tween _tween;
 	private CanvasLayer _joystick;
+	private Sprite _body;
 	private Sprite _gun;
 	private MobileJoystick _aim;
 	private TypeBullet _typeBullet = TypeBullet.Plasma;
@@ -366,6 +367,7 @@ public class Player : KinematicBody2D
 	
 	private void init(){
 		bulletScene = (PackedScene)GD.Load("res://scenes/Tank/Bullet.tscn");
+		_body = GetNode<Sprite>("BodyTank");
 		_lives = 5;
 		_hp = 100;
 		_bulletPosition = GetNode<Position2D>("BodyTank/Gun/BulletPosition");
@@ -405,8 +407,72 @@ public class Player : KinematicBody2D
 		_shootTimer.OneShot = true;
 	}
 	
-	public void SelectType(){
-		
-		
+	public void SelectType(BodyEnum bodyType, GunEnum gunType, ColorEnum colorType)
+{
+	_typeBody = bodyType;
+	_typeGun = gunType;
+	_color = colorType;
+	
+	UpdateTankAppearance();
+}
+
+private void UpdateTankAppearance()
+{
+	string colorFolder = GetColorFolder();
+	string bodyFileName = GetBodyFileName();
+	string gunFileName = GetGunFileName();
+	
+	string bodyPath = $"res://assets/future_tanks/PNG/Hulls_{colorFolder}/{bodyFileName}.png";
+	string gunPath = $"res://assets/future_tanks/PNG/Weapon_{colorFolder}/{gunFileName}.png";
+	
+	var bodyTexture = (Texture)GD.Load(bodyPath);
+	var gunTexture = (Texture)GD.Load(gunPath);
+	
+	if (bodyTexture != null)
+		_body.Texture = bodyTexture;
+	else
+		GD.PrintErr($"Body texture not found: {bodyPath}");
+	
+	if (gunTexture != null)
+		_gun.Texture = gunTexture;
+	else
+		GD.PrintErr($"Gun texture not found: {gunPath}");
+}
+
+private string GetColorFolder()
+{
+	switch (_color)
+	{
+		case ColorEnum.Brown: return "Color_A";
+		case ColorEnum.Green: return "Color_B";
+		case ColorEnum.Azure: return "Color_C";
+		default: return "Color_A";
 	}
+}
+
+private string GetBodyFileName()
+{
+	switch (_typeBody)
+	{
+		case BodyEnum.Light: return "Hull_05";
+		case BodyEnum.Medium: return "Hull_02";
+		case BodyEnum.Heavy: return "Hull_06";
+		case BodyEnum.LMedium: return "Hull_01";
+		case BodyEnum.MHeavy: return "Hull_03";
+		default: return "Hull_02";
+	}
+}
+
+private string GetGunFileName()
+{
+	switch (_typeGun)
+	{
+		case GunEnum.Light: return "Gun_01";
+		case GunEnum.Medium: return "Gun_03";
+		case GunEnum.Heavy: return "Gun_08";
+		case GunEnum.LMedium: return "Gun_04";
+		case GunEnum.MHeavy: return "Gun_07";
+		default: return "Gun_01";
+	}
+}
 }
