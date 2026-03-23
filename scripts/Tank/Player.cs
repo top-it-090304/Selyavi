@@ -23,6 +23,9 @@ public class Player : KinematicBody2D
 	private MobileJoystick _aim;
 	private TypeBullet _typeBullet = TypeBullet.Plasma;
 	private Vector2 _startPosition;
+	private BodyEnum _typeBody = BodyEnum.Medium;
+	private GunEnum _typeGun = GunEnum.Medium;
+	private ColorEnum _color = ColorEnum.Brown;
 	#endregion
 	PackedScene bulletScene;
 	
@@ -364,7 +367,7 @@ public class Player : KinematicBody2D
 	private void init(){
 		bulletScene = (PackedScene)GD.Load("res://scenes/Tank/Bullet.tscn");
 		_lives = 5;
-		_hp = 20;
+		_hp = 100;
 		_bulletPosition = GetNode<Position2D>("BodyTank/Gun/BulletPosition");
 		_movingSound = GetNode<AudioStreamPlayer>("MovingSound");
 		_gun = GetNode<Sprite>("BodyTank/Gun");
@@ -400,5 +403,10 @@ public class Player : KinematicBody2D
 		_shootTimer = new Timer();
 		_shootTimer.WaitTime = 1f; 
 		_shootTimer.OneShot = true;
+	}
+	
+	public void SelectType(){
+		
+		
 	}
 }
