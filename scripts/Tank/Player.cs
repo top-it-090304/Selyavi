@@ -30,6 +30,8 @@ public class Player : KinematicBody2D
 	private ColorEnum _color = ColorEnum.Brown;
 	#endregion
 	PackedScene bulletScene;
+	[Signal]
+	public delegate void HealthChanged(int currentHealth, int maxHealth);
 	
 	public int Speed{
 		get => _speed;
@@ -289,7 +291,10 @@ public class Player : KinematicBody2D
 	}
 	public void TakeDamage(int damage){
 		_hp -= damage;
-		if(_hp <= 0){
+		EmitSignal(nameof(HealthChanged), _hp, GetMaxHealth());
+		
+		if (_hp <= 0)
+		{
 			Destroy();
 		}
 	}
@@ -302,8 +307,9 @@ public class Player : KinematicBody2D
 	}
 	
 	private void Revive(){
-		_hp = 20;
+		_hp = GetMaxHealth();
 		GlobalPosition = _startPosition;
+		EmitSignal(nameof(HealthChanged), _hp, GetMaxHealth());
 	}
 	
 	private void fadeSound(){
@@ -446,6 +452,7 @@ public class Player : KinematicBody2D
 				_damage = 30;
 				break;
 		}
+		EmitSignal(nameof(HealthChanged), _hp, GetMaxHealth());
 	}
 
 	private string GetBodyFileName()
@@ -473,7 +480,30 @@ public class Player : KinematicBody2D
 			default: return "Gun_01";
 		}
 	}
-		private void UpdateTankAppearance()
+	public int GetCurrentHealth()
+	{
+		return _hp;
+	}
+
+	public int GetMaxHealth()
+	{
+		switch (_typeBody)
+		{
+			case BodyEnum.Light:
+				return 80;
+			case BodyEnum.Medium:
+				return 100;
+			case BodyEnum.Heavy:
+				return 150;
+			case BodyEnum.LMedium:
+				return 120;
+			case BodyEnum.MHeavy:
+				return 130;
+			default:
+				return 100;
+		}
+	}
+			private void UpdateTankAppearance()
 	{
 		string colorFolder = GetColorFolder();
 		string bodyFileName = GetBodyFileName();

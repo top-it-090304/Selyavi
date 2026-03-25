@@ -1,4 +1,4 @@
-[gd_scene load_steps=26 format=2]
+[gd_scene load_steps=27 format=2]
 
 [ext_resource path="res://assets/backround/PNG/Tiles/Ground_Tile_01_A.png" type="Texture" id=1]
 [ext_resource path="res://scenes/Tank/Player.tscn" type="PackedScene" id=2]
@@ -20,6 +20,7 @@
 [ext_resource path="res://assets/PlasmaUntoched копия.png" type="Texture" id=18]
 [ext_resource path="res://assets/LightBulletToched.png" type="Texture" id=19]
 [ext_resource path="res://assets/MediumBulletUntoched.png" type="Texture" id=20]
+[ext_resource path="res://scenes/Tank/HUD.tscn" type="PackedScene" id=21]
 
 [sub_resource type="TileSet" id=1]
 0/name = "Ground_Tile_02_C.png 0"
@@ -117,9 +118,9 @@ radius = 306.08
 radius = 306.08
 
 [sub_resource type="NavigationPolygon" id=2]
-vertices = PoolVector2Array( 530, 115, 1874, 19, 1736, 1042, 496, 236, 456, 208, 336, 145, 365, 212, 489, 362, 457, 380, 157, 1062, 66, 697, 343, 372, 70, 406, 63, 222, 198, 190, 340, 300, 342, 236 )
-polygons = [ PoolIntArray( 0, 1, 2, 3, 4 ), PoolIntArray( 5, 0, 4, 6 ), PoolIntArray( 7, 3, 2 ), PoolIntArray( 8, 7, 2, 9, 10 ), PoolIntArray( 11, 8, 10, 12 ), PoolIntArray( 11, 12, 13, 14, 15 ), PoolIntArray( 16, 15, 14, 5 ), PoolIntArray( 5, 6, 16 ) ]
-outlines = [ PoolVector2Array( 336, 145, 198, 190, 63, 222, 70, 406, 66, 697, 157, 1062, 1736, 1042, 1874, 19, 530, 115 ), PoolVector2Array( 340, 300, 343, 372, 457, 380, 489, 362, 496, 236, 456, 208, 365, 212, 342, 236 ) ]
+vertices = PoolVector2Array( 995, 1440, 1118, 1066, 1420, 429, 1839, 1564, 992, 1563, 867, 19, 1874, 19, 1429, 302, 1380, 283, 1283, 287, 995, 217, 1114, 930, 1274, 440, 998, 1082, 972, 1208, 999, 342, 867, 217, 456, 208, 240, 152, 240, 17, -22, 1570, 720, 1192, 709, 1442, 696, 1282, 115, 601, 112, 143, 342, 236, 340, 300, 867, 349, 496, 236, 489, 362, 731, 923, 101, 1125, 457, 380, 703, 1127, 408, 1562, 432, 1278, 702, 1571, 142, 1410, 258, 1418, 262, 1556, 343, 372, -20, 684, 365, 212 )
+polygons = [ PoolIntArray( 0, 1, 2, 3, 4 ), PoolIntArray( 5, 6, 7, 8 ), PoolIntArray( 5, 8, 9, 10 ), PoolIntArray( 7, 6, 3, 2 ), PoolIntArray( 2, 1, 11, 12 ), PoolIntArray( 13, 1, 0, 14 ), PoolIntArray( 15, 10, 9, 12, 11 ), PoolIntArray( 5, 10, 16, 17, 18, 19 ), PoolIntArray( 4, 3, 20 ), PoolIntArray( 21, 14, 0, 22, 23 ), PoolIntArray( 24, 25, 18, 26, 27 ), PoolIntArray( 16, 28, 29, 17 ), PoolIntArray( 30, 29, 28, 31 ), PoolIntArray( 15, 11, 31, 28 ), PoolIntArray( 32, 33, 30, 31, 34 ), PoolIntArray( 35, 36, 23, 22, 37 ), PoolIntArray( 38, 39, 40, 20 ), PoolIntArray( 41, 33, 32, 24 ), PoolIntArray( 20, 42, 24, 32 ), PoolIntArray( 18, 17, 43 ), PoolIntArray( 18, 43, 26 ), PoolIntArray( 24, 27, 41 ), PoolIntArray( 20, 32, 38 ), PoolIntArray( 20, 40, 35 ), PoolIntArray( 4, 20, 35 ), PoolIntArray( 4, 35, 37 ) ]
+outlines = [ PoolVector2Array( 240, 17, 240, 152, 112, 143, 115, 601, -20, 684, -22, 1570, 1839, 1564, 1874, 19, 867, 19 ), PoolVector2Array( 340, 300, 343, 372, 457, 380, 489, 362, 496, 236, 456, 208, 365, 212, 342, 236 ), PoolVector2Array( 1283, 287, 1380, 283, 1429, 302, 1420, 429, 1274, 440 ), PoolVector2Array( 867, 217, 995, 217, 999, 342, 867, 349 ), PoolVector2Array( 992, 1563, 995, 1440, 709, 1442, 702, 1571 ), PoolVector2Array( 720, 1192, 972, 1208, 998, 1082, 1118, 1066, 1114, 930, 731, 923, 703, 1127, 101, 1125, 142, 1410, 258, 1418, 262, 1556, 408, 1562, 432, 1278, 696, 1282 ), PoolVector2Array( 241, 1097, 237, 859, -29, 843, -27, 1115 ) ]
 
 [node name="Field" type="Node2D"]
 script = ExtResource( 8 )
@@ -129,12 +130,7 @@ tile_set = SubResource( 1 )
 format = 1
 tile_data = PoolIntArray( 0, 2, 0, 4, 2, 0, 8, 2, 0, 12, 2, 0, 16, 2, 0, 20, 2, 0, 24, 3, 0, 28, 0, 0, 262144, 2, 0, 262148, 2, 0, 262152, 2, 0, 262156, 2, 0, 262160, 2, 0, 262164, 3, 0, 262168, 0, 0, 262172, 0, 0, 524288, 2, 0, 524292, 2, 0, 524296, 2, 0, 524300, 2, 0, 524304, 2, 0, 524308, 2, 0, 524312, 0, 0, 524316, 0, 0, 786432, 3, 0, 786436, 1, 0, 786440, 1, 0, 786444, 1, 0, 786448, 1, 0, 786452, 1, 0, 786456, 0, 0, 786460, 5, 0, 1048576, 5, 0, 1048580, 5, 0, 1048584, 5, 0, 1048588, 4, 0, 1048592, 4, 0, 1048596, 4, 0, 1048600, 3, 0, 1048604, 5, 0, 1310720, 5, 0, 1310724, 5, 0, 1310728, 5, 0, 1310732, 4, 0, 1310736, 4, 0, 1310740, 3, 0, 1310744, 3, 0, 1310748, 5, 0, 1572864, 5, 0, 1572868, 5, 0, 1572872, 5, 0, 1572876, 5, 0, 1572880, 5, 0, 1572884, 5, 0, 1572888, 5, 0, 1572892, 5, 0 )
 
-[node name="Backround" type="Sprite" parent="."]
-visible = false
-position = Vector2( 512, 300 )
-texture = ExtResource( 1 )
-region_enabled = true
-region_rect = Rect2( 0, 0, 1024, 600 )
+[node name="HUD" parent="." instance=ExtResource( 21 )]
 
 [node name="PlayerTank" parent="." instance=ExtResource( 2 )]
 position = Vector2( 543, 318 )
@@ -157,7 +153,7 @@ drag_margin_bottom = 0.1
 [node name="PauseButton" type="CanvasLayer" parent="PlayerTank"]
 
 [node name="PauseButton" type="TouchScreenButton" parent="PlayerTank/PauseButton"]
-position = Vector2( 1150, 4 )
+position = Vector2( 18.0001, 4 )
 scale = Vector2( 0.177734, 0.177734 )
 normal = ExtResource( 9 )
 
@@ -253,7 +249,7 @@ position = Vector2( 1092, 1460 )
 position = Vector2( 1616, 1193 )
 
 [node name="DestructibleWall15" parent="IngameWalls" instance=ExtResource( 5 )]
-position = Vector2( 754, 1296 )
+position = Vector2( 895, 1178 )
 
 [node name="DestructibleWall16" parent="IngameWalls" instance=ExtResource( 5 )]
 position = Vector2( 752, 1162 )
@@ -277,7 +273,7 @@ position = Vector2( 1422, 119 )
 position = Vector2( 1765, 616 )
 
 [node name="IndestructibleWall4" parent="IngameWalls" instance=ExtResource( 4 )]
-position = Vector2( 753, 1425 )
+position = Vector2( 896, 1546 )
 
 [node name="DestructibleWall20" parent="IngameWalls" instance=ExtResource( 5 )]
 position = Vector2( 1684, 321 )
@@ -343,7 +339,6 @@ position = Vector2( 2086, 1272 )
 [node name="Navigation2D" type="Navigation2D" parent="."]
 
 [node name="NavigationPolygonInstance" type="NavigationPolygonInstance" parent="Navigation2D"]
-visible = false
 position = Vector2( 28, -17 )
 navpoly = SubResource( 2 )
 
