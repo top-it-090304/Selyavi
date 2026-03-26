@@ -33,6 +33,9 @@ public class Player : KinematicBody2D
 	[Signal]
 	public delegate void HealthChanged(int currentHealth, int maxHealth);
 	
+	[Signal]
+	public delegate void LivesChanged(int currentLives); 
+	
 	public int Speed{
 		get => _speed;
 		set {
@@ -82,7 +85,6 @@ public class Player : KinematicBody2D
 			{
 				_movingSound.VolumeDb = dbValue;
 			}
-			GD.Print("Громкость SFX изменена: ", value, " (", dbValue, " dB)");
 	}
 	private void LoadInitialScopeState()
 	{
@@ -299,11 +301,15 @@ public class Player : KinematicBody2D
 		}
 	}
 	
-	private void Destroy(){
+	private void Destroy()
+	{
 		_lives--;
-		if(_lives != 0)
+		EmitSignal(nameof(LivesChanged), _lives);
+		
+		if (_lives != 0)
 			Revive();
-		else QueueFree();
+		else 
+			QueueFree();
 	}
 	
 	private void Revive(){
@@ -374,7 +380,7 @@ public class Player : KinematicBody2D
 	private void init(){
 		bulletScene = (PackedScene)GD.Load("res://scenes/Tank/Bullet.tscn");
 		_body = GetNode<Sprite>("BodyTank");
-		_lives = 5;
+		_lives = 3;
 		_hp = 100;
 		_bulletPosition = GetNode<Position2D>("BodyTank/Gun/BulletPosition");
 		_movingSound = GetNode<AudioStreamPlayer>("MovingSound");
@@ -483,6 +489,10 @@ public class Player : KinematicBody2D
 	public int GetCurrentHealth()
 	{
 		return _hp;
+	}
+	public int GetLives()
+	{
+		return _lives;
 	}
 
 	public int GetMaxHealth()

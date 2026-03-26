@@ -17,7 +17,7 @@ public class Base : Area2D
 	[Export]
 	public TypeBase typeBase;
 	
-	[Export] private int _maxEnemies = 4;
+	[Export] private int _maxEnemies = 3;
 	private float _timeSinceLastCheck = 0;
 	private float _spawnRadius = 50f; 
 	
@@ -32,7 +32,7 @@ public class Base : Area2D
 		_spawnTimer.OneShot = true;
 		AddChild(_spawnTimer);
 		
-		_spawnTimer.Start(1f);
+		_spawnTimer.Start(5f);
 	}
 	
 	private void OnBodyEntered(Node body)
