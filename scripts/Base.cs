@@ -9,6 +9,7 @@ public class Base : Area2D
 	}
 	
 	private Timer _spawnTimer;
+	private Timer _healTimer;
 	private Position2D _enemyPosition;
 	PackedScene enemyScene;
 	[Signal]
@@ -18,6 +19,9 @@ public class Base : Area2D
 	public TypeBase typeBase;
 	
 	[Export] private int _maxEnemies = 4;
+	[Export] private int _healAmount = 1;
+	[Export] private float _healInterval = 1f;
+	[Export] private float _healRadius = 100f;
 	private float _timeSinceLastCheck = 0;
 	private float _spawnRadius = 50f; 
 	
@@ -32,6 +36,13 @@ public class Base : Area2D
 		_spawnTimer.OneShot = true;
 		AddChild(_spawnTimer);
 		
+		_healTimer = new Timer();
+		_healTimer.WaitTime = _healInterval;
+		_healTimer.OneShot = false;
+		AddChild(_healTimer);
+		_healTimer.Connect("timeout", this, nameof(OnHealTimeout));
+		_healTimer.Start();
+		
 		_spawnTimer.Start(1f);
 	}
 	
@@ -41,6 +52,20 @@ public class Base : Area2D
 		{
 			if ((bullet.IsPlayer && typeBase == TypeBase.Enemy) || (!bullet.IsPlayer && typeBase == TypeBase.Player))
 				Destroy();
+		}
+	}
+	
+	private void OnHealTimeout()
+	{
+		if (typeBase != TypeBase.Player) return;
+		
+		Player player = GetNodeOrNull<Player>("/root/Field/PlayerTank");
+		if (player == null) return;
+		
+		float distance = GlobalPosition.DistanceTo(player.GlobalPosition);
+		if (distance <= _healRadius)
+		{
+			player.TakeHeal(_healAmount);
 		}
 	}
 	
