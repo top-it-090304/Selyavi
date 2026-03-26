@@ -81,7 +81,7 @@ public class Player : KinematicBody2D
 		public void TakeHeal(int amount){
 		_hp += amount;
 		if (_hp > _maxHp) _hp = _maxHp; 
-		GD.Print($"Player healed +{amount}, HP: {_hp}");
+		EmitSignal(nameof(HealthChanged), _hp, GetMaxHealth());
 	}
 		private void OnSfxVolumeChanged(float value)
 		{
@@ -560,13 +560,12 @@ public class Player : KinematicBody2D
 		var bodyTexture = (Texture)GD.Load(bodyPath);
 		var gunTexture = (Texture)GD.Load(gunPath);
 		
-		if (bodyTexture != null)
-			_body.Texture = bodyTexture;
-		else
-		
-		if (gunTexture != null)
+		if (bodyTexture != null){
+						_body.Texture = bodyTexture;
+		}
+		if (gunTexture != null){
 			_gun.Texture = gunTexture;
-		else
+			}
 	}
 
 	private string GetColorFolder()

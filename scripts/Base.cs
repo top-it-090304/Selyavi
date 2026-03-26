@@ -19,9 +19,9 @@ public class Base : Area2D
 	public TypeBase typeBase;
 	
 	[Export] private int _maxEnemies = 3;
-	[Export] private int _healAmount = 1;
+	[Export] private int _healAmount = 5;
 	[Export] private float _healInterval = 1f;
-	[Export] private float _healRadius = 100f;
+	[Export] private float _healRadius = 300f;
 	private float _timeSinceLastCheck = 0;
 	private float _spawnRadius = 50f; 
 	
