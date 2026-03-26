@@ -136,6 +136,22 @@ public class Bullet : Area2D
 		QueueFree();
 	}
 
+	public void init(TypeBullet typeBullet, bool isPlayer, int damage)
+	{
+		_typeBullet = typeBullet;
+		_isPlayer = isPlayer;
+		
+		if (isPlayer)
+		{
+			UpdateType();  
+		}
+		else
+		{
+			_damage = damage;
+			UpdateAppearance();
+		}
+	}
+
 	private void UpdateType()
 	{
 		switch (_typeBullet)
@@ -143,17 +159,17 @@ public class Bullet : Area2D
 			case TypeBullet.Plasma:
 				_bulletSprite.Texture = (Texture)GD.Load("res://assets/future_tanks/PNG/Effects/Plasma.png");
 				_bulletSpeed = 7;
-				_damage = 5;
+				_damage = 25;
 				break;
 			case TypeBullet.Medium:
 				_bulletSprite.Texture = (Texture)GD.Load("res://assets/future_tanks/PNG/Effects/Medium_Shell.png");
 				_bulletSpeed = 4;
-				_damage = 10;
+				_damage = 40;
 				break;
 			case TypeBullet.Light:
 				_bulletSprite.Texture = (Texture)GD.Load("res://assets/future_tanks/PNG/Effects/Light_Shell.png");
 				_bulletSpeed = 6;
-				_damage = 7;
+				_damage = 35;
 				break;
 		}
 
@@ -163,12 +179,28 @@ public class Bullet : Area2D
 		}
 	}
 
-	public void init(TypeBullet typeBullet, bool isPlayer, int damage)
+	private void UpdateAppearance()
 	{
-		_damage = damage;
-		_typeBullet = typeBullet;
-		_isPlayer = isPlayer;
-		UpdateType();
+		switch (_typeBullet)
+		{
+			case TypeBullet.Plasma:
+				_bulletSprite.Texture = (Texture)GD.Load("res://assets/future_tanks/PNG/Effects/Plasma.png");
+				_bulletSpeed = 7;
+				break;
+			case TypeBullet.Medium:
+				_bulletSprite.Texture = (Texture)GD.Load("res://assets/future_tanks/PNG/Effects/Medium_Shell.png");
+				_bulletSpeed = 4;
+				break;
+			case TypeBullet.Light:
+				_bulletSprite.Texture = (Texture)GD.Load("res://assets/future_tanks/PNG/Effects/Light_Shell.png");
+				_bulletSpeed = 6;
+				break;
+		}
+
+		if (AudioManager.Instance != null)
+		{
+			AudioManager.Instance.PlayBulletSound(_typeBullet, GlobalPosition);
+		}
 	}
 
 	public override void _Process(float delta)

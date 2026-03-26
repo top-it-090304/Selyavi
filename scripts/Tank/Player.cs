@@ -29,11 +29,15 @@ public class Player : KinematicBody2D
 	private BodyEnum _typeBody = BodyEnum.Medium;
 	private GunEnum _typeGun = GunEnum.Medium;
 	private ColorEnum _color = ColorEnum.Brown;
+	private int _money = 0;
 	#endregion
 	PackedScene bulletScene;
 	[Signal]
 	public delegate void HealthChanged(int currentHealth, int maxHealth);
-	
+	[Signal]
+	public delegate void LivesChanged(int currentLives); 
+	[Signal]
+	public delegate void MoneyChanged(int currentMoney);
 	public int Speed{
 		get => _speed;
 		set {
@@ -87,7 +91,6 @@ public class Player : KinematicBody2D
 			{
 				_movingSound.VolumeDb = dbValue;
 			}
-			GD.Print("Громкость SFX изменена: ", value, " (", dbValue, " dB)");
 	}
 	private void LoadInitialScopeState()
 	{
@@ -196,12 +199,10 @@ public class Player : KinematicBody2D
 		_typeBullet = TypeBullet.Plasma;
 	}
 
-
 	private void _on_SmallShell_pressed()
 	{
 		_typeBullet = TypeBullet.Light;
 	}
-
 
 	private void _on_MediumShell_pressed()
 	{
@@ -304,11 +305,15 @@ public class Player : KinematicBody2D
 		}
 	}
 	
-	private void Destroy(){
+	private void Destroy()
+	{
 		_lives--;
-		if(_lives != 0)
+		EmitSignal(nameof(LivesChanged), _lives);
+		
+		if (_lives != 0)
 			Revive();
-		else QueueFree();
+		else 
+			QueueFree();
 	}
 	
 	private void Revive(){
@@ -353,33 +358,33 @@ public class Player : KinematicBody2D
 	 }
 
 	public override void _Draw()
-{
-	if(_aim.IsJoystickActive && _isScopeEnadled){
-		Vector2 globalMuzzlePos = _bulletPosition.GlobalPosition;
-		
-		float gunAngle = _gun.GlobalRotation;
-		Vector2 direction = new Vector2(1, 0).Rotated(gunAngle);
-		
-		Vector2 perpendicular = new Vector2(direction.y, -direction.x);
-		
-		float rayLength = 1000f;
-		
-		Vector2 globalRayEnd = globalMuzzlePos + perpendicular * rayLength;
-		
-		Vector2 localMuzzlePos = ToLocal(globalMuzzlePos);
-		Vector2 localRayEnd = ToLocal(globalRayEnd);
-		
-		Color rayColor = Colors.Red;
-		float rayWidth = 2f;
-		DrawLine(localMuzzlePos, localRayEnd, rayColor, rayWidth);
+	{
+		if(_aim.IsJoystickActive && _isScopeEnadled){
+			Vector2 globalMuzzlePos = _bulletPosition.GlobalPosition;
+			
+			float gunAngle = _gun.GlobalRotation;
+			Vector2 direction = new Vector2(1, 0).Rotated(gunAngle);
+			
+			Vector2 perpendicular = new Vector2(direction.y, -direction.x);
+			
+			float rayLength = 1000f;
+			
+			Vector2 globalRayEnd = globalMuzzlePos + perpendicular * rayLength;
+			
+			Vector2 localMuzzlePos = ToLocal(globalMuzzlePos);
+			Vector2 localRayEnd = ToLocal(globalRayEnd);
+			
+			Color rayColor = Colors.Red;
+			float rayWidth = 2f;
+			DrawLine(localMuzzlePos, localRayEnd, rayColor, rayWidth);
+		}
 	}
-}
 
 	
 	private void init(){
 		bulletScene = (PackedScene)GD.Load("res://scenes/Tank/Bullet.tscn");
 		_body = GetNode<Sprite>("BodyTank");
-		_lives = 5;
+		_lives = 3;
 		_hp = 100;
 		_maxHp = _hp;
 		_bulletPosition = GetNode<Position2D>("BodyTank/Gun/BulletPosition");
@@ -490,7 +495,18 @@ public class Player : KinematicBody2D
 	{
 		return _hp;
 	}
-
+	public int GetLives()
+	{
+		return _lives;
+	}
+	public void Heal(int amount)
+	{
+		int oldHealth = _hp;
+		_hp += amount;
+		_hp = Mathf.Min(_hp, GetMaxHealth());
+		
+		EmitSignal(nameof(HealthChanged), _hp, GetMaxHealth());
+	}
 	public int GetMaxHealth()
 	{
 		switch (_typeBody)
@@ -509,6 +525,29 @@ public class Player : KinematicBody2D
 				return 100;
 		}
 	}
+	
+	public int GetMoney()
+	{
+		return _money;
+	}
+	
+	public void AddMoney(int amount)
+	{
+		_money += amount;
+		EmitSignal(nameof(MoneyChanged), _money);
+	}
+	
+	public bool SpendMoney(int amount)
+	{
+		if (_money >= amount)
+		{
+			_money -= amount;
+			EmitSignal(nameof(MoneyChanged), _money);
+			return true;
+		}
+		return false;
+	}
+	
 			private void UpdateTankAppearance()
 	{
 		string colorFolder = GetColorFolder();
@@ -524,12 +563,10 @@ public class Player : KinematicBody2D
 		if (bodyTexture != null)
 			_body.Texture = bodyTexture;
 		else
-			GD.PrintErr($"Body texture not found: {bodyPath}");
 		
 		if (gunTexture != null)
 			_gun.Texture = gunTexture;
 		else
-			GD.PrintErr($"Gun texture not found: {gunPath}");
 	}
 
 	private string GetColorFolder()

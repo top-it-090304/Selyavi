@@ -286,7 +286,27 @@ public class Enemy : KinematicBody2D
 
 	private void Destroy()
 	{
+		if (_player != null)
+		{
+			int reward = GetEnemyReward();
+			_player.AddMoney(reward);
+		}
+		
 		QueueFree();
+	}
+	private int GetEnemyReward()
+	{
+		switch (_typeEnemy)
+		{
+			case TypeEnemy.Light:
+				return 50;
+			case TypeEnemy.Medium:
+				return 75;
+			case TypeEnemy.Heavy:
+				return 100;
+			default:
+				return 50;
+		}
 	}
 
 	private void FireAtTarget(Node2D target)

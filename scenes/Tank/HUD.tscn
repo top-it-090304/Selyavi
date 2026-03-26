@@ -1,6 +1,8 @@
-[gd_scene load_steps=4 format=2]
+[gd_scene load_steps=6 format=2]
 
 [ext_resource path="res://assets/fonts/ofont.ru_Shonen.ttf" type="DynamicFontData" id=1]
+[ext_resource path="res://assets/HP.png" type="Texture" id=2]
+[ext_resource path="res://assets/logo.png" type="Texture" id=3]
 [ext_resource path="res://scripts/HUD.cs" type="Script" id=4]
 
 [sub_resource type="DynamicFont" id=1]
@@ -12,11 +14,13 @@ font_data = ExtResource( 1 )
 script = ExtResource( 4 )
 
 [node name="HealthPanel" type="Control" parent="."]
-margin_right = 40.0
-margin_bottom = 40.0
+margin_left = 50.0
+margin_top = -1.0
+margin_right = 90.0
+margin_bottom = 39.0
 
 [node name="HealthProgress" type="ProgressBar" parent="HealthPanel"]
-margin_left = 925.0
+margin_left = 972.0
 margin_top = 4.0
 margin_right = 1221.0
 margin_bottom = 66.0
@@ -25,9 +29,35 @@ value = 100.0
 percent_visible = false
 
 [node name="HealthLabel" type="Label" parent="HealthPanel"]
-margin_left = 963.0
-margin_top = 18.0
-margin_right = 1213.0
-margin_bottom = 59.0
+margin_left = 991.0
+margin_top = 17.0
+margin_right = 1207.0
+margin_bottom = 58.0
 custom_fonts/font = SubResource( 1 )
 text = "100/100"
+
+[node name="LivesLabel" type="Label" parent="HealthPanel"]
+margin_left = 967.0
+margin_top = 87.0
+margin_right = 1213.0
+margin_bottom = 124.0
+custom_fonts/font = SubResource( 1 )
+text = "Жизни: 3"
+
+[node name="Hp" type="Sprite" parent="HealthPanel"]
+position = Vector2( 934, 39 )
+scale = Vector2( 0.135254, 0.135254 )
+texture = ExtResource( 2 )
+
+[node name="MoneyLabel" type="Label" parent="HealthPanel"]
+margin_left = 1060.0
+margin_top = 159.0
+margin_right = 1098.0
+margin_bottom = 196.0
+custom_fonts/font = SubResource( 1 )
+text = "0"
+
+[node name="Logo" type="Sprite" parent="HealthPanel"]
+position = Vector2( 1006, 180 )
+scale = Vector2( 0.175, 0.175 )
+texture = ExtResource( 3 )

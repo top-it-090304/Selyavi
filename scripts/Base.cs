@@ -18,7 +18,7 @@ public class Base : Area2D
 	[Export]
 	public TypeBase typeBase;
 	
-	[Export] private int _maxEnemies = 4;
+	[Export] private int _maxEnemies = 3;
 	[Export] private int _healAmount = 1;
 	[Export] private float _healInterval = 1f;
 	[Export] private float _healRadius = 100f;
@@ -36,14 +36,13 @@ public class Base : Area2D
 		_spawnTimer.OneShot = true;
 		AddChild(_spawnTimer);
 		
+		_spawnTimer.Start(5f);
 		_healTimer = new Timer();
 		_healTimer.WaitTime = _healInterval;
 		_healTimer.OneShot = false;
 		AddChild(_healTimer);
 		_healTimer.Connect("timeout", this, nameof(OnHealTimeout));
 		_healTimer.Start();
-		
-		_spawnTimer.Start(1f);
 	}
 	
 	private void OnBodyEntered(Node body)
