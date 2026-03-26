@@ -7,6 +7,7 @@ public class Player : KinematicBody2D
 	#region private fields
 	private int _speed = 250;
 	private int _hp;
+	private int _maxHp;
 	private int _lives;
 	private bool _isMoving = false;
 	private bool _isScopeEnadled = true;
@@ -77,7 +78,11 @@ public class Player : KinematicBody2D
 				LoadInitialScopeState();
 			}
 		}
-		
+		public void TakeHeal(int amount){
+		_hp += amount;
+		if (_hp > _maxHp) _hp = _maxHp; 
+		GD.Print($"Player healed +{amount}, HP: {_hp}");
+	}
 		private void OnSfxVolumeChanged(float value)
 		{
 			float dbValue = GD.Linear2Db(value);
@@ -381,6 +386,7 @@ public class Player : KinematicBody2D
 		_body = GetNode<Sprite>("BodyTank");
 		_lives = 3;
 		_hp = 100;
+		_maxHp = _hp;
 		_bulletPosition = GetNode<Position2D>("BodyTank/Gun/BulletPosition");
 		_movingSound = GetNode<AudioStreamPlayer>("MovingSound");
 		_gun = GetNode<Sprite>("BodyTank/Gun");

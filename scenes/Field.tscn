@@ -334,7 +334,8 @@ rotation = 1.5708
 scale = Vector2( 1, 1.75 )
 
 [node name="Base" parent="." instance=ExtResource( 15 )]
-position = Vector2( 1095, 456 )
+
+position = Vector2( 710, 174 )
 
 [node name="Navigation2D" type="Navigation2D" parent="."]
 
