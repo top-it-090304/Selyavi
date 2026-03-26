@@ -7,6 +7,7 @@
 [ext_resource path="res://assets/fonts/font.tres" type="DynamicFont" id=5]
 [ext_resource path="res://scenes/MenuScenes/SoundButton.png" type="Texture" id=6]
 
+
 [sub_resource type="StyleBoxTexture" id=4]
 texture = ExtResource( 3 )
 region_rect = Rect2( 34, 57, 339, 78 )

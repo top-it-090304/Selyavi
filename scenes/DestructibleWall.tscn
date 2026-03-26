@@ -4,6 +4,7 @@
 [ext_resource path="res://scripts/DestructibleWall.cs" type="Script" id=2]
 [ext_resource path="res://assets/backround/PNG/Blocks/Block_A_02.png" type="Texture" id=3]
 
+
 [node name="DestructibleWall" instance=ExtResource( 1 )]
 script = ExtResource( 2 )
 

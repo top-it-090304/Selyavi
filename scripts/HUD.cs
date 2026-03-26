@@ -5,6 +5,7 @@ public class HUD : CanvasLayer
 	private ProgressBar _healthProgress;
 	private Label _healthLabel;
 	private Label _livesLabel;
+	private Label _moneyLabel;
 	private Player _player;
 
 	public override void _Ready()
@@ -15,6 +16,7 @@ public class HUD : CanvasLayer
 		_healthProgress = healthPanel.GetNodeOrNull<ProgressBar>("HealthProgress");
 		_healthLabel = healthPanel.GetNodeOrNull<Label>("HealthLabel");
 		_livesLabel = healthPanel.GetNodeOrNull<Label>("LivesLabel");
+		_moneyLabel = healthPanel.GetNodeOrNull<Label>("MoneyLabel");
 		
 		if (_healthProgress == null || _healthLabel == null) return;
 		
@@ -48,20 +50,33 @@ public class HUD : CanvasLayer
 				_player.Connect(nameof(Player.LivesChanged), this, nameof(OnLivesChanged));
 			}
 			
+			if (!_player.IsConnected(nameof(Player.MoneyChanged), this, nameof(OnMoneyChanged)))
+			{
+				_player.Connect(nameof(Player.MoneyChanged), this, nameof(OnMoneyChanged));
+			}
+			
 			int currentHealth = _player.GetCurrentHealth();
 			int maxHealth = _player.GetMaxHealth();
 			int currentLives = _player.GetLives();
+			int currentMoney = _player.GetMoney();
+			
 			int displayHealth = Mathf.Max(0, currentHealth);
+			
 			_healthProgress.MaxValue = maxHealth;
-			_healthProgress.Value = currentHealth;
-			_healthLabel.Text = $"{currentHealth}/{maxHealth}";
+			_healthProgress.Value = displayHealth;
+			_healthLabel.Text = $"{displayHealth}/{maxHealth}";
 			
 			if (_livesLabel != null)
 			{
-				_livesLabel.Text = $"{currentLives}";
+				_livesLabel.Text = $"Жизни: {currentLives}";
 			}
 			
-			UpdateHealthColor(currentHealth, maxHealth);
+			if (_moneyLabel != null)
+			{
+				_moneyLabel.Text = $"💰 {currentMoney}";
+			}
+			
+			UpdateHealthColor(displayHealth, maxHealth);
 		}
 		else
 		{
@@ -101,6 +116,7 @@ public class HUD : CanvasLayer
 		if (_healthProgress == null || _healthLabel == null) return;
 		
 		int displayHealth = Mathf.Max(0, currentHealth);
+		
 		_healthProgress.Value = displayHealth;
 		_healthLabel.Text = $"{displayHealth}/{maxHealth}";
 		UpdateHealthColor(displayHealth, maxHealth);
@@ -109,7 +125,13 @@ public class HUD : CanvasLayer
 	private void OnLivesChanged(int currentLives)
 	{
 		if (_livesLabel == null) return;
-		_livesLabel.Text = $"{currentLives}";
+		_livesLabel.Text = $"Жизни: {currentLives}";
+	}
+	
+	private void OnMoneyChanged(int currentMoney)
+	{
+		if (_moneyLabel == null) return;
+		_moneyLabel.Text = $"💰 {currentMoney}";
 	}
 	
 	private void UpdateHealthColor(int currentHealth, int maxHealth)

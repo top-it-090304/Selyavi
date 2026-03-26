@@ -4,6 +4,7 @@
 [ext_resource path="res://scenes/Tank/PlayerTank.cs" type="Script" id=2]
 [ext_resource path="res://scenes/Tank/MobileJoystick.tscn" type="PackedScene" id=3]
 
+
 [node name="PlayerTank" instance=ExtResource( 1 )]
 script = ExtResource( 2 )
 
