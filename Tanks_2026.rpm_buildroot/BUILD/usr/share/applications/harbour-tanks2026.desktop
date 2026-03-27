@@ -1,0 +1,18 @@
+[Desktop Entry]
+Type=Application
+X-Nemo-Application-Type=silica-qt5
+Icon=harbour-tanks2026
+Exec=harbour-tanks2026 --main-pack /usr/share/harbour-tanks2026/harbour-tanks2026.pck
+Name=Tanks_2026
+Name[en]=Tanks_2026
+
+[X-Sailjail]
+Permissions=Audio;Internet
+OrganizationName=org.selyavi.tanks
+ApplicationName=tanks2026
+
+[X-Aurora-Application]
+Orientation=Landscape
+[X-Aurora-SplashScreen]
+GradientStartColor=#1f2637
+GradientEndColor=#1f2637
