@@ -8,6 +8,34 @@
 
 config_version=4
 
+_global_script_classes=[ {
+"base": "KinematicBody2D",
+"class": "Enemy",
+"language": "GDScript",
+"path": "res://scripts/Tank/Enemy.gd"
+}, {
+"base": "StaticBody2D",
+"class": "IngameWall",
+"language": "GDScript",
+"path": "res://scripts/IngameWall.gd"
+}, {
+"base": "KinematicBody2D",
+"class": "Player",
+"language": "GDScript",
+"path": "res://scripts/Tank/Player.gd"
+}, {
+"base": "Reference",
+"class": "TankEnums",
+"language": "GDScript",
+"path": "res://scripts/Tank/TankCustomize/tankEnums.gd"
+} ]
+_global_script_class_icons={
+"Enemy": "",
+"IngameWall": "",
+"Player": "",
+"TankEnums": ""
+}
+
 [application]
 
 config/name="Tanks 2026"
@@ -16,8 +44,8 @@ config/icon="res://icon.png"
 
 [autoload]
 
-AudioManager="*res://scenes/AudioManager.tscn"
-GameManager="*res://scripts/GameManager.cs"
+AudioManager="*res://scripts/AudioManager.gd"
+GameManager="*res://scripts/GameManager.gd"
 
 [display]
 
@@ -33,6 +61,7 @@ enabled=PoolStringArray(  )
 [global]
 
 etc=false
+autol=false
 
 [gui]
 
