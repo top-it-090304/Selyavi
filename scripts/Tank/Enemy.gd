@@ -244,9 +244,15 @@ func take_damage(damage: int):
 		_destroy()
 
 func _destroy():
-	if _player != null:
+	if is_instance_valid(_player) and _player!=null:
 		var reward = _get_enemy_reward()
 		_player.add_money(reward)
+		
+		if SaveManager != null:
+			SaveManager.save_game()
+		elif _player.has_method("_save_money"):
+			_player._save_money()
+	
 	queue_free()
 
 func _get_enemy_reward() -> int:

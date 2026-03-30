@@ -109,7 +109,43 @@ func _ready():
 		_is_scope_enabled = GameManager.get_scope_enabled()
 	else:
 		_load_initial_scope_state()
+	_load_saved_money()
 
+func _load_saved_money():
+	if SaveManager != null:
+		# Подключаемся к сигналу загрузки денег
+		if not SaveManager.is_connected("money_loaded", self, "_on_money_loaded"):
+			SaveManager.connect("money_loaded", self, "_on_money_loaded")
+		
+		# Загружаем сохраненные деньги
+		SaveManager.load_game()
+	else:
+		# Fallback: загружаем из файла напрямую
+		_load_money_from_file()
+
+func _load_money_from_file():
+	var config = ConfigFile.new()
+	if config.load("user://savegame.cfg") == OK:
+		_money = config.get_value("player", "money", 0)
+		emit_signal("money_changed", _money)
+
+func _on_money_loaded(amount: int):
+	_money = amount
+	emit_signal("money_changed", _money)
+	print("Money loaded from save: ", _money)
+
+func _save_money():
+	if SaveManager != null:
+		SaveManager.save_game()
+	else:
+		# Fallback: сохраняем в отдельный файл
+		_save_money_to_file()
+
+func _save_money_to_file():
+	var config = ConfigFile.new()
+	config.set_value("player", "money", _money)
+	config.save("user://savegame.cfg")
+	
 func _on_sfx_volume_changed(value: float):
 	var db_value = linear2db(value)
 	_normal_movement_volume = db_value
@@ -397,6 +433,11 @@ func get_money() -> int:
 func add_money(amount: int):
 	_money += amount
 	emit_signal("money_changed", _money)
+	if _money > 99999:
+		_money = 99999
+	if _money < 0:
+		_money = 0
+	_save_money()
 
 func spend_money(amount: int) -> bool:
 	if _money >= amount:

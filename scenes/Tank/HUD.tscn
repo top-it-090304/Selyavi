@@ -50,9 +50,9 @@ scale = Vector2( 0.135254, 0.135254 )
 texture = ExtResource( 2 )
 
 [node name="MoneyLabel" type="Label" parent="HealthPanel"]
-margin_left = 1060.0
+margin_left = 1043.0
 margin_top = 159.0
-margin_right = 1098.0
+margin_right = 1081.0
 margin_bottom = 196.0
 custom_fonts/font = SubResource( 1 )
 text = "0"
