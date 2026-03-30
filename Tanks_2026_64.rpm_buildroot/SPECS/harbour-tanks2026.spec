@@ -10,7 +10,7 @@ Version:    1.0.0
 Release:    1
 Group:      Game
 License:    Proprietary
-BuildArch:  x86_64
+BuildArch:  aarch64
 URL:        http://example.org/
 
 %define _topdir /home/markc_ubuntu/Desktop/GodotProjects/Tanks_2026/Tanks_2026_64.rpm_buildroot
