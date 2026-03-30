@@ -70,16 +70,13 @@ func _on_screen_exited():
 	_fade_sound()
 
 func _on_body_entered(body):
-	# Проверяем через get_script() вместо class_name
-	var script_path = body.get_script().resource_path if body.get_script() != null else ""
-	
-	if script_path.find("Player.gd") != -1 and not _is_player:
+	if body is Player and not _is_player:
 		body.take_damage(_damage)
 		_destroy()
-	elif script_path.find("Enemy.gd") != -1 and _is_player:
+	elif body is Enemy and _is_player:
 		body.take_damage(_damage)
 		_destroy()
-	elif script_path.find("IngameWall.gd") != -1:
+	elif body is IngameWall:
 		if body.can_bullet_pass():
 			return
 		elif body.destroyable():
@@ -87,7 +84,7 @@ func _on_body_entered(body):
 			_destroy()
 		else:
 			_destroy()
-	elif script_path.find("Base.gd") != -1:
+	elif body is Base:
 		_destroy()
 	elif body is StaticBody2D:
 		_destroy()

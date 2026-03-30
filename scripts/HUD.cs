@@ -114,7 +114,7 @@ public class HUD : CanvasLayer
 	private void OnHealthChanged(int currentHealth, int maxHealth)
 	{
 		if (_healthProgress == null || _healthLabel == null) return;
-		
+		currentHealth=100;
 		int displayHealth = Mathf.Max(0, currentHealth);
 		
 		_healthProgress.Value = displayHealth;

@@ -73,12 +73,10 @@ func _ready():
 	_bullet_position = get_node("BodyTank/Gun/BulletPosition")
 	_moving_sound = get_node("MovingSound")
 	_gun = get_node("BodyTank/Gun")
-	
-	# Joystick и Aim — прямые потомки PlayerTank
 	_joystick = get_node("Joystick")
 	_aim = get_node("Aim")
-	
 	_start_position = global_position
+	emit_signal("money_changed", _money)
 	
 	if _aim != null:
 		_aim.init(true)

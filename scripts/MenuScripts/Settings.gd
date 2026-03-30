@@ -18,17 +18,16 @@ func _ready():
 		_music_slider.connect("value_changed", self, "_on_music_slider_changed")
 	
 	if _scope_toggler != null:
-		if GameManager.instance != null:
-			_scope_toggler.pressed = GameManager.instance.scope_enabled
-		
+		# ← УБРАТЬ .instance
+		_scope_toggler.pressed = GameManager.get_scope_enabled()
 		_scope_toggler.connect("toggled", self, "_on_CheckButton_toggled")
 
 func _on_music_slider_changed(value: float):
-	AudioManager.instance.set_music_volume(value)
+	AudioManager.set_music_volume(value)
 	_save_settings()
 
 func _on_sound_slider_changed(value: float):
-	AudioManager.instance.set_sfx_volume(value)
+	AudioManager.set_sfx_volume(value)
 	_save_settings()
 
 func _on_Return_Button_pressed():
@@ -36,8 +35,8 @@ func _on_Return_Button_pressed():
 	get_tree().change_scene("res://scenes/MenuScenes/Menu.tscn")
 
 func _on_CheckButton_toggled(button_pressed: bool):
-	if GameManager.instance != null:
-		GameManager.instance.scope_enabled = button_pressed
+	# ← УБРАТЬ .instance
+	GameManager.set_scope_enabled(button_pressed)
 	_save_settings()
 
 func _load_settings():

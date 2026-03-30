@@ -1,3 +1,4 @@
+class_name DestructibleWall
 extends IngameWall
 
 func _ready():

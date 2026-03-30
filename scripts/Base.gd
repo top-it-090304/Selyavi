@@ -1,3 +1,4 @@
+class_name Base
 extends Area2D
 
 enum TypeBase { PLAYER, ENEMY }
@@ -53,7 +54,8 @@ func _on_heal_timeout():
 	var distance = global_position.distance_to(player.global_position)
 	if distance <= _heal_radius:
 		player.take_heal(_heal_amount)
-
+func destroy():
+	_destroy()
 func _destroy():
 	emit_signal("base_state")
 	queue_free()
