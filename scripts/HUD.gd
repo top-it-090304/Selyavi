@@ -4,7 +4,7 @@ var _healthProgress: ProgressBar
 var _healthLabel: Label
 var _livesLabel: Label
 var _moneyLabel: Label
-var _player: Player
+var _player
 
 func _ready():
 	var healthPanel = get_node_or_null("HealthPanel")
@@ -34,19 +34,28 @@ func _find_player_and_connect():
 		_player = get_tree().get_root().find_node("PlayerTank", true, false)
 	
 	if _player != null:
-		if not _player.is_connected("health_changed", self, "_on_health_changed"):
+		if _player.has_signal("health_changed") and not _player.is_connected("health_changed", self, "_on_health_changed"):
 			_player.connect("health_changed", self, "_on_health_changed")
 		
-		if not _player.is_connected("lives_changed", self, "_on_lives_changed"):
+		if _player.has_signal("lives_changed") and not _player.is_connected("lives_changed", self, "_on_lives_changed"):
 			_player.connect("lives_changed", self, "_on_lives_changed")
 		
-		if not _player.is_connected("money_changed", self, "_on_money_changed"):
+		if _player.has_signal("money_changed") and not _player.is_connected("money_changed", self, "_on_money_changed"):
 			_player.connect("money_changed", self, "_on_money_changed")
 		
-		var current_health = _player.get_current_health()
-		var max_health = _player.get_max_health()
-		var current_lives = _player.get_lives()
-		var current_money = _player.get_money()
+		var current_health = 100
+		var max_health = 100
+		var current_lives = 3
+		var current_money = 0
+		
+		if _player.has_method("get_current_health"):
+			current_health = _player.get_current_health()
+		if _player.has_method("get_max_health"):
+			max_health = _player.get_max_health()
+		if _player.has_method("get_lives"):
+			current_lives = _player.get_lives()
+		if _player.has_method("get_money"):
+			current_money = _player.get_money()
 		
 		var display_health = max(0, current_health)
 		
@@ -58,7 +67,7 @@ func _find_player_and_connect():
 			_livesLabel.text = "Жизни: " + str(current_lives)
 		
 		if _moneyLabel != null:
-			_moneyLabel.text = "💰 " + str(current_money)
+			_moneyLabel.text =str(current_money)
 		
 		_update_health_color(display_health, max_health)
 	else:
@@ -108,7 +117,7 @@ func _on_lives_changed(current_lives: int):
 func _on_money_changed(current_money: int):
 	if _moneyLabel == null:
 		return
-	_moneyLabel.text = "💰 " + str(current_money)
+	_moneyLabel.text = str(current_money)
 
 func _update_health_color(current_health: int, max_health: int):
 	var percent = float(current_health) / float(max_health)
