@@ -32,6 +32,10 @@ var _bullet_scene: PackedScene
 
 enum TypeEnemy { LIGHT, MEDIUM, HEAVY, STATIONARY }
 
+func set_enemy_type(type: int):
+	_type_enemy = type
+	_apply_enemy_stats()
+
 func _ready():
 	add_to_group("enemies")
 	_nav2d = get_node("NavigationAgent2D")
@@ -48,9 +52,41 @@ func _ready():
 	if navigation_2d != null:
 		_nav2d.set_navigation(navigation_2d)
 	
-	_randomize_enemy_type()
+	if _type_enemy == null:
+		_randomize_enemy_type()
+	_apply_enemy_stats()
 
 	_detection_area = get_node("DetectionArea")
+
+	_current_state = State.PATROL
+	_player = get_node("/root/Field/PlayerTank")
+	_base = get_node("/root/Field/Base")
+	_bullet_position = get_node("BodyTank/Gun/BulletPosition")
+
+	if _detection_area != null:
+		if not _detection_area.is_connected("body_entered", self, "_on_detection_area_entered"):
+			_detection_area.connect("body_entered", self, "_on_detection_area_entered")
+		if not _detection_area.is_connected("body_exited", self, "_on_detection_area_exited"):
+			_detection_area.connect("body_exited", self, "_on_detection_area_exited")
+
+	_bullet_scene = load("res://scenes/Tank/Bullet.tscn")
+	_shoot_timer = Timer.new()
+	_shoot_timer.wait_time = _fire_rate
+	_shoot_timer.one_shot = true
+	add_child(_shoot_timer)
+	add_child(_tween)
+
+	if _nav2d != null:
+		_nav2d.max_speed = _patrol_speed
+		_nav2d.target_desired_distance = 10.0
+		_nav2d.path_desired_distance = 5.0
+
+	_configure_audio_players()
+	if _moving_sound != null and _type_enemy != TypeEnemy.STATIONARY:
+		_normal_movement_volume = _moving_sound.volume_db
+
+func _apply_enemy_stats():
+	if _body == null or _gun == null: return
 
 	match _type_enemy:
 		TypeEnemy.LIGHT:
@@ -61,7 +97,8 @@ func _ready():
 			_fire_rate = 1.0
 			_body.texture = load("res://assets/future_tanks/PNG/Hulls_Color_D/Hull_08.png")
 			_gun.texture = load("res://assets/future_tanks/PNG/Weapon_Color_D/Gun_05.png")
-			_gun.position += Vector2(0, -35)
+			_gun.position = Vector2(0, -35)
+			_body.visible = true
 		TypeEnemy.MEDIUM:
 			_patrol_speed = 100
 			_chase_speed = 105
@@ -70,6 +107,8 @@ func _ready():
 			_fire_rate = 1.2
 			_body.texture = load("res://assets/future_tanks/PNG/Hulls_Color_D/Hull_01.png")
 			_gun.texture = load("res://assets/future_tanks/PNG/Weapon_Color_D/Gun_03.png")
+			_gun.position = Vector2.ZERO
+			_body.visible = true
 		TypeEnemy.HEAVY:
 			_patrol_speed = 90
 			_chase_speed = 100
@@ -78,46 +117,23 @@ func _ready():
 			_fire_rate = 2.5
 			_body.texture = load("res://assets/future_tanks/PNG/Hulls_Color_D/Hull_02.png")
 			_gun.texture = load("res://assets/future_tanks/PNG/Weapon_Color_D/Gun_08.png")
+			_gun.position = Vector2.ZERO
+			_body.visible = true
 		TypeEnemy.STATIONARY:
 			_patrol_speed = 0
 			_chase_speed = 0
 			_hp = 150
 			_damage = 40
 			_fire_rate = 2.0
-			_body.visible = false # Скрываем корпус
+			_body.visible = false
 			_gun.texture = load("res://assets/future_tanks/PNG/Weapon_Color_D/Gun_06.png")
-			_gun.position = Vector2.ZERO # Центрируем пушку
+			_gun.position = Vector2.ZERO
 			if _moving_sound != null:
-				_moving_sound.stream = null # Отключаем звук
-			# Увеличиваем Area2D для стационарного танка
+				_moving_sound.stream = null
 			if _detection_area != null:
 				var shape = _detection_area.get_node("CollisionShape2D")
 				if shape != null and shape.shape is CircleShape2D:
-					shape.shape.radius *= 1.8
-
-	_current_state = State.PATROL
-	_player = get_node("/root/Field/PlayerTank")
-	_base = get_node("/root/Field/Base")
-	_bullet_position = get_node("BodyTank/Gun/BulletPosition")
-	
-	_detection_area.connect("body_entered", self, "_on_detection_area_entered")
-	_detection_area.connect("body_exited", self, "_on_detection_area_exited")
-	
-	_bullet_scene = load("res://scenes/Tank/Bullet.tscn")
-	_shoot_timer = Timer.new()
-	_shoot_timer.wait_time = _fire_rate
-	_shoot_timer.one_shot = true
-	add_child(_shoot_timer)
-	add_child(_tween)
-	
-	if _nav2d != null:
-		_nav2d.max_speed = _patrol_speed
-		_nav2d.target_desired_distance = 10.0
-		_nav2d.path_desired_distance = 5.0
-	
-	_configure_audio_players()
-	if _moving_sound != null and _type_enemy != TypeEnemy.STATIONARY:
-		_normal_movement_volume = _moving_sound.volume_db
+					shape.shape.radius = 400.0 # Фиксированный большой радиус
 
 func _configure_audio_players():
 	var sfx_bus_index = AudioServer.get_bus_index("SFX")
@@ -255,7 +271,6 @@ func _check_and_fire():
 	if target == null:
 		return
 
-	# Only shoot at the base if it's within the detection area
 	if target == _base:
 		if _detection_area == null or not _detection_area.overlaps_area(_base):
 			return
@@ -366,5 +381,5 @@ func _on_tween_complete(_obj, _key):
 	_moving_sound.volume_db = _normal_movement_volume
 
 func _randomize_enemy_type():
-	var values = [TypeEnemy.LIGHT, TypeEnemy.MEDIUM, TypeEnemy.HEAVY, TypeEnemy.STATIONARY]
+	var values = [TypeEnemy.LIGHT, TypeEnemy.MEDIUM, TypeEnemy.HEAVY] # Убрали из рандома
 	_type_enemy = values[randi() % values.size()]

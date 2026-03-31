@@ -19,6 +19,8 @@ export var _heal_radius: float = 300.0
 var _time_since_last_check: float = 0.0
 var _spawn_radius: float = 60.0
 
+var _stationary_enemies = []
+
 func _ready():
 	connect("area_entered", self, "_on_bullet_entered")
 	_enemy_scene = load("res://scenes/Tank/Enemy.tscn")
@@ -81,7 +83,11 @@ func _destroy():
 
 func _count_enemies_on_scene() -> int:
 	var enemies = get_tree().get_nodes_in_group("enemies")
-	return enemies.size()
+	var count = 0
+	for enemy in enemies:
+		if enemy.get("_type_enemy") != 3: # Не считаем стационарных в общий лимит танков
+			count += 1
+	return count
 
 func _is_enemy_on_base() -> bool:
 	var all_enemies = get_tree().get_nodes_in_group("enemies")
@@ -94,7 +100,10 @@ func _is_enemy_on_base() -> bool:
 func _spawn_enemy():
 	if type_base == TypeBase.PLAYER:
 		return
-	
+
+	# Поддерживаем всегда 2 стационарных танка
+	_maintain_stationary_enemies()
+
 	var current_enemies = _count_enemies_on_scene()
 	if current_enemies >= _max_enemies:
 		return
@@ -105,12 +114,30 @@ func _spawn_enemy():
 		enemy.global_position = spawn_pos
 		get_tree().root.add_child(enemy)
 
-func _get_safe_spawn_pos() -> Vector2:
+func _maintain_stationary_enemies():
+	var active_stationary = []
+	for e in _stationary_enemies:
+		if is_instance_valid(e):
+			active_stationary.append(e)
+	_stationary_enemies = active_stationary
+
+	while _stationary_enemies.size() < 2:
+		var spawn_pos = _get_safe_spawn_pos(true)
+		if spawn_pos != Vector2.ZERO:
+			var enemy = _enemy_scene.instance()
+			if enemy.has_method("set_enemy_type"):
+				enemy.set_enemy_type(3) # STATIONARY
+			enemy.global_position = spawn_pos
+			get_tree().root.add_child(enemy)
+			_stationary_enemies.append(enemy)
+		else:
+			break
+
+func _get_safe_spawn_pos(is_stationary: bool = false) -> Vector2:
 	var player = get_node_or_null("/root/Field/PlayerTank")
 	var player_base = null
 
-	# Ищем базу игрока
-	var bases = get_tree().get_nodes_in_group("bases") # Предположим, базы в этой группе
+	var bases = get_tree().get_nodes_in_group("bases")
 	for b in bases:
 		if b.type_base == TypeBase.PLAYER:
 			player_base = b
@@ -131,12 +158,11 @@ func _get_safe_spawn_pos() -> Vector2:
 	while attempts < 30:
 		var angle = 0.0
 		if has_target:
-			# Спавним в конусе 90 градусов в сторону игрока
 			angle = base_angle + rand_range(-PI/4, PI/4)
 		else:
 			angle = rand_range(0, 2 * PI)
 
-		var spawn_distance = rand_range(200, 350)
+		var spawn_distance = rand_range(150, 250) if is_stationary else rand_range(250, 400)
 		var spawn_pos = global_position + Vector2(cos(angle), sin(angle)) * spawn_distance
 
 		if _is_pos_safe(spawn_pos):
@@ -147,7 +173,7 @@ func _get_safe_spawn_pos() -> Vector2:
 func _is_pos_safe(pos: Vector2) -> bool:
 	var space_state = get_world_2d().direct_space_state
 	var shape = CircleShape2D.new()
-	shape.radius = 40.0
+	shape.radius = 45.0
 
 	var shape_query = Physics2DShapeQueryParameters.new()
 	shape_query.set_shape(shape)
