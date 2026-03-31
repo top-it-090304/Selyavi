@@ -25,11 +25,12 @@ var _moving_sound: AudioStreamPlayer
 var _tween: Tween
 var _is_moving: bool = false
 var _normal_movement_volume: float = -20.0
+var _fire_rate: float = 1.0
 # endregion
 
 var _bullet_scene: PackedScene
 
-enum TypeEnemy { LIGHT, MEDIUM, HEAVY }
+enum TypeEnemy { LIGHT, MEDIUM, HEAVY, STATIONARY }
 
 func _ready():
 	add_to_group("enemies")
@@ -48,12 +49,16 @@ func _ready():
 		_nav2d.set_navigation(navigation_2d)
 	
 	_randomize_enemy_type()
+
+	_detection_area = get_node("DetectionArea")
+
 	match _type_enemy:
 		TypeEnemy.LIGHT:
 			_patrol_speed = 110
 			_chase_speed = 120
 			_hp = 50
 			_damage = 10
+			_fire_rate = 1.0
 			_body.texture = load("res://assets/future_tanks/PNG/Hulls_Color_D/Hull_08.png")
 			_gun.texture = load("res://assets/future_tanks/PNG/Weapon_Color_D/Gun_05.png")
 			_gun.position += Vector2(0, -35)
@@ -62,6 +67,7 @@ func _ready():
 			_chase_speed = 105
 			_hp = 70
 			_damage = 25
+			_fire_rate = 1.2
 			_body.texture = load("res://assets/future_tanks/PNG/Hulls_Color_D/Hull_01.png")
 			_gun.texture = load("res://assets/future_tanks/PNG/Weapon_Color_D/Gun_03.png")
 		TypeEnemy.HEAVY:
@@ -69,11 +75,24 @@ func _ready():
 			_chase_speed = 100
 			_hp = 100
 			_damage = 35
+			_fire_rate = 2.5 # Уменьшена скорострельность (было 1.0 по умолчанию)
 			_body.texture = load("res://assets/future_tanks/PNG/Hulls_Color_D/Hull_02.png")
 			_gun.texture = load("res://assets/future_tanks/PNG/Weapon_Color_D/Gun_08.png")
-	
+		TypeEnemy.STATIONARY:
+			_patrol_speed = 0
+			_chase_speed = 0
+			_hp = 150
+			_damage = 40
+			_fire_rate = 2.0
+			_body.texture = load("res://assets/future_tanks/PNG/Hulls_Color_D/Hull_06.png")
+			_gun.texture = load("res://assets/future_tanks/PNG/Weapon_Color_D/Gun_06.png")
+			# Увеличиваем Area2D для стационарного танка
+			if _detection_area != null:
+				var shape = _detection_area.get_node("CollisionShape2D")
+				if shape != null and shape.shape is CircleShape2D:
+					shape.shape.radius *= 1.5
+
 	_current_state = State.PATROL
-	_detection_area = get_node("DetectionArea")
 	_player = get_node("/root/Field/PlayerTank")
 	_base = get_node("/root/Field/Base")
 	_bullet_position = get_node("BodyTank/Gun/BulletPosition")
@@ -83,7 +102,7 @@ func _ready():
 	
 	_bullet_scene = load("res://scenes/Tank/Bullet.tscn")
 	_shoot_timer = Timer.new()
-	_shoot_timer.wait_time = 1.0
+	_shoot_timer.wait_time = _fire_rate
 	_shoot_timer.one_shot = true
 	add_child(_shoot_timer)
 	add_child(_tween)
@@ -135,7 +154,7 @@ func _handle_movement_sound(movement_velocity: Vector2):
 				_fade_sound()
 
 func _update_target():
-	if _nav2d == null:
+	if _nav2d == null or _type_enemy == TypeEnemy.STATIONARY:
 		return
 	
 	match _current_state:
@@ -163,7 +182,8 @@ func _aim_gun():
 	_gun.global_rotation = gun_angle
 
 func _move_enemy():
-	if _nav2d == null:
+	if _nav2d == null or _type_enemy == TypeEnemy.STATIONARY:
+		_velocity = Vector2.ZERO
 		return
 	
 	var should_move = false
@@ -271,6 +291,8 @@ func _get_enemy_reward() -> int:
 			return 75
 		TypeEnemy.HEAVY:
 			return 100
+		TypeEnemy.STATIONARY:
+			return 150
 	return 50
 
 func _fire_at_target(target: Node2D):
@@ -312,6 +334,7 @@ func _fire_at_target(target: Node2D):
 		muzzle_flash.frame = 0
 		muzzle_flash.play("Fire")
 	
+	_shoot_timer.wait_time = _fire_rate
 	_shoot_timer.start()
 
 func _fade_sound():
@@ -337,5 +360,5 @@ func _on_tween_complete(_obj, _key):
 	_moving_sound.volume_db = _normal_movement_volume
 
 func _randomize_enemy_type():
-	var values = [TypeEnemy.LIGHT, TypeEnemy.MEDIUM, TypeEnemy.HEAVY]
+	var values = [TypeEnemy.LIGHT, TypeEnemy.MEDIUM, TypeEnemy.HEAVY, TypeEnemy.STATIONARY]
 	_type_enemy = values[randi() % values.size()]
