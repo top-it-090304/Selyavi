@@ -334,17 +334,17 @@ rotation = 1.5708
 scale = Vector2( 1, 1.75 )
 
 [node name="Base" parent="." instance=ExtResource( 15 )]
-position = Vector2( 710, 174 )
+position = Vector2( 699, -273 )
 type_base = 0
 
 [node name="Navigation2D" type="Navigation2D" parent="."]
 
 [node name="NavigationPolygonInstance" type="NavigationPolygonInstance" parent="Navigation2D"]
-position = Vector2( 28, -17 )
+position = Vector2( 35, -12 )
 navpoly = SubResource( 2 )
 
 [node name="EnemyBase" parent="." instance=ExtResource( 15 )]
-position = Vector2( 299, 605 )
+position = Vector2( 1357, 701 )
 
 [connection signal="pressed" from="PlayerTank/PauseButton/PauseButton" to="." method="_on_TouchScreenButton_pressed"]
 [connection signal="pressed" from="PlayerTank/CanvasLayer/Plasma" to="PlayerTank" method="_on_Plasma_pressed"]

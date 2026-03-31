@@ -25,7 +25,7 @@ func _ready():
 	_enemy_position = get_node_or_null("EnemyPosition")
 	
 	_spawn_timer = Timer.new()
-	_spawn_timer.wait_time = 0.1 # Убрали задержку (минимальное значение)
+	_spawn_timer.wait_time = 0.1
 	_spawn_timer.one_shot = true
 	add_child(_spawn_timer)
 	
@@ -92,7 +92,6 @@ func _is_enemy_on_base() -> bool:
 	return false
 
 func _spawn_enemy():
-	# Убрали проверку таймера здесь, чтобы спавн был мгновенным, если лимит не достигнут
 	if type_base == TypeBase.PLAYER:
 		return
 	
@@ -107,9 +106,36 @@ func _spawn_enemy():
 		get_tree().root.add_child(enemy)
 
 func _get_safe_spawn_pos() -> Vector2:
+	var player = get_node_or_null("/root/Field/PlayerTank")
+	var player_base = null
+
+	# Ищем базу игрока
+	var bases = get_tree().get_nodes_in_group("bases") # Предположим, базы в этой группе
+	for b in bases:
+		if b.type_base == TypeBase.PLAYER:
+			player_base = b
+			break
+
+	var target_pos = Vector2.ZERO
+	if is_instance_valid(player_base):
+		target_pos = player_base.global_position
+	elif is_instance_valid(player):
+		target_pos = player.global_position
+
+	var base_angle = 0.0
+	var has_target = target_pos != Vector2.ZERO
+	if has_target:
+		base_angle = (target_pos - global_position).angle()
+
 	var attempts = 0
 	while attempts < 30:
-		var angle = rand_range(0, 2 * PI)
+		var angle = 0.0
+		if has_target:
+			# Спавним в конусе 90 градусов в сторону игрока
+			angle = base_angle + rand_range(-PI/4, PI/4)
+		else:
+			angle = rand_range(0, 2 * PI)
+
 		var spawn_distance = rand_range(200, 350)
 		var spawn_pos = global_position + Vector2(cos(angle), sin(angle)) * spawn_distance
 
@@ -137,7 +163,6 @@ func _is_pos_safe(pos: Vector2) -> bool:
 
 func _process(delta):
 	_time_since_last_check += delta
-	# Проверяем чаще, чтобы спавн казался мгновенным
 	if _time_since_last_check >= 0.1:
 		_spawn_enemy()
 		_time_since_last_check = 0

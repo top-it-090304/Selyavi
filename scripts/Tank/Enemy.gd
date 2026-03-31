@@ -75,7 +75,7 @@ func _ready():
 			_chase_speed = 100
 			_hp = 100
 			_damage = 35
-			_fire_rate = 2.5 # Уменьшена скорострельность (было 1.0 по умолчанию)
+			_fire_rate = 2.5
 			_body.texture = load("res://assets/future_tanks/PNG/Hulls_Color_D/Hull_02.png")
 			_gun.texture = load("res://assets/future_tanks/PNG/Weapon_Color_D/Gun_08.png")
 		TypeEnemy.STATIONARY:
@@ -84,13 +84,16 @@ func _ready():
 			_hp = 150
 			_damage = 40
 			_fire_rate = 2.0
-			_body.texture = load("res://assets/future_tanks/PNG/Hulls_Color_D/Hull_06.png")
+			_body.visible = false # Скрываем корпус
 			_gun.texture = load("res://assets/future_tanks/PNG/Weapon_Color_D/Gun_06.png")
+			_gun.position = Vector2.ZERO # Центрируем пушку
+			if _moving_sound != null:
+				_moving_sound.stream = null # Отключаем звук
 			# Увеличиваем Area2D для стационарного танка
 			if _detection_area != null:
 				var shape = _detection_area.get_node("CollisionShape2D")
 				if shape != null and shape.shape is CircleShape2D:
-					shape.shape.radius *= 1.5
+					shape.shape.radius *= 1.8
 
 	_current_state = State.PATROL
 	_player = get_node("/root/Field/PlayerTank")
@@ -113,7 +116,7 @@ func _ready():
 		_nav2d.path_desired_distance = 5.0
 	
 	_configure_audio_players()
-	if _moving_sound != null:
+	if _moving_sound != null and _type_enemy != TypeEnemy.STATIONARY:
 		_normal_movement_volume = _moving_sound.volume_db
 
 func _configure_audio_players():
@@ -135,6 +138,9 @@ func _physics_process(delta):
 	_velocity = move_and_slide(_velocity)
 
 func _handle_movement_sound(movement_velocity: Vector2):
+	if _type_enemy == TypeEnemy.STATIONARY:
+		return
+
 	var is_moving_now = movement_velocity.length() > 0.1
 	
 	if is_moving_now:
