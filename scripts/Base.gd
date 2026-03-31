@@ -22,7 +22,10 @@ var _spawn_radius: float = 60.0
 var _stationary_enemies = []
 
 func _ready():
-	connect("area_entered", self, "_on_bullet_entered")
+	randomize()
+	if not is_connected("area_entered", self, "_on_bullet_entered"):
+		connect("area_entered", self, "_on_bullet_entered")
+
 	_enemy_scene = load("res://scenes/Tank/Enemy.tscn")
 	_enemy_position = get_node_or_null("EnemyPosition")
 	
@@ -44,6 +47,7 @@ func _ready():
 
 func _setup_base_collision():
 	var sb = StaticBody2D.new()
+	sb.name = "BaseStaticBody"
 	add_child(sb)
 	var cs = CollisionShape2D.new()
 	var circle = CircleShape2D.new()
@@ -162,7 +166,8 @@ func _get_safe_spawn_pos(is_stationary: bool = false) -> Vector2:
 		else:
 			angle = rand_range(0, 2 * PI)
 
-		var spawn_distance = rand_range(150, 250) if is_stationary else rand_range(250, 400)
+		# Слегка увеличили минимальное расстояние для безопасности
+		var spawn_distance = rand_range(110, 180) if is_stationary else rand_range(180, 300)
 		var spawn_pos = global_position + Vector2(cos(angle), sin(angle)) * spawn_distance
 
 		if _is_pos_safe(spawn_pos):
@@ -178,7 +183,12 @@ func _is_pos_safe(pos: Vector2) -> bool:
 	var shape_query = Physics2DShapeQueryParameters.new()
 	shape_query.set_shape(shape)
 	shape_query.transform = Transform2D(0, pos)
-	shape_query.exclude = [self]
+
+	var excludes = [self]
+	var sb = get_node_or_null("BaseStaticBody")
+	if sb:
+		excludes.append(sb)
+	shape_query.exclude = excludes
 
 	var results = space_state.intersect_shape(shape_query)
 	for result in results:
