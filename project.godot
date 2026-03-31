@@ -8,6 +8,58 @@
 
 config_version=4
 
+_global_script_classes=[ {
+"base": "Area2D",
+"class": "Base",
+"language": "GDScript",
+"path": "res://scripts/Base.gd"
+}, {
+"base": "IngameWall",
+"class": "DestructibleWall",
+"language": "GDScript",
+"path": "res://scripts/DestructibleWall.gd"
+}, {
+"base": "KinematicBody2D",
+"class": "Enemy",
+"language": "GDScript",
+"path": "res://scripts/Tank/Enemy.gd"
+}, {
+"base": "IngameWall",
+"class": "IndestructibleWall",
+"language": "GDScript",
+"path": "res://scripts/IndestructibleWall.gd"
+}, {
+"base": "StaticBody2D",
+"class": "IngameWall",
+"language": "GDScript",
+"path": "res://scripts/IngameWall.gd"
+}, {
+"base": "KinematicBody2D",
+"class": "Player",
+"language": "GDScript",
+"path": "res://scripts/Tank/Player.gd"
+}, {
+"base": "KinematicBody2D",
+"class": "Tank",
+"language": "GDScript",
+"path": "res://scripts/Tank/TankCustomize/Tank.gd"
+}, {
+"base": "Reference",
+"class": "TankEnums",
+"language": "GDScript",
+"path": "res://scripts/Tank/TankCustomize/tankEnums.gd"
+} ]
+_global_script_class_icons={
+"Base": "",
+"DestructibleWall": "",
+"Enemy": "",
+"IndestructibleWall": "",
+"IngameWall": "",
+"Player": "",
+"Tank": "",
+"TankEnums": ""
+}
+
 [application]
 
 config/name="Tanks 2026"
@@ -16,8 +68,9 @@ config/icon="res://icon.png"
 
 [autoload]
 
-AudioManager="*res://scenes/AudioManager.tscn"
-GameManager="*res://scripts/GameManager.cs"
+AudioManager="*res://scripts/AudioManager.gd"
+GameManager="*res://scripts/GameManager.gd"
+SaveManager="*res://scripts/SaveManager.gd"
 
 [display]
 
@@ -33,6 +86,7 @@ enabled=PoolStringArray(  )
 [global]
 
 etc=false
+autol=false
 
 [gui]
 

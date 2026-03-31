@@ -1,4 +1,4 @@
-[gd_scene load_steps=26 format=2]
+[gd_scene load_steps=27 format=2]
 
 [ext_resource path="res://assets/backround/PNG/Tiles/Ground_Tile_01_A.png" type="Texture" id=1]
 [ext_resource path="res://scenes/Tank/Player.tscn" type="PackedScene" id=2]
@@ -7,6 +7,7 @@
 [ext_resource path="res://scenes/DestructibleWall.tscn" type="PackedScene" id=5]
 [ext_resource path="res://assets/Music/68. Sad Eyes.mp3" type="AudioStream" id=6]
 [ext_resource path="res://assets/backround/PNG/Tiles/Ground_Tile_02_C.png" type="Texture" id=7]
+[ext_resource path="res://scripts/Field.gd" type="Script" id=8]
 [ext_resource path="res://assets/ButtonSprites/pause_594725.png" type="Texture" id=9]
 [ext_resource path="res://assets/backround/PNG/Tiles/Ground_Tile_01_C.png" type="Texture" id=10]
 [ext_resource path="res://assets/backround/PNG/Tiles/Ground_Tile_01_B.png" type="Texture" id=11]
@@ -122,6 +123,7 @@ polygons = [ PoolIntArray( 0, 1, 2, 3, 4 ), PoolIntArray( 5, 6, 7, 8 ), PoolIntA
 outlines = [ PoolVector2Array( 240, 17, 240, 152, 112, 143, 115, 601, -20, 684, -22, 1570, 1839, 1564, 1874, 19, 867, 19 ), PoolVector2Array( 340, 300, 343, 372, 457, 380, 489, 362, 496, 236, 456, 208, 365, 212, 342, 236 ), PoolVector2Array( 1283, 287, 1380, 283, 1429, 302, 1420, 429, 1274, 440 ), PoolVector2Array( 867, 217, 995, 217, 999, 342, 867, 349 ), PoolVector2Array( 992, 1563, 995, 1440, 709, 1442, 702, 1571 ), PoolVector2Array( 720, 1192, 972, 1208, 998, 1082, 1118, 1066, 1114, 930, 731, 923, 703, 1127, 101, 1125, 142, 1410, 258, 1418, 262, 1556, 408, 1562, 432, 1278, 696, 1282 ), PoolVector2Array( 241, 1097, 237, 859, -29, 843, -27, 1115 ) ]
 
 [node name="Field" type="Node2D"]
+script = ExtResource( 8 )
 
 [node name="TileMap" type="TileMap" parent="."]
 tile_set = SubResource( 1 )
@@ -333,6 +335,7 @@ scale = Vector2( 1, 1.75 )
 
 [node name="Base" parent="." instance=ExtResource( 15 )]
 position = Vector2( 710, 174 )
+type_base = 0
 
 [node name="Navigation2D" type="Navigation2D" parent="."]
 
@@ -341,7 +344,7 @@ position = Vector2( 28, -17 )
 navpoly = SubResource( 2 )
 
 [node name="EnemyBase" parent="." instance=ExtResource( 15 )]
-position = Vector2( 593, 1428 )
+position = Vector2( 299, 605 )
 
 [connection signal="pressed" from="PlayerTank/PauseButton/PauseButton" to="." method="_on_TouchScreenButton_pressed"]
 [connection signal="pressed" from="PlayerTank/CanvasLayer/Plasma" to="PlayerTank" method="_on_Plasma_pressed"]
