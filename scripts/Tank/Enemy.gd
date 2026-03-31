@@ -20,7 +20,7 @@ var _body: Sprite
 var _damage: int = 20
 var _nav2d: NavigationAgent2D
 var _ray_cast: RayCast2D
-var _type_enemy: int
+var _type_enemy: int = -1
 var _moving_sound: AudioStreamPlayer
 var _tween: Tween
 var _is_moving: bool = false
@@ -52,7 +52,7 @@ func _ready():
 	if navigation_2d != null:
 		_nav2d.set_navigation(navigation_2d)
 	
-	if _type_enemy == null:
+	if _type_enemy == -1:
 		_randomize_enemy_type()
 	_apply_enemy_stats()
 
@@ -88,6 +88,10 @@ func _ready():
 func _apply_enemy_stats():
 	if _body == null or _gun == null: return
 
+	
+	_gun.position = Vector2.ZERO
+	_body.visible = true
+
 	match _type_enemy:
 		TypeEnemy.LIGHT:
 			_patrol_speed = 110
@@ -98,7 +102,6 @@ func _apply_enemy_stats():
 			_body.texture = load("res://assets/future_tanks/PNG/Hulls_Color_D/Hull_08.png")
 			_gun.texture = load("res://assets/future_tanks/PNG/Weapon_Color_D/Gun_05.png")
 			_gun.position = Vector2(0, -35)
-			_body.visible = true
 		TypeEnemy.MEDIUM:
 			_patrol_speed = 100
 			_chase_speed = 105
@@ -107,8 +110,8 @@ func _apply_enemy_stats():
 			_fire_rate = 1.2
 			_body.texture = load("res://assets/future_tanks/PNG/Hulls_Color_D/Hull_01.png")
 			_gun.texture = load("res://assets/future_tanks/PNG/Weapon_Color_D/Gun_03.png")
-			_gun.position = Vector2.ZERO
-			_body.visible = true
+			_gun.position -= Vector2(0, -35) 
+
 		TypeEnemy.HEAVY:
 			_patrol_speed = 90
 			_chase_speed = 100
@@ -117,8 +120,8 @@ func _apply_enemy_stats():
 			_fire_rate = 2.5
 			_body.texture = load("res://assets/future_tanks/PNG/Hulls_Color_D/Hull_02.png")
 			_gun.texture = load("res://assets/future_tanks/PNG/Weapon_Color_D/Gun_08.png")
-			_gun.position = Vector2.ZERO
-			_body.visible = true
+			_gun.position -= Vector2(0, -35) 
+
 		TypeEnemy.STATIONARY:
 			_patrol_speed = 0
 			_chase_speed = 0
@@ -127,13 +130,12 @@ func _apply_enemy_stats():
 			_fire_rate = 2.0
 			_body.visible = false
 			_gun.texture = load("res://assets/future_tanks/PNG/Weapon_Color_D/Gun_06.png")
-			_gun.position = Vector2.ZERO
 			if _moving_sound != null:
 				_moving_sound.stream = null
 			if _detection_area != null:
 				var shape = _detection_area.get_node("CollisionShape2D")
 				if shape != null and shape.shape is CircleShape2D:
-					shape.shape.radius = 400.0 # Фиксированный большой радиус
+					shape.shape.radius = 400.0
 
 func _configure_audio_players():
 	var sfx_bus_index = AudioServer.get_bus_index("SFX")
@@ -381,5 +383,5 @@ func _on_tween_complete(_obj, _key):
 	_moving_sound.volume_db = _normal_movement_volume
 
 func _randomize_enemy_type():
-	var values = [TypeEnemy.LIGHT, TypeEnemy.MEDIUM, TypeEnemy.HEAVY] # Убрали из рандома
+	var values = [TypeEnemy.LIGHT, TypeEnemy.MEDIUM, TypeEnemy.HEAVY]
 	_type_enemy = values[randi() % values.size()]
