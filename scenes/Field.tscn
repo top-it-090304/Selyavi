@@ -344,7 +344,7 @@ position = Vector2( 28, -17 )
 navpoly = SubResource( 2 )
 
 [node name="EnemyBase" parent="." instance=ExtResource( 15 )]
-position = Vector2( 593, 1428 )
+position = Vector2( 299, 605 )
 
 [connection signal="pressed" from="PlayerTank/PauseButton/PauseButton" to="." method="_on_TouchScreenButton_pressed"]
 [connection signal="pressed" from="PlayerTank/CanvasLayer/Plasma" to="PlayerTank" method="_on_Plasma_pressed"]

@@ -35,6 +35,9 @@ func _ready():
 	add_to_group("enemies")
 	_nav2d = get_node("NavigationAgent2D")
 	_ray_cast = get_node("RayCast2D")
+	if _ray_cast != null:
+		_ray_cast.collide_with_areas = true
+
 	_gun = get_node("BodyTank/Gun")
 	_body = get_node("BodyTank")
 	_moving_sound = get_node("MovingSound")
@@ -225,7 +228,12 @@ func _check_and_fire():
 	var target = _get_current_target()
 	if target == null:
 		return
-	
+
+	# Only shoot at the base if it's within the detection area
+	if target == _base:
+		if _detection_area == null or not _detection_area.overlaps_area(_base):
+			return
+
 	if _is_target_visible():
 		_fire_at_target(target)
 
