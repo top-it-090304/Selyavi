@@ -125,7 +125,7 @@ public class Player : Tank
 		}
 		else if (Input.IsActionJustPressed(\"light_bullet\"))
 		{
-			_typeBullet = TypeBullet.Light;
+			_typeBullet = TypeBullet.Light3D;
 			bulletChanged = true;
 		}
 

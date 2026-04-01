@@ -1,27 +1,27 @@
 extends Node
 
-signal scope_toggled(enabled)
-
-var _scope_enabled: bool = true
-
-func get_scope_enabled() -> bool:
-	return _scope_enabled
-
-func set_scope_enabled(value: bool):
-	_scope_enabled = value
-	emit_signal("scope_toggled", _scope_enabled)
-	_save_scope_state()
+signal on_visual_scope_updated(is_active)
 
 func _ready():
-	_load_settings()
+	if SaveManager != null:
+		if not SaveManager.settings_changed.is_connected(_on_settings_update):
+			SaveManager.settings_changed.connect(_on_settings_update)
 
-func _load_settings():
-	var config = ConfigFile.new()
-	if config.load("user://settings.cfg") == OK:
-		_scope_enabled = config.get_value("game", "scope_enabled", true)
+func is_scope_currently_enabled() -> bool:
+	if SaveManager == null:
+		return true
 
-func _save_scope_state():
-	var config = ConfigFile.new()
-	config.load("user://settings.cfg")
-	config.set_value("game", "scope_enabled", _scope_enabled)
-	config.save("user://settings.cfg")
+	var raw_val = SaveManager.get_setting("game", "scope_enabled", true)
+
+	if typeof(raw_val) == TYPE_SIGNAL:
+		return true
+
+	return bool(raw_val)
+
+func set_scope_active(new_state: bool):
+	if SaveManager != null:
+		SaveManager.set_setting("game", "scope_enabled", new_state)
+		on_visual_scope_updated.emit(new_state)
+
+func _on_settings_update():
+	on_visual_scope_updated.emit(is_scope_currently_enabled())

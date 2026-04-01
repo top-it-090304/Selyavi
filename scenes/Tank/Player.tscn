@@ -1,62 +1,88 @@
-[gd_scene load_steps=15 format=2]
+[gd_scene load_steps=15 format=3 uid="uid://mfxaskty4hrm"]
 
-[ext_resource path="res://assets/future_tanks/PNG/Weapon_Color_A/Gun_01.png" type="Texture" id=1]
-[ext_resource path="res://assets/sounds/tracks_rattle_slow_01.mp3" type="AudioStream" id=2]
-[ext_resource path="res://assets/future_tanks/PNG/Hulls_Color_A/Hull_02.png" type="Texture" id=3]
-[ext_resource path="res://scenes/Tank/MobileJoystick.tscn" type="PackedScene" id=4]
-[ext_resource path="res://scripts/Tank/Player.gd" type="Script" id=5]
-[ext_resource path="res://assets/future_tanks/PNG/Effects/Explosion_C.png" type="Texture" id=6]
-[ext_resource path="res://assets/future_tanks/PNG/Effects/Explosion_B.png" type="Texture" id=7]
-[ext_resource path="res://assets/future_tanks/PNG/Effects/Explosion_H.png" type="Texture" id=8]
-[ext_resource path="res://assets/future_tanks/PNG/Effects/Explosion_G.png" type="Texture" id=9]
-[ext_resource path="res://assets/future_tanks/PNG/Effects/Explosion_D.png" type="Texture" id=10]
-[ext_resource path="res://assets/future_tanks/PNG/Effects/Explosion_E.png" type="Texture" id=11]
-[ext_resource path="res://assets/future_tanks/PNG/Effects/Explosion_F.png" type="Texture" id=12]
+[ext_resource type="Texture2D" uid="uid://qe6yjbi5bg6s" path="res://assets/future_tanks/PNG/Weapon_Color_A/Gun_01.png" id="1"]
+[ext_resource type="AudioStream" uid="uid://dwnx2lsl0j4q8" path="res://assets/sounds/tracks_rattle_slow_01.mp3" id="2"]
+[ext_resource type="Texture2D" uid="uid://bwine470dqcde" path="res://assets/future_tanks/PNG/Hulls_Color_A/Hull_02.png" id="3"]
+[ext_resource type="PackedScene" path="res://scenes/Tank/MobileJoystick.tscn" id="4"]
+[ext_resource type="Script" uid="uid://cdr230ecwbyny" path="res://scripts/Tank/Player.gd" id="5"]
+[ext_resource type="Texture2D" uid="uid://ckbpx037n4exd" path="res://assets/future_tanks/PNG/Effects/Explosion_C.png" id="6"]
+[ext_resource type="Texture2D" uid="uid://cxcea5x72q078" path="res://assets/future_tanks/PNG/Effects/Explosion_B.png" id="7"]
+[ext_resource type="Texture2D" uid="uid://bajuary7lod6k" path="res://assets/future_tanks/PNG/Effects/Explosion_H.png" id="8"]
+[ext_resource type="Texture2D" uid="uid://bybep7qcjpc0d" path="res://assets/future_tanks/PNG/Effects/Explosion_G.png" id="9"]
+[ext_resource type="Texture2D" uid="uid://crvkhkltili1j" path="res://assets/future_tanks/PNG/Effects/Explosion_D.png" id="10"]
+[ext_resource type="Texture2D" uid="uid://cylnqnkimkyi8" path="res://assets/future_tanks/PNG/Effects/Explosion_E.png" id="11"]
+[ext_resource type="Texture2D" uid="uid://baagelqvgpq0e" path="res://assets/future_tanks/PNG/Effects/Explosion_F.png" id="12"]
 
-[sub_resource type="CapsuleShape2D" id=1]
-radius = 106.0
-height = 120.0
+[sub_resource type="CapsuleShape2D" id="1"]
+radius = 50.0
+height = 130.0
 
-[sub_resource type="SpriteFrames" id=2]
-animations = [ {
-"frames": [ null, ExtResource( 7 ), ExtResource( 6 ), ExtResource( 10 ), ExtResource( 11 ), ExtResource( 12 ), ExtResource( 9 ), ExtResource( 8 ), null ],
+[sub_resource type="SpriteFrames" id="2"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": null
+}, {
+"duration": 1.0,
+"texture": ExtResource("7")
+}, {
+"duration": 1.0,
+"texture": ExtResource("6")
+}, {
+"duration": 1.0,
+"texture": ExtResource("10")
+}, {
+"duration": 1.0,
+"texture": ExtResource("11")
+}, {
+"duration": 1.0,
+"texture": ExtResource("12")
+}, {
+"duration": 1.0,
+"texture": ExtResource("9")
+}, {
+"duration": 1.0,
+"texture": ExtResource("8")
+}, {
+"duration": 1.0,
+"texture": null
+}],
 "loop": false,
-"name": "Fire",
+"name": &"Fire",
 "speed": 25.0
-} ]
+}]
 
-[node name="PlayerTank" type="KinematicBody2D"]
-script = ExtResource( 5 )
+[node name="PlayerTank" type="CharacterBody2D"]
+script = ExtResource("5")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-scale = Vector2( 0.5, 0.5 )
-shape = SubResource( 1 )
+shape = SubResource("1")
 
-[node name="BodyTank" type="Sprite" parent="."]
-scale = Vector2( 0.5, 0.5 )
-texture = ExtResource( 3 )
+[node name="BodyTank" type="Sprite2D" parent="."]
+scale = Vector2(0.5, 0.5)
+texture = ExtResource("3")
 
-[node name="Gun" type="Sprite" parent="BodyTank"]
-position = Vector2( 0, 42 )
-texture = ExtResource( 1 )
-offset = Vector2( 0, -42 )
+[node name="Gun" type="Sprite2D" parent="BodyTank"]
+position = Vector2(0, 42)
+texture = ExtResource("1")
+offset = Vector2(0, -42)
 
-[node name="BulletPosition" type="Position2D" parent="BodyTank/Gun"]
-position = Vector2( 0, -145 )
+[node name="BulletPosition" type="Marker2D" parent="BodyTank/Gun"]
+position = Vector2(0, -145)
 
-[node name="ShotAnimation" type="AnimatedSprite" parent="."]
-scale = Vector2( 0.3, 0.3 )
-frames = SubResource( 2 )
-animation = "Fire"
+[node name="ShotAnimation" type="AnimatedSprite2D" parent="."]
+scale = Vector2(0.3, 0.3)
+sprite_frames = SubResource("2")
+animation = &"Fire"
 
 [node name="MovingSound" type="AudioStreamPlayer" parent="."]
-stream = ExtResource( 2 )
+stream = ExtResource("2")
 volume_db = -10.0
 
-[node name="Joystick" parent="." instance=ExtResource( 4 )]
-offset = Vector2( 70, 180 )
-transform = Transform2D( 1, 0, 0, 1, 70, 180 )
+[node name="Joystick" parent="." instance=ExtResource("4")]
+offset = Vector2(70, 180)
+transform = Transform2D(1, 0, 0, 1, 70, 180)
 
-[node name="Aim" parent="." instance=ExtResource( 4 )]
-offset = Vector2( 1000, 180 )
-transform = Transform2D( 1, 0, 0, 1, 1000, 180 )
+[node name="Aim" parent="." instance=ExtResource("4")]
+offset = Vector2(1000, 180)
+transform = Transform2D(1, 0, 0, 1, 1000, 180)

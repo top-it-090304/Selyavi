@@ -3,17 +3,15 @@ extends CanvasLayer
 signal use_move_vector(move_vector)
 signal fire_touch()
 
-# region private fields
 var _touch_button: TouchScreenButton
 var _fire_button: TouchScreenButton
 var move_vector: Vector2 = Vector2.ZERO
 var _is_joystick_active: bool = false
-var _inner_circle: Sprite
+var _inner_circle: Sprite2D
 var _joystick_radius: float = 100.0
 var _last_valid_direction: Vector2 = Vector2.ZERO
 var _button_center: Vector2
-var _joystick_texture: Texture
-# endregion
+var _joystick_texture: Texture2D
 
 func get_is_joystick_active() -> bool:
 	return _is_joystick_active
@@ -21,12 +19,11 @@ func get_is_joystick_active() -> bool:
 var is_aim: bool = false
 
 func _ready():
-	var original_texture: Texture = load("res://assets/scope.png")
-	var image: Image = original_texture.get_data()
+	var original_texture: CompressedTexture2D = load("res://assets/scope.png")
+	var image: Image = original_texture.get_image()
 	
 	image.resize(100, 100, Image.INTERPOLATE_BILINEAR)
-	var resized_texture: ImageTexture = ImageTexture.new()
-	resized_texture.create_from_image(image)
+	var resized_texture: ImageTexture = ImageTexture.create_from_image(image)
 	
 	_joystick_texture = resized_texture
 	_touch_button = get_node("TouchScreenButton")
@@ -34,7 +31,7 @@ func _ready():
 	_inner_circle = get_node("JoystickTipArrows")
 	_button_center = _touch_button.position + Vector2(_joystick_radius, _joystick_radius)
 	_reset_joystick()
-	_fire_button.connect("released", self, "_on_button_fire_pressed")
+	_fire_button.released.connect(_on_button_fire_pressed)
 
 func init(aim: bool):
 	is_aim = aim
@@ -64,7 +61,7 @@ func _input(event):
 			var new_direction: Vector2 = clamped_direction / _joystick_radius
 			
 			if is_aim and _last_valid_direction != Vector2.ZERO:
-				move_vector = _last_valid_direction.linear_interpolate(new_direction, 0.3)
+				move_vector = _last_valid_direction.lerp(new_direction, 0.3)
 			else:
 				move_vector = new_direction
 			
@@ -73,18 +70,23 @@ func _input(event):
 			
 			_is_joystick_active = true
 		else:
-			if not is_aim:
+			# Если это был активный джойстик и его отпустили
+			if _is_joystick_active:
+				if is_aim:
+					# Стреляем при отпускании джойстика прицеливания
+					fire_touch.emit()
 				_reset_joystick()
-			_is_joystick_active = false
+				_is_joystick_active = false
 
 func _physics_process(delta):
 	if _is_joystick_active:
-		emit_signal("use_move_vector", move_vector)
+		use_move_vector.emit(move_vector)
 
 func _on_button_fire_pressed():
-	emit_signal("fire_touch")
+	fire_touch.emit()
 
 func _reset_joystick():
 	_inner_circle.position = _button_center
 	move_vector = Vector2.ZERO
-	_last_valid_direction = Vector2.ZERO
+	if not is_aim:
+		_last_valid_direction = Vector2.ZERO

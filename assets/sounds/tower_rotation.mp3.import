@@ -2,14 +2,18 @@
 
 importer="mp3"
 type="AudioStreamMP3"
-path="res://.import/tower_rotation.mp3-37929e66df2db058c84633600e96e0c6.mp3str"
+uid="uid://d3jkn4g705mdc"
+path="res://.godot/imported/tower_rotation.mp3-37929e66df2db058c84633600e96e0c6.mp3str"
 
 [deps]
 
 source_file="res://assets/sounds/tower_rotation.mp3"
-dest_files=[ "res://.import/tower_rotation.mp3-37929e66df2db058c84633600e96e0c6.mp3str" ]
+dest_files=["res://.godot/imported/tower_rotation.mp3-37929e66df2db058c84633600e96e0c6.mp3str"]
 
 [params]
 
 loop=true
 loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

@@ -23,25 +23,26 @@ func _ready():
 	_healthProgress.min_value = 0
 	_healthProgress.max_value = 100
 	_healthProgress.value = 100
-	_healthProgress.percent_visible = false
+	_healthProgress.show_percentage = false
 	
 	call_deferred("_find_player_and_connect")
 
 func _find_player_and_connect():
-	_player = get_tree().get_root().find_node("Player", true, false)
+	_player = get_tree().get_root().find_child("Player", true, false)
 	
 	if _player == null:
-		_player = get_tree().get_root().find_node("PlayerTank", true, false)
+		_player = get_tree().get_root().find_child("PlayerTank", true, false)
 	
 	if _player != null:
-		if _player.has_signal("health_changed") and not _player.is_connected("health_changed", self, "_on_health_changed"):
-			_player.connect("health_changed", self, "_on_health_changed")
+		# Правильное подключение сигналов в Godot 4
+		if _player.has_signal("health_changed") and not _player.health_changed.is_connected(_on_health_changed):
+			_player.health_changed.connect(_on_health_changed)
 		
-		if _player.has_signal("lives_changed") and not _player.is_connected("lives_changed", self, "_on_lives_changed"):
-			_player.connect("lives_changed", self, "_on_lives_changed")
+		if _player.has_signal("lives_changed") and not _player.lives_changed.is_connected(_on_lives_changed):
+			_player.lives_changed.connect(_on_lives_changed)
 		
-		if _player.has_signal("money_changed") and not _player.is_connected("money_changed", self, "_on_money_changed"):
-			_player.connect("money_changed", self, "_on_money_changed")
+		if _player.has_signal("money_changed") and not _player.money_changed.is_connected(_on_money_changed):
+			_player.money_changed.connect(_on_money_changed)
 		
 		var current_health = 100
 		var max_health = 100
@@ -67,11 +68,11 @@ func _find_player_and_connect():
 			_livesLabel.text = "Жизни: " + str(current_lives)
 		
 		if _moneyLabel != null:
-			_moneyLabel.text =str(current_money)
+			_moneyLabel.text = str(current_money)
 		
 		_update_health_color(display_health, max_health)
 	else:
-		get_tree().create_timer(0.5).connect("timeout", self, "_find_player_and_connect")
+		get_tree().create_timer(0.5).timeout.connect(_find_player_and_connect)
 
 func _setup_progress_bar_style():
 	if _healthProgress == null:
@@ -96,8 +97,8 @@ func _setup_progress_bar_style():
 	progress_style.corner_radius_top_left = 5
 	progress_style.corner_radius_top_right = 5
 	
-	_healthProgress.add_stylebox_override("under", background_style)
-	_healthProgress.add_stylebox_override("fg", progress_style)
+	_healthProgress.add_theme_stylebox_override("under", background_style)
+	_healthProgress.add_theme_stylebox_override("fill", progress_style)
 
 func _on_health_changed(current_health: int, max_health: int):
 	if _healthProgress == null or _healthLabel == null:
@@ -121,7 +122,7 @@ func _on_money_changed(current_money: int):
 
 func _update_health_color(current_health: int, max_health: int):
 	var percent = float(current_health) / float(max_health)
-	var style = _healthProgress.get_stylebox("fg")
+	var style = _healthProgress.get_theme_stylebox("fill")
 	if style is StyleBoxFlat:
 		var flat_style = style as StyleBoxFlat
 		if percent <= 0.3:
@@ -131,4 +132,4 @@ func _update_health_color(current_health: int, max_health: int):
 		else:
 			flat_style.bg_color = Color(0.2, 0.8, 0.2)
 		
-		_healthProgress.add_stylebox_override("fg", flat_style)
+		_healthProgress.add_theme_stylebox_override("fill", flat_style)

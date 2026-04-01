@@ -2,11 +2,11 @@
 
 [ext_resource path="res://scenes/IngameWall.tscn" type="PackedScene" id=1]
 [ext_resource path="res://scripts/DestructibleWall.gd" type="Script" id=2]
-[ext_resource path="res://assets/backround/PNG/Blocks/Block_A_02.png" type="Texture" id=3]
+[ext_resource path="res://assets/backround/PNG/Blocks/Block_A_02.png" type="Texture2D" id=3]
 
 [node name="DestructibleWall" instance=ExtResource( 1 )]
 script = ExtResource( 2 )
 
-[node name="BlockA02" type="Sprite" parent="." index="1"]
+[node name="BlockA02" type="Sprite2D" parent="." index="1"]
 position = Vector2( 54, -53 )
 texture = ExtResource( 3 )

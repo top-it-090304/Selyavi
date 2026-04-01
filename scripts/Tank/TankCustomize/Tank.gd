@@ -1,4 +1,4 @@
-extends KinematicBody2D
+extends CharacterBody2D
 class_name Tank
 
 # region protected fields
@@ -6,10 +6,9 @@ var _speed: int = 250
 var _hp: int
 var _isMoving: bool = false
 var _velocity: Vector2 = Vector2.ZERO
-var _bulletPosition: Position2D
+var _bulletPosition: Marker2D
 var _shootTimer: Timer
-var _gun: Sprite
-var _tween: Tween
+var _gun: Sprite2D
 var _movingSound: AudioStreamPlayer
 var _normalMovementVolume: float = 0.0
 # endregion
@@ -21,10 +20,7 @@ func _ready():
 	_shootTimer.wait_time = 1.0
 	_shootTimer.one_shot = true
 	add_child(_shootTimer)
-	
-	_tween = Tween.new()
-	add_child(_tween)
-	
+
 	_bulletPosition = get_node("BodyTank/Gun/BulletPosition")
 	_gun = get_node("BodyTank/Gun")
 	_movingSound = get_node("MovingSound")
@@ -42,9 +38,7 @@ func _handle_movement_sound(movementVelocity: Vector2):
 	
 	if isMovingNow:
 		if not _isMoving:
-			if _tween.is_active():
-				_tween.stop_all()
-				_tween.remove_all()
+			# Убрали создание пустого Tween тут
 			if _movingSound != null:
 				_movingSound.volume_db = _normalMovementVolume
 				if not _movingSound.playing:
@@ -57,27 +51,17 @@ func _handle_movement_sound(movementVelocity: Vector2):
 				_fade_sound()
 
 func _fade_sound():
-	if _tween.is_connected("tween_completed", self, "_on_tween_complete"):
-		_tween.disconnect("tween_completed", self, "_on_tween_complete")
-	if _tween.is_active():
-		_tween.stop_all()
-		_tween.remove_all()
-	
-	_tween.interpolate_property(
-		_movingSound,
-		"volume_db",
-		_movingSound.volume_db,
-		-80,
-		0.3,
-		Tween.TRANS_LINEAR,
-		Tween.EASE_IN_OUT
-	)
-	_tween.start()
-	_tween.connect("tween_completed", self, "_on_tween_complete")
+	# Создаем Tween только при необходимости
+	var tween = create_tween()
+	tween.set_trans(Tween.TRANS_LINEAR)
+	tween.set_ease(Tween.EASE_IN_OUT)
+	tween.tween_property(_movingSound, "volume_db", -80.0, 0.3)
+	tween.finished.connect(_on_tween_complete)
 
-func _on_tween_complete(obj: Object, key: NodePath):
-	_movingSound.stop()
-	_movingSound.volume_db = _normalMovementVolume
+func _on_tween_complete():
+	if _movingSound != null:
+		_movingSound.stop()
+		_movingSound.volume_db = _normalMovementVolume
 
 func _rotate_gun_toward(targetGlobalPosition: Vector2):
 	if _gun == null:
@@ -91,7 +75,7 @@ func _fire_bullet(type: int, isPlayer: bool):
 	if _shootTimer.time_left > 0:
 		return
 	
-	var bullet = bulletScene.instance()
+	var bullet = bulletScene.instantiate()
 	bullet.global_position = _bulletPosition.global_position
 	bullet.global_rotation = _gun.global_rotation
 	get_tree().root.add_child(bullet)

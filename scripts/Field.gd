@@ -1,12 +1,10 @@
 extends Node2D
 
-# region private fields
 var _musicPlayer: AudioStreamPlayer
 var _pauseScene: PackedScene
 var _currentPause: Node
 var _enemyBase: Base
 var _playerBase: Base
-# endregion
 
 func _ready():
 	_musicPlayer = get_node_or_null("MusicPlayer")
@@ -14,16 +12,17 @@ func _ready():
 		_musicPlayer.bus = "Music"
 		_musicPlayer.play()
 	
-	_enemyBase = get_node("EnemyBase")
-	_playerBase = get_node("Base")
+	_enemyBase = get_node_or_null("EnemyBase")
+	_playerBase = get_node_or_null("Base")
 	
-	_playerBase.connect("base_state", self, "PlayerBaseDestroy")
+	if _playerBase != null:
+		_playerBase.base_state.connect(_on_player_base_destroy)
 	
 	_pauseScene = load("res://scenes/MenuScenes/PauseScreen.tscn")
 
-func PlayerBaseDestroy():
+func _on_player_base_destroy():
 	if _enemyBase != null:
 		_enemyBase.destroy()
 
 func _on_TouchScreenButton_pressed():
-	get_tree().change_scene("res://scenes/MenuScenes/PauseScreen.tscn")
+	get_tree().change_scene_to_file("res://scenes/MenuScenes/PauseScreen.tscn")

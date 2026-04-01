@@ -1,16 +1,13 @@
 extends Area2D
 
-# region private fields
 var _bullet_speed: int = 7
 var _velocity: Vector2 = Vector2.ZERO
 var _bullet_sound: AudioStreamPlayer
-var _tween_bullet: Tween
-var _visibility_bullet: VisibilityNotifier2D
+var _visibility_bullet: VisibleOnScreenNotifier2D
 var _type_bullet: int
-var _bullet_sprite: Sprite
+var _bullet_sprite: Sprite2D
 var _damage: int = 0
 var _is_player: bool = false
-# endregion
 
 const PLASMA: int = 0
 const MEDIUM: int = 1
@@ -19,7 +16,7 @@ const LIGHT: int = 2
 func get_bullet_speed() -> int:
 	return _bullet_speed
 
-func set_bullet_speed(value: int) -> void:
+func set_bullet_speed(value: int):
 	if value > 0 and value <= 30:
 		_bullet_speed = value
 
@@ -30,40 +27,25 @@ func _ready():
 	_bullet_sprite = $BulletSprite
 	_bullet_sound = $PlasmaGunSound
 	_velocity = Vector2(0, -1).rotated(rotation)
-	_visibility_bullet = $VisibilityNotifier2D
-	_tween_bullet = Tween.new()
-	add_child(_tween_bullet)
-
-	connect("body_entered", self, "_on_body_entered")
-	if not _visibility_bullet.is_connected("screen_exited", self, "_on_screen_exited"):
-		_visibility_bullet.connect("screen_exited", self, "_on_screen_exited")
+	_visibility_bullet = $VisibleOnScreenNotifier2D
+	
+	body_entered.connect(_on_body_entered)
+	if not _visibility_bullet.is_connected("screen_exited", _on_screen_exited):
+		_visibility_bullet.screen_exited.connect(_on_screen_exited)
 
 func _move():
 	position += _velocity * _bullet_speed
 
 func _fade_sound():
-	if _tween_bullet == null:
-		return
-	if not _tween_bullet.is_inside_tree():
-		queue_free()
-		return
-	if _tween_bullet.is_connected("tween_completed", self, "_on_tween_complete"):
-		_tween_bullet.disconnect("tween_completed", self, "_on_tween_complete")
-	_tween_bullet.interpolate_property(
-		_bullet_sound,
-		"volume_db",
-		_bullet_sound.volume_db,
-		-80,
-		1.0,
-		Tween.TRANS_LINEAR,
-		Tween.EASE_IN_OUT
-	)
-	_tween_bullet.start()
-	_tween_bullet.connect("tween_completed", self, "_on_tween_complete")
+	# Создаем Tween только когда он нужен
+	var tween = create_tween()
+	tween.tween_property(_bullet_sound, "volume_db", -80, 1.0)
+	tween.finished.connect(_on_fade_complete)
 
-func _on_tween_complete(_obj, _key):
-	_bullet_sound.stop()
-	_bullet_sound.volume_db = 0
+func _on_fade_complete():
+	if _bullet_sound != null:
+		_bullet_sound.stop()
+		_bullet_sound.volume_db = 0
 	queue_free()
 
 func _on_screen_exited():
@@ -76,10 +58,10 @@ func _on_body_entered(body):
 	elif body is Enemy and _is_player:
 		body.take_damage(_damage)
 		_destroy()
-	elif body is IngameWall:
+	elif body.has_method("can_bullet_pass"):
 		if body.can_bullet_pass():
 			return
-		elif body.destroyable():
+		elif body.has_method("destroyable") and body.destroyable():
 			body.destroy()
 			_destroy()
 		else:

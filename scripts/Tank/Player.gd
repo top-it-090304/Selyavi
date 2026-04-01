@@ -1,5 +1,5 @@
 class_name Player
-extends KinematicBody2D
+extends CharacterBody2D
 
 signal health_changed(current_health, max_health)
 signal lives_changed(current_lives)
@@ -11,48 +11,44 @@ var _hp: int
 var _max_hp: int
 var _lives: int
 var _is_moving: bool = false
-var _is_scope_enabled: bool = true
+var is_scope_on: bool = true
 var _normal_movement_volume: float = 0.0
 var _damage: int = 30
 var _velocity: Vector2 = Vector2.ZERO
-var _bullet_position: Position2D
+var _bullet_position: Marker2D
 var _shoot_timer: Timer
 var _moving_sound: AudioStreamPlayer
-var _tween: Tween
+var _fade_tween: Tween
 var _joystick: CanvasLayer
-var _body: Sprite
-var _gun: Sprite
+var _body: Sprite2D
+var _gun: Sprite2D
 var _aim: Node
-var _type_bullet: int = 0  # PLASMA
+var _type_bullet: int = 0
 var _start_position: Vector2
-var _type_body: int = 1   # Medium
-var _type_gun: int = 1    # Medium
-var _color: int = 0       # Brown
+var _type_body: int = 1
+var _type_gun: int = 1
+var _color: int = 0
 var _money: int = 0
 # endregion
 
 var _bullet_scene: PackedScene
 
-# TypeBullet constants
 const PLASMA: int = 0
 const MEDIUM: int = 1
 const LIGHT: int = 2
 
-# BodyEnum constants
 const BODY_LIGHT: int = 0
 const BODY_MEDIUM: int = 1
 const BODY_HEAVY: int = 2
 const BODY_LMEDIUM: int = 3
 const BODY_MHEAVY: int = 4
 
-# GunEnum constants
 const GUN_LIGHT: int = 0
 const GUN_MEDIUM: int = 1
 const GUN_HEAVY: int = 2
 const GUN_LMEDIUM: int = 3
 const GUN_MHEAVY: int = 4
 
-# ColorEnum constants
 const COLOR_BROWN: int = 0
 const COLOR_GREEN: int = 1
 const COLOR_AZURE: int = 2
@@ -76,69 +72,64 @@ func _ready():
 	_joystick = get_node("Joystick")
 	_aim = get_node("Aim")
 	_start_position = global_position
-	emit_signal("money_changed", _money)
+	money_changed.emit(_money)
 	
 	if _aim != null:
 		_aim.init(true)
-		if not _aim.is_connected("use_move_vector", self, "use_move_vector_aim"):
-			_aim.connect("use_move_vector", self, "use_move_vector_aim")
-		if not _aim.is_connected("fire_touch", self, "fire_touch"):
-			_aim.connect("fire_touch", self, "fire_touch")
+		if not _aim.use_move_vector.is_connected(use_move_vector_aim):
+			_aim.use_move_vector.connect(use_move_vector_aim)
+		if not _aim.fire_touch.is_connected(fire_touch):
+			_aim.fire_touch.connect(fire_touch)
 	
 	if _joystick != null:
-		if not _joystick.is_connected("use_move_vector", self, "use_move_vector"):
-			_joystick.connect("use_move_vector", self, "use_move_vector")
+		if not _joystick.use_move_vector.is_connected(use_move_vector):
+			_joystick.use_move_vector.connect(use_move_vector)
 	
-	_tween = Tween.new()
 	_shoot_timer = Timer.new()
 	_shoot_timer.wait_time = 1.0
 	_shoot_timer.one_shot = true
 	add_child(_shoot_timer)
-	add_child(_tween)
 	_configure_audio_players()
 	if _moving_sound != null:
 		_normal_movement_volume = _moving_sound.volume_db
 	
 	if AudioManager != null:
-		if not AudioManager.is_connected("sfx_volume_changed", self, "_on_sfx_volume_changed"):
-			AudioManager.connect("sfx_volume_changed", self, "_on_sfx_volume_changed")
+		if not AudioManager.sfx_volume_changed.is_connected(_on_sfx_volume_changed):
+			AudioManager.sfx_volume_changed.connect(_on_sfx_volume_changed)
 	
 	if GameManager != null:
-		if not GameManager.is_connected("scope_toggled", self, "_toggle_scope"):
-			GameManager.connect("scope_toggled", self, "_toggle_scope")
-		_is_scope_enabled = GameManager.get_scope_enabled()
+		# ПОДКЛЮЧАЕМСЯ К НОВОМУ СИГНАЛУ
+		if not GameManager.on_visual_scope_updated.is_connected(_toggle_scope):
+			GameManager.on_visual_scope_updated.connect(_toggle_scope)
+		# ИСПОЛЬЗУЕМ НОВУЮ ФУНКЦИЮ
+		is_scope_on = GameManager.is_scope_currently_enabled()
 	else:
 		_load_initial_scope_state()
 	_load_saved_money()
 
 func _load_saved_money():
 	if SaveManager != null:
-		# Подключаемся к сигналу загрузки денег
-		if not SaveManager.is_connected("money_loaded", self, "_on_money_loaded"):
-			SaveManager.connect("money_loaded", self, "_on_money_loaded")
-		
-		# Загружаем сохраненные деньги
+		if not SaveManager.money_loaded.is_connected(_on_money_loaded):
+			SaveManager.money_loaded.connect(_on_money_loaded)
 		SaveManager.load_game()
 	else:
-		# Fallback: загружаем из файла напрямую
 		_load_money_from_file()
 
 func _load_money_from_file():
 	var config = ConfigFile.new()
 	if config.load("user://savegame.cfg") == OK:
 		_money = config.get_value("player", "money", 0)
-		emit_signal("money_changed", _money)
+		money_changed.emit(_money)
 
 func _on_money_loaded(amount: int):
 	_money = amount
-	emit_signal("money_changed", _money)
+	money_changed.emit(_money)
 	print("Money loaded from save: ", _money)
 
 func _save_money():
 	if SaveManager != null:
 		SaveManager.save_game()
 	else:
-		# Fallback: сохраняем в отдельный файл
 		_save_money_to_file()
 
 func _save_money_to_file():
@@ -147,21 +138,24 @@ func _save_money_to_file():
 	config.save("user://savegame.cfg")
 	
 func _on_sfx_volume_changed(value: float):
-	var db_value = linear2db(value)
+	var db_value = linear_to_db(value)
 	_normal_movement_volume = db_value
 	if _moving_sound.playing:
 		_moving_sound.volume_db = db_value
 
 func _load_initial_scope_state():
-	var config = ConfigFile.new()
-	if config.load("user://settings.cfg") == OK:
-		_is_scope_enabled = config.get_value("game", "scope_enabled", true)
+	if SaveManager != null:
+		is_scope_on = SaveManager.get_setting("game", "scope_enabled", true)
 	else:
-		_is_scope_enabled = true
+		var config = ConfigFile.new()
+		if config.load("user://settings.cfg") == OK:
+			is_scope_on = config.get_value("game", "scope_enabled", true)
+		else:
+			is_scope_on = true
 
 func _toggle_scope(checkbox_value: bool):
-	_is_scope_enabled = checkbox_value
-	update()
+	is_scope_on = checkbox_value
+	queue_redraw()
 
 func _configure_audio_players():
 	if _moving_sound != null:
@@ -169,7 +163,8 @@ func _configure_audio_players():
 
 func use_move_vector(move_vector: Vector2):
 	var joystick_velocity = move_vector * 200
-	move_and_slide(joystick_velocity)
+	velocity = joystick_velocity
+	move_and_slide()
 	_rotate_player_mobile(move_vector)
 	_handle_movement_sound(joystick_velocity)
 
@@ -178,9 +173,8 @@ func _handle_movement_sound(movement_velocity: Vector2):
 	
 	if is_moving_now:
 		if not _is_moving:
-			if _tween.is_active():
-				_tween.stop_all()
-				_tween.remove_all()
+			if _fade_tween != null and _fade_tween.is_running():
+				_fade_tween.kill()
 			_moving_sound.volume_db = _normal_movement_volume
 			if not _moving_sound.playing:
 				_moving_sound.play()
@@ -195,7 +189,7 @@ func fire_touch():
 	if _shoot_timer.time_left > 0:
 		return
 	
-	var bullet = _bullet_scene.instance()
+	var bullet = _bullet_scene.instantiate()
 	bullet.global_position = _bullet_position.global_position
 	bullet.rotation_degrees = _gun.global_rotation_degrees
 	get_tree().root.add_child(bullet)
@@ -211,7 +205,9 @@ func use_move_vector_aim(move_vector: Vector2):
 
 func _physics_process(delta):
 	_get_input()
-	_velocity = move_and_slide(_velocity)
+	velocity = _velocity
+	move_and_slide()
+	_velocity = velocity
 
 func _get_input():
 	_move()
@@ -253,10 +249,10 @@ func _move():
 		_handle_movement_sound(Vector2.ZERO)
 
 func _rotate_player_mobile(direction: Vector2):
-	rotation_degrees = rad2deg(direction.angle()) + 90
+	rotation_degrees = rad_to_deg(direction.angle()) + 90
 
 func _rotate_player_mobile_aim(direction: Vector2):
-	_gun.global_rotation_degrees = rad2deg(direction.angle()) + 90
+	_gun.global_rotation_degrees = rad_to_deg(direction.angle()) + 90
 
 func _rotate_player(direction: Vector2):
 	if direction.x > 0:
@@ -284,14 +280,14 @@ func _fire():
 
 func take_damage(damage: int):
 	_hp -= damage
-	emit_signal("health_changed", _hp, get_max_health())
+	health_changed.emit(_hp, get_max_health())
 	
 	if _hp <= 0:
 		_destroy()
 
 func _destroy():
 	_lives -= 1
-	emit_signal("lives_changed", _lives)
+	lives_changed.emit(_lives)
 	
 	if _lives != 0:
 		_revive()
@@ -301,35 +297,26 @@ func _destroy():
 func _revive():
 	_hp = get_max_health()
 	global_position = _start_position
-	emit_signal("health_changed", _hp, get_max_health())
+	health_changed.emit(_hp, get_max_health())
 
 func _fade_sound():
-	if _tween.is_connected("tween_completed", self, "_on_tween_complete"):
-		_tween.disconnect("tween_completed", self, "_on_tween_complete")
-	if _tween.is_active():
-		_tween.stop_all()
-		_tween.remove_all()
-	_tween.interpolate_property(
-		_moving_sound,
-		"volume_db",
-		_moving_sound.volume_db,
-		-80,
-		0.3,
-		Tween.TRANS_LINEAR,
-		Tween.EASE_IN_OUT
-	)
-	_tween.start()
-	_tween.connect("tween_completed", self, "_on_tween_complete")
+	if _fade_tween != null and _fade_tween.is_running():
+		_fade_tween.kill()
+	_fade_tween = create_tween()
+	_fade_tween.set_trans(Tween.TRANS_LINEAR)
+	_fade_tween.set_ease(Tween.EASE_IN_OUT)
+	_fade_tween.tween_property(_moving_sound, "volume_db", -80.0, 0.3)
+	_fade_tween.finished.connect(_on_tween_complete)
 
-func _on_tween_complete(_obj, _key):
+func _on_tween_complete():
 	_moving_sound.stop()
 	_moving_sound.volume_db = _normal_movement_volume
 
 func _process(delta):
-	update()
+	queue_redraw()
 
 func _draw():
-	if _aim.get_is_joystick_active() and _is_scope_enabled:
+	if _aim != null and _aim.get_is_joystick_active() and is_scope_on:
 		var global_muzzle_pos = _bullet_position.global_position
 		var gun_angle = _gun.global_rotation
 		var direction = Vector2(1, 0).rotated(gun_angle)
@@ -338,7 +325,7 @@ func _draw():
 		var global_ray_end = global_muzzle_pos + perpendicular * ray_length
 		var local_muzzle_pos = to_local(global_muzzle_pos)
 		var local_ray_end = to_local(global_ray_end)
-		draw_line(local_muzzle_pos, local_ray_end, Color.red, 2.0)
+		draw_line(local_muzzle_pos, local_ray_end, Color.RED, 2.0)
 
 func select_type(body_type: int, gun_type: int, color_type: int):
 	_type_body = body_type
@@ -368,7 +355,7 @@ func _update_stats():
 		_:
 			_hp = 100
 			_damage = 30
-	emit_signal("health_changed", _hp, get_max_health())
+	health_changed.emit(_hp, get_max_health())
 
 func _get_body_file_name() -> String:
 	match _type_body:
@@ -407,10 +394,9 @@ func get_lives() -> int:
 	return _lives
 
 func heal(amount: int):
-	var old_health = _hp
 	_hp += amount
 	_hp = min(_hp, get_max_health())
-	emit_signal("health_changed", _hp, get_max_health())
+	health_changed.emit(_hp, get_max_health())
 
 func get_max_health() -> int:
 	match _type_body:
@@ -432,7 +418,7 @@ func get_money() -> int:
 
 func add_money(amount: int):
 	_money += amount
-	emit_signal("money_changed", _money)
+	money_changed.emit(_money)
 	if _money > 99999:
 		_money = 99999
 	if _money < 0:
@@ -442,7 +428,7 @@ func add_money(amount: int):
 func spend_money(amount: int) -> bool:
 	if _money >= amount:
 		_money -= amount
-		emit_signal("money_changed", _money)
+		money_changed.emit(_money)
 		return true
 	return false
 
@@ -477,4 +463,4 @@ func take_heal(amount: int):
 	_hp += amount
 	if _hp > _max_hp:
 		_hp = _max_hp
-	emit_signal("health_changed", _hp, get_max_health())
+	health_changed.emit(_hp, get_max_health())

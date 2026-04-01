@@ -26,7 +26,7 @@ func play_bullet_sound(type: int, global_position: Vector2):
 				path = "res://assets/sounds/plasma_gun_06.mp3"
 			1:  # TypeBullet.Medium
 				path = "res://assets/sounds/vystrel-tanka.mp3"
-			2:  # TypeBullet.Light
+			2:  # TypeBullet.Light3D
 				path = "res://assets/sounds/light_bullet.mp3"
 		
 		sound.stream = load(path)
@@ -38,7 +38,6 @@ func play_bullet_sound(type: int, global_position: Vector2):
 func _ready():
 	_check_all_buses()
 	_load_settings()
-	set_music_volume(1.0)
 
 func _check_all_buses():
 	for i in range(AudioServer.get_bus_count()):
@@ -55,24 +54,24 @@ func _find_bus_index(bus_name: String) -> int:
 	return 0
 
 func set_music_volume(value: float):
-	var db_value = linear2db(value)
+	var db_value = linear_to_db(value)
 	AudioServer.set_bus_volume_db(_music_bus_index, db_value)
 	emit_signal("music_volume_changed", value)
 	_save_setting("music_volume", value)
 
 func set_sfx_volume(value: float):
-	var db_value = linear2db(value)
+	var db_value = linear_to_db(value)
 	AudioServer.set_bus_volume_db(_sfx_bus_index, db_value)
 	emit_signal("sfx_volume_changed", value)
 	_save_setting("sfx_volume", value)
 
 func get_music_volume() -> float:
 	var db_value = AudioServer.get_bus_volume_db(_music_bus_index)
-	return db2linear(db_value)
+	return db_to_linear(db_value)
 
 func get_sfx_volume() -> float:
 	var db_value = AudioServer.get_bus_volume_db(_sfx_bus_index)
-	return db2linear(db_value)
+	return db_to_linear(db_value)
 
 func _save_setting(key: String, value: float):
 	var config = ConfigFile.new()
