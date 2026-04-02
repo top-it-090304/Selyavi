@@ -2657,8 +2657,8 @@ position = Vector2(1036, -15)
 rotation = 1.5708
 scale = Vector2(1, 1.75)
 
-[node name="Base" parent="." instance=ExtResource("15")]
-position = Vector2(-221, 319)
+[node name="Base" parent="." instance=ExtResource( 15 )]
+position = Vector2( 737, -223 )
 type_base = 0
 
 [node name="Navigation2D" type="Node2D" parent="."]

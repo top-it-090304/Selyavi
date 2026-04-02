@@ -21,8 +21,7 @@ var _body: Sprite2D
 var _damage: int = 20
 var _nav2d: NavigationAgent2D
 var _ray_cast: RayCast2D
-# Делаем тип врага выбираемым в Инспекторе
-@export var _type_enemy: TypeEnemy = TypeEnemy.NONE
+var _type_enemy: int = -1
 var _moving_sound: AudioStreamPlayer
 var _is_moving: bool = false
 var _normal_movement_volume: float = -20.0
@@ -40,6 +39,7 @@ func set_enemy_type(type: int):
 		_apply_enemy_stats()
 
 func _ready():
+	randomize()
 	add_to_group("enemies")
 	_nav2d = get_node("NavigationAgent2D")
 	_ray_cast = get_node("RayCast2D")
@@ -51,9 +51,13 @@ func _ready():
 	_gun = get_node("BodyTank/Gun")
 	_body = get_node("BodyTank")
 	_moving_sound = get_node("MovingSound")
-
-	# Если в инспекторе выбрано NONE, то рандомизируем
-	if _type_enemy == TypeEnemy.NONE:
+	_tween = Tween.new()
+	
+	var navigation_2d = get_node("/root/Field/Navigation2D")
+	if navigation_2d != null:
+		_nav2d.set_navigation(navigation_2d)
+	
+	if _type_enemy == -1:
 		_randomize_enemy_type()
 
 	_apply_enemy_stats()
@@ -88,6 +92,11 @@ func _ready():
 func _apply_enemy_stats():
 	if _body == null or _gun == null: return
 
+	# Сброс базовых параметров
+	_gun.position = Vector2.ZERO
+	_body.visible = true
+	_body.modulate.a = 1.0
+
 	match _type_enemy:
 		TypeEnemy.LIGHT:
 			_patrol_speed = 110
@@ -97,8 +106,7 @@ func _apply_enemy_stats():
 			_fire_rate = 1.0
 			_body.texture = load("res://assets/future_tanks/PNG/Hulls_Color_D/Hull_08.png")
 			_gun.texture = load("res://assets/future_tanks/PNG/Weapon_Color_D/Gun_05.png")
-			_gun.position = Vector2(0, 0)
-			_body.visible = true
+			_gun.position -= Vector2(0, -35)
 		TypeEnemy.MEDIUM:
 			_patrol_speed = 100
 			_chase_speed = 105
@@ -107,8 +115,7 @@ func _apply_enemy_stats():
 			_fire_rate = 1.2
 			_body.texture = load("res://assets/future_tanks/PNG/Hulls_Color_D/Hull_01.png")
 			_gun.texture = load("res://assets/future_tanks/PNG/Weapon_Color_D/Gun_03.png")
-			_gun.position = Vector2(0, 35)
-			_body.visible = true
+			_gun.position -= Vector2(0, -35)
 		TypeEnemy.HEAVY:
 			_patrol_speed = 90
 			_chase_speed = 100
@@ -117,25 +124,22 @@ func _apply_enemy_stats():
 			_fire_rate = 2.5
 			_body.texture = load("res://assets/future_tanks/PNG/Hulls_Color_D/Hull_02.png")
 			_gun.texture = load("res://assets/future_tanks/PNG/Weapon_Color_D/Gun_08.png")
-			_gun.position = Vector2(0, 35)
-			_body.visible = true
+			_gun.position -= Vector2(0, -35)
 		TypeEnemy.STATIONARY:
 			_patrol_speed = 0
 			_chase_speed = 0
 			_hp = 100
 			_damage = 40
-			_fire_rate = 1.5
-			_body.visible = true
-			# Новые текстуры для турели
-			_body.texture = load("res://assets/future_tanks/PNG/Hulls_Color_C/Hull_03.png")
-			_gun.texture = load("res://assets/future_tanks/PNG/Weapon_Color_C/Gun_01.png")
-			_gun.position = Vector2(0, 35)
+			_fire_rate = 2.0
+			_body.texture = null
+			_gun.texture = load("res://assets/future_tanks/PNG/Weapon_Color_D/Gun_06.png")
+			_gun.position = Vector2.ZERO
 			if _moving_sound != null:
 				_moving_sound.stream = null
 			if _detection_area != null:
 				var shape = _detection_area.get_node("CollisionShape2D")
 				if shape != null and shape.shape is CircleShape2D:
-					shape.shape.radius = 500.0
+					shape.shape.radius = 300.0
 
 func _configure_audio_players():
 	if _moving_sound != null:
