@@ -1,19 +1,13 @@
-[gd_scene load_steps=37 format=3 uid="uid://3npfo77iqe53"]
+[gd_scene load_steps=24 format=4 uid="uid://3npfo77iqe53"]
 
-[ext_resource type="Texture2D" uid="uid://d0567nau2humj" path="res://assets/backround/PNG/Tiles/Ground_Tile_01_A.png" id="1"]
 [ext_resource type="PackedScene" uid="uid://mfxaskty4hrm" path="res://scenes/Tank/Player.tscn" id="2"]
 [ext_resource type="Texture2D" uid="uid://d0bnoilig7yxs" path="res://assets/ground_shaker_asset/Terrains/terrain.png" id="2_mssve"]
 [ext_resource type="PackedScene" path="res://scenes/obtacles/wall.tscn" id="3"]
 [ext_resource type="PackedScene" path="res://scenes/IndestructibleWall.tscn" id="4"]
 [ext_resource type="PackedScene" path="res://scenes/DestructibleWall.tscn" id="5"]
 [ext_resource type="AudioStream" uid="uid://bxl5wv7crhm5" path="res://assets/Music/68. Sad Eyes.mp3" id="6"]
-[ext_resource type="Texture2D" uid="uid://c887sn702xm5y" path="res://assets/backround/PNG/Tiles/Ground_Tile_02_C.png" id="7"]
 [ext_resource type="Script" uid="uid://3wsw25sk74o6" path="res://scripts/Field.gd" id="8"]
 [ext_resource type="Texture2D" uid="uid://dsiq4t7qegc5x" path="res://assets/ButtonSprites/pause_594725.png" id="9"]
-[ext_resource type="Texture2D" uid="uid://w12fl3uqp8ti" path="res://assets/backround/PNG/Tiles/Ground_Tile_01_C.png" id="10"]
-[ext_resource type="Texture2D" uid="uid://b58vy4itcgiif" path="res://assets/backround/PNG/Tiles/Ground_Tile_01_B.png" id="11"]
-[ext_resource type="Texture2D" uid="uid://bng36a76pjekb" path="res://assets/backround/PNG/Tiles/Ground_Tile_02_B.png" id="12"]
-[ext_resource type="Texture2D" uid="uid://6ivrfki3faf4" path="res://assets/backround/PNG/Tiles/Ground_Tile_02_A.png" id="13"]
 [ext_resource type="Texture2D" uid="uid://btg7yqgvi0xgx" path="res://assets/MediumBulletToched.png" id="14"]
 [ext_resource type="PackedScene" path="res://scenes/Base.tscn" id="15"]
 [ext_resource type="Texture2D" uid="uid://cp8043eh4y6qd" path="res://assets/LightBulletUntoched.png" id="16"]
@@ -2272,165 +2266,6 @@ texture_region_size = Vector2i(128, 128)
 tile_size = Vector2i(128, 128)
 sources/0 = SubResource("TileSetAtlasSource_kqlyb")
 
-[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_ek068"]
-texture = ExtResource("7")
-texture_region_size = Vector2i(256, 256)
-0:0/next_alternative_id = 8
-0:0/0 = 0
-0:0/1 = 1
-0:0/1/flip_h = true
-0:0/2 = 2
-0:0/2/flip_v = true
-0:0/3 = 3
-0:0/3/flip_h = true
-0:0/3/flip_v = true
-0:0/4 = 4
-0:0/4/transpose = true
-0:0/5 = 5
-0:0/5/flip_h = true
-0:0/5/transpose = true
-0:0/6 = 6
-0:0/6/flip_v = true
-0:0/6/transpose = true
-0:0/7 = 7
-0:0/7/flip_h = true
-0:0/7/flip_v = true
-0:0/7/transpose = true
-
-[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_n0sxv"]
-texture = ExtResource("10")
-texture_region_size = Vector2i(256, 256)
-0:0/next_alternative_id = 8
-0:0/0 = 0
-0:0/1 = 1
-0:0/1/flip_h = true
-0:0/2 = 2
-0:0/2/flip_v = true
-0:0/3 = 3
-0:0/3/flip_h = true
-0:0/3/flip_v = true
-0:0/4 = 4
-0:0/4/transpose = true
-0:0/5 = 5
-0:0/5/flip_h = true
-0:0/5/transpose = true
-0:0/6 = 6
-0:0/6/flip_v = true
-0:0/6/transpose = true
-0:0/7 = 7
-0:0/7/flip_h = true
-0:0/7/flip_v = true
-0:0/7/transpose = true
-
-[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_mssve"]
-texture = ExtResource("1")
-texture_region_size = Vector2i(256, 256)
-0:0/next_alternative_id = 8
-0:0/0 = 0
-0:0/1 = 1
-0:0/1/flip_h = true
-0:0/2 = 2
-0:0/2/flip_v = true
-0:0/3 = 3
-0:0/3/flip_h = true
-0:0/3/flip_v = true
-0:0/4 = 4
-0:0/4/transpose = true
-0:0/5 = 5
-0:0/5/flip_h = true
-0:0/5/transpose = true
-0:0/6 = 6
-0:0/6/flip_v = true
-0:0/6/transpose = true
-0:0/7 = 7
-0:0/7/flip_h = true
-0:0/7/flip_v = true
-0:0/7/transpose = true
-
-[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_i1s7d"]
-texture = ExtResource("13")
-texture_region_size = Vector2i(256, 256)
-0:0/next_alternative_id = 8
-0:0/0 = 0
-0:0/1 = 1
-0:0/1/flip_h = true
-0:0/2 = 2
-0:0/2/flip_v = true
-0:0/3 = 3
-0:0/3/flip_h = true
-0:0/3/flip_v = true
-0:0/4 = 4
-0:0/4/transpose = true
-0:0/5 = 5
-0:0/5/flip_h = true
-0:0/5/transpose = true
-0:0/6 = 6
-0:0/6/flip_v = true
-0:0/6/transpose = true
-0:0/7 = 7
-0:0/7/flip_h = true
-0:0/7/flip_v = true
-0:0/7/transpose = true
-
-[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_slgcm"]
-texture = ExtResource("12")
-texture_region_size = Vector2i(256, 256)
-0:0/next_alternative_id = 8
-0:0/0 = 0
-0:0/1 = 1
-0:0/1/flip_h = true
-0:0/2 = 2
-0:0/2/flip_v = true
-0:0/3 = 3
-0:0/3/flip_h = true
-0:0/3/flip_v = true
-0:0/4 = 4
-0:0/4/transpose = true
-0:0/5 = 5
-0:0/5/flip_h = true
-0:0/5/transpose = true
-0:0/6 = 6
-0:0/6/flip_v = true
-0:0/6/transpose = true
-0:0/7 = 7
-0:0/7/flip_h = true
-0:0/7/flip_v = true
-0:0/7/transpose = true
-
-[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_niwwu"]
-texture = ExtResource("11")
-texture_region_size = Vector2i(256, 256)
-0:0/next_alternative_id = 8
-0:0/0 = 0
-0:0/1 = 1
-0:0/1/flip_h = true
-0:0/2 = 2
-0:0/2/flip_v = true
-0:0/3 = 3
-0:0/3/flip_h = true
-0:0/3/flip_v = true
-0:0/4 = 4
-0:0/4/transpose = true
-0:0/5 = 5
-0:0/5/flip_h = true
-0:0/5/transpose = true
-0:0/6 = 6
-0:0/6/flip_v = true
-0:0/6/transpose = true
-0:0/7 = 7
-0:0/7/flip_h = true
-0:0/7/flip_v = true
-0:0/7/transpose = true
-
-[sub_resource type="TileSet" id="1"]
-tile_size = Vector2i(256, 256)
-sources/0 = SubResource("TileSetAtlasSource_ek068")
-sources/1 = SubResource("TileSetAtlasSource_n0sxv")
-sources/2 = SubResource("TileSetAtlasSource_mssve")
-sources/3 = SubResource("TileSetAtlasSource_i1s7d")
-sources/4 = SubResource("TileSetAtlasSource_slgcm")
-sources/5 = SubResource("TileSetAtlasSource_niwwu")
-
 [sub_resource type="CircleShape2D" id="3"]
 radius = 306.08
 
@@ -2449,11 +2284,8 @@ outlines = Array[PackedVector2Array]([PackedVector2Array(240, 17, 240, 152, 112,
 script = ExtResource("8")
 
 [node name="TileMapLayer" type="TileMapLayer" parent="."]
+tile_map_data = PackedByteArray("AAAHAAIAAAAAAAEAAAAAAAEAAAAAAAEAAAABAAEAAAAAAAEAAAACAAEAAAAAAAEAAAADAAEAAAAAAAEAAAAEAAEAAAAAAAEAAAAFAAIAAAAAAAEAAAAGAAIAAAAAAAEAAAAGAAMAAAAAAAEAAAAGAAQAAAAAAAEAAAAFAAQAAAAAAAEAAAAEAAMAAAAAAAEAAAADAAMAAAAAAAEAAAACAAIAAAAAAAEAAAABAAIAAAAAAAEAAAADAAIAAAAAAAEAAAAEAAIAAAAAAAEAAAAAAAAAAAAAAAEAAAABAAAAAAAAAAEAAAACAAAAAAAAAAEAAAADAAAAAAAAAAEAAAAEAAAAAAAAAAEAAAAFAAAAAAAAAAEAAAAGAAAAAAAAAAEAAAAHAAAAAAAAAAEAAAAIAAAAAAAAAAEAAAAJAAAAAAAAAAEAAAAKAAAAAAAAAAEAAAALAAAAAAAAAAEAAAAMAAAAAAAAAAEAAAANAAAAAAAAAAEAAAAOAAAAAAAAAAEAAAAOAAEAAAAAAAEAAAAOAAIAAAAAAAEAAAAOAAMAAAAAAAEAAAAOAAQAAAAAAAEAAAAOAAUAAAAAAAEAAAAOAAYAAAAAAAEAAAAOAAcAAAAAAAEAAAAOAAgAAAAAAAEAAAAOAAkAAAAAAAEAAAAOAAoAAAAAAAEAAAAOAAsAAAAAAAEAAAAOAAwAAAAAAAEAAAANAAwAAAAAAAEAAAAMAAwAAAAAAAEAAAALAAwAAAAAAAEAAAAKAAwAAAAAAAEAAAAJAAwAAAAAAAEAAAAIAAwAAAAAAAEAAAAHAAwAAAAAAAEAAAAGAAwAAAAAAAEAAAAFAAwAAAAAAAEAAAAEAAwAAAAAAAEAAAADAAwAAAAAAAEAAAACAAwAAAAAAAEAAAABAAwAAAAAAAEAAAAAAAwAAAAAAAEAAAAAAAsAAAAAAAEAAAAAAAoAAAAAAAEAAAAAAAkAAAAAAAEAAAAAAAgAAAAAAAEAAAAAAAcAAAAAAAEAAAAAAAYAAAAAAAEAAAAAAAUAAAAAAAEAAAAAAAQAAAAAAAEAAAAAAAMAAAAAAAEAAAAGAAgAAAAAAAEAAAAGAAcAAAAAAAEAAAAGAAYAAAAAAAEAAAAGAAUAAAAAAAEAAAAFAAUAAAAAAAEAAAAEAAUAAAAAAAEAAAAEAAQAAAAAAAEAAAADAAQAAAAAAAEAAAACAAQAAAAAAAEAAAACAAMAAAAAAAEAAAABAAMAAAAAAAEAAAABAAQAAAAAAAEAAAABAAUAAAAAAAEAAAABAAYAAAAAAAEAAAABAAcAAAAAAAEAAAABAAgAAAAAAAEAAAABAAkAAAAAAAEAAAABAAoAAAAAAAEAAAABAAsAAAAAAAEAAAACAAsAAAAAAAEAAAACAAoAAAAAAAEAAAACAAkAAAAAAAEAAAACAAgAAAAAAAEAAAACAAcAAAAAAAEAAAACAAYAAAAAAAEAAAACAAUAAAAAAAEAAAADAAUAAAAAAAEAAAADAAYAAAAAAAEAAAADAAcAAAAAAAEAAAADAAgAAAAAAAEAAAADAAkAAAAAAAEAAAADAAoAAAAAAAEAAAADAAsAAAAAAAEAAAAEAAsAAAAAAAEAAAAEAAoAAAAAAAEAAAAEAAkAAAAAAAEAAAAEAAgAAAAAAAEAAAAEAAcAAAAAAAEAAAAEAAYAAAAAAAEAAAAFAAYAAAAAAAEAAAAFAAcAAAAAAAEAAAAFAAgAAAAAAAEAAAAFAAkAAAAAAAEAAAAFAAoAAAAAAAEAAAAFAAsAAAAAAAEAAAAGAAsAAAAAAAEAAAAGAAoAAAAAAAEAAAAGAAkAAAAAAAEAAAAHAAkAAAAAAAEAAAAHAAgAAAAAAAEAAAAHAAcAAAAAAAEAAAAHAAYAAAAAAAEAAAAHAAUAAAAAAAEAAAAHAAQAAAAAAAEAAAAHAAMAAAAAAAEAAAAIAAMAAAAAAAEAAAAIAAIAAAAAAAEAAAAIAAEAAAAAAAEAAAAHAAEAAAAAAAEAAAAGAAEAAAAAAAEAAAAFAAEAAAAAAAEAAAAJAAEAAAAAAAEAAAAJAAIAAAAAAAEAAAAJAAMAAAAAAAEAAAAJAAQAAAAAAAEAAAAIAAQAAAAAAAEAAAAIAAUAAAAAAAEAAAAIAAYAAAAAAAEAAAAIAAcAAAAAAAEAAAAIAAgAAAAAAAEAAAAIAAkAAAAAAAEAAAAIAAoAAAAAAAEAAAAHAAoAAAAAAAEAAAAHAAsAAAAAAAEAAAAIAAsAAAAAAAEAAAAJAAsAAAAAAAEAAAAJAAoAAAAAAAEAAAAJAAkAAAAAAAEAAAAJAAgAAAAAAAEAAAAJAAcAAAAAAAEAAAAJAAYAAAAAAAEAAAAJAAUAAAAAAAEAAAAKAAUAAAAAAAEAAAAKAAQAAAAAAAEAAAAKAAMAAAAAAAEAAAAKAAIAAAAAAAEAAAAKAAEAAAAAAAEAAAALAAEAAAAAAAEAAAALAAIAAAAAAAEAAAALAAMAAAAAAAEAAAALAAQAAAAAAAEAAAALAAUAAAAAAAEAAAALAAYAAAAAAAEAAAAKAAYAAAAAAAEAAAAKAAcAAAAAAAEAAAAKAAgAAAAAAAEAAAAKAAkAAAAAAAEAAAAKAAoAAAAAAAEAAAAKAAsAAAAAAAEAAAALAAsAAAAAAAEAAAALAAoAAAAAAAEAAAALAAkAAAAAAAEAAAALAAgAAAAAAAEAAAALAAcAAAAAAAEAAAAMAAcAAAAAAAEAAAAMAAYAAAAAAAEAAAAMAAUAAAAAAAEAAAAMAAQAAAAAAAEAAAAMAAMAAAAAAAEAAAAMAAIAAAAAAAEAAAAMAAEAAAAAAAEAAAANAAEAAAAAAAEAAAANAAIAAAAAAAEAAAANAAMAAAAAAAEAAAANAAQAAAAAAAEAAAANAAUAAAAAAAEAAAANAAYAAAAAAAEAAAANAAcAAAAAAAEAAAANAAgAAAAAAAEAAAAMAAgAAAAAAAEAAAAMAAkAAAAAAAEAAAAMAAoAAAAAAAEAAAAMAAsAAAAAAAEAAAANAAsAAAAAAAEAAAANAAoAAAAAAAEAAAANAAkAAAAAAAEAAAAFAAMAAAAAAAEAAAAAAAIAAAAAAAEAAAA=")
 tile_set = SubResource("TileSet_4osdq")
-
-[node name="TileMap" type="TileMap" parent="."]
-tile_set = SubResource("1")
-format = 2
 
 [node name="HUD" parent="." instance=ExtResource("21")]
 
@@ -2664,6 +2496,7 @@ type_base = 0
 [node name="Navigation2D" type="Node2D" parent="."]
 
 [node name="NavigationRegion2D" type="NavigationRegion2D" parent="Navigation2D"]
+visible = false
 position = Vector2(35, -12)
 navigation_polygon = SubResource("2")
 

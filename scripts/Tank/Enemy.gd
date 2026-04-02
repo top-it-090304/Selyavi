@@ -21,12 +21,17 @@ var _body: Sprite2D
 var _damage: int = 20
 var _nav2d: NavigationAgent2D
 var _ray_cast: RayCast2D
-# Делаем тип врага выбираемым в Инспекторе
 @export var _type_enemy: TypeEnemy = TypeEnemy.NONE
 var _moving_sound: AudioStreamPlayer
 var _is_moving: bool = false
 var _normal_movement_volume: float = -20.0
 var _fire_rate: float = 1.0
+
+# Переменные для режима сканирования турели
+var _scan_angle: float = 0.0
+var _scan_dir: int = 1
+var _scan_wait_timer: float = 0.0
+var _scan_limit: float = 45.0 # Угол поворота в градусах
 # endregion
 
 var _bullet_scene: PackedScene
@@ -45,14 +50,12 @@ func _ready():
 	_ray_cast = get_node("RayCast2D")
 	if _ray_cast != null:
 		_ray_cast.collide_with_areas = true
-		# Исключаем себя из проверок луча, чтобы не блокировать стрельбу
 		_ray_cast.add_exception(self)
 
 	_gun = get_node("BodyTank/Gun")
 	_body = get_node("BodyTank")
 	_moving_sound = get_node("MovingSound")
 
-	# Если в инспекторе выбрано NONE, то рандомизируем
 	if _type_enemy == TypeEnemy.NONE:
 		_randomize_enemy_type()
 
@@ -126,7 +129,6 @@ func _apply_enemy_stats():
 			_damage = 40
 			_fire_rate = 1.5
 			_body.visible = true
-			# Новые текстуры для турели
 			_body.texture = load("res://assets/future_tanks/PNG/Hulls_Color_C/Hull_03.png")
 			_gun.texture = load("res://assets/future_tanks/PNG/Weapon_Color_C/Gun_01.png")
 			_gun.position = Vector2(0, 35)
@@ -147,7 +149,7 @@ func _physics_process(delta):
 		return
 	
 	_update_target()
-	_aim_gun()
+	_aim_gun(delta)
 	_update_ray_cast()
 	_check_and_fire()
 	_move_enemy()
@@ -188,19 +190,35 @@ func _update_target():
 			if _player != null and is_instance_valid(_player):
 				_nav2d.target_position = _player.global_position
 
-func _aim_gun():
+func _aim_gun(delta: float):
 	if _gun == null:
 		return
-	
-	var target = _get_current_target()
-	if target == null or not is_instance_valid(target):
-		return
-	
-	var direction_to_target = (target.global_position - _gun.global_position).normalized()
-	var target_angle = direction_to_target.angle()
-	
-	var gun_angle = target_angle + PI / 2
-	_gun.global_rotation = gun_angle
+
+	if _type_enemy == TypeEnemy.STATIONARY and _current_state == State.PATROL:
+		# СОСТОЯНИЕ 1: Сканирование (вращение башней)
+		if _scan_wait_timer > 0:
+			_scan_wait_timer -= delta
+			return
+
+		var rotation_speed = 40.0 # Скорость вращения при сканировании
+		_scan_angle += rotation_speed * delta * _scan_dir
+
+		if abs(_scan_angle) >= _scan_limit:
+			_scan_dir *= -1
+			_scan_wait_timer = 1.5 # Время паузы в крайних точках
+
+		_gun.rotation_degrees = _scan_angle
+	else:
+		# СОСТОЯНИЕ 2: Наведение на цель ( noticed player )
+		var target = _get_current_target()
+		if target == null or not is_instance_valid(target):
+			return
+
+		var direction_to_target = (target.global_position - _gun.global_position).normalized()
+		var target_angle = direction_to_target.angle() + PI / 2
+
+		# Плавный поворот башни
+		_gun.global_rotation = lerp_angle(_gun.global_rotation, target_angle, 0.1)
 
 func _move_enemy():
 	if _nav2d == null or _type_enemy == TypeEnemy.STATIONARY:
@@ -238,11 +256,8 @@ func _is_target_visible() -> bool:
 	if _ray_cast.is_colliding():
 		var collider = _ray_cast.get_collider()
 		if collider != null and is_instance_valid(collider):
-			# Если луч попал в игрока или базу - цель видима
 			if collider == _player or collider == _base: return true
-		# Если попал во что-то другое (стену) - цель скрыта
 		return false
-	# Если луч ни с чем не столкнулся - путь до цели свободен
 	return true
 
 func _get_current_target():
@@ -254,8 +269,16 @@ func _get_current_target():
 func _check_and_fire():
 	var target = _get_current_target()
 	if target == null: return
+
+	if _type_enemy == TypeEnemy.STATIONARY:
+		# СОСТОЯНИЕ 3: Стрельба только при приближении
+		var dist = global_position.distance_to(target.global_position)
+		if dist > 400.0: # Дистанция атаки турели
+			return
+
 	if target == _base:
 		if _detection_area == null or not _detection_area.overlaps_area(_base): return
+
 	if _is_target_visible():
 		_fire_at_target(target)
 
