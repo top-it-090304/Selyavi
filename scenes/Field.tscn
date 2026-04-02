@@ -16,7 +16,7 @@
 [ext_resource type="Texture2D" uid="uid://c4nj8b1cau8t2" path="res://assets/LightBulletToched.png" id="19"]
 [ext_resource type="Texture2D" uid="uid://cykjctquwaf6p" path="res://assets/MediumBulletUntoched.png" id="20"]
 [ext_resource type="PackedScene" uid="uid://336qfi6ddylt" path="res://scenes/Tank/HUD.tscn" id="21"]
-[ext_resource type="PackedScene" path="res://scenes/Tank/Enemy.tscn" id="22_n0sxv"]
+[ext_resource type="PackedScene" uid="uid://dfpgy8w1vxtx0" path="res://scenes/Tank/Enemy.tscn" id="22_n0sxv"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_kqlyb"]
 texture = ExtResource("2_mssve")
