@@ -2,3 +2,11 @@ res://default_env.tres
 res://scenes/Field.tscn
 res://scenes/Tank/HUD.tscn
 res://scenes/MenuScenes/Settings.tscn
+res://assets/fonts/font.tres
+res://scripts/Base.gd
+res://scripts/SaveManager.gd
+res://scripts/MenuScripts/Menu.gd
+res://scripts/MenuScripts/Shop.gd
+res://scripts/Tank/Enemy.gd
+res://scripts/Field.gd
+res://scripts/MenuScripts/PauseScreen.gd
