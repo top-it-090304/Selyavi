@@ -25,4 +25,14 @@ func _on_player_base_destroy():
 		_enemyBase.destroy()
 
 func _on_TouchScreenButton_pressed():
-	get_tree().change_scene_to_file("res://scenes/MenuScenes/PauseScreen.tscn")
+	if get_tree().paused:
+		return
+	
+	get_tree().paused = true
+	
+	# CanvasLayer гарантирует отрисовку поверх всего
+	var canvas_layer = CanvasLayer.new()
+	canvas_layer.process_mode = Node.PROCESS_MODE_ALWAYS
+	_currentPause = _pauseScene.instantiate()
+	canvas_layer.add_child(_currentPause)
+	add_child(canvas_layer)
