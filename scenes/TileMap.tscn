@@ -1,0 +1,38 @@
+[gd_scene load_steps=3 format=2]
+
+[ext_resource path="res://assets/backround/PNG/Tiles/9_tiles-connected_32x32_16852-22051.png" type="Texture2D" id=1]
+
+[sub_resource type="TileSet" id=1]
+0/name = "9_tiles-connected_32x32_16852-22051.png 0"
+0/texture = ExtResource( 1 )
+0/tex_offset = Vector2( 0, 0 )
+0/modulate = Color( 1, 1, 1, 1 )
+0/region = Rect2( 96, 64, 32, 32 )
+0/tile_mode = 0
+0/occluder_offset = Vector2( 0, 0 )
+0/navigation_offset = Vector2( 0, 0 )
+0/shape_offset = Vector2( 0, 0 )
+0/shape_transform = Transform2D( 1, 0, 0, 1, 0, 0 )
+0/shape_one_way = false
+0/shape_one_way_margin = 0.0
+0/shapes = [  ]
+0/z_index = 0
+1/name = "9_tiles-connected_32x32_16852-22051.png 1"
+1/texture = ExtResource( 1 )
+1/tex_offset = Vector2( 0, 0 )
+1/modulate = Color( 1, 1, 1, 1 )
+1/region = Rect2( 0, 128, 32, 32 )
+1/tile_mode = 0
+1/occluder_offset = Vector2( 0, 0 )
+1/navigation_offset = Vector2( 0, 0 )
+1/shape_offset = Vector2( 0, 0 )
+1/shape_transform = Transform2D( 1, 0, 0, 1, 0, 0 )
+1/shape_one_way = false
+1/shape_one_way_margin = 0.0
+1/shapes = [  ]
+1/z_index = 0
+
+[node name="TileMap" type="TileMap"]
+tile_set = SubResource( 1 )
+format = 1
+tile_data = PackedInt32Array( 9, 0, 0, 10, 0, 0, 11, 0, 0, 65541, 0, 0, 65542, 0, 0, 65545, 0, 0, 65548, 0, 0, 131077, 0, 0, 131078, 0, 0, 131079, 0, 0, 131081, 0, 0, 131085, 0, 0, 196613, 0, 0, 196615, 0, 0, 196617, 0, 0, 196621, 0, 0, 262150, 0, 0, 262151, 0, 0, 262153, 0, 0, 262158, 0, 0, 327688, 0, 0, 327694, 0, 0, 393225, 0, 0, 393226, 0, 0, 393227, 0, 0, 393231, 0, 0, 458764, 0, 0, 458765, 0, 0, 458766, 0, 0, 458767, 0, 0 )

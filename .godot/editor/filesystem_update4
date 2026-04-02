@@ -1,0 +1,4 @@
+res://default_env.tres
+res://scenes/Field.tscn
+res://scenes/Tank/HUD.tscn
+res://scenes/MenuScenes/Settings.tscn
