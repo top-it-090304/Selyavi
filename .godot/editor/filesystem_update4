@@ -3,6 +3,5 @@ res://scenes/Field.tscn
 res://scenes/Tank/HUD.tscn
 res://scenes/MenuScenes/Settings.tscn
 res://scenes/MenuScenes/Shop.tscn
-res://scripts/MenuScripts/Shop.gd
 res://scenes/MenuScenes/Menu.tscn
-res://scripts/MenuScripts/Menu.gd
+res://scripts/MenuScripts/Shop.gd

@@ -33,9 +33,9 @@ var guns = [
 ]
 
 var colors = [
-	{"id": 0, "name": "Коричневый", "price": 0, "hp_bonus": 0, "speed_bonus": 0, "rof_bonus": 0, "folder": "Color_A", "color": Color("8b4513")},
-	{"id": 1, "name": "Зеленый", "price": 300, "hp_bonus": 10, "speed_bonus": 20, "rof_bonus": -0.1, "folder": "Color_B", "color": Color("228b22")},
-	{"id": 2, "name": "Лазурный", "price": 500, "hp_bonus": 20, "speed_bonus": -10, "rof_bonus": -0.2, "folder": "Color_C", "color": Color("00ffff")}
+	{"id": 0, "name": "Коричневый", "price": 0, "hp_bonus": 0, "speed_bonus": 0, "rof_bonus": 0, "folder": "Color_A", "color": Color("a47d6c")},
+	{"id": 1, "name": "Зеленый", "price": 300, "hp_bonus": 10, "speed_bonus": 20, "rof_bonus": -0.1, "folder": "Color_B", "color": Color("888456")},
+	{"id": 2, "name": "Лазурный", "price": 500, "hp_bonus": 20, "speed_bonus": -10, "rof_bonus": -0.2, "folder": "Color_C", "color": Color("699f9c")}
 ]
 
 var current_body_idx = 0
@@ -93,10 +93,10 @@ func update_ui():
 	$Selectors/HullSelector/Display/Label.text = body.name
 
 	# Update Color Square - safely accessing stylebox
-	var sb = color_fill.get_theme_stylebox("panel").duplicate()
-	if sb is StyleBoxFlat:
-		sb.bg_color = color.color
-		color_fill.add_theme_stylebox_override("panel", sb)
+	var stylebox = color_fill.get_theme_stylebox("panel").duplicate()
+	if stylebox is StyleBoxFlat:
+		stylebox.bg_color = color.color
+		color_fill.add_theme_stylebox_override("panel", stylebox)
 
 	$Selectors/ColorSelector/Display/Label.text = color.name
 
