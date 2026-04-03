@@ -7,6 +7,7 @@ signal base_state()
 
 @export var type_base: int = TypeBase.ENEMY
 @export var _hp: int = 100 # Здоровье базы (примерно на 3-4 выстрела игрока)
+@export var _max_hp: int = 100
 
 var _spawn_timer: Timer
 var _heal_timer: Timer
@@ -82,8 +83,21 @@ func _on_heal_timeout():
 
 func take_damage(amount: int):
 	_hp -= amount
+	_update_damage_visuals()
 	if _hp <= 0:
 		_destroy()
+
+func _update_damage_visuals():
+	# Эффект мигания при попадании (без дыма)
+	var tween = create_tween()
+	# Пытаемся мигнуть спрайтом (обычно у базы есть Sprite2D)
+	var sprite = get_node_or_null("Sprite2D")
+	if sprite == null:
+		# Если нет Sprite2D, мигаем всем Area2D (может повлиять на дочерние)
+		sprite = self
+
+	tween.tween_property(sprite, "modulate", Color(5, 5, 5), 0.05)
+	tween.tween_property(sprite, "modulate", Color(1, 1, 1), 0.05)
 
 func destroy():
 	_destroy()
