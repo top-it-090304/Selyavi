@@ -1,0 +1,252 @@
+[gd_scene load_steps=4 format=3 uid="uid://cdxfm038kd06l"]
+
+[ext_resource type="Script" uid="uid://vja1k2m687in" path="res://scripts/MenuScripts/Shop.gd" id="1_shop"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_color_fill"]
+bg_color = Color(1, 1, 1, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_black_border"]
+bg_color = Color(0.6, 0.6, 0.6, 0)
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 4
+border_color = Color(0, 0, 0, 1)
+
+[node name="Shop" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_shop")
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.08, 0.08, 0.1, 1)
+
+[node name="TankFrame" type="Panel" parent="."]
+layout_mode = 0
+offset_left = 64.0
+offset_top = 64.0
+offset_right = 448.0
+offset_bottom = 448.0
+
+[node name="TankPreview" type="Control" parent="TankFrame"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Body" type="Sprite2D" parent="TankFrame/TankPreview"]
+scale = Vector2(1.5, 1.5)
+
+[node name="Gun" type="Sprite2D" parent="TankFrame/TankPreview/Body"]
+position = Vector2(0, 35)
+
+[node name="Stats" type="VBoxContainer" parent="."]
+layout_mode = 0
+offset_left = 64.0
+offset_top = 464.0
+offset_right = 448.0
+offset_bottom = 600.0
+
+[node name="Damage" type="Label" parent="Stats"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "УРОН: x1.0"
+
+[node name="HP" type="Label" parent="Stats"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "ЗДОРОВЬЕ: 100"
+
+[node name="Speed" type="Label" parent="Stats"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "СКОРОСТЬ: 250"
+
+[node name="ROF" type="Label" parent="Stats"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "СКОРОСТРЕЛЬНОСТЬ: 1.0s"
+
+[node name="Selectors" type="VBoxContainer" parent="."]
+layout_mode = 0
+offset_left = 512.0
+offset_top = 32.0
+offset_right = 1152.0
+offset_bottom = 480.0
+theme_override_constants/separation = 20
+alignment = 1
+
+[node name="GunSelector" type="HBoxContainer" parent="Selectors"]
+layout_mode = 2
+alignment = 1
+
+[node name="Left" type="Button" parent="Selectors/GunSelector"]
+custom_minimum_size = Vector2(60, 60)
+layout_mode = 2
+size_flags_vertical = 4
+text = "<"
+
+[node name="Display" type="VBoxContainer" parent="Selectors/GunSelector"]
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 2
+
+[node name="Icon" type="TextureRect" parent="Selectors/GunSelector/Display"]
+custom_minimum_size = Vector2(100, 100)
+layout_mode = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Label" type="Label" parent="Selectors/GunSelector/Display"]
+layout_mode = 2
+text = "ПУШКА"
+horizontal_alignment = 1
+
+[node name="Right" type="Button" parent="Selectors/GunSelector"]
+custom_minimum_size = Vector2(60, 60)
+layout_mode = 2
+size_flags_vertical = 4
+text = ">"
+
+[node name="BuyGun" type="Button" parent="Selectors/GunSelector"]
+custom_minimum_size = Vector2(120, 60)
+layout_mode = 2
+size_flags_vertical = 4
+text = "КУПИТЬ"
+
+[node name="HullSelector" type="HBoxContainer" parent="Selectors"]
+layout_mode = 2
+alignment = 1
+
+[node name="Left" type="Button" parent="Selectors/HullSelector"]
+custom_minimum_size = Vector2(60, 60)
+layout_mode = 2
+size_flags_vertical = 4
+text = "<"
+
+[node name="Display" type="VBoxContainer" parent="Selectors/HullSelector"]
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 2
+
+[node name="Icon" type="TextureRect" parent="Selectors/HullSelector/Display"]
+custom_minimum_size = Vector2(100, 100)
+layout_mode = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Label" type="Label" parent="Selectors/HullSelector/Display"]
+layout_mode = 2
+text = "КОРПУС"
+horizontal_alignment = 1
+
+[node name="Right" type="Button" parent="Selectors/HullSelector"]
+custom_minimum_size = Vector2(60, 60)
+layout_mode = 2
+size_flags_vertical = 4
+text = ">"
+
+[node name="BuyHull" type="Button" parent="Selectors/HullSelector"]
+custom_minimum_size = Vector2(120, 60)
+layout_mode = 2
+size_flags_vertical = 4
+text = "КУПИТЬ"
+
+[node name="ColorSelector" type="HBoxContainer" parent="Selectors"]
+layout_mode = 2
+alignment = 1
+
+[node name="Left" type="Button" parent="Selectors/ColorSelector"]
+custom_minimum_size = Vector2(60, 60)
+layout_mode = 2
+size_flags_vertical = 4
+text = "<"
+
+[node name="Display" type="VBoxContainer" parent="Selectors/ColorSelector"]
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 2
+
+[node name="ColorBox" type="Control" parent="Selectors/ColorSelector/Display"]
+custom_minimum_size = Vector2(66, 66)
+layout_mode = 2
+size_flags_horizontal = 4
+
+[node name="Fill" type="Panel" parent="Selectors/ColorSelector/Display/ColorBox"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 4.0
+offset_top = 4.0
+offset_right = -4.0
+offset_bottom = -4.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_color_fill")
+
+[node name="Border" type="Panel" parent="Selectors/ColorSelector/Display/ColorBox"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_black_border")
+
+[node name="Label" type="Label" parent="Selectors/ColorSelector/Display"]
+layout_mode = 2
+text = "ЦВЕТ"
+horizontal_alignment = 1
+
+[node name="Right" type="Button" parent="Selectors/ColorSelector"]
+custom_minimum_size = Vector2(60, 60)
+layout_mode = 2
+size_flags_vertical = 4
+text = ">"
+
+[node name="BuyColor" type="Button" parent="Selectors/ColorSelector"]
+custom_minimum_size = Vector2(120, 60)
+layout_mode = 2
+size_flags_vertical = 4
+text = "КУПИТЬ"
+
+[node name="MoneyLabel" type="Label" parent="."]
+layout_mode = 0
+offset_left = 896.0
+offset_top = 16.0
+offset_right = 1136.0
+offset_bottom = 48.0
+theme_override_font_sizes/font_size = 24
+text = "Монеты: 0"
+horizontal_alignment = 2
+
+[node name="BackButton" type="Button" parent="."]
+layout_mode = 0
+offset_left = 16.0
+offset_top = 16.0
+offset_right = 112.0
+offset_bottom = 48.0
+text = "Назад"
+
+[connection signal="pressed" from="Selectors/GunSelector/Left" to="." method="_on_gun_left_pressed"]
+[connection signal="pressed" from="Selectors/GunSelector/Right" to="." method="_on_gun_right_pressed"]
+[connection signal="pressed" from="Selectors/GunSelector/BuyGun" to="." method="_on_buy_gun_pressed"]
+[connection signal="pressed" from="Selectors/HullSelector/Left" to="." method="_on_hull_left_pressed"]
+[connection signal="pressed" from="Selectors/HullSelector/Right" to="." method="_on_hull_right_pressed"]
+[connection signal="pressed" from="Selectors/HullSelector/BuyHull" to="." method="_on_buy_hull_pressed"]
+[connection signal="pressed" from="Selectors/ColorSelector/Left" to="." method="_on_color_left_pressed"]
+[connection signal="pressed" from="Selectors/ColorSelector/Right" to="." method="_on_color_right_pressed"]
+[connection signal="pressed" from="Selectors/ColorSelector/BuyColor" to="." method="_on_buy_color_pressed"]
+[connection signal="pressed" from="BackButton" to="." method="_on_back_button_pressed"]

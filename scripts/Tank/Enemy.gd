@@ -137,7 +137,7 @@ func _apply_enemy_stats():
 			if _detection_area != null:
 				var shape = _detection_area.get_node("CollisionShape2D")
 				if shape != null and shape.shape is CircleShape2D:
-					shape.shape.radius = 500.0
+					shape.shape.radius = 600.0 # Видит игрока издалека
 
 func _configure_audio_players():
 	if _moving_sound != null:
@@ -195,7 +195,7 @@ func _aim_gun(delta: float):
 		return
 
 	if _type_enemy == TypeEnemy.STATIONARY and _current_state == State.PATROL:
-		# СОСТОЯНИЕ 1: Сканирование (вращение башней)
+		# Сканирование (вращение башней)
 		if _scan_wait_timer > 0:
 			_scan_wait_timer -= delta
 			return
@@ -209,7 +209,7 @@ func _aim_gun(delta: float):
 
 		_gun.rotation_degrees = _scan_angle
 	else:
-		# СОСТОЯНИЕ 2: Наведение на цель ( noticed player )
+		# Наведение на цель ( noticed player )
 		var target = _get_current_target()
 		if target == null or not is_instance_valid(target):
 			return
@@ -271,9 +271,9 @@ func _check_and_fire():
 	if target == null: return
 
 	if _type_enemy == TypeEnemy.STATIONARY:
-		# СОСТОЯНИЕ 3: Стрельба только при приближении
+		# Стреляет только при приближении ближе 350
 		var dist = global_position.distance_to(target.global_position)
-		if dist > 400.0: # Дистанция атаки турели
+		if dist > 350.0:
 			return
 
 	if target == _base:
@@ -317,7 +317,13 @@ func _fire_at_target(target: Node2D):
 	bullet.global_rotation = gun_angle
 	bullet.global_position = _bullet_position.global_position
 	get_tree().root.add_child(bullet)
-	bullet.init(TypeBullet.TypeBullet.PLASMA, false, _damage)
+
+	var bullet_type = TypeBullet.TypeBullet.PLASMA
+	if _type_enemy == TypeEnemy.STATIONARY:
+		bullet_type = TypeBullet.TypeBullet.MEDIUM
+
+	bullet.init(bullet_type, false, _damage)
+
 	var muzzle_flash = get_node("ShotAnimation")
 	if muzzle_flash != null:
 		muzzle_flash.global_position = _bullet_position.global_position
