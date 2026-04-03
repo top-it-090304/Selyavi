@@ -4,6 +4,7 @@ extends CharacterBody2D
 signal health_changed(current_health, max_health)
 signal lives_changed(current_lives)
 signal money_changed(current_money)
+signal ammo_changed(type)
 
 # region private fields
 var _speed: int = 250
@@ -216,14 +217,17 @@ func _change_bullet():
 func _on_Plasma_pressed():
 	_type_bullet = PLASMA
 	_shoot_timer.start()
+	ammo_changed.emit(_type_bullet)
 
 func _on_SmallShell_pressed():
 	_type_bullet = LIGHT
 	_shoot_timer.start()
+	ammo_changed.emit(_type_bullet)
 
 func _on_MediumShell_pressed():
 	_type_bullet = MEDIUM
 	_shoot_timer.start()
+	ammo_changed.emit(_type_bullet)
 
 func _move():
 	var input_dir = Vector2.ZERO
