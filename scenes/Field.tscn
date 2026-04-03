@@ -1,4 +1,4 @@
-[gd_scene load_steps=24 format=4 uid="uid://3npfo77iqe53"]
+[gd_scene load_steps=15 format=4 uid="uid://3npfo77iqe53"]
 
 [ext_resource type="PackedScene" uid="uid://mfxaskty4hrm" path="res://scenes/Tank/Player.tscn" id="2"]
 [ext_resource type="Texture2D" uid="uid://d0bnoilig7yxs" path="res://assets/ground_shaker_asset/Terrains/terrain.png" id="2_mssve"]
@@ -8,13 +8,7 @@
 [ext_resource type="AudioStream" uid="uid://bxl5wv7crhm5" path="res://assets/Music/68. Sad Eyes.mp3" id="6"]
 [ext_resource type="Script" uid="uid://3wsw25sk74o6" path="res://scripts/Field.gd" id="8"]
 [ext_resource type="Texture2D" uid="uid://dsiq4t7qegc5x" path="res://assets/ButtonSprites/pause_594725.png" id="9"]
-[ext_resource type="Texture2D" uid="uid://btg7yqgvi0xgx" path="res://assets/MediumBulletToched.png" id="14"]
 [ext_resource type="PackedScene" path="res://scenes/Base.tscn" id="15"]
-[ext_resource type="Texture2D" uid="uid://cp8043eh4y6qd" path="res://assets/LightBulletUntoched.png" id="16"]
-[ext_resource type="Texture2D" uid="uid://ceytp6qxl7rpq" path="res://assets/PlasmaToched.png" id="17"]
-[ext_resource type="Texture2D" uid="uid://bu665wcsx16k6" path="res://assets/PlasmaUntoched копия.png" id="18"]
-[ext_resource type="Texture2D" uid="uid://c4nj8b1cau8t2" path="res://assets/LightBulletToched.png" id="19"]
-[ext_resource type="Texture2D" uid="uid://cykjctquwaf6p" path="res://assets/MediumBulletUntoched.png" id="20"]
 [ext_resource type="PackedScene" uid="uid://336qfi6ddylt" path="res://scenes/Tank/HUD.tscn" id="21"]
 [ext_resource type="PackedScene" uid="uid://dfpgy8w1vxtx0" path="res://scenes/Tank/Enemy.tscn" id="22_n0sxv"]
 
@@ -2266,15 +2260,6 @@ texture_region_size = Vector2i(128, 128)
 tile_size = Vector2i(128, 128)
 sources/0 = SubResource("TileSetAtlasSource_2i15a")
 
-[sub_resource type="CircleShape2D" id="3"]
-radius = 306.08
-
-[sub_resource type="CircleShape2D" id="4"]
-radius = 306.08
-
-[sub_resource type="CircleShape2D" id="5"]
-radius = 306.08
-
 [sub_resource type="NavigationPolygon" id="2"]
 vertices = PackedVector2Array(250, 162.727, 250, 45.3203, 391.539, 220.844, 1439.5, 295.344, 1863.67, 33.2969, 1829.22, 1554.03, 1429.36, 438.32, 838.711, 1557.22, 1263.35, 450.828, 712.57, 1560.7, 712.742, 1557.63, 125.039, 606.57, 122.07, 153.727, 480.68, 331.367, 585.117, 460.883, -17.0703, 1104.3, -18.9219, 853.617, -10.3828, 854.141, -10.9531, 1103.89, -11.9688, 1559.96, -10.0078, 689.602, 947.219, 470.109, 453.047, 218.133, 485.711, 240.992, 1381.67, 272.922, 1273.55, 277.383, 1101.97, 305.25)
 polygons = Array[PackedInt32Array]([PackedInt32Array(0, 1, 2), PackedInt32Array(3, 4, 5, 6), PackedInt32Array(6, 5, 7, 8), PackedInt32Array(7, 9, 10, 8), PackedInt32Array(11, 12, 0, 2, 13, 14), PackedInt32Array(15, 16, 17, 18), PackedInt32Array(8, 10, 19, 18, 17), PackedInt32Array(8, 17, 20, 11, 21), PackedInt32Array(22, 23, 13, 2), PackedInt32Array(4, 3, 24), PackedInt32Array(4, 24, 25), PackedInt32Array(26, 4, 25), PackedInt32Array(26, 25, 8, 21), PackedInt32Array(21, 11, 14)])
@@ -2313,29 +2298,6 @@ drag_bottom_margin = 0.1
 position = Vector2(18.0001, 4)
 scale = Vector2(0.177734, 0.177734)
 texture_normal = ExtResource("9")
-
-[node name="CanvasLayer" type="CanvasLayer" parent="PlayerTank"]
-
-[node name="Plasma" type="TouchScreenButton" parent="PlayerTank/CanvasLayer"]
-position = Vector2(340, 596)
-scale = Vector2(0.273927, 0.273927)
-texture_normal = ExtResource("18")
-texture_pressed = ExtResource("17")
-shape = SubResource("3")
-
-[node name="SmallShell" type="TouchScreenButton" parent="PlayerTank/CanvasLayer"]
-position = Vector2(557, 596)
-scale = Vector2(0.274, 0.274)
-texture_normal = ExtResource("16")
-texture_pressed = ExtResource("19")
-shape = SubResource("4")
-
-[node name="MediumShell" type="TouchScreenButton" parent="PlayerTank/CanvasLayer"]
-position = Vector2(757, 596)
-scale = Vector2(0.274, 0.274)
-texture_normal = ExtResource("20")
-texture_pressed = ExtResource("14")
-shape = SubResource("5")
 
 [node name="MusicPlayer" type="AudioStreamPlayer" parent="."]
 stream = ExtResource("6")
@@ -2521,6 +2483,3 @@ _type_enemy = 3
 position = Vector2(466, 134)
 
 [connection signal="pressed" from="PlayerTank/PauseButton/PauseButton" to="." method="_on_TouchScreenButton_pressed"]
-[connection signal="pressed" from="PlayerTank/CanvasLayer/Plasma" to="PlayerTank" method="_on_Plasma_pressed"]
-[connection signal="pressed" from="PlayerTank/CanvasLayer/SmallShell" to="PlayerTank" method="_on_SmallShell_pressed"]
-[connection signal="pressed" from="PlayerTank/CanvasLayer/MediumShell" to="PlayerTank" method="_on_MediumShell_pressed"]

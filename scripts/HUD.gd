@@ -5,6 +5,7 @@ var _healthLabel: Label
 var _livesLabel: Label
 var _moneyLabel: Label
 var _player
+var _ammo_buttons = {}
 
 func _ready():
 	var healthPanel = get_node_or_null("HealthPanel")
@@ -16,6 +17,8 @@ func _ready():
 	_livesLabel = healthPanel.get_node_or_null("LivesLabel")
 	_moneyLabel = healthPanel.get_node_or_null("MoneyLabel")
 	
+	_setup_ammo_selection()
+
 	if _healthProgress == null or _healthLabel == null:
 		return
 	
@@ -28,10 +31,10 @@ func _ready():
 	call_deferred("_find_player_and_connect")
 
 func _find_player_and_connect():
-	_player = get_tree().get_root().find_child("Player", true, false)
-
-	if _player == null:
-		_player = get_tree().get_root().find_child("PlayerTank", true, false)
+	# Универсальный поиск игрока через группу
+	var players = get_tree().get_nodes_in_group("players")
+	if players.size() > 0:
+		_player = players[0]
 	
 	if _player != null:
 		# Правильное подключение сигналов в Godot 4
@@ -43,6 +46,10 @@ func _find_player_and_connect():
 
 		if _player.has_signal("money_changed") and not _player.money_changed.is_connected(_on_money_changed):
 			_player.money_changed.connect(_on_money_changed)
+
+		if _player.has_signal("ammo_changed") and not _player.ammo_changed.is_connected(_on_ammo_changed):
+			_player.ammo_changed.connect(_on_ammo_changed)
+			_on_ammo_changed(_player._type_bullet)
 
 		var current_health = 100
 		var max_health = 100
@@ -133,3 +140,120 @@ func _update_health_color(current_health: int, max_health: int):
 			flat_style.bg_color = Color(0.2, 0.8, 0.2)
 
 		_healthProgress.add_theme_stylebox_override("fill", flat_style)
+
+func _setup_ammo_selection():
+	if has_node("AmmoPanel"):
+		get_node("AmmoPanel").queue_free()
+
+	_ammo_buttons.clear()
+
+	# Используем HBoxContainer для автоматического выравнивания и центрирования
+	var ammo_panel = HBoxContainer.new()
+	ammo_panel.name = "AmmoPanel"
+	add_child(ammo_panel)
+
+	# Центрируем панель внизу экрана (12 = PRESET_BOTTOM_CENTER)
+	ammo_panel.set_anchors_and_offsets_preset(12)
+	ammo_panel.grow_horizontal = Control.GROW_DIRECTION_BOTH
+	ammo_panel.grow_vertical = Control.GROW_DIRECTION_BEGIN
+	ammo_panel.position.y -= 25 # Опустили максимально низко к краю
+	ammo_panel.alignment = BoxContainer.ALIGNMENT_CENTER
+	ammo_panel.add_theme_constant_override("separation", 20)
+
+	var textures = {
+		0: ["res://assets/PlasmaUntoched копия.png", "res://assets/PlasmaToched.png"],
+		1: ["res://assets/MediumBulletUntoched.png", "res://assets/MediumBulletToched.png"],
+		2: ["res://assets/LightBulletUntoched.png", "res://assets/LightBulletToched.png"]
+	}
+
+	var ammo_types = ["PL", "MD", "LG"]
+
+	for i in range(3):
+		var slot = Control.new()
+		slot.name = "Slot_" + str(i)
+		slot.custom_minimum_size = Vector2(100, 110)
+		ammo_panel.add_child(slot)
+
+		# Фон и рамка (Panel)
+		var bg = Panel.new()
+		bg.name = "BG"
+		bg.size = Vector2(100, 110)
+		bg.mouse_filter = Control.MOUSE_FILTER_IGNORE # Пропускаем нажатия к TouchArea
+		slot.add_child(bg)
+
+		# Базовый стиль слота (темный с закругленными углами)
+		var style = StyleBoxFlat.new()
+		style.bg_color = Color(0.1, 0.1, 0.1, 0.8)
+		style.border_width_left = 2
+		style.border_width_top = 2
+		style.border_width_right = 2
+		style.border_width_bottom = 2
+		style.border_color = Color(0.4, 0.4, 0.4)
+		style.corner_radius_top_left = 10
+		style.corner_radius_top_right = 10
+		style.corner_radius_bottom_left = 10
+		style.corner_radius_bottom_right = 10
+		bg.add_theme_stylebox_override("panel", style)
+
+		# Иконка снаряда
+		var icon = Sprite2D.new()
+		icon.name = "Icon"
+		icon.texture = load(textures[i][0])
+		icon.position = Vector2(50, 55)
+		icon.scale = Vector2(0.2, 0.2)
+		slot.add_child(icon)
+
+		# Тип снаряда (текст сверху слева)
+		var label = Label.new()
+		label.text = ammo_types[i]
+		label.position = Vector2(8, 5)
+		label.add_theme_font_size_override("font_size", 18)
+		label.add_theme_color_override("font_shadow_color", Color.BLACK)
+		slot.add_child(label)
+
+		# Невидимая область для нажатия через gui_input (без встроенных эффектов "кругов")
+		var touch_area = Control.new()
+		touch_area.name = "TouchArea"
+		touch_area.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+		slot.add_child(touch_area)
+
+		_ammo_buttons[i] = slot
+
+		# Обработка нажатия (тач или мышь) без визуального фидбека
+		touch_area.gui_input.connect(func(event):
+			if (event is InputEventScreenTouch and event.pressed) or (event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT):
+				if _player:
+					if i == 0: _player._on_Plasma_pressed()
+					elif i == 1: _player._on_MediumShell_pressed()
+					elif i == 2: _player._on_SmallShell_pressed()
+		)
+
+func _on_ammo_changed(type: int):
+	for ammo_type in _ammo_buttons:
+		var slot = _ammo_buttons[ammo_type]
+		var bg = slot.get_node("BG")
+		var icon = slot.get_node("Icon")
+
+		# Клонируем стиль, чтобы изменения одного слота не влияли на другие
+		var style = bg.get_theme_stylebox("panel").duplicate()
+
+		var textures = {
+			0: ["res://assets/PlasmaUntoched копия.png", "res://assets/PlasmaToched.png"],
+			1: ["res://assets/MediumBulletUntoched.png", "res://assets/MediumBulletToched.png"],
+			2: ["res://assets/LightBulletUntoched.png", "res://assets/LightBulletToched.png"]
+		}
+
+		if ammo_type == type:
+			# Активный слот: золотая рамка и яркая иконка
+			style.border_color = Color(1.0, 0.8, 0.2)
+			style.bg_color = Color(0.2, 0.2, 0.15, 0.9)
+			icon.texture = load(textures[ammo_type][1])
+			slot.modulate.a = 1.0
+		else:
+			# Неактивный слот: серая рамка и прозрачность
+			style.border_color = Color(0.4, 0.4, 0.4)
+			style.bg_color = Color(0.1, 0.1, 0.1, 0.8)
+			icon.texture = load(textures[ammo_type][0])
+			slot.modulate.a = 0.6
+
+		bg.add_theme_stylebox_override("panel", style)
