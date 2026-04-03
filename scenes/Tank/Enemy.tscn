@@ -1,8 +1,8 @@
 [gd_scene load_steps=15 format=3 uid="uid://dfpgy8w1vxtx0"]
 
-[ext_resource type="Script" uid="uid://ds8yxyy8y7y6" path="res://scripts/Tank/Enemy.gd" id="1"]
-[ext_resource type="Texture2D" uid="uid://d2r0p6h5l2q6y" path="res://assets/future_tanks/PNG/Weapon_Color_D/Gun_03.png" id="2"]
-[ext_resource type="Texture2D" uid="uid://bd3y7p5p7p7p" path="res://assets/future_tanks/PNG/Hulls_Color_D/Hull_01.png" id="3"]
+[ext_resource type="Script" uid="uid://dygrqoxd5vchg" path="res://scripts/Tank/Enemy.gd" id="1"]
+[ext_resource type="Texture2D" uid="uid://dhn7jrx5ylpaq" path="res://assets/future_tanks/PNG/Weapon_Color_D/Gun_03.png" id="2"]
+[ext_resource type="Texture2D" uid="uid://ich10xfcjdqx" path="res://assets/future_tanks/PNG/Hulls_Color_D/Hull_01.png" id="3"]
 [ext_resource type="Texture2D" uid="uid://ckbpx037n4exd" path="res://assets/future_tanks/PNG/Effects/Explosion_C.png" id="4"]
 [ext_resource type="Texture2D" uid="uid://cxcea5x72q078" path="res://assets/future_tanks/PNG/Effects/Explosion_B.png" id="5"]
 [ext_resource type="Texture2D" uid="uid://bajuary7lod6k" path="res://assets/future_tanks/PNG/Effects/Explosion_H.png" id="6"]
@@ -82,7 +82,6 @@ target_desired_distance = 22.23
 path_max_distance = 13.0
 
 [node name="RayCast2D" type="RayCast2D" parent="."]
-enabled = true
 target_position = Vector2(0, 200)
 
 [node name="ShotAnimation" type="AnimatedSprite2D" parent="."]

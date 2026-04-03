@@ -23,6 +23,7 @@ var _joystick: Node
 var _body: Sprite2D
 var _gun: Sprite2D
 var _aim: Node
+var _smoke_particles: CPUParticles2D
 var _type_bullet: int = 0 # По умолчанию ПЛАЗМА (PLASMA = 0)
 var _start_position: Vector2
 var _type_body: int = 1
@@ -64,6 +65,7 @@ func _ready():
 	_aim = get_node("Aim")
 	_start_position = global_position
 
+	_setup_damage_effects()
 	_setup_joystick_positions()
 
 	_shoot_timer = Timer.new()
@@ -248,8 +250,54 @@ func _rotate_player(direction: Vector2):
 func take_damage(damage: int):
 	_hp -= damage
 	health_changed.emit(_hp, _max_hp)
+	_update_damage_visuals()
 	if _hp <= 0:
 		_destroy()
+
+func _setup_damage_effects():
+	_smoke_particles = CPUParticles2D.new()
+	add_child(_smoke_particles)
+	_smoke_particles.position = Vector2(0, 0)
+	_smoke_particles.emitting = false
+	_smoke_particles.amount = 20
+	_smoke_particles.lifetime = 0.8
+	_smoke_particles.texture = load("res://assets/future_tanks/PNG/Effects/Smoke_A.png")
+	_smoke_particles.emission_shape = CPUParticles2D.EMISSION_SHAPE_SPHERE
+	_smoke_particles.emission_sphere_radius = 20.0
+	_smoke_particles.spread = 180.0
+	_smoke_particles.gravity = Vector2(0, -100)
+	_smoke_particles.initial_velocity_min = 20.0
+	_smoke_particles.initial_velocity_max = 50.0
+	_smoke_particles.scale_amount_min = 0.1
+	_smoke_particles.scale_amount_max = 0.3
+	_smoke_particles.color = Color(0.3, 0.3, 0.3, 0.6)
+
+	# Анимация прозрачности
+	var curve = Gradient.new()
+	curve.add_point(0.0, Color(0.5, 0.5, 0.5, 0.0))
+	curve.add_point(0.2, Color(0.2, 0.2, 0.2, 0.7))
+	curve.add_point(1.0, Color(0.1, 0.1, 0.1, 0.0))
+	_smoke_particles.color_ramp = curve
+
+func _update_damage_visuals():
+	var health_percent = float(_hp) / float(_max_hp)
+
+	# Эффект мигания при попадании
+	var tween = create_tween()
+	tween.tween_property(_body, "modulate", Color(5, 5, 5), 0.05)
+	tween.tween_property(_body, "modulate", Color(1, 1, 1), 0.05)
+
+	# Дым при низком HP
+	if health_percent <= 0.5:
+		_smoke_particles.emitting = true
+		if health_percent <= 0.25:
+			_smoke_particles.amount = 40
+			_smoke_particles.color = Color(0.1, 0.1, 0.1, 0.8) # Черный дым
+		else:
+			_smoke_particles.amount = 20
+			_smoke_particles.color = Color(0.3, 0.3, 0.3, 0.5) # Серый дым
+	else:
+		_smoke_particles.emitting = false
 
 func _destroy():
 	_lives -= 1
@@ -265,6 +313,7 @@ func _revive():
 	_hp = _max_hp
 	global_position = _start_position
 	health_changed.emit(_hp, _max_hp)
+	_update_damage_visuals()
 
 func _fade_sound():
 	if _fade_tween != null and _fade_tween.is_running():
