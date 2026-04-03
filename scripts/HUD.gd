@@ -4,10 +4,14 @@ var _healthProgress: ProgressBar
 var _healthLabel: Label
 var _livesLabel: Label
 var _moneyLabel: Label
+var _basesLabel: Label
+var _basesIcon: Sprite2D # Иконка базы
+var _total_enemy_bases: int = 0
 var _player
 var _ammo_buttons = {}
 
 func _ready():
+	add_to_group("hud") # Регистрация для Field.gd
 	var healthPanel = get_node_or_null("HealthPanel")
 	if healthPanel == null:
 		return
@@ -17,6 +21,7 @@ func _ready():
 	_livesLabel = healthPanel.get_node_or_null("LivesLabel")
 	_moneyLabel = healthPanel.get_node_or_null("MoneyLabel")
 	
+	_setup_bases_label(healthPanel) # Создаем метку баз
 	_setup_ammo_selection()
 
 	if _healthProgress == null or _healthLabel == null:
@@ -29,6 +34,63 @@ func _ready():
 	_healthProgress.show_percentage = false
 
 	call_deferred("_find_player_and_connect")
+
+func _setup_bases_label(container: Control):
+	# Контейнер для иконки и текста
+	var bases_container = Control.new()
+	bases_container.name = "BasesContainer"
+	bases_container.position = Vector2(130, 15)
+	container.add_child(bases_container)
+
+	_basesIcon = Sprite2D.new()
+	_basesIcon.texture = load("res://assets/backround/PNG/Props/Platform.png")
+	_basesIcon.scale = Vector2(0.5, 0.5)
+	_basesIcon.centered = true
+	_basesIcon.position = Vector2(40, 40) # Центр иконки в контейнере
+	_basesIcon.modulate = Color(1.0, 0.2, 0.2, 0.8) # Чуть прозрачный красный
+	bases_container.add_child(_basesIcon)
+
+	_basesLabel = Label.new()
+	_basesLabel.name = "BasesLabel"
+	# Центрируем текст прямо поверх иконки
+	_basesLabel.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_basesLabel.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	_basesLabel.size = Vector2(80, 80) # Размер совпадает с областью иконки
+	_basesLabel.position = Vector2(0, 0)
+
+	# Применяем стиль как у валюты
+	_basesLabel.add_theme_font_size_override("font_size", 26)
+	_basesLabel.add_theme_color_override("font_shadow_color", Color.BLACK)
+	_basesLabel.add_theme_constant_override("shadow_offset_x", 2)
+	_basesLabel.add_theme_constant_override("shadow_offset_y", 2)
+	_basesLabel.add_theme_constant_override("shadow_outline_size", 1)
+	bases_container.add_child(_basesLabel)
+
+	call_deferred("_initialize_bases_count")
+
+func _initialize_bases_count():
+	# Ждем два кадра, чтобы сцена полностью стабилизировалась
+	await get_tree().process_frame
+	await get_tree().process_frame
+
+	_total_enemy_bases = 0
+	var all_bases = get_tree().get_nodes_in_group("bases")
+	for b in all_bases:
+		if b.type_base == 1: # ENEMY
+			_total_enemy_bases += 1
+	update_bases_count()
+
+func update_bases_count():
+	if _basesLabel == null: return
+
+	var current_enemy_bases = 0
+	var all_bases = get_tree().get_nodes_in_group("bases")
+	for b in all_bases:
+		if b.type_base == 1: # ENEMY
+			current_enemy_bases += 1
+
+	var destroyed = _total_enemy_bases - current_enemy_bases
+	_basesLabel.text = str(destroyed) + "/" + str(_total_enemy_bases)
 
 func _find_player_and_connect():
 	# Универсальный поиск игрока через группу
@@ -223,9 +285,7 @@ func _setup_ammo_selection():
 		touch_area.gui_input.connect(func(event):
 			if (event is InputEventScreenTouch and event.pressed) or (event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT):
 				if _player:
-					if i == 0: _player._on_Plasma_pressed()
-					elif i == 1: _player._on_MediumShell_pressed()
-					elif i == 2: _player._on_SmallShell_pressed()
+					_player._on_ammo_selected(i)
 		)
 
 func _on_ammo_changed(type: int):

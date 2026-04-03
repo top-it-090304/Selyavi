@@ -1,121 +1,71 @@
 class_name Player
-extends CharacterBody2D
+extends Tank
 
 signal health_changed(current_health, max_health)
 signal lives_changed(current_lives)
 signal money_changed(current_money)
 signal ammo_changed(type)
 
-# region private fields
+# region специфичные поля игрока
+var _lives: int = 3
+var _money: int = 0
 var _speed: int = 250
-var _hp: int
-var _max_hp: int
-var _lives: int
-var _is_moving: bool = false
-var is_scope_on: bool = true
-var _normal_movement_volume: float = 0.0
-var _damage: int = 30
-var _velocity: Vector2 = Vector2.ZERO
-var _bullet_position: Marker2D
-var _shoot_timer: Timer
-var _moving_sound: AudioStreamPlayer
-var _fade_tween: Tween
-var _joystick: Node
-var _body: Sprite2D
-var _gun: Sprite2D
-var _aim: Node
-var _smoke_particles: CPUParticles2D
-var _type_bullet: int = 0 # По умолчанию ПЛАЗМА (PLASMA = 0)
 var _start_position: Vector2
+var is_scope_on: bool = true
+
+var _joystick: Node
+var _aim: Node
+var _type_bullet: int = 0
 var _type_body: int = 1
 var _type_gun: int = 1
 var _color: int = 0
-var _money: int = 0
 # endregion
-
-var _bullet_scene: PackedScene
 
 const PLASMA: int = 0
 const MEDIUM: int = 1
 const LIGHT: int = 2
 
-const BODY_LIGHT: int = 0
-const BODY_MEDIUM: int = 1
-const BODY_HEAVY: int = 2
-const BODY_LMEDIUM: int = 3
-const BODY_MHEAVY: int = 4
-
-const GUN_LIGHT: int = 0
-const GUN_MEDIUM: int = 1
-const GUN_HEAVY: int = 2
-const GUN_LMEDIUM: int = 3
-const GUN_MHEAVY: int = 4
-
-const COLOR_BROWN: int = 0
-const COLOR_GREEN: int = 1
-const COLOR_AZURE: int = 2
+# Константы типов (те же самые)
+const BODY_LIGHT = 0; const BODY_MEDIUM = 1; const BODY_HEAVY = 2; const BODY_LMEDIUM = 3; const BODY_MHEAVY = 4
+const GUN_LIGHT = 0; const GUN_MEDIUM = 1; const GUN_HEAVY = 2; const GUN_LMEDIUM = 3; const GUN_MHEAVY = 4
+const COLOR_BROWN = 0; const COLOR_GREEN = 1; const COLOR_AZURE = 2
 
 func _ready():
-	add_to_group("players") # Добавляем игрока в группу для универсального поиска
-	_bullet_scene = load("res://scenes/Tank/Bullet.tscn")
-	_body = get_node("BodyTank")
+	add_to_group("players")
+	_init_base_tank() # Инициализация из Tank.gd
+
 	_lives = 3
-	_bullet_position = get_node("BodyTank/Gun/BulletPosition")
-	_moving_sound = get_node("MovingSound")
-	_gun = get_node("BodyTank/Gun")
-	_joystick = get_node("Joystick")
-	_aim = get_node("Aim")
+	_joystick = get_node_or_null("Joystick")
+	_aim = get_node_or_null("Aim")
 	_start_position = global_position
 
-	_setup_damage_effects()
 	_setup_joystick_positions()
-
-	_shoot_timer = Timer.new()
-	_shoot_timer.one_shot = true
-	add_child(_shoot_timer)
-
-	# Загружаем сохраненные настройки танка и деньги
 	_load_all_data()
 
 	if _aim != null:
 		_aim.init(true)
-		if not _aim.use_move_vector.is_connected(use_move_vector_aim):
-			_aim.use_move_vector.connect(use_move_vector_aim)
-		if not _aim.fire_touch.is_connected(fire_touch):
-			_aim.fire_touch.connect(fire_touch)
+		_aim.use_move_vector.connect(use_move_vector_aim)
+		_aim.fire_touch.connect(fire_touch)
 	
 	if _joystick != null:
-		if not _joystick.use_move_vector.is_connected(use_move_vector):
-			_joystick.use_move_vector.connect(use_move_vector)
-	
-	_configure_audio_players()
-	if _moving_sound != null:
-		_normal_movement_volume = _moving_sound.volume_db
+		_joystick.use_move_vector.connect(use_move_vector)
 	
 	if AudioManager != null:
-		if not AudioManager.sfx_volume_changed.is_connected(_on_sfx_volume_changed):
-			AudioManager.sfx_volume_changed.connect(_on_sfx_volume_changed)
+		AudioManager.sfx_volume_changed.connect(_on_sfx_volume_changed)
 	
 	if GameManager != null:
-		if not GameManager.on_visual_scope_updated.is_connected(_toggle_scope):
-			GameManager.on_visual_scope_updated.connect(_toggle_scope)
+		GameManager.on_visual_scope_updated.connect(_toggle_scope)
 		is_scope_on = GameManager.is_scope_currently_enabled()
-	else:
-		is_scope_on = SaveManager.get_setting("game", "scope_enabled", true)
 
 func _load_all_data():
 	if SaveManager != null:
-		# Сначала подписываемся на сигнал, потом загружаем
 		if not SaveManager.money_loaded.is_connected(_on_money_loaded):
 			SaveManager.money_loaded.connect(_on_money_loaded)
-
 		SaveManager.load_game()
-
 		_type_body = SaveManager.get_player_stat("body_type", 1)
 		_type_gun = SaveManager.get_player_stat("gun_type", 1)
 		_color = SaveManager.get_player_stat("color_type", 0)
 		_money = SaveManager.save_data.get("money", 0)
-
 		select_type(_type_body, _type_gun, _color)
 		money_changed.emit(_money)
 
@@ -124,45 +74,22 @@ func _on_money_loaded(amount: int):
 	money_changed.emit(_money)
 
 func _on_sfx_volume_changed(value: float):
-	var db_value = linear_to_db(value)
-	_normal_movement_volume = db_value
-	if _moving_sound.playing:
-		_moving_sound.volume_db = db_value
+	_normal_movement_volume = linear_to_db(value)
+	if _moving_sound and _moving_sound.playing:
+		_moving_sound.volume_db = _normal_movement_volume
 
 func _toggle_scope(checkbox_value: bool):
 	is_scope_on = checkbox_value
 	queue_redraw()
 
-func _configure_audio_players():
-	if _moving_sound != null:
-		_moving_sound.bus = "SFX"
-
 func use_move_vector(move_vector: Vector2):
-	var joystick_velocity = move_vector * _speed
-	velocity = joystick_velocity
+	velocity = move_vector * _speed
 	move_and_slide()
-	_rotate_player_mobile(move_vector)
-	_handle_movement_sound(joystick_velocity)
-
-func _handle_movement_sound(movement_velocity: Vector2):
-	var is_moving_now = movement_velocity.length() > 0.1
-	if is_moving_now:
-		if not _is_moving:
-			if _fade_tween != null and _fade_tween.is_running():
-				_fade_tween.kill()
-			_moving_sound.volume_db = _normal_movement_volume
-			if not _moving_sound.playing:
-				_moving_sound.play()
-			_is_moving = true
-	else:
-		if _is_moving:
-			_is_moving = false
-			if _moving_sound.playing:
-				_fade_sound()
+	rotation_degrees = rad_to_deg(move_vector.angle()) + 90
+	_handle_movement_sound(velocity)
 
 func fire_touch():
-	if _shoot_timer.time_left > 0:
-		return
+	if _shoot_timer.time_left > 0: return
 	
 	var bullet = _bullet_scene.instantiate()
 	bullet.global_position = _bullet_position.global_position
@@ -178,131 +105,43 @@ func fire_touch():
 	_shoot_timer.start()
 
 func use_move_vector_aim(move_vector: Vector2):
-	_rotate_player_mobile_aim(move_vector)
+	_gun.global_rotation_degrees = rad_to_deg(move_vector.angle()) + 90
 
-func _physics_process(delta):
+func _physics_process(_delta):
 	_get_input()
 	move_and_slide()
 	queue_redraw()
 
-func _input(event):
-	# Игнорируем любые события мыши/тача в _input,
-	# чтобы они не эмулировали стрельбу при нажатии на джойстики.
-	# Вместо этого используем _unhandled_input для стрельбы в пустом месте.
-	pass
-
 func _unhandled_input(event):
-	# Стрельба по клику/тапу в пустом месте (не на джойстике)
 	if (event is InputEventMouseButton or event is InputEventScreenTouch) and event.pressed:
-		# Явно проверяем, не попадает ли клик в зону джойстиков,
-		# так как _unhandled_input может вызываться, если джойстик не поглотил событие на 100%
-		if _joystick and _joystick.has_method("is_pos_inside") and _joystick.is_pos_inside(event.position):
-			return
-		if _aim and _aim.has_method("is_pos_inside") and _aim.is_pos_inside(event.position):
-			return
-
+		if _joystick and _joystick.has_method("is_pos_inside") and _joystick.is_pos_inside(event.position): return
+		if _aim and _aim.has_method("is_pos_inside") and _aim.is_pos_inside(event.position): return
 		fire_touch()
 
 func _get_input():
-	_move()
-	_change_bullet()
-
-func _change_bullet():
-	if Input.is_action_just_pressed("plasma"):
-		_on_Plasma_pressed()
-	elif Input.is_action_just_pressed("medium_bullet"):
-		_on_MediumShell_pressed()
-	elif Input.is_action_just_pressed("light_bullet"):
-		_on_SmallShell_pressed()
-
-func _on_Plasma_pressed():
-	_type_bullet = PLASMA
-	_shoot_timer.start()
-	ammo_changed.emit(_type_bullet)
-
-func _on_SmallShell_pressed():
-	_type_bullet = LIGHT
-	_shoot_timer.start()
-	ammo_changed.emit(_type_bullet)
-
-func _on_MediumShell_pressed():
-	_type_bullet = MEDIUM
-	_shoot_timer.start()
-	ammo_changed.emit(_type_bullet)
-
-func _move():
 	var input_dir = Vector2.ZERO
 	input_dir.x = Input.get_action_strength("move_right") - Input.get_action_strength("move_left")
 	input_dir.y = Input.get_action_strength("move_down") - Input.get_action_strength("move_up")
 	
 	if input_dir.length() > 0:
 		velocity = input_dir.normalized() * _speed
-		_rotate_player(velocity)
+		rotation = velocity.angle() + PI/2
 		_handle_movement_sound(velocity)
 	else:
 		velocity = Vector2.ZERO
 		_handle_movement_sound(Vector2.ZERO)
 
-func _rotate_player_mobile(direction: Vector2):
-	rotation_degrees = rad_to_deg(direction.angle()) + 90
+	if Input.is_action_just_pressed("plasma"): _on_ammo_selected(PLASMA)
+	elif Input.is_action_just_pressed("medium_bullet"): _on_ammo_selected(MEDIUM)
+	elif Input.is_action_just_pressed("light_bullet"): _on_ammo_selected(LIGHT)
 
-func _rotate_player_mobile_aim(direction: Vector2):
-	_gun.global_rotation_degrees = rad_to_deg(direction.angle()) + 90
-
-func _rotate_player(direction: Vector2):
-	rotation = direction.angle() + PI/2
+func _on_ammo_selected(type: int):
+	_type_bullet = type
+	ammo_changed.emit(_type_bullet)
 
 func take_damage(damage: int):
-	_hp -= damage
+	super.take_damage(damage) # Вызов базовой логики урона
 	health_changed.emit(_hp, _max_hp)
-	_update_damage_visuals()
-	if _hp <= 0:
-		_destroy()
-
-func _setup_damage_effects():
-	_smoke_particles = CPUParticles2D.new()
-	add_child(_smoke_particles)
-	_smoke_particles.position = Vector2(0, 0)
-	_smoke_particles.emitting = false
-	_smoke_particles.amount = 20
-	_smoke_particles.lifetime = 0.8
-	_smoke_particles.texture = load("res://assets/future_tanks/PNG/Effects/Smoke_A.png")
-	_smoke_particles.emission_shape = CPUParticles2D.EMISSION_SHAPE_SPHERE
-	_smoke_particles.emission_sphere_radius = 20.0
-	_smoke_particles.spread = 180.0
-	_smoke_particles.gravity = Vector2(0, -100)
-	_smoke_particles.initial_velocity_min = 20.0
-	_smoke_particles.initial_velocity_max = 50.0
-	_smoke_particles.scale_amount_min = 0.1
-	_smoke_particles.scale_amount_max = 0.3
-	_smoke_particles.color = Color(0.3, 0.3, 0.3, 0.6)
-
-	# Анимация прозрачности
-	var curve = Gradient.new()
-	curve.add_point(0.0, Color(0.5, 0.5, 0.5, 0.0))
-	curve.add_point(0.2, Color(0.2, 0.2, 0.2, 0.7))
-	curve.add_point(1.0, Color(0.1, 0.1, 0.1, 0.0))
-	_smoke_particles.color_ramp = curve
-
-func _update_damage_visuals():
-	var health_percent = float(_hp) / float(_max_hp)
-
-	# Эффект мигания при попадании
-	var tween = create_tween()
-	tween.tween_property(_body, "modulate", Color(5, 5, 5), 0.05)
-	tween.tween_property(_body, "modulate", Color(1, 1, 1), 0.05)
-
-	# Дым при низком HP
-	if health_percent <= 0.5:
-		_smoke_particles.emitting = true
-		if health_percent <= 0.25:
-			_smoke_particles.amount = 40
-			_smoke_particles.color = Color(0.1, 0.1, 0.1, 0.8) # Черный дым
-		else:
-			_smoke_particles.amount = 20
-			_smoke_particles.color = Color(0.3, 0.3, 0.3, 0.5) # Серый дым
-	else:
-		_smoke_particles.emitting = false
 
 func _destroy():
 	_lives -= 1
@@ -310,9 +149,8 @@ func _destroy():
 	if _lives > 0:
 		_revive()
 	else:
-		# Сохраняем прогресс перед выходом
 		SaveManager.save_game()
-		queue_free()
+		super._destroy()
 
 func _revive():
 	_hp = _max_hp
@@ -320,58 +158,29 @@ func _revive():
 	health_changed.emit(_hp, _max_hp)
 	_update_damage_visuals()
 
-func _fade_sound():
-	if _fade_tween != null and _fade_tween.is_running():
-		_fade_tween.kill()
-	_fade_tween = create_tween()
-	_fade_tween.tween_property(_moving_sound, "volume_db", -80.0, 0.3)
-	_fade_tween.finished.connect(_on_tween_complete)
-
-func _on_tween_complete():
-	_moving_sound.stop()
-	_moving_sound.volume_db = _normal_movement_volume
-
 func _setup_joystick_positions():
 	if SaveManager == null: return
-
 	var is_lefty = SaveManager.get_setting("controls", "lefty_mode", false)
-
-	# Позиции по умолчанию (из сцены):
-	# Joystick: (70, 180)
-	# Aim: (1000, 180)
-	# Для мобилок (ширина ~1152-1280)
-
 	if is_lefty:
-		if _joystick:
-			_joystick.offset = Vector2(1000, 180)
-		if _aim:
-			_aim.offset = Vector2(70, 180)
+		if _joystick: _joystick.offset = Vector2(1000, 180)
+		if _aim: _aim.offset = Vector2(70, 180)
 	else:
-		if _joystick:
-			_joystick.offset = Vector2(70, 180)
-		if _aim:
-			_aim.offset = Vector2(1000, 180)
+		if _joystick: _joystick.offset = Vector2(70, 180)
+		if _aim: _aim.offset = Vector2(1000, 180)
 
 func select_type(body_type: int, gun_type: int, color_type: int):
-	_type_body = body_type
-	_type_gun = gun_type
-	_color = color_type
-	_update_tank_appearance()
+	_type_body = body_type; _type_gun = gun_type; _color = color_type
 	_update_stats()
+	_update_appearance()
 
 func _update_stats():
-	var hp_base = 100
-	var speed_base = 250
-	var dmg_mod = 1.0
-	var reload_base = 1.0
-
+	var hp_base = 100; var speed_base = 250; var dmg_mod = 1.0; var reload_base = 1.0
 	match _type_body:
 		BODY_LIGHT: hp_base = 80; speed_base = 300
 		BODY_MEDIUM: hp_base = 100; speed_base = 250
 		BODY_HEAVY: hp_base = 150; speed_base = 180
 		BODY_LMEDIUM: hp_base = 120; speed_base = 220
 		BODY_MHEAVY: hp_base = 135; speed_base = 200
-
 	match _type_gun:
 		GUN_LIGHT: dmg_mod = 0.8; reload_base = 0.5
 		GUN_MEDIUM: dmg_mod = 1.0; reload_base = 1.0
@@ -379,75 +188,28 @@ func _update_stats():
 		GUN_LMEDIUM: dmg_mod = 1.1; reload_base = 0.8
 		GUN_MHEAVY: dmg_mod = 1.3; reload_base = 1.8
 
-	var hp_bonus = 0
-	var speed_bonus = 0
-	var reload_bonus = 0
-
-	match _color:
-		COLOR_GREEN: hp_bonus = 10; speed_bonus = 20; reload_bonus = -0.1
-		COLOR_AZURE: hp_bonus = 20; speed_bonus = -10; reload_bonus = -0.2
-
-	_max_hp = hp_base + hp_bonus
+	_max_hp = hp_base + (20 if _color == COLOR_AZURE else 10 if _color == COLOR_GREEN else 0)
 	_hp = _max_hp
-	_speed = speed_base + speed_bonus
+	_speed = speed_base + (20 if _color == COLOR_GREEN else -10 if _color == COLOR_AZURE else 0)
 	_damage = int(30 * dmg_mod)
-	if _shoot_timer != null:
-		_shoot_timer.wait_time = max(0.1, reload_base + reload_bonus)
-
+	if _shoot_timer: _shoot_timer.wait_time = max(0.1, reload_base)
 	health_changed.emit(_hp, _max_hp)
-
-func get_money() -> int:
-	return _money
 
 func add_money(amount: int):
 	_money += amount
 	money_changed.emit(_money)
 	SaveManager.save_game()
 
-func spend_money(amount: int) -> bool:
-	if _money >= amount:
-		_money -= amount
-		money_changed.emit(_money)
-		SaveManager.save_game()
-		return true
-	return false
+func get_money() -> int:
+	return _money
 
-func _update_tank_appearance():
-	var color_folder = _get_color_folder()
-	var body_path = "res://assets/future_tanks/PNG/Hulls_" + color_folder + "/" + _get_body_file_name() + ".png"
-	var gun_path = "res://assets/future_tanks/PNG/Weapon_" + color_folder + "/" + _get_gun_file_name() + ".png"
-	
-	_body.texture = load(body_path)
-	_gun.texture = load(gun_path)
-
-	var gun_offset = 35
-	if _type_body == BODY_LIGHT or _type_body == BODY_LMEDIUM:
-		gun_offset = 0
-	_gun.position = Vector2(0, gun_offset)
-
-func _get_body_file_name() -> String:
-	match _type_body:
-		BODY_LIGHT: return "Hull_05"
-		BODY_HEAVY: return "Hull_06"
-		BODY_LMEDIUM: return "Hull_01"
-		BODY_MHEAVY: return "Hull_03"
-		_: return "Hull_02"
-
-func _get_gun_file_name() -> String:
-	match _type_gun:
-		GUN_LIGHT: return "Gun_01"
-		GUN_MEDIUM: return "Gun_03"
-		GUN_HEAVY: return "Gun_08"
-		GUN_LMEDIUM: return "Gun_04"
-		GUN_MHEAVY: return "Gun_07"
-		_: return "Gun_01"
-
-func _get_color_folder() -> String:
-	match _color:
-		COLOR_BROWN: return "Color_A"
-		COLOR_GREEN: return "Color_B"
-		COLOR_AZURE: return "Color_C"
-		_: return "Color_A"
+func _update_appearance():
+	var color_f = "Color_A" if _color == COLOR_BROWN else "Color_B" if _color == COLOR_GREEN else "Color_C"
+	var b_name = ["Hull_05", "Hull_02", "Hull_06", "Hull_01", "Hull_03"][_type_body]
+	var g_name = ["Gun_01", "Gun_03", "Gun_08", "Gun_04", "Gun_07"][_type_gun]
+	_body.texture = load("res://assets/future_tanks/PNG/Hulls_" + color_f + "/" + b_name + ".png")
+	_gun.texture = load("res://assets/future_tanks/PNG/Weapon_" + color_f + "/" + g_name + ".png")
+	_gun.position = Vector2(0, 0 if (_type_body == BODY_LIGHT or _type_body == BODY_LMEDIUM) else 35)
 
 func take_heal(amount: int):
 	_hp = min(_hp + amount, _max_hp)
@@ -455,10 +217,5 @@ func take_heal(amount: int):
 
 func _draw():
 	if is_scope_on and _aim != null and _aim.get_is_joystick_active():
-		var muzzle_pos = _bullet_position.global_position
-		var gun_angle = _gun.global_rotation
-		var direction = Vector2(0, -1).rotated(gun_angle)
-		var ray_length = 1000.0
-		var local_muzzle = to_local(muzzle_pos)
-		var local_end = to_local(muzzle_pos + direction * ray_length)
-		draw_line(local_muzzle, local_end, Color(1, 0, 0, 0.5), 2.0)
+		var direction = Vector2(0, -1).rotated(_gun.global_rotation)
+		draw_line(to_local(_bullet_position.global_position), to_local(_bullet_position.global_position + direction * 1000), Color(1, 0, 0, 0.5), 2.0)
