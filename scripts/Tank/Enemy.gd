@@ -23,6 +23,8 @@ var _nav2d: NavigationAgent2D
 var _ray_cast: RayCast2D
 @export var _type_enemy: TypeEnemy = TypeEnemy.NONE
 var _moving_sound: AudioStreamPlayer
+var _smoke_particles: CPUParticles2D
+var _max_hp: int = 10
 var _is_moving: bool = false
 var _normal_movement_volume: float = -20.0
 var _fire_rate: float = 1.0
@@ -55,6 +57,8 @@ func _ready():
 	_gun = get_node("BodyTank/Gun")
 	_body = get_node("BodyTank")
 	_moving_sound = get_node("MovingSound")
+
+	_setup_damage_effects()
 
 	if _type_enemy == TypeEnemy.NONE:
 		_randomize_enemy_type()
@@ -96,6 +100,7 @@ func _apply_enemy_stats():
 			_patrol_speed = 110
 			_chase_speed = 120
 			_hp = 50
+			_max_hp = 50
 			_damage = 10
 			_fire_rate = 1.0
 			_body.texture = load("res://assets/future_tanks/PNG/Hulls_Color_D/Hull_08.png")
@@ -106,6 +111,7 @@ func _apply_enemy_stats():
 			_patrol_speed = 100
 			_chase_speed = 105
 			_hp = 70
+			_max_hp = 70
 			_damage = 25
 			_fire_rate = 1.2
 			_body.texture = load("res://assets/future_tanks/PNG/Hulls_Color_D/Hull_01.png")
@@ -116,6 +122,7 @@ func _apply_enemy_stats():
 			_patrol_speed = 90
 			_chase_speed = 100
 			_hp = 100
+			_max_hp = 100
 			_damage = 35
 			_fire_rate = 2.5
 			_body.texture = load("res://assets/future_tanks/PNG/Hulls_Color_D/Hull_02.png")
@@ -126,6 +133,7 @@ func _apply_enemy_stats():
 			_patrol_speed = 0
 			_chase_speed = 0
 			_hp = 100
+			_max_hp = 100
 			_damage = 40
 			_fire_rate = 1.5
 			_body.visible = true
@@ -296,7 +304,51 @@ func _on_detection_area_exited(body):
 
 func take_damage(damage: int):
 	_hp -= damage
+	_update_damage_visuals()
 	if _hp <= 0: _destroy()
+
+func _setup_damage_effects():
+	_smoke_particles = CPUParticles2D.new()
+	add_child(_smoke_particles)
+	_smoke_particles.position = Vector2(0, 0)
+	_smoke_particles.emitting = false
+	_smoke_particles.amount = 20
+	_smoke_particles.lifetime = 0.8
+	_smoke_particles.texture = load("res://assets/future_tanks/PNG/Effects/Smoke_A.png")
+	_smoke_particles.emission_shape = CPUParticles2D.EMISSION_SHAPE_SPHERE
+	_smoke_particles.emission_sphere_radius = 20.0
+	_smoke_particles.spread = 180.0
+	_smoke_particles.gravity = Vector2(0, -100)
+	_smoke_particles.initial_velocity_min = 20.0
+	_smoke_particles.initial_velocity_max = 50.0
+	_smoke_particles.scale_amount_min = 0.1
+	_smoke_particles.scale_amount_max = 0.3
+	_smoke_particles.color = Color(0.3, 0.3, 0.3, 0.6)
+
+	var curve = Gradient.new()
+	curve.add_point(0.0, Color(0.5, 0.5, 0.5, 0.0))
+	curve.add_point(0.2, Color(0.2, 0.2, 0.2, 0.7))
+	curve.add_point(1.0, Color(0.1, 0.1, 0.1, 0.0))
+	_smoke_particles.color_ramp = curve
+
+func _update_damage_visuals():
+	if _max_hp <= 0: return
+	var health_percent = float(_hp) / float(_max_hp)
+
+	var tween = create_tween()
+	tween.tween_property(_body, "modulate", Color(5, 5, 5), 0.05)
+	tween.tween_property(_body, "modulate", Color(1, 1, 1), 0.05)
+
+	if health_percent <= 0.5:
+		_smoke_particles.emitting = true
+		if health_percent <= 0.25:
+			_smoke_particles.amount = 40
+			_smoke_particles.color = Color(0.1, 0.1, 0.1, 0.8)
+		else:
+			_smoke_particles.amount = 20
+			_smoke_particles.color = Color(0.3, 0.3, 0.3, 0.5)
+	else:
+		_smoke_particles.emitting = false
 
 func _destroy():
 	if is_instance_valid(_player) and _player != null:
