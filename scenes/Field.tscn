@@ -2276,8 +2276,8 @@ radius = 306.08
 radius = 306.08
 
 [sub_resource type="NavigationPolygon" id="2"]
-vertices = PackedVector2Array(995, 1440, 1118, 1066, 1420, 429, 1839, 1564, 992, 1563, 867, 19, 1874, 19, 1429, 302, 1380, 283, 1283, 287, 995, 217, 1114, 930, 1274, 440, 998, 1082, 972, 1208, 999, 342, 867, 217, 456, 208, 240, 152, 240, 17, -22, 1570, 720, 1192, 709, 1442, 696, 1282, 115, 601, 112, 143, 342, 236, 340, 300, 867, 349, 496, 236, 489, 362, 731, 923, 101, 1125, 457, 380, 703, 1127, 408, 1562, 432, 1278, 702, 1571, 142, 1410, 258, 1418, 262, 1556, 343, 372, -20, 684, 365, 212)
-polygons = Array[PackedInt32Array]([PackedInt32Array(0, 1, 2, 3, 4), PackedInt32Array(5, 6, 7, 8), PackedInt32Array(5, 8, 9, 10), PackedInt32Array(7, 6, 3, 2), PackedInt32Array(2, 1, 11, 12), PackedInt32Array(13, 1, 0, 14), PackedInt32Array(15, 10, 9, 12, 11), PackedInt32Array(5, 10, 16, 17, 18, 19), PackedInt32Array(4, 3, 20), PackedInt32Array(21, 14, 0, 22, 23), PackedInt32Array(24, 25, 18, 26, 27), PackedInt32Array(16, 28, 29, 17), PackedInt32Array(30, 29, 28, 31), PackedInt32Array(15, 11, 31, 28), PackedInt32Array(32, 33, 30, 31, 34), PackedInt32Array(35, 36, 23, 22, 37), PackedInt32Array(38, 39, 40, 20), PackedInt32Array(41, 33, 32, 24), PackedInt32Array(20, 42, 24, 32), PackedInt32Array(18, 17, 43), PackedInt32Array(18, 43, 26), PackedInt32Array(24, 27, 41), PackedInt32Array(20, 32, 38), PackedInt32Array(20, 40, 35), PackedInt32Array(4, 20, 35), PackedInt32Array(4, 35, 37)])
+vertices = PackedVector2Array(250, 162.727, 250, 45.3203, 391.539, 220.844, 1439.5, 295.344, 1863.67, 33.2969, 1829.22, 1554.03, 1429.36, 438.32, 838.711, 1557.22, 1263.35, 450.828, 712.57, 1560.7, 712.742, 1557.63, 125.039, 606.57, 122.07, 153.727, 480.68, 331.367, 585.117, 460.883, -17.0703, 1104.3, -18.9219, 853.617, -10.3828, 854.141, -10.9531, 1103.89, -11.9688, 1559.96, -10.0078, 689.602, 947.219, 470.109, 453.047, 218.133, 485.711, 240.992, 1381.67, 272.922, 1273.55, 277.383, 1101.97, 305.25)
+polygons = Array[PackedInt32Array]([PackedInt32Array(0, 1, 2), PackedInt32Array(3, 4, 5, 6), PackedInt32Array(6, 5, 7, 8), PackedInt32Array(7, 9, 10, 8), PackedInt32Array(11, 12, 0, 2, 13, 14), PackedInt32Array(15, 16, 17, 18), PackedInt32Array(8, 10, 19, 18, 17), PackedInt32Array(8, 17, 20, 11, 21), PackedInt32Array(22, 23, 13, 2), PackedInt32Array(4, 3, 24), PackedInt32Array(4, 24, 25), PackedInt32Array(26, 4, 25), PackedInt32Array(26, 25, 8, 21), PackedInt32Array(21, 11, 14)])
 outlines = Array[PackedVector2Array]([PackedVector2Array(240, 17, 240, 152, 112, 143, 115, 601, -20, 684, -22, 1570, 1839, 1564, 1874, 19, 867, 19), PackedVector2Array(340, 300, 343, 372, 457, 380, 489, 362, 496, 236, 456, 208, 365, 212, 342, 236), PackedVector2Array(1283, 287, 1380, 283, 1429, 302, 1420, 429, 1274, 440), PackedVector2Array(867, 217, 995, 217, 999, 342, 867, 349), PackedVector2Array(992, 1563, 995, 1440, 709, 1442, 702, 1571), PackedVector2Array(720, 1192, 972, 1208, 998, 1082, 1118, 1066, 1114, 930, 731, 923, 703, 1127, 101, 1125, 142, 1410, 258, 1418, 262, 1556, 408, 1562, 432, 1278, 696, 1282), PackedVector2Array(241, 1097, 237, 859, -29, 843, -27, 1115)])
 
 [node name="Field" type="Node2D"]
@@ -2355,7 +2355,7 @@ position = Vector2(904, 115)
 position = Vector2(144, 117)
 
 [node name="DestructibleWall" parent="IngameWalls" instance=ExtResource("5")]
-position = Vector2(910, 322)
+position = Vector2(1433, 261)
 
 [node name="DestructibleWall2" parent="IngameWalls" instance=ExtResource("5")]
 position = Vector2(777, 590)
@@ -2447,6 +2447,15 @@ position = Vector2(610, 1254)
 [node name="IndestructibleWall7" parent="IngameWalls" instance=ExtResource("4")]
 position = Vector2(468, 1235)
 
+[node name="IndestructibleWall14" parent="IngameWalls" instance=ExtResource("4")]
+position = Vector2(807, 384)
+
+[node name="IndestructibleWall15" parent="IngameWalls" instance=ExtResource("4")]
+position = Vector2(673, 404)
+
+[node name="IndestructibleWall16" parent="IngameWalls" instance=ExtResource("4")]
+position = Vector2(915, 254)
+
 [node name="BorderWalls" type="Node" parent="."]
 
 [node name="wall" parent="BorderWalls" instance=ExtResource("3")]
@@ -2491,7 +2500,7 @@ rotation = 1.5708
 scale = Vector2(1, 1.75)
 
 [node name="Base" parent="." instance=ExtResource("15")]
-position = Vector2(-221, 319)
+position = Vector2(758, 137)
 type_base = 0
 
 [node name="Navigation2D" type="Node2D" parent="."]
@@ -2502,11 +2511,14 @@ position = Vector2(35, -12)
 navigation_polygon = SubResource("2")
 
 [node name="EnemyBase" parent="." instance=ExtResource("15")]
-position = Vector2(1357, 701)
+position = Vector2(1608, 1417)
 
 [node name="Enemy" parent="." instance=ExtResource("22_n0sxv")]
 position = Vector2(400, 1039)
 _type_enemy = 3
+
+[node name="DestructibleWall" parent="." instance=ExtResource("5")]
+position = Vector2(466, 134)
 
 [connection signal="pressed" from="PlayerTank/PauseButton/PauseButton" to="." method="_on_TouchScreenButton_pressed"]
 [connection signal="pressed" from="PlayerTank/CanvasLayer/Plasma" to="PlayerTank" method="_on_Plasma_pressed"]

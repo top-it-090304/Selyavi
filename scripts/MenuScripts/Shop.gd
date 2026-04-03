@@ -84,7 +84,7 @@ func update_ui():
 	damage_label.text = "УРОН: x" + str(gun.dmg_mod)
 	hp_label.text = "ЗДОРОВЬЕ: " + str(body.hp + color.hp_bonus)
 	speed_label.text = "СКОРОСТЬ: " + str(body.speed + color.speed_bonus)
-	rof_label.text = "СКОРОСТРЕЛЬНОСТЬ: " + str(gun.rof + color.rof_bonus) + "s"
+	rof_label.text = "СКОРОСТРЕЛЬНОСТЬ: " + str(gun.rof + color.rof_bonus) + " сек"
 
 	# Update Selectors with icons and names
 	$Selectors/GunSelector/Display/Icon.texture = gun_tex

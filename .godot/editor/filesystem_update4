@@ -1,3 +1,6 @@
 res://default_env.tres
 res://scenes/Field.tscn
-res://scripts/MenuScripts/PauseScreen.gd
+res://scenes/Tank/HUD.tscn
+res://scenes/MenuScenes/Settings.tscn
+res://scenes/MenuScenes/Shop.tscn
+res://scenes/MenuScenes/Menu.tscn
