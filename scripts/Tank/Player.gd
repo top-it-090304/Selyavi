@@ -64,14 +64,20 @@ func _ready():
 	_bullet_scene = load("res://scenes/Tank/Bullet.tscn")
 	_body = get_node("BodyTank")
 	_lives = 3
-	_hp = 100
-	_max_hp = _hp
 	_bullet_position = get_node("BodyTank/Gun/BulletPosition")
 	_moving_sound = get_node("MovingSound")
 	_gun = get_node("BodyTank/Gun")
 	_joystick = get_node("Joystick")
 	_aim = get_node("Aim")
 	_start_position = global_position
+
+	_shoot_timer = Timer.new()
+	_shoot_timer.one_shot = true
+	add_child(_shoot_timer)
+
+	# Загружаем сохраненные настройки танка
+	_load_saved_stats()
+
 	money_changed.emit(_money)
 	
 	if _aim != null:
@@ -85,10 +91,6 @@ func _ready():
 		if not _joystick.use_move_vector.is_connected(use_move_vector):
 			_joystick.use_move_vector.connect(use_move_vector)
 	
-	_shoot_timer = Timer.new()
-	_shoot_timer.wait_time = 1.0
-	_shoot_timer.one_shot = true
-	add_child(_shoot_timer)
 	_configure_audio_players()
 	if _moving_sound != null:
 		_normal_movement_volume = _moving_sound.volume_db
@@ -98,14 +100,19 @@ func _ready():
 			AudioManager.sfx_volume_changed.connect(_on_sfx_volume_changed)
 	
 	if GameManager != null:
-		# ПОДКЛЮЧАЕМСЯ К НОВОМУ СИГНАЛУ
 		if not GameManager.on_visual_scope_updated.is_connected(_toggle_scope):
 			GameManager.on_visual_scope_updated.connect(_toggle_scope)
-		# ИСПОЛЬЗУЕМ НОВУЮ ФУНКЦИЮ
 		is_scope_on = GameManager.is_scope_currently_enabled()
 	else:
 		_load_initial_scope_state()
 	_load_saved_money()
+
+func _load_saved_stats():
+	if SaveManager != null:
+		_type_body = SaveManager.get_player_stat("body_type", 1)
+		_type_gun = SaveManager.get_player_stat("gun_type", 1)
+		_color = SaveManager.get_player_stat("color_type", 0)
+		select_type(_type_body, _type_gun, _color)
 
 func _load_saved_money():
 	if SaveManager != null:
@@ -124,7 +131,6 @@ func _load_money_from_file():
 func _on_money_loaded(amount: int):
 	_money = amount
 	money_changed.emit(_money)
-	print("Money loaded from save: ", _money)
 
 func _save_money():
 	if SaveManager != null:
@@ -162,7 +168,7 @@ func _configure_audio_players():
 		_moving_sound.bus = "SFX"
 
 func use_move_vector(move_vector: Vector2):
-	var joystick_velocity = move_vector * 200
+	var joystick_velocity = move_vector * _speed
 	velocity = joystick_velocity
 	move_and_slide()
 	_rotate_player_mobile(move_vector)
@@ -280,7 +286,7 @@ func _fire():
 
 func take_damage(damage: int):
 	_hp -= damage
-	health_changed.emit(_hp, get_max_health())
+	health_changed.emit(_hp, _max_hp)
 	
 	if _hp <= 0:
 		_destroy()
@@ -295,9 +301,9 @@ func _destroy():
 		queue_free()
 
 func _revive():
-	_hp = get_max_health()
+	_hp = _max_hp
 	global_position = _start_position
-	health_changed.emit(_hp, get_max_health())
+	health_changed.emit(_hp, _max_hp)
 
 func _fade_sound():
 	if _fade_tween != null and _fade_tween.is_running():
@@ -336,56 +342,88 @@ func select_type(body_type: int, gun_type: int, color_type: int):
 	_update_stats()
 
 func _update_stats():
+	var hp_base = 100
+	var speed_base = 250
+	var dmg_mod = 1.0
+	var reload_base = 1.0
+
+	# Параметры корпусов
 	match _type_body:
 		BODY_LIGHT:
-			_hp = 80
-			_damage = 20
+			hp_base = 80
+			speed_base = 300
 		BODY_MEDIUM:
-			_hp = 100
-			_damage = 30
+			hp_base = 100
+			speed_base = 250
 		BODY_HEAVY:
-			_hp = 150
-			_damage = 50
+			hp_base = 150
+			speed_base = 180
 		BODY_LMEDIUM:
-			_hp = 120
-			_damage = 25
+			hp_base = 120
+			speed_base = 220
 		BODY_MHEAVY:
-			_hp = 130
-			_damage = 40
-		_:
-			_hp = 100
-			_damage = 30
-	health_changed.emit(_hp, get_max_health())
+			hp_base = 135
+			speed_base = 200
+
+	# Параметры пушек
+	match _type_gun:
+		GUN_LIGHT:
+			dmg_mod = 0.8
+			reload_base = 0.5
+		GUN_MEDIUM:
+			dmg_mod = 1.0
+			reload_base = 1.0
+		GUN_HEAVY:
+			dmg_mod = 1.5
+			reload_base = 2.5
+		GUN_LMEDIUM:
+			dmg_mod = 1.1
+			reload_base = 0.8
+		GUN_MHEAVY:
+			dmg_mod = 1.3
+			reload_base = 1.8
+
+	# Бонусы цвета
+	var hp_bonus = 0
+	var speed_bonus = 0
+	var reload_bonus = 0
+
+	match _color:
+		COLOR_GREEN:
+			hp_bonus = 10
+			speed_bonus = 20
+			reload_bonus = -0.1
+		COLOR_AZURE:
+			hp_bonus = 20
+			speed_bonus = -10
+			reload_bonus = -0.2
+
+	_max_hp = hp_base + hp_bonus
+	_hp = _max_hp
+	_speed = speed_base + speed_bonus
+	_damage = int(30 * dmg_mod)
+	if _shoot_timer != null:
+		_shoot_timer.wait_time = max(0.1, reload_base + reload_bonus)
+
+	health_changed.emit(_hp, _max_hp)
 
 func _get_body_file_name() -> String:
 	match _type_body:
-		BODY_LIGHT:
-			return "Hull_05"
-		BODY_MEDIUM:
-			return "Hull_02"
-		BODY_HEAVY:
-			return "Hull_06"
-		BODY_LMEDIUM:
-			return "Hull_01"
-		BODY_MHEAVY:
-			return "Hull_03"
-		_:
-			return "Hull_02"
+		BODY_LIGHT: return "Hull_05"
+		BODY_MEDIUM: return "Hull_02"
+		BODY_HEAVY: return "Hull_06"
+		BODY_LMEDIUM: return "Hull_01"
+		BODY_MHEAVY: return "Hull_03"
+		_: return "Hull_02"
 
 func _get_gun_file_name() -> String:
 	match _type_gun:
-		GUN_LIGHT:
-			return "Gun_01"
-		GUN_MEDIUM:
-			return "Gun_03"
-		GUN_HEAVY:
-			return "Gun_08"
-		GUN_LMEDIUM:
-			return "Gun_04"
-		GUN_MHEAVY:
-			return "Gun_07"
-		_:
-			return "Gun_01"
+		GUN_LIGHT: return "Gun_01"
+		GUN_MEDIUM: return "Gun_03"
+		GUN_HEAVY: return "Gun_08"
+		GUN_LMEDIUM: return "Gun_04"
+		GUN_MHEAVY: return "Gun_07"
+		_: return "Gun_01"
 
 func get_current_health() -> int:
 	return _hp
@@ -395,23 +433,11 @@ func get_lives() -> int:
 
 func heal(amount: int):
 	_hp += amount
-	_hp = min(_hp, get_max_health())
-	health_changed.emit(_hp, get_max_health())
+	_hp = min(_hp, _max_hp)
+	health_changed.emit(_hp, _max_hp)
 
 func get_max_health() -> int:
-	match _type_body:
-		BODY_LIGHT:
-			return 80
-		BODY_MEDIUM:
-			return 100
-		BODY_HEAVY:
-			return 150
-		BODY_LMEDIUM:
-			return 120
-		BODY_MHEAVY:
-			return 130
-		_:
-			return 100
+	return _max_hp
 
 func get_money() -> int:
 	return _money
@@ -429,6 +455,7 @@ func spend_money(amount: int) -> bool:
 	if _money >= amount:
 		_money -= amount
 		money_changed.emit(_money)
+		_save_money()
 		return true
 	return false
 
@@ -448,19 +475,21 @@ func _update_tank_appearance():
 	if gun_texture != null:
 		_gun.texture = gun_texture
 
+	# Корректировка смещения пушки (аналогично магазину)
+	var gun_offset = 35
+	if _type_body == BODY_LIGHT or _type_body == BODY_LMEDIUM:
+		gun_offset = 0
+	_gun.position = Vector2(0, gun_offset)
+
 func _get_color_folder() -> String:
 	match _color:
-		COLOR_BROWN:
-			return "Color_A"
-		COLOR_GREEN:
-			return "Color_B"
-		COLOR_AZURE:
-			return "Color_C"
-		_:
-			return "Color_A"
+		COLOR_BROWN: return "Color_A"
+		COLOR_GREEN: return "Color_B"
+		COLOR_AZURE: return "Color_C"
+		_: return "Color_A"
 
 func take_heal(amount: int):
 	_hp += amount
 	if _hp > _max_hp:
 		_hp = _max_hp
-	health_changed.emit(_hp, get_max_health())
+	health_changed.emit(_hp, _max_hp)

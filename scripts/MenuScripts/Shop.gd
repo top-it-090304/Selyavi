@@ -60,7 +60,8 @@ func _ready():
 	update_ui()
 
 func update_ui():
-	money_label.text = "Монеты: " + str(money)
+	# Принудительно приводим к int, чтобы убрать запятые и цифры после них
+	money_label.text = str(int(money))
 
 	var body = bodies[current_body_idx]
 	var gun = guns[current_gun_idx]
@@ -110,6 +111,10 @@ func _update_selector_buttons():
 
 func _update_btn(btn: Button, category: String, id: int, price: int, stat_name: String):
 	var owned = SaveManager.is_purchased(category, id)
+	# Если цена 0, считаем предмет купленным
+	if price == 0:
+		owned = true
+
 	if owned:
 		var equipped = SaveManager.get_player_stat(stat_name, -1) == id
 		btn.text = "ВЫБРАНО" if equipped else "ВЫБРАТЬ"
@@ -129,14 +134,18 @@ func _on_buy_color_pressed():
 
 func _handle_buy(category: String, id: int, price: int, stat_name: String):
 	var owned = SaveManager.is_purchased(category, id)
+	if price == 0:
+		owned = true
+
 	if owned:
 		SaveManager.set_player_stat(stat_name, id)
+		SaveManager.save_game() # Сохраняем при экипировке
 	elif money >= price:
 		money -= price
 		SaveManager.save_data["money"] = money
 		SaveManager.add_purchased(category, id)
 		SaveManager.set_player_stat(stat_name, id)
-		SaveManager.save_game()
+		SaveManager.save_game() # Сохраняем при покупке
 
 	update_ui()
 

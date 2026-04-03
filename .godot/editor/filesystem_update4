@@ -5,3 +5,6 @@ res://scenes/MenuScenes/Settings.tscn
 res://scenes/MenuScenes/Shop.tscn
 res://scenes/MenuScenes/Menu.tscn
 res://scripts/MenuScripts/Shop.gd
+res://scripts/Field.gd
+res://scripts/MenuScripts/PauseScreen.gd
+res://scripts/Tank/Player.gd

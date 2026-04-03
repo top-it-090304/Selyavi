@@ -1,7 +1,8 @@
-[gd_scene load_steps=6 format=3 uid="uid://cdxfm038kd06l"]
+[gd_scene load_steps=7 format=3 uid="uid://cdxfm038kd06l"]
 
 [ext_resource type="Script" uid="uid://vja1k2m687in" path="res://scripts/MenuScripts/Shop.gd" id="1_shop"]
 [ext_resource type="FontFile" uid="uid://bsnvk4l0ue5ri" path="res://assets/fonts/ofont.ru_Shonen.ttf" id="2_font"]
+[ext_resource type="Texture2D" uid="uid://bpdqon4pc1ayv" path="res://assets/logo.png" id="3_l6lbb"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_dark_bg"]
 bg_color = Color(0.15, 0.15, 0.18, 1)
@@ -320,29 +321,33 @@ theme_override_font_sizes/font_size = 30
 text = "КУПИТЬ"
 
 [node name="MoneyLabel" type="Label" parent="."]
+layout_mode = 0
+offset_left = 1032.0
+offset_top = 20.0
+offset_right = 1432.0
+offset_bottom = 80.0
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 42
+text = "0"
+
+[node name="BackButton" type="Button" parent="."]
 layout_mode = 1
 anchors_preset = 1
 anchor_left = 1.0
 anchor_right = 1.0
-offset_left = -450.0
-offset_top = 20.0
-offset_right = -30.0
-offset_bottom = 80.0
+offset_left = -1269.0
+offset_top = 12.0
+offset_right = -1069.0
+offset_bottom = 92.0
 grow_horizontal = 0
-theme_override_fonts/font = ExtResource("2_font")
-theme_override_font_sizes/font_size = 42
-text = "Монеты: 0"
-horizontal_alignment = 2
-
-[node name="BackButton" type="Button" parent="."]
-layout_mode = 0
-offset_left = 30.0
-offset_top = 20.0
-offset_right = 230.0
-offset_bottom = 100.0
 theme_override_fonts/font = ExtResource("2_font")
 theme_override_font_sizes/font_size = 36
 text = "Назад"
+
+[node name="Logo" type="Sprite2D" parent="."]
+position = Vector2(960, 49)
+scale = Vector2(0.21, 0.21)
+texture = ExtResource("3_l6lbb")
 
 [connection signal="pressed" from="Selectors/GunSelector/Left" to="." method="_on_gun_left_pressed"]
 [connection signal="pressed" from="Selectors/GunSelector/Right" to="." method="_on_gun_right_pressed"]
