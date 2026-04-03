@@ -28,6 +28,7 @@ var _max_hp: int = 10
 var _is_moving: bool = false
 var _normal_movement_volume: float = -20.0
 var _fire_rate: float = 1.0
+var _spread: float = 0.15 # Разброс пуль в радианах
 
 # Переменные для режима сканирования турели
 var _scan_angle: float = 0.0
@@ -45,6 +46,7 @@ func set_enemy_type(type: int):
 	_type_enemy = type as TypeEnemy
 	if is_inside_tree():
 		_apply_enemy_stats()
+		_setup_vision()
 
 func _ready():
 	add_to_group("enemies")
@@ -56,6 +58,7 @@ func _ready():
 
 	_gun = get_node("BodyTank/Gun")
 	_body = get_node("BodyTank")
+	_detection_area = get_node("DetectionArea")
 	_moving_sound = get_node("MovingSound")
 
 	_setup_damage_effects()
@@ -64,8 +67,8 @@ func _ready():
 		_randomize_enemy_type()
 
 	_apply_enemy_stats()
+	_setup_vision()
 
-	_detection_area = get_node("DetectionArea")
 	_current_state = State.PATROL
 	_player = get_node("/root/Field/PlayerTank")
 	_base = get_node("/root/Field/Base")
@@ -103,6 +106,7 @@ func _apply_enemy_stats():
 			_max_hp = 50
 			_damage = 10
 			_fire_rate = 1.0
+			_spread = 0.25 # Большой разброс
 			_body.texture = load("res://assets/future_tanks/PNG/Hulls_Color_D/Hull_08.png")
 			_gun.texture = load("res://assets/future_tanks/PNG/Weapon_Color_D/Gun_05.png")
 			_gun.position = Vector2(0, 0)
@@ -114,6 +118,7 @@ func _apply_enemy_stats():
 			_max_hp = 70
 			_damage = 25
 			_fire_rate = 1.2
+			_spread = 0.15 # Средний разброс
 			_body.texture = load("res://assets/future_tanks/PNG/Hulls_Color_D/Hull_01.png")
 			_gun.texture = load("res://assets/future_tanks/PNG/Weapon_Color_D/Gun_03.png")
 			_gun.position = Vector2(0, 35)
@@ -125,6 +130,7 @@ func _apply_enemy_stats():
 			_max_hp = 100
 			_damage = 35
 			_fire_rate = 2.5
+			_spread = 0.1 # Высокая точность
 			_body.texture = load("res://assets/future_tanks/PNG/Hulls_Color_D/Hull_02.png")
 			_gun.texture = load("res://assets/future_tanks/PNG/Weapon_Color_D/Gun_08.png")
 			_gun.position = Vector2(0, 35)
@@ -136,16 +142,13 @@ func _apply_enemy_stats():
 			_max_hp = 100
 			_damage = 40
 			_fire_rate = 1.5
+			_spread = 0.05 # Почти снайперская точность
 			_body.visible = true
 			_body.texture = load("res://assets/future_tanks/PNG/Hulls_Color_C/Hull_03.png")
 			_gun.texture = load("res://assets/future_tanks/PNG/Weapon_Color_C/Gun_01.png")
 			_gun.position = Vector2(0, 35)
 			if _moving_sound != null:
 				_moving_sound.stream = null
-			if _detection_area != null:
-				var shape = _detection_area.get_node("CollisionShape2D")
-				if shape != null and shape.shape is CircleShape2D:
-					shape.shape.radius = 600.0 # Видит игрока издалека
 
 func _configure_audio_players():
 	if _moving_sound != null:
@@ -369,7 +372,11 @@ func _fire_at_target(target: Node2D):
 	var bullet = _bullet_scene.instantiate()
 	var direction_to_target = (target.global_position - _gun.global_position).normalized()
 	var gun_angle = direction_to_target.angle() + PI / 2
-	bullet.global_rotation = gun_angle
+
+	# Добавляем случайное отклонение (разброс)
+	var random_offset = randf_range(-_spread, _spread)
+	bullet.global_rotation = gun_angle + random_offset
+
 	bullet.global_position = _bullet_position.global_position
 	get_tree().root.add_child(bullet)
 
@@ -400,3 +407,51 @@ func _on_fade_complete():
 func _randomize_enemy_type():
 	var values = [TypeEnemy.LIGHT, TypeEnemy.MEDIUM, TypeEnemy.HEAVY]
 	_type_enemy = values[randi() % values.size()]
+
+func _setup_vision():
+	if _detection_area == null or _gun == null: return
+
+	# Привязываем область обнаружения к пушке, чтобы зрение вращалось вместе с дулом
+	if _detection_area.get_parent() != _gun:
+		var old_p = _detection_area.get_parent()
+		if old_p: old_p.remove_child(_detection_area)
+		_gun.add_child(_detection_area)
+		_detection_area.position = Vector2.ZERO
+		_detection_area.rotation = 0
+
+	var short_r = 200.0
+	var long_r = 550.0
+
+	match _type_enemy:
+		TypeEnemy.LIGHT:
+			short_r = 180.0
+			long_r = 500.0
+		TypeEnemy.MEDIUM:
+			short_r = 220.0
+			long_r = 600.0
+		TypeEnemy.HEAVY:
+			short_r = 250.0
+			long_r = 650.0
+		TypeEnemy.STATIONARY:
+			short_r = 300.0
+			long_r = 850.0
+
+	# Настройка базового круга (всенаправленное зрение/слух)
+	var base_col = _detection_area.get_node_or_null("CollisionShape2D")
+	if base_col and base_col.shape is CircleShape2D:
+		base_col.shape = base_col.shape.duplicate() # Чтобы не менять радиус у других типов
+		base_col.shape.radius = short_r
+
+	# Настройка направленного зрения (вытянутая капсула вперед)
+	var long_col = _detection_area.get_node_or_null("LongVision")
+	if long_col == null:
+		long_col = CollisionShape2D.new()
+		long_col.name = "LongVision"
+		_detection_area.add_child(long_col)
+
+	var capsule = CapsuleShape2D.new()
+	capsule.radius = 100.0
+	capsule.height = long_r
+	long_col.shape = capsule
+	# Смещаем капсулу так, чтобы она торчала вперед от танка
+	long_col.position = Vector2(0, -long_r / 2)

@@ -156,7 +156,7 @@ func _setup_ammo_selection():
 	ammo_panel.set_anchors_and_offsets_preset(12)
 	ammo_panel.grow_horizontal = Control.GROW_DIRECTION_BOTH
 	ammo_panel.grow_vertical = Control.GROW_DIRECTION_BEGIN
-	ammo_panel.position.y -= 70 # Опустили пониже
+	ammo_panel.position.y -= 25 # Опустили максимально низко к краю
 	ammo_panel.alignment = BoxContainer.ALIGNMENT_CENTER
 	ammo_panel.add_theme_constant_override("separation", 20)
 
@@ -178,6 +178,7 @@ func _setup_ammo_selection():
 		var bg = Panel.new()
 		bg.name = "BG"
 		bg.size = Vector2(100, 110)
+		bg.mouse_filter = Control.MOUSE_FILTER_IGNORE # Пропускаем нажатия к TouchArea
 		slot.add_child(bg)
 
 		# Базовый стиль слота (темный с закругленными углами)
@@ -210,21 +211,21 @@ func _setup_ammo_selection():
 		label.add_theme_color_override("font_shadow_color", Color.BLACK)
 		slot.add_child(label)
 
-		# Невидимая кнопка (TouchScreenButton) для мультитача
-		var btn = TouchScreenButton.new()
-		btn.name = "Btn"
-		# Создаем прозрачную текстуру на весь слот, чтобы убрать дефолтные голубые круги Godot
-		var transparent_img = Image.create(100, 110, false, Image.FORMAT_RGBA8)
-		btn.texture_normal = ImageTexture.create_from_image(transparent_img)
-		slot.add_child(btn)
+		# Невидимая область для нажатия через gui_input (без встроенных эффектов "кругов")
+		var touch_area = Control.new()
+		touch_area.name = "TouchArea"
+		touch_area.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+		slot.add_child(touch_area)
 
 		_ammo_buttons[i] = slot
 
-		# Подключение нажатия
-		btn.pressed.connect(func(): if _player:
-			if i == 0: _player._on_Plasma_pressed()
-			elif i == 1: _player._on_MediumShell_pressed()
-			elif i == 2: _player._on_SmallShell_pressed()
+		# Обработка нажатия (тач или мышь) без визуального фидбека
+		touch_area.gui_input.connect(func(event):
+			if (event is InputEventScreenTouch and event.pressed) or (event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT):
+				if _player:
+					if i == 0: _player._on_Plasma_pressed()
+					elif i == 1: _player._on_MediumShell_pressed()
+					elif i == 2: _player._on_SmallShell_pressed()
 		)
 
 func _on_ammo_changed(type: int):
