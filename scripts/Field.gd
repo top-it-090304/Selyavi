@@ -49,19 +49,19 @@ func _on_base_destroyed(type: int):
 		if player and player.has_method("add_money"):
 			player.add_money(200)
 
-		# Оповещаем HUD об уничтожении базы
-		var huds = get_tree().get_nodes_in_group("hud")
-		if huds.size() > 0:
-			huds[0].update_bases_count()
-
-		# Проверяем, остались ли еще вражеские базы
-		await get_tree().process_frame # Ждем, пока база удалится из группы
+		# Получаем список всех вражеских баз ДО удаления текущей
 		var enemy_bases = []
 		for b in get_tree().get_nodes_in_group("bases"):
 			if b.type_base == 1: # ENEMY
 				enemy_bases.append(b)
 
-		if enemy_bases.size() == 0:
+		# Оповещаем HUD об уничтожении базы (передаем актуальное состояние)
+		var huds = get_tree().get_nodes_in_group("hud")
+		if huds.size() > 0:
+			huds[0].update_bases_count()
+
+		# Если это была последняя база (сейчас их в группе 1, и она уничтожена)
+		if enemy_bases.size() <= 1:
 			_show_game_over_screen(true, "Все базы противника уничтожены!")
 	else:
 		# Уничтожена база игрока

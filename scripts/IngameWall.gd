@@ -5,6 +5,13 @@ var _destroyable: bool = false
 var _can_player_pass: bool = false
 var _player_speed: int = 0
 var _can_bullet_pass: bool = false
+var _hp: int = 50 # Здоровье стены
+
+func take_damage(damage: int):
+	if _destroyable:
+		_hp -= damage
+		if _hp <= 0:
+			destroy()
 
 func destroy():
 	if _destroyable:

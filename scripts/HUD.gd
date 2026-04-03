@@ -39,26 +39,33 @@ func _setup_bases_label(container: Control):
 	# Контейнер для иконки и текста
 	var bases_container = Control.new()
 	bases_container.name = "BasesContainer"
-	# Смещаем вправо (на уровень кнопки паузы)
 	bases_container.position = Vector2(130, 15)
 	container.add_child(bases_container)
 
 	_basesIcon = Sprite2D.new()
 	_basesIcon.texture = load("res://assets/backround/PNG/Props/Platform.png")
-	_basesIcon.centered = false
-	_basesIcon.scale = Vector2(0.4, 0.4)
-	_basesIcon.modulate = Color(1.0, 0.2, 0.2) # Ярко-красный цвет врага
+	_basesIcon.scale = Vector2(0.5, 0.5)
+	_basesIcon.centered = true
+	_basesIcon.position = Vector2(40, 40) # Центр иконки в контейнере
+	_basesIcon.modulate = Color(1.0, 0.2, 0.2, 0.8) # Чуть прозрачный красный
 	bases_container.add_child(_basesIcon)
 
 	_basesLabel = Label.new()
 	_basesLabel.name = "BasesLabel"
-	# Центрируем текст относительно иконки платформы
-	_basesLabel.position = Vector2(45, 5)
-	_basesLabel.add_theme_font_size_override("font_size", 22)
+	# Центрируем текст прямо поверх иконки
+	_basesLabel.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_basesLabel.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	_basesLabel.size = Vector2(80, 80) # Размер совпадает с областью иконки
+	_basesLabel.position = Vector2(0, 0)
+
+	# Применяем стиль как у валюты
+	_basesLabel.add_theme_font_size_override("font_size", 26)
 	_basesLabel.add_theme_color_override("font_shadow_color", Color.BLACK)
+	_basesLabel.add_theme_constant_override("shadow_offset_x", 2)
+	_basesLabel.add_theme_constant_override("shadow_offset_y", 2)
+	_basesLabel.add_theme_constant_override("shadow_outline_size", 1)
 	bases_container.add_child(_basesLabel)
 
-	# Считаем общее количество баз один раз при старте
 	call_deferred("_initialize_bases_count")
 
 func _initialize_bases_count():
@@ -278,9 +285,7 @@ func _setup_ammo_selection():
 		touch_area.gui_input.connect(func(event):
 			if (event is InputEventScreenTouch and event.pressed) or (event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT):
 				if _player:
-					if i == 0: _player._on_Plasma_pressed()
-					elif i == 1: _player._on_MediumShell_pressed()
-					elif i == 2: _player._on_SmallShell_pressed()
+					_player._on_ammo_selected(i)
 		)
 
 func _on_ammo_changed(type: int):
