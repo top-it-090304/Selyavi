@@ -10,3 +10,4 @@ res://scripts/Base.gd
 res://scripts/Field.gd
 res://scripts/HUD.gd
 res://scripts/Tank/Player.gd
+res://scenes/Base.tscn

@@ -8,7 +8,7 @@
 [ext_resource type="AudioStream" uid="uid://bxl5wv7crhm5" path="res://assets/Music/68. Sad Eyes.mp3" id="6"]
 [ext_resource type="Script" uid="uid://3wsw25sk74o6" path="res://scripts/Field.gd" id="8"]
 [ext_resource type="Texture2D" uid="uid://dsiq4t7qegc5x" path="res://assets/ButtonSprites/pause_594725.png" id="9"]
-[ext_resource type="PackedScene" path="res://scenes/Base.tscn" id="15"]
+[ext_resource type="PackedScene" uid="uid://bjw4bj0fr4c7q" path="res://scenes/Base.tscn" id="15"]
 [ext_resource type="PackedScene" uid="uid://336qfi6ddylt" path="res://scenes/Tank/HUD.tscn" id="21"]
 [ext_resource type="PackedScene" uid="uid://dfpgy8w1vxtx0" path="res://scenes/Tank/Enemy.tscn" id="22_n0sxv"]
 
@@ -2474,6 +2474,9 @@ navigation_polygon = SubResource("2")
 
 [node name="EnemyBase" parent="." instance=ExtResource("15")]
 position = Vector2(1608, 1417)
+
+[node name="EnemyBase2" parent="." instance=ExtResource("15")]
+position = Vector2(1569, 826)
 
 [node name="Enemy" parent="." instance=ExtResource("22_n0sxv")]
 position = Vector2(400, 1039)

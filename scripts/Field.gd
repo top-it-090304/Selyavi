@@ -11,19 +11,24 @@ func _ready():
 	if _musicPlayer != null:
 		_musicPlayer.bus = "Music"
 		_musicPlayer.play()
-	
-	_enemyBase = get_node_or_null("EnemyBase")
-	_playerBase = get_node_or_null("Base")
-	
-	if _playerBase != null:
-		_playerBase.base_state.connect(_on_base_destroyed)
-	if _enemyBase != null:
-		_enemyBase.base_state.connect(_on_base_destroyed)
+
+	# Автоматически подписываемся на ВСЕ базы, которые есть или появятся на сцене
+	get_tree().node_added.connect(_on_node_added)
+	# И на те, что уже есть
+	for node in get_tree().get_nodes_in_group("bases"):
+		_connect_base(node)
 	
 	_pauseScene = load("res://scenes/MenuScenes/PauseScreen.tscn")
-
-	# Подключаемся к игроку для отслеживания жизней
 	call_deferred("_connect_player_lives")
+
+func _on_node_added(node):
+	if node.is_in_group("bases"):
+		_connect_base(node)
+
+func _connect_base(base_node):
+	if base_node.has_signal("base_state"):
+		if not base_node.base_state.is_connected(_on_base_destroyed):
+			base_node.base_state.connect(_on_base_destroyed)
 
 func _connect_player_lives():
 	var player = get_node_or_null("PlayerTank")
@@ -35,16 +40,32 @@ func _on_player_lives_changed(lives: int):
 		_show_game_over_screen(false, "У вас закончились жизни")
 
 func _on_base_destroyed(type: int):
-	# type == 0 (PLAYER), type == 1 (ENEMY) в соответствии с enum TypeBase в Base.gd
-	var is_victory = (type == 1) # Уничтожена вражеская база
+	# type == 0 (PLAYER), type == 1 (ENEMY)
+	var is_enemy_base = (type == 1)
 
-	if is_victory:
-		var player = get_node_or_null("PlayerTank")
+	if is_enemy_base:
+		var players = get_tree().get_nodes_in_group("players")
+		var player = players[0] if players.size() > 0 else null
 		if player and player.has_method("add_money"):
 			player.add_money(200)
 
-	var reason = "Вы захватили базу противника" if is_victory else "Ваша база была уничтожена"
-	_show_game_over_screen(is_victory, reason)
+		# Оповещаем HUD об уничтожении базы
+		var huds = get_tree().get_nodes_in_group("hud")
+		if huds.size() > 0:
+			huds[0].update_bases_count()
+
+		# Проверяем, остались ли еще вражеские базы
+		await get_tree().process_frame # Ждем, пока база удалится из группы
+		var enemy_bases = []
+		for b in get_tree().get_nodes_in_group("bases"):
+			if b.type_base == 1: # ENEMY
+				enemy_bases.append(b)
+
+		if enemy_bases.size() == 0:
+			_show_game_over_screen(true, "Все базы противника уничтожены!")
+	else:
+		# Уничтожена база игрока
+		_show_game_over_screen(false, "Ваша база была уничтожена")
 
 func _show_game_over_screen(is_victory: bool, reason: String = ""):
 	get_tree().paused = true

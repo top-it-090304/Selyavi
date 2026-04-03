@@ -277,9 +277,13 @@ func _is_target_visible() -> bool:
 	if _ray_cast.is_colliding():
 		var collider = _ray_cast.get_collider()
 		if collider != null and is_instance_valid(collider):
+			# Если видим игрока напрямую
 			if collider == _player: return true
-			# База может быть представлена своим StaticBody2D дочерним элементом
+			# Если видим базу
 			if collider == _base or (collider.get_parent() != null and collider.get_parent() == _base):
+				return true
+			# Если на пути разрушаемый объект (стена), считаем что "видим препятствие для стрельбы"
+			if collider.has_method("take_damage"):
 				return true
 		return false
 	return true
@@ -302,9 +306,40 @@ func _check_and_fire():
 	elif _type_enemy == TypeEnemy.HEAVY:
 		attack_range = 500.0
 
-	# Если цель - база, мы должны быть достаточно близко или видеть ее
+	# Проверка: если на пути к цели стена, стреляем в стену
+	if _ray_cast != null and _ray_cast.is_colliding():
+		var collider = _ray_cast.get_collider()
+		if collider != null and collider != _player and collider != _base:
+			if collider.has_method("take_damage") or (collider.get_parent() != null and collider.get_parent().has_method("take_damage")):
+				# Стреляем в препятствие, если оно близко
+				if global_position.distance_to(collider.global_position) < 300.0:
+					_fire_at_obstacle(collider)
+					return
+
+	# Стандартная стрельба по цели
 	if dist <= attack_range and _is_target_visible():
 		_fire_at_target(target)
+
+func _fire_at_obstacle(obstacle: Node):
+	if _shoot_timer.time_left > 0: return
+
+	var bullet = _bullet_scene.instantiate()
+	# Направляем пулю прямо по лучу RayCast (в стену)
+	var direction = (obstacle.global_position - _gun.global_position).normalized()
+	bullet.global_rotation = direction.angle() + PI / 2
+	bullet.global_position = _bullet_position.global_position
+
+	get_tree().root.add_child(bullet)
+	bullet.init(TypeBullet.TypeBullet.PLASMA, false, _damage)
+
+	# Эффект выстрела
+	var muzzle_flash = get_node("ShotAnimation")
+	if muzzle_flash != null:
+		muzzle_flash.global_position = _bullet_position.global_position
+		muzzle_flash.frame = 0
+		muzzle_flash.play("Fire")
+
+	_shoot_timer.start()
 
 func _on_detection_area_entered(body):
 	if body == _player and is_instance_valid(_player):

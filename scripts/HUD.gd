@@ -4,10 +4,14 @@ var _healthProgress: ProgressBar
 var _healthLabel: Label
 var _livesLabel: Label
 var _moneyLabel: Label
+var _basesLabel: Label
+var _basesIcon: Sprite2D # Иконка базы
+var _total_enemy_bases: int = 0
 var _player
 var _ammo_buttons = {}
 
 func _ready():
+	add_to_group("hud") # Регистрация для Field.gd
 	var healthPanel = get_node_or_null("HealthPanel")
 	if healthPanel == null:
 		return
@@ -17,6 +21,7 @@ func _ready():
 	_livesLabel = healthPanel.get_node_or_null("LivesLabel")
 	_moneyLabel = healthPanel.get_node_or_null("MoneyLabel")
 	
+	_setup_bases_label(healthPanel) # Создаем метку баз
 	_setup_ammo_selection()
 
 	if _healthProgress == null or _healthLabel == null:
@@ -29,6 +34,56 @@ func _ready():
 	_healthProgress.show_percentage = false
 
 	call_deferred("_find_player_and_connect")
+
+func _setup_bases_label(container: Control):
+	# Контейнер для иконки и текста
+	var bases_container = Control.new()
+	bases_container.name = "BasesContainer"
+	# Смещаем вправо (на уровень кнопки паузы)
+	bases_container.position = Vector2(130, 15)
+	container.add_child(bases_container)
+
+	_basesIcon = Sprite2D.new()
+	_basesIcon.texture = load("res://assets/backround/PNG/Props/Platform.png")
+	_basesIcon.centered = false
+	_basesIcon.scale = Vector2(0.4, 0.4)
+	_basesIcon.modulate = Color(1.0, 0.2, 0.2) # Ярко-красный цвет врага
+	bases_container.add_child(_basesIcon)
+
+	_basesLabel = Label.new()
+	_basesLabel.name = "BasesLabel"
+	# Центрируем текст относительно иконки платформы
+	_basesLabel.position = Vector2(45, 5)
+	_basesLabel.add_theme_font_size_override("font_size", 22)
+	_basesLabel.add_theme_color_override("font_shadow_color", Color.BLACK)
+	bases_container.add_child(_basesLabel)
+
+	# Считаем общее количество баз один раз при старте
+	call_deferred("_initialize_bases_count")
+
+func _initialize_bases_count():
+	# Ждем два кадра, чтобы сцена полностью стабилизировалась
+	await get_tree().process_frame
+	await get_tree().process_frame
+
+	_total_enemy_bases = 0
+	var all_bases = get_tree().get_nodes_in_group("bases")
+	for b in all_bases:
+		if b.type_base == 1: # ENEMY
+			_total_enemy_bases += 1
+	update_bases_count()
+
+func update_bases_count():
+	if _basesLabel == null: return
+
+	var current_enemy_bases = 0
+	var all_bases = get_tree().get_nodes_in_group("bases")
+	for b in all_bases:
+		if b.type_base == 1: # ENEMY
+			current_enemy_bases += 1
+
+	var destroyed = _total_enemy_bases - current_enemy_bases
+	_basesLabel.text = str(destroyed) + "/" + str(_total_enemy_bases)
 
 func _find_player_and_connect():
 	# Универсальный поиск игрока через группу
