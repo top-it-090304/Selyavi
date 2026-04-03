@@ -1,23 +1,84 @@
-[gd_scene load_steps=7 format=3 uid="uid://cdxfm038kd06l"]
+[gd_scene load_steps=12 format=3 uid="uid://cdxfm038kd06l"]
 
 [ext_resource type="Script" uid="uid://vja1k2m687in" path="res://scripts/MenuScripts/Shop.gd" id="1_shop"]
 [ext_resource type="FontFile" uid="uid://bsnvk4l0ue5ri" path="res://assets/fonts/ofont.ru_Shonen.ttf" id="2_font"]
 [ext_resource type="Texture2D" uid="uid://bpdqon4pc1ayv" path="res://assets/logo.png" id="3_l6lbb"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_dark_bg"]
-bg_color = Color(0.15, 0.15, 0.18, 1)
+bg_color = Color(0.14902, 0.172549, 0.14902, 1)
 border_width_left = 4
 border_width_top = 4
 border_width_right = 4
 border_width_bottom = 4
-border_color = Color(0.3, 0.3, 0.35, 1)
-corner_radius_top_left = 15
-corner_radius_top_right = 15
-corner_radius_bottom_right = 15
-corner_radius_bottom_left = 15
+border_color = Color(0.290196, 0.341176, 0.25098, 1)
+corner_radius_top_left = 20
+corner_radius_top_right = 20
+corner_radius_bottom_right = 20
+corner_radius_bottom_left = 20
+shadow_color = Color(0, 0, 0, 0.392157)
+shadow_size = 15
+
+[sub_resource type="LabelSettings" id="LabelSettings_stats"]
+font = ExtResource("2_font")
+font_size = 32
+font_color = Color(0.741176, 0.819608, 0.705882, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn_hover"]
+content_margin_left = 20.0
+content_margin_top = 10.0
+content_margin_right = 20.0
+content_margin_bottom = 10.0
+bg_color = Color(0.25098, 0.301961, 0.25098, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 6
+border_color = Color(0.439216, 0.501961, 0.380392, 1)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+shadow_color = Color(0.439216, 0.501961, 0.380392, 0.235294)
+shadow_size = 10
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn_pressed"]
+content_margin_left = 20.0
+content_margin_top = 14.0
+content_margin_right = 20.0
+content_margin_bottom = 6.0
+bg_color = Color(0.121569, 0.14902, 0.121569, 1)
+border_width_left = 2
+border_width_top = 4
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.0784314, 0.0901961, 0.0784314, 1)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn_normal"]
+content_margin_left = 20.0
+content_margin_top = 10.0
+content_margin_right = 20.0
+content_margin_bottom = 10.0
+bg_color = Color(0.180392, 0.219608, 0.180392, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 6
+border_color = Color(0.290196, 0.341176, 0.25098, 1)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_color_fill"]
 bg_color = Color(1, 1, 1, 1)
+corner_radius_top_left = 5
+corner_radius_top_right = 5
+corner_radius_bottom_right = 5
+corner_radius_bottom_left = 5
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_black_border"]
 bg_color = Color(0.6, 0.6, 0.6, 0)
@@ -25,7 +86,18 @@ border_width_left = 4
 border_width_top = 4
 border_width_right = 4
 border_width_bottom = 4
-border_color = Color(0, 0, 0, 1)
+border_color = Color(0.0784314, 0.0901961, 0.0784314, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="LabelSettings" id="LabelSettings_money"]
+font = ExtResource("2_font")
+font_size = 42
+font_color = Color(0.741176, 0.819608, 0.705882, 1)
+outline_size = 8
+outline_color = Color(0.0784314, 0.0901961, 0.0784314, 1)
 
 [node name="Shop" type="Control"]
 layout_mode = 3
@@ -43,14 +115,14 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-color = Color(0.08, 0.08, 0.1, 1)
+color = Color(0.109804, 0.121569, 0.109804, 1)
 
 [node name="TankFrame" type="Panel" parent="."]
 layout_mode = 0
 offset_left = 64.0
 offset_top = 100.0
 offset_right = 514.0
-offset_bottom = 550.0
+offset_bottom = 450.0
 theme_override_styles/panel = SubResource("StyleBoxFlat_dark_bg")
 
 [node name="TankPreview" type="Control" parent="TankFrame"]
@@ -72,34 +144,31 @@ position = Vector2(0, 35)
 [node name="Stats" type="VBoxContainer" parent="."]
 layout_mode = 0
 offset_left = 64.0
-offset_top = 570.0
+offset_top = 470.0
 offset_right = 514.0
 offset_bottom = 750.0
 theme_override_constants/separation = 20
+alignment = 1
 
 [node name="Damage" type="Label" parent="Stats"]
 layout_mode = 2
-theme_override_fonts/font = ExtResource("2_font")
-theme_override_font_sizes/font_size = 32
 text = "УРОН: x1.0"
+label_settings = SubResource("LabelSettings_stats")
 
 [node name="HP" type="Label" parent="Stats"]
 layout_mode = 2
-theme_override_fonts/font = ExtResource("2_font")
-theme_override_font_sizes/font_size = 32
 text = "ЗДОРОВЬЕ: 100"
+label_settings = SubResource("LabelSettings_stats")
 
 [node name="Speed" type="Label" parent="Stats"]
 layout_mode = 2
-theme_override_fonts/font = ExtResource("2_font")
-theme_override_font_sizes/font_size = 32
 text = "СКОРОСТЬ: 250"
+label_settings = SubResource("LabelSettings_stats")
 
 [node name="ROF" type="Label" parent="Stats"]
 layout_mode = 2
-theme_override_fonts/font = ExtResource("2_font")
-theme_override_font_sizes/font_size = 32
 text = "СКОРОСТРЕЛЬНОСТЬ: 1.0s"
+label_settings = SubResource("LabelSettings_stats")
 
 [node name="Selectors" type="VBoxContainer" parent="."]
 layout_mode = 0
@@ -121,6 +190,9 @@ layout_mode = 2
 size_flags_vertical = 4
 theme_override_fonts/font = ExtResource("2_font")
 theme_override_font_sizes/font_size = 40
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
 text = "<"
 
 [node name="Display" type="Control" parent="Selectors/GunSelector"]
@@ -152,6 +224,7 @@ offset_top = -35.0
 offset_right = 125.0
 grow_horizontal = 2
 grow_vertical = 0
+theme_override_colors/font_color = Color(0.741176, 0.819608, 0.705882, 1)
 theme_override_fonts/font = ExtResource("2_font")
 theme_override_font_sizes/font_size = 20
 text = "ПУШКА"
@@ -163,6 +236,9 @@ layout_mode = 2
 size_flags_vertical = 4
 theme_override_fonts/font = ExtResource("2_font")
 theme_override_font_sizes/font_size = 40
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
 text = ">"
 
 [node name="BuyGun" type="Button" parent="Selectors/GunSelector"]
@@ -171,6 +247,9 @@ layout_mode = 2
 size_flags_vertical = 4
 theme_override_fonts/font = ExtResource("2_font")
 theme_override_font_sizes/font_size = 30
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
 text = "КУПИТЬ"
 
 [node name="HullSelector" type="HBoxContainer" parent="Selectors"]
@@ -184,6 +263,9 @@ layout_mode = 2
 size_flags_vertical = 4
 theme_override_fonts/font = ExtResource("2_font")
 theme_override_font_sizes/font_size = 40
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
 text = "<"
 
 [node name="Display" type="Control" parent="Selectors/HullSelector"]
@@ -215,6 +297,7 @@ offset_top = -35.0
 offset_right = 125.0
 grow_horizontal = 2
 grow_vertical = 0
+theme_override_colors/font_color = Color(0.741176, 0.819608, 0.705882, 1)
 theme_override_fonts/font = ExtResource("2_font")
 theme_override_font_sizes/font_size = 20
 text = "КОРПУС"
@@ -226,6 +309,9 @@ layout_mode = 2
 size_flags_vertical = 4
 theme_override_fonts/font = ExtResource("2_font")
 theme_override_font_sizes/font_size = 40
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
 text = ">"
 
 [node name="BuyHull" type="Button" parent="Selectors/HullSelector"]
@@ -234,6 +320,9 @@ layout_mode = 2
 size_flags_vertical = 4
 theme_override_fonts/font = ExtResource("2_font")
 theme_override_font_sizes/font_size = 30
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
 text = "КУПИТЬ"
 
 [node name="ColorSelector" type="HBoxContainer" parent="Selectors"]
@@ -247,6 +336,9 @@ layout_mode = 2
 size_flags_vertical = 4
 theme_override_fonts/font = ExtResource("2_font")
 theme_override_font_sizes/font_size = 40
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
 text = "<"
 
 [node name="Display" type="Control" parent="Selectors/ColorSelector"]
@@ -299,6 +391,7 @@ offset_top = -35.0
 offset_right = 125.0
 grow_horizontal = 2
 grow_vertical = 0
+theme_override_colors/font_color = Color(0.741176, 0.819608, 0.705882, 1)
 theme_override_fonts/font = ExtResource("2_font")
 theme_override_font_sizes/font_size = 20
 text = "ЦВЕТ"
@@ -310,6 +403,9 @@ layout_mode = 2
 size_flags_vertical = 4
 theme_override_fonts/font = ExtResource("2_font")
 theme_override_font_sizes/font_size = 40
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
 text = ">"
 
 [node name="BuyColor" type="Button" parent="Selectors/ColorSelector"]
@@ -318,6 +414,9 @@ layout_mode = 2
 size_flags_vertical = 4
 theme_override_fonts/font = ExtResource("2_font")
 theme_override_font_sizes/font_size = 30
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
 text = "КУПИТЬ"
 
 [node name="MoneyLabel" type="Label" parent="."]
@@ -326,9 +425,8 @@ offset_left = 1032.0
 offset_top = 20.0
 offset_right = 1432.0
 offset_bottom = 80.0
-theme_override_fonts/font = ExtResource("2_font")
-theme_override_font_sizes/font_size = 42
 text = "0"
+label_settings = SubResource("LabelSettings_money")
 
 [node name="BackButton" type="Button" parent="."]
 layout_mode = 1
@@ -342,6 +440,9 @@ offset_bottom = 92.0
 grow_horizontal = 0
 theme_override_fonts/font = ExtResource("2_font")
 theme_override_font_sizes/font_size = 36
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
 text = "Назад"
 
 [node name="Logo" type="Sprite2D" parent="."]
