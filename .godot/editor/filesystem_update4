@@ -5,10 +5,5 @@ res://scenes/MenuScenes/Settings.tscn
 res://scenes/MenuScenes/Shop.tscn
 res://scenes/MenuScenes/Menu.tscn
 res://scenes/Tank/Enemy.tscn
-res://scripts/Tank/Enemy.gd
-res://scripts/Base.gd
-res://scripts/Field.gd
-res://scripts/HUD.gd
-res://scripts/Tank/Player.gd
 res://scenes/Base.tscn
-res://scripts/IngameWall.gd
+res://scripts/Base.gd

@@ -155,7 +155,8 @@ func _spawn_enemy():
 	if spawn_pos != Vector2.ZERO:
 		var enemy = _enemy_scene.instantiate()
 		enemy.global_position = spawn_pos
-		get_tree().root.add_child(enemy)
+		# Добавляем врага на уровень (в родителя базы), а не в корень
+		get_parent().add_child(enemy)
 
 func _get_safe_spawn_pos(is_stationary: bool = false) -> Vector2:
 	var player = get_node_or_null("/root/Field/PlayerTank")

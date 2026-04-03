@@ -166,14 +166,27 @@ func _show_game_over_screen(is_victory: bool, reason: String = ""):
 	btn_container.add_child(btn_menu)
 
 	btn_retry.pressed.connect(func():
+		_cleanup_global_objects()
 		get_tree().paused = false
 		get_tree().reload_current_scene()
 	)
 
 	btn_menu.pressed.connect(func():
+		_cleanup_global_objects()
 		get_tree().paused = false
 		get_tree().change_scene_to_file("res://scenes/MenuScenes/Menu.tscn")
 	)
+
+func _cleanup_global_objects():
+	# Удаляем пули, врагов и прочие объекты, которые могли "зависнуть" в корне
+	for node in get_tree().root.get_children():
+		# Не удаляем саму сцену уровня и системные узлы
+		if node == get_tree().current_scene: continue
+		if node is Window: continue # Окна редактора/дебаггера
+
+		# Удаляем только динамические объекты (пули, враги и т.д.)
+		if node.is_in_group("enemies") or node.is_in_group("bullets") or node.name.contains("Bullet"):
+			node.queue_free()
 
 func _on_TouchScreenButton_pressed():
 	if get_tree().paused:

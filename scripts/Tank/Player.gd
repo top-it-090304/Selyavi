@@ -94,7 +94,7 @@ func fire_touch():
 	var bullet = _bullet_scene.instantiate()
 	bullet.global_position = _bullet_position.global_position
 	bullet.rotation_degrees = _gun.global_rotation_degrees
-	get_tree().root.add_child(bullet)
+	get_parent().add_child(bullet)
 	bullet.init(_type_bullet, true, _damage)
 
 	var muzzle_flash = get_node_or_null("ShotAnimation")

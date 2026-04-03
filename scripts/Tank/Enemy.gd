@@ -54,7 +54,10 @@ func _ready():
 	_shoot_timer.wait_time = _fire_rate
 
 func _physics_process(delta):
-	if not is_instance_valid(_base): return
+	# Если цели потеряны (например, после перезагрузки), пробуем найти их снова
+	if not is_instance_valid(_player) or not is_instance_valid(_base):
+		_find_targets()
+		if not is_instance_valid(_base): return # Если базы всё ещё нет, стоим
 	
 	_update_target()
 	_aim_gun(delta)
@@ -64,6 +67,19 @@ func _physics_process(delta):
 
 	move_and_slide()
 	_handle_movement_sound(velocity)
+
+func _find_targets():
+	# Ищем игрока в группе
+	var players = get_tree().get_nodes_in_group("players")
+	if players.size() > 0:
+		_player = players[0]
+
+	# Ищем базу игрока (type_base == 0)
+	var bases = get_tree().get_nodes_in_group("bases")
+	for b in bases:
+		if b.get("type_base") == 0:
+			_base = b
+			break
 
 func _update_target():
 	if _nav2d == null or _type_enemy == TypeEnemy.STATIONARY: return
@@ -147,7 +163,7 @@ func _fire_at_pos(pos: Vector2):
 	bullet.global_position = _bullet_position.global_position
 	bullet.global_rotation = angle
 
-	get_tree().root.add_child(bullet)
+	get_parent().add_child(bullet)
 	var b_type = 1 if _type_enemy == TypeEnemy.STATIONARY else 0
 	bullet.init(b_type, false, _damage)
 
