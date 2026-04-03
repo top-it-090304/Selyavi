@@ -50,4 +50,9 @@ func _on_check_button_toggled(button_pressed: bool):
 	GameManager.set_scope_active(button_pressed)
 
 func _on_Return_Button_pressed():
-	get_tree().change_scene_to_file("res://scenes/MenuScenes/Menu.tscn")
+	if GameManager.has_meta("from_scene"):
+		var last_scene = GameManager.get_meta("from_scene")
+		GameManager.remove_meta("from_scene")
+		get_tree().change_scene_to_file(last_scene)
+	else:
+		get_tree().change_scene_to_file("res://scenes/MenuScenes/Menu.tscn")

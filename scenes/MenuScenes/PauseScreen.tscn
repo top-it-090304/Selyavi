@@ -1,69 +1,111 @@
-[gd_scene load_steps=5 format=3 uid="uid://brr1ry45o4hvq"]
+[gd_scene load_steps=6 format=3 uid="uid://brr1ry45o4hvq"]
 
-[ext_resource type="FontFile" uid="uid://bsnvk4l0ue5ri" path="res://assets/fonts/ofont.ru_Shonen.ttf" id="1"]
-[ext_resource type="FontFile" path="res://assets/fonts/font.tres" id="2"]
-[ext_resource type="Script" uid="uid://brru0wn57mrkb" path="res://scripts/MenuScripts/PauseScreen.gd" id="3"]
+[ext_resource type="FontFile" path="res://assets/fonts/font.tres" id="1"]
+[ext_resource type="Script" uid="uid://brru0wn57mrkb" path="res://scripts/MenuScripts/PauseScreen.gd" id="2"]
 
-[sub_resource type="FontFile" id="1"]
-fallbacks = Array[Font]([ExtResource("1")])
-cache/0/16/0/ascent = 0.0
-cache/0/16/0/descent = 0.0
-cache/0/16/0/underline_position = 0.0
-cache/0/16/0/underline_thickness = 0.0
-cache/0/16/0/scale = 1.0
-cache/0/70/0/ascent = 0.0
-cache/0/70/0/descent = 0.0
-cache/0/70/0/underline_position = 0.0
-cache/0/70/0/underline_thickness = 0.0
-cache/0/70/0/scale = 1.0
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_sidebar"]
+bg_color = Color(0.0588235, 0.0588235, 0.0588235, 0.705882)
+border_width_right = 5
+border_color = Color(1, 1, 1, 0.117647)
+corner_radius_top_right = 20
+corner_radius_bottom_right = 20
 
-[node name="PauseScreen" type="Node2D"]
-script = ExtResource("3")
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_button"]
+bg_color = Color(1, 1, 1, 0.0784314)
+corner_radius_top_left = 15
+corner_radius_top_right = 15
+corner_radius_bottom_right = 15
+corner_radius_bottom_left = 15
 
-[node name="Background" type="ColorRect" parent="."]
-offset_right = 1281.0
-offset_bottom = 767.0
-color = Color(0.827451, 0.686275, 0.819608, 1)
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_hover"]
+bg_color = Color(1, 1, 1, 0.156863)
+corner_radius_top_left = 15
+corner_radius_top_right = 15
+corner_radius_bottom_right = 15
+corner_radius_bottom_left = 15
 
-[node name="ReturnToGameButton" type="Button" parent="."]
-offset_left = 383.0
-offset_top = 166.0
-offset_right = 819.0
-offset_bottom = 307.0
-scale = Vector2(1.2, 1.2)
-theme_override_fonts/font = ExtResource("2")
-theme_override_font_sizes/font_size = 50
-text = "Продолжить"
+[node name="PauseScreen" type="CanvasLayer"]
+process_mode = 3
+layer = 128
+script = ExtResource("2")
 
-[node name="ReturnToSettingsButton" type="Button" parent="."]
-offset_left = 383.0
-offset_top = 353.0
-offset_right = 819.0
-offset_bottom = 494.0
-scale = Vector2(1.2, 1.2)
-theme_override_fonts/font = ExtResource("2")
-theme_override_font_sizes/font_size = 50
-text = "Настройки"
+[node name="DimOverlay" type="ColorRect" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.235294)
 
-[node name="ReturnToMenuButton" type="Button" parent="."]
-offset_left = 383.0
-offset_top = 544.0
-offset_right = 819.0
-offset_bottom = 685.0
-scale = Vector2(1.2, 1.2)
-theme_override_fonts/font = ExtResource("2")
-theme_override_font_sizes/font_size = 50
-text = "В Меню"
+[node name="Sidebar" type="Panel" parent="."]
+custom_minimum_size = Vector2(240, 0)
+anchors_preset = 9
+anchor_bottom = 1.0
+offset_right = 240.0
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_sidebar")
 
-[node name="Label" type="Label" parent="."]
-offset_left = 481.0
-offset_top = 23.0
-offset_right = 804.0
-offset_bottom = 92.0
-theme_override_fonts/font = SubResource("1")
-theme_override_font_sizes/font_size = 70
-text = "Пауза"
+[node name="VBoxContainer" type="VBoxContainer" parent="Sidebar"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -70.0
+offset_top = -300.0
+offset_right = 70.0
+offset_bottom = 300.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 30
+alignment = 1
 
-[connection signal="pressed" from="ReturnToGameButton" to="." method="_on_ReturnToGameButton_pressed"]
-[connection signal="pressed" from="ReturnToSettingsButton" to="." method="_on_ReturnToSettingsButton_pressed"]
-[connection signal="pressed" from="ReturnToMenuButton" to="." method="_on_ReturnToMenuButton_pressed"]
+[node name="ReturnToGameButton" type="Button" parent="Sidebar/VBoxContainer"]
+custom_minimum_size = Vector2(110, 110)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_fonts/font = ExtResource("1")
+theme_override_font_sizes/font_size = 60
+theme_override_styles/normal = SubResource("StyleBoxFlat_button")
+theme_override_styles/hover = SubResource("StyleBoxFlat_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_hover")
+text = "▶"
+
+[node name="RestartButton" type="Button" parent="Sidebar/VBoxContainer"]
+custom_minimum_size = Vector2(110, 110)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_fonts/font = ExtResource("1")
+theme_override_font_sizes/font_size = 60
+theme_override_styles/normal = SubResource("StyleBoxFlat_button")
+theme_override_styles/hover = SubResource("StyleBoxFlat_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_hover")
+text = "↺"
+
+[node name="ReturnToSettingsButton" type="Button" parent="Sidebar/VBoxContainer"]
+custom_minimum_size = Vector2(110, 110)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_fonts/font = ExtResource("1")
+theme_override_font_sizes/font_size = 60
+theme_override_styles/normal = SubResource("StyleBoxFlat_button")
+theme_override_styles/hover = SubResource("StyleBoxFlat_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_hover")
+text = "⚙"
+
+[node name="ReturnToMenuButton" type="Button" parent="Sidebar/VBoxContainer"]
+custom_minimum_size = Vector2(110, 110)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_fonts/font = ExtResource("1")
+theme_override_font_sizes/font_size = 60
+theme_override_styles/normal = SubResource("StyleBoxFlat_button")
+theme_override_styles/hover = SubResource("StyleBoxFlat_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_hover")
+text = "☰"
+
+[connection signal="pressed" from="Sidebar/VBoxContainer/ReturnToGameButton" to="." method="_on_ReturnToGameButton_pressed"]
+[connection signal="pressed" from="Sidebar/VBoxContainer/RestartButton" to="." method="_on_RestartButton_pressed"]
+[connection signal="pressed" from="Sidebar/VBoxContainer/ReturnToSettingsButton" to="." method="_on_ReturnToSettingsButton_pressed"]
+[connection signal="pressed" from="Sidebar/VBoxContainer/ReturnToMenuButton" to="." method="_on_ReturnToMenuButton_pressed"]
