@@ -4,10 +4,4 @@ res://scenes/Tank/HUD.tscn
 res://scenes/MenuScenes/Settings.tscn
 res://scenes/MenuScenes/Shop.tscn
 res://scenes/MenuScenes/Menu.tscn
-res://scripts/Tank/Enemy.gd
-res://scripts/SaveManager.gd
-res://scripts/Tank/Player.gd
-res://scripts/MenuScripts/Settings.gd
-res://scripts/Tank/MobileJoystick.gd
-res://scripts/MenuScripts/Shop.gd
-res://scripts/HUD.gd
+res://scripts/MenuScripts/PauseScreen.gd
