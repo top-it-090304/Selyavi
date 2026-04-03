@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://br7yr2dcfm5dk" path="res://scripts/MenuScripts/Menu.gd" id="1"]
 [ext_resource type="FontFile" uid="uid://bsnvk4l0ue5ri" path="res://assets/fonts/ofont.ru_Shonen.ttf" id="2"]
-[ext_resource type="Texture2D" uid="uid://d0bnoilig7yxs" path="res://assets/ground_shaker_asset/Terrains/terrain.png" id="3_player_hull"]
+[ext_resource type="Texture2D" uid="uid://d0bnoilig7yxs" path="res://assets/ground_shaker_asset/Terrains/terrain.png" id="3_old_bg"]
 [ext_resource type="Texture2D" uid="uid://bwine470dqcde" path="res://assets/future_tanks/PNG/Hulls_Color_A/Hull_02.png" id="4_trwdx"]
 [ext_resource type="Texture2D" uid="uid://qe6yjbi5bg6s" path="res://assets/future_tanks/PNG/Weapon_Color_A/Gun_01.png" id="5_usdci"]
 [ext_resource type="Texture2D" uid="uid://dyk8ocdauyfc5" path="res://assets/future_tanks/PNG/Effects/Plasma.png" id="6_03djm"]
@@ -13,7 +13,7 @@
 [ext_resource type="Texture2D" uid="uid://7on00xx11sco" path="res://assets/future_tanks/PNG/Weapon_Color_D/Gun_05.png" id="11_su3p4"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_e0cov"]
-texture = ExtResource("3_player_hull")
+texture = ExtResource("3_old_bg")
 texture_region_size = Vector2i(128, 128)
 0:0/0 = 0
 1:0/0 = 0

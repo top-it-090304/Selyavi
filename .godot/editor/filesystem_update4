@@ -6,3 +6,4 @@ res://scenes/MenuScenes/Shop.tscn
 res://scenes/MenuScenes/Menu.tscn
 res://scripts/MenuScripts/PauseScreen.gd
 res://scripts/MenuScripts/Settings.gd
+res://scripts/MenuScripts/Info.gd
