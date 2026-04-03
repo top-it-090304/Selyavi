@@ -9,30 +9,33 @@ extends Control
 @onready var speed_label = $Stats/Speed
 @onready var rof_label = $Stats/ROF
 
-@onready var buy_button = $BuyButton
-@onready var status_label = $BuyButton/StatusLabel
+@onready var buy_gun_btn = $Selectors/GunSelector/BuyGun
+@onready var buy_hull_btn = $Selectors/HullSelector/BuyHull
+@onready var buy_color_btn = $Selectors/ColorSelector/BuyColor
 
-# Item Data
+@onready var color_fill = $Selectors/ColorSelector/Display/ColorBox/Fill
+
+# Item Data с уменьшенными значениями offset (отрицательные значения поднимают пушку выше)
 var bodies = [
-	{"id": 0, "name": "Light Hull", "price": 500, "hp": 80, "speed": 300, "file": "Hull_05"},
-	{"id": 1, "name": "Medium Hull", "price": 0, "hp": 100, "speed": 250, "file": "Hull_02"},
-	{"id": 2, "name": "Heavy Hull", "price": 1000, "hp": 150, "speed": 180, "file": "Hull_06"},
-	{"id": 3, "name": "L-Medium Hull", "price": 750, "hp": 120, "speed": 220, "file": "Hull_01"},
-	{"id": 4, "name": "M-Heavy Hull", "price": 1200, "hp": 135, "speed": 200, "file": "Hull_03"}
+	{"id": 0, "name": "Легкий корпус", "price": 500, "hp": 80, "speed": 300, "file": "Hull_05", "offset": -15},
+	{"id": 1, "name": "Средний корпус", "price": 0, "hp": 100, "speed": 250, "file": "Hull_02", "offset": -20},
+	{"id": 2, "name": "Тяжелый корпус", "price": 1000, "hp": 150, "speed": 180, "file": "Hull_06", "offset": -15},
+	{"id": 3, "name": "Л-Средний корпус", "price": 750, "hp": 120, "speed": 220, "file": "Hull_01", "offset": -5},
+	{"id": 4, "name": "Т-Средний корпус", "price": 1200, "hp": 135, "speed": 200, "file": "Hull_03", "offset": -10}
 ]
 
 var guns = [
-	{"id": 0, "name": "Light Gun", "price": 400, "dmg_mod": 0.8, "rof": 0.5, "file": "Gun_01"},
-	{"id": 1, "name": "Medium Gun", "price": 0, "dmg_mod": 1.0, "rof": 1.0, "file": "Gun_03"},
-	{"id": 2, "name": "Heavy Gun", "price": 1000, "dmg_mod": 1.5, "rof": 2.5, "file": "Gun_08"},
-	{"id": 3, "name": "L-Medium Gun", "price": 600, "dmg_mod": 1.1, "rof": 0.8, "file": "Gun_04"},
-	{"id": 4, "name": "M-Heavy Gun", "price": 900, "dmg_mod": 1.3, "rof": 1.8, "file": "Gun_07"}
+	{"id": 0, "name": "Легкая пушка", "price": 400, "dmg_mod": 0.8, "rof": 0.5, "file": "Gun_01"},
+	{"id": 1, "name": "Средняя пушка", "price": 0, "dmg_mod": 1.0, "rof": 1.0, "file": "Gun_03"},
+	{"id": 2, "name": "Тяжелая пушка", "price": 1000, "dmg_mod": 1.5, "rof": 2.5, "file": "Gun_08"},
+	{"id": 3, "name": "Л-Средняя пушка", "price": 600, "dmg_mod": 1.1, "rof": 0.8, "file": "Gun_04"},
+	{"id": 4, "name": "Т-Средняя пушка", "price": 900, "dmg_mod": 1.3, "rof": 1.8, "file": "Gun_07"}
 ]
 
 var colors = [
-	{"id": 0, "name": "Brown", "price": 0, "hp_bonus": 0, "speed_bonus": 0, "rof_bonus": 0, "folder": "Color_A"},
-	{"id": 1, "name": "Green", "price": 300, "hp_bonus": 10, "speed_bonus": 20, "rof_bonus": -0.1, "folder": "Color_B"},
-	{"id": 2, "name": "Azure", "price": 500, "hp_bonus": 20, "speed_bonus": -10, "rof_bonus": -0.2, "folder": "Color_C"}
+	{"id": 0, "name": "Коричневый", "price": 0, "hp_bonus": 0, "speed_bonus": 0, "rof_bonus": 0, "folder": "Color_A", "color": Color("8b4513")},
+	{"id": 1, "name": "Зеленый", "price": 300, "hp_bonus": 10, "speed_bonus": 20, "rof_bonus": -0.1, "folder": "Color_B", "color": Color("228b22")},
+	{"id": 2, "name": "Лазурный", "price": 500, "hp_bonus": 20, "speed_bonus": -10, "rof_bonus": -0.2, "folder": "Color_C", "color": Color("00ffff")}
 ]
 
 var current_body_idx = 0
@@ -47,7 +50,7 @@ func _ready():
 	current_gun_idx = SaveManager.get_player_stat("gun_type", 1)
 	current_color_idx = SaveManager.get_player_stat("color_type", 0)
 
-	if SaveManager.has_method("get_money_from_active_player"):
+	if SaveManager.has_method("_get_money_from_active_player"):
 		var m = SaveManager._get_money_from_active_player()
 		if m != -1: money = m
 		else: money = SaveManager.save_data.get("money", 0)
@@ -57,7 +60,7 @@ func _ready():
 	update_ui()
 
 func update_ui():
-	money_label.text = "Money: " + str(money)
+	money_label.text = "Монеты: " + str(money)
 
 	var body = bodies[current_body_idx]
 	var gun = guns[current_gun_idx]
@@ -67,82 +70,75 @@ func update_ui():
 	var body_path = "res://assets/future_tanks/PNG/Hulls_" + color.folder + "/" + body.file + ".png"
 	var gun_path = "res://assets/future_tanks/PNG/Weapon_" + color.folder + "/" + gun.file + ".png"
 
-	tank_preview_body.texture = load(body_path)
-	tank_preview_gun.texture = load(gun_path)
+	var body_tex = load(body_path)
+	var gun_tex = load(gun_path)
+
+	tank_preview_body.texture = body_tex
+	tank_preview_gun.texture = gun_tex
+
+	# Корректировка позиции пушки на превью
+	tank_preview_gun.position = Vector2(0, body.offset)
 
 	# Update Stats
-	damage_label.text = "Damage: x" + str(gun.dmg_mod)
-	hp_label.text = "HP: " + str(body.hp + color.hp_bonus)
-	speed_label.text = "Speed: " + str(body.speed + color.speed_bonus)
-	rof_label.text = "Reload: " + str(gun.rof + color.rof_bonus) + "s"
+	damage_label.text = "УРОН: x" + str(gun.dmg_mod)
+	hp_label.text = "ЗДОРОВЬЕ: " + str(body.hp + color.hp_bonus)
+	speed_label.text = "СКОРОСТЬ: " + str(body.speed + color.speed_bonus)
+	rof_label.text = "СКОРОСТРЕЛЬНОСТЬ: " + str(gun.rof + color.rof_bonus) + "s"
 
-	# Check Buy Button
-	_update_buy_button()
+	# Update Selectors with icons and names
+	$Selectors/GunSelector/Display/Icon.texture = gun_tex
+	$Selectors/GunSelector/Display/Label.text = gun.name
 
-	# Update selector names (assuming labels exist)
-	$Selectors/GunSelector/Label.text = gun.name
-	$Selectors/HullSelector/Label.text = body.name
-	$Selectors/ColorSelector/Label.text = color.name
+	$Selectors/HullSelector/Display/Icon.texture = body_tex
+	$Selectors/HullSelector/Display/Label.text = body.name
 
-func _update_buy_button():
-	var body_owned = SaveManager.is_purchased("bodies", current_body_idx)
-	var gun_owned = SaveManager.is_purchased("guns", current_gun_idx)
-	var color_owned = SaveManager.is_purchased("colors", current_color_idx)
+	# Update Color Square - safely accessing stylebox
+	var sb = color_fill.get_theme_stylebox("panel").duplicate()
+	if sb is StyleBoxFlat:
+		sb.bg_color = color.color
+		color_fill.add_theme_stylebox_override("panel", sb)
 
-	var all_owned = body_owned and gun_owned and color_owned
+	$Selectors/ColorSelector/Display/Label.text = color.name
 
-	if all_owned:
-		var is_equipped = (current_body_idx == SaveManager.get_player_stat("body_type", -1) and
-						   current_gun_idx == SaveManager.get_player_stat("gun_type", -1) and
-						   current_color_idx == SaveManager.get_player_stat("color_type", -1))
+	# Update individual buy buttons
+	_update_selector_buttons()
 
-		if is_equipped:
-			buy_button.disabled = true
-			status_label.text = "Equipped"
-		else:
-			buy_button.disabled = false
-			status_label.text = "Equip"
+func _update_selector_buttons():
+	_update_btn(buy_gun_btn, "guns", current_gun_idx, guns[current_gun_idx].price, "gun_type")
+	_update_btn(buy_hull_btn, "bodies", current_body_idx, bodies[current_body_idx].price, "body_type")
+	_update_btn(buy_color_btn, "colors", current_color_idx, colors[current_color_idx].price, "color_type")
+
+func _update_btn(btn: Button, category: String, id: int, price: int, stat_name: String):
+	var owned = SaveManager.is_purchased(category, id)
+	if owned:
+		var equipped = SaveManager.get_player_stat(stat_name, -1) == id
+		btn.text = "ВЫБРАНО" if equipped else "ВЫБРАТЬ"
+		btn.disabled = equipped
 	else:
-		var total_cost = 0
-		if not body_owned: total_cost += bodies[current_body_idx].price
-		if not gun_owned: total_cost += guns[current_gun_idx].price
-		if not color_owned: total_cost += colors[current_color_idx].price
+		btn.text = str(price)
+		btn.disabled = (money < price)
 
-		status_label.text = "Buy: " + str(total_cost)
-		buy_button.disabled = (money < total_cost)
+func _on_buy_gun_pressed():
+	_handle_buy("guns", current_gun_idx, guns[current_gun_idx].price, "gun_type")
 
-func _on_buy_button_pressed():
-	var body_owned = SaveManager.is_purchased("bodies", current_body_idx)
-	var gun_owned = SaveManager.is_purchased("guns", current_gun_idx)
-	var color_owned = SaveManager.is_purchased("colors", current_color_idx)
+func _on_buy_hull_pressed():
+	_handle_buy("bodies", current_body_idx, bodies[current_body_idx].price, "body_type")
 
-	if body_owned and gun_owned and color_owned:
-		# Just equip
-		SaveManager.set_player_stat("body_type", current_body_idx)
-		SaveManager.set_player_stat("gun_type", current_gun_idx)
-		SaveManager.set_player_stat("color_type", current_color_idx)
-		update_ui()
-		return
+func _on_buy_color_pressed():
+	_handle_buy("colors", current_color_idx, colors[current_color_idx].price, "color_type")
 
-	var total_cost = 0
-	if not body_owned: total_cost += bodies[current_body_idx].price
-	if not gun_owned: total_cost += guns[current_gun_idx].price
-	if not color_owned: total_cost += colors[current_color_idx].price
-
-	if money >= total_cost:
-		money -= total_cost
+func _handle_buy(category: String, id: int, price: int, stat_name: String):
+	var owned = SaveManager.is_purchased(category, id)
+	if owned:
+		SaveManager.set_player_stat(stat_name, id)
+	elif money >= price:
+		money -= price
 		SaveManager.save_data["money"] = money
-
-		if not body_owned: SaveManager.add_purchased("bodies", current_body_idx)
-		if not gun_owned: SaveManager.add_purchased("guns", current_gun_idx)
-		if not color_owned: SaveManager.add_purchased("colors", current_color_idx)
-
-		SaveManager.set_player_stat("body_type", current_body_idx)
-		SaveManager.set_player_stat("gun_type", current_gun_idx)
-		SaveManager.set_player_stat("color_type", current_color_idx)
-
+		SaveManager.add_purchased(category, id)
+		SaveManager.set_player_stat(stat_name, id)
 		SaveManager.save_game()
-		update_ui()
+
+	update_ui()
 
 func _on_gun_left_pressed():
 	current_gun_idx = (current_gun_idx - 1 + guns.size()) % guns.size()
