@@ -195,6 +195,15 @@ label_settings = SubResource("LabelSettings_label")
 layout_mode = 2
 size_flags_horizontal = 0
 
+[node name="LeftHandLabel" type="Label" parent="MainPanel/GridContainer"]
+layout_mode = 2
+text = "Режим для левшей"
+label_settings = SubResource("LabelSettings_label")
+
+[node name="CheckButton_LeftHand" type="CheckButton" parent="MainPanel/GridContainer"]
+layout_mode = 2
+size_flags_horizontal = 0
+
 [node name="Return_Button" type="Button" parent="MainPanel"]
 layout_mode = 1
 anchors_preset = 7

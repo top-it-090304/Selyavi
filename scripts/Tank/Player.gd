@@ -64,6 +64,8 @@ func _ready():
 	_aim = get_node("Aim")
 	_start_position = global_position
 
+	_setup_joystick_positions()
+
 	_shoot_timer = Timer.new()
 	_shoot_timer.one_shot = true
 	add_child(_shoot_timer)
@@ -274,6 +276,27 @@ func _fade_sound():
 func _on_tween_complete():
 	_moving_sound.stop()
 	_moving_sound.volume_db = _normal_movement_volume
+
+func _setup_joystick_positions():
+	if SaveManager == null: return
+
+	var is_lefty = SaveManager.get_setting("controls", "lefty_mode", false)
+
+	# Позиции по умолчанию (из сцены):
+	# Joystick: (70, 180)
+	# Aim: (1000, 180)
+	# Для мобилок (ширина ~1152-1280)
+
+	if is_lefty:
+		if _joystick:
+			_joystick.offset = Vector2(1000, 180)
+		if _aim:
+			_aim.offset = Vector2(70, 180)
+	else:
+		if _joystick:
+			_joystick.offset = Vector2(70, 180)
+		if _aim:
+			_aim.offset = Vector2(1000, 180)
 
 func select_type(body_type: int, gun_type: int, color_type: int):
 	_type_body = body_type
