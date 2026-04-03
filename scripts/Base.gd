@@ -23,6 +23,7 @@ var _time_since_last_check: float = 0.0
 var _spawn_radius: float = 60.0
 
 func _ready():
+	add_to_group("bases") # Добавляем в группу для универсального поиска
 	area_entered.connect(_on_bullet_entered)
 	_enemy_scene = load("res://scenes/Tank/Enemy.tscn")
 	_enemy_position = get_node_or_null("EnemyPosition")

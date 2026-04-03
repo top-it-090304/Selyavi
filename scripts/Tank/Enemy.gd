@@ -70,8 +70,18 @@ func _ready():
 	_setup_vision()
 
 	_current_state = State.PATROL
-	_player = get_node("/root/Field/PlayerTank")
-	_base = get_node("/root/Field/Base")
+
+	# Универсальный поиск через группы
+	var players = get_tree().get_nodes_in_group("players")
+	if players.size() > 0:
+		_player = players[0]
+
+	var bases = get_tree().get_nodes_in_group("bases")
+	for b in bases:
+		if b.type_base == 0: # 0 = PLAYER (TypeBase.PLAYER)
+			_base = b
+			break
+
 	_bullet_position = get_node("BodyTank/Gun/BulletPosition")
 
 	if _detection_area != null:

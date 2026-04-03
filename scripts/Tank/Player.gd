@@ -56,6 +56,7 @@ const COLOR_GREEN: int = 1
 const COLOR_AZURE: int = 2
 
 func _ready():
+	add_to_group("players") # Добавляем игрока в группу для универсального поиска
 	_bullet_scene = load("res://scenes/Tank/Bullet.tscn")
 	_body = get_node("BodyTank")
 	_lives = 3

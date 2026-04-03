@@ -31,10 +31,10 @@ func _ready():
 	call_deferred("_find_player_and_connect")
 
 func _find_player_and_connect():
-	_player = get_tree().get_root().find_child("Player", true, false)
-
-	if _player == null:
-		_player = get_tree().get_root().find_child("PlayerTank", true, false)
+	# Универсальный поиск игрока через группу
+	var players = get_tree().get_nodes_in_group("players")
+	if players.size() > 0:
+		_player = players[0]
 	
 	if _player != null:
 		# Правильное подключение сигналов в Godot 4
