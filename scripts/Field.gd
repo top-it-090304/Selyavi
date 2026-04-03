@@ -37,6 +37,12 @@ func _on_player_lives_changed(lives: int):
 func _on_base_destroyed(type: int):
 	# type == 0 (PLAYER), type == 1 (ENEMY) в соответствии с enum TypeBase в Base.gd
 	var is_victory = (type == 1) # Уничтожена вражеская база
+
+	if is_victory:
+		var player = get_node_or_null("PlayerTank")
+		if player and player.has_method("add_money"):
+			player.add_money(200)
+
 	var reason = "Вы захватили базу противника" if is_victory else "Ваша база была уничтожена"
 	_show_game_over_screen(is_victory, reason)
 

@@ -26,7 +26,9 @@ func _ready():
 	area_entered.connect(_on_bullet_entered)
 	_enemy_scene = load("res://scenes/Tank/Enemy.tscn")
 	_enemy_position = get_node_or_null("EnemyPosition")
-	
+
+	_setup_base_appearance()
+
 	_spawn_timer = Timer.new()
 	_spawn_timer.wait_time = 0.1
 	_spawn_timer.one_shot = true
@@ -81,6 +83,16 @@ func _on_heal_timeout():
 		if player.has_method("take_heal"):
 			player.take_heal(_heal_amount)
 
+func _setup_base_appearance():
+	var sprite = get_node_or_null("Sprite2D")
+	if sprite != null:
+		if type_base == TypeBase.ENEMY:
+			# Вражеская база - красная
+			sprite.modulate = Color(1.0, 0.4, 0.4)
+		else:
+			# База игрока - сине-зеленая
+			sprite.modulate = Color(0.5, 1.0, 0.8)
+
 func take_damage(amount: int):
 	_hp -= amount
 	_update_damage_visuals()
@@ -88,16 +100,19 @@ func take_damage(amount: int):
 		_destroy()
 
 func _update_damage_visuals():
-	# Эффект мигания при попадании (без дыма)
-	var tween = create_tween()
-	# Пытаемся мигнуть спрайтом (обычно у базы есть Sprite2D)
+	# Эффект мигания при попадании
 	var sprite = get_node_or_null("Sprite2D")
 	if sprite == null:
-		# Если нет Sprite2D, мигаем всем Area2D (может повлиять на дочерние)
 		sprite = self
 
+	# Определяем целевой цвет в зависимости от типа базы
+	var target_color = Color(1.0, 0.4, 0.4) if type_base == TypeBase.ENEMY else Color(0.5, 1.0, 0.8)
+
+	var tween = create_tween()
+	# Вспышка (белый/яркий)
 	tween.tween_property(sprite, "modulate", Color(5, 5, 5), 0.05)
-	tween.tween_property(sprite, "modulate", Color(1, 1, 1), 0.05)
+	# Возврат к исходному цвету базы, а не к чисто белому
+	tween.tween_property(sprite, "modulate", target_color, 0.05)
 
 func destroy():
 	_destroy()
