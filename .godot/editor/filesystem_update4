@@ -6,3 +6,5 @@ res://scenes/MenuScenes/Shop.tscn
 res://scenes/MenuScenes/Menu.tscn
 res://scenes/Tank/Enemy.tscn
 res://scripts/Tank/Enemy.gd
+res://scripts/Base.gd
+res://scripts/Field.gd

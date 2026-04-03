@@ -103,7 +103,7 @@ func destroy():
 	_destroy()
 
 func _destroy():
-	base_state.emit()
+	base_state.emit(type_base) # Передаем тип базы (игрок или враг)
 	queue_free()
 
 func _count_enemies_on_scene() -> int:
