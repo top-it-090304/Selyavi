@@ -33,9 +33,9 @@ var guns = [
 ]
 
 var colors = [
-	{"id": 0, "name": "Коричневый", "price": 0, "hp_bonus": 0, "speed_bonus": 0, "rof_bonus": 0, "folder": "Color_A", "color": Color("8b4513")},
-	{"id": 1, "name": "Зеленый", "price": 300, "hp_bonus": 10, "speed_bonus": 20, "rof_bonus": -0.1, "folder": "Color_B", "color": Color("228b22")},
-	{"id": 2, "name": "Лазурный", "price": 500, "hp_bonus": 20, "speed_bonus": -10, "rof_bonus": -0.2, "folder": "Color_C", "color": Color("00ffff")}
+	{"id": 0, "name": "Коричневый", "price": 0, "hp_bonus": 0, "speed_bonus": 0, "rof_bonus": 0, "folder": "Color_A", "color": Color("a47d6c")},
+	{"id": 1, "name": "Зеленый", "price": 300, "hp_bonus": 10, "speed_bonus": 20, "rof_bonus": -0.1, "folder": "Color_B", "color": Color("888456")},
+	{"id": 2, "name": "Лазурный", "price": 500, "hp_bonus": 20, "speed_bonus": -10, "rof_bonus": -0.2, "folder": "Color_C", "color": Color("699f9c")}
 ]
 
 var current_body_idx = 0
@@ -60,7 +60,8 @@ func _ready():
 	update_ui()
 
 func update_ui():
-	money_label.text = "Монеты: " + str(money)
+	# Принудительно приводим к int, чтобы убрать запятые и цифры после них
+	money_label.text = str(int(money))
 
 	var body = bodies[current_body_idx]
 	var gun = guns[current_gun_idx]
@@ -93,10 +94,10 @@ func update_ui():
 	$Selectors/HullSelector/Display/Label.text = body.name
 
 	# Update Color Square - safely accessing stylebox
-	var sb = color_fill.get_theme_stylebox("panel").duplicate()
-	if sb is StyleBoxFlat:
-		sb.bg_color = color.color
-		color_fill.add_theme_stylebox_override("panel", sb)
+	var stylebox = color_fill.get_theme_stylebox("panel").duplicate()
+	if stylebox is StyleBoxFlat:
+		stylebox.bg_color = color.color
+		color_fill.add_theme_stylebox_override("panel", stylebox)
 
 	$Selectors/ColorSelector/Display/Label.text = color.name
 
@@ -110,6 +111,10 @@ func _update_selector_buttons():
 
 func _update_btn(btn: Button, category: String, id: int, price: int, stat_name: String):
 	var owned = SaveManager.is_purchased(category, id)
+	# Если цена 0, считаем предмет купленным
+	if price == 0:
+		owned = true
+
 	if owned:
 		var equipped = SaveManager.get_player_stat(stat_name, -1) == id
 		btn.text = "ВЫБРАНО" if equipped else "ВЫБРАТЬ"
@@ -129,14 +134,18 @@ func _on_buy_color_pressed():
 
 func _handle_buy(category: String, id: int, price: int, stat_name: String):
 	var owned = SaveManager.is_purchased(category, id)
+	if price == 0:
+		owned = true
+
 	if owned:
 		SaveManager.set_player_stat(stat_name, id)
+		SaveManager.save_game() # Сохраняем при экипировке
 	elif money >= price:
 		money -= price
 		SaveManager.save_data["money"] = money
 		SaveManager.add_purchased(category, id)
 		SaveManager.set_player_stat(stat_name, id)
-		SaveManager.save_game()
+		SaveManager.save_game() # Сохраняем при покупке
 
 	update_ui()
 
