@@ -74,13 +74,13 @@ offset_bottom = 599.0
 color = Color(0.85098, 0.478431, 0.478431, 1)
 
 [node name="Return_Button" type="Button" parent="."]
-offset_left = 108.0
-offset_top = 189.0
-offset_right = 416.0
-offset_bottom = 323.0
+offset_left = 58.5023
+offset_top = 181.747
+offset_right = 478.502
+offset_bottom = 315.747
 theme_override_fonts/font = ExtResource("5")
 theme_override_font_sizes/font_size = 50
-text = "Меню"
+text = "Продолжить"
 
 [node name="HSlider2" type="HSlider" parent="."]
 offset_left = 581.0
@@ -115,9 +115,9 @@ step = 0.5
 value = 2.0
 
 [node name="Label" type="Label" parent="."]
-offset_left = 613.0
+offset_left = 525.741
 offset_top = 42.0
-offset_right = 948.0
+offset_right = 907.741
 offset_bottom = 86.0
 pivot_offset = Vector2(-179, 98)
 theme_override_fonts/font = SubResource("6")
@@ -125,10 +125,10 @@ theme_override_font_sizes/font_size = 30
 text = "Громкость музыки"
 
 [node name="Label2" type="Label" parent="."]
-offset_left = 616.0
+offset_left = 528.741
 offset_top = 220.0
-offset_right = 924.0
-offset_bottom = 242.0
+offset_right = 876.741
+offset_bottom = 245.0
 pivot_offset = Vector2(-179, 98)
 theme_override_fonts/font = SubResource("6")
 theme_override_font_sizes/font_size = 30

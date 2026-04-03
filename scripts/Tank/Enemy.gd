@@ -256,7 +256,10 @@ func _is_target_visible() -> bool:
 	if _ray_cast.is_colliding():
 		var collider = _ray_cast.get_collider()
 		if collider != null and is_instance_valid(collider):
-			if collider == _player or collider == _base: return true
+			if collider == _player: return true
+			# База может быть представлена своим StaticBody2D дочерним элементом
+			if collider == _base or (collider.get_parent() != null and collider.get_parent() == _base):
+				return true
 		return false
 	return true
 
@@ -270,16 +273,16 @@ func _check_and_fire():
 	var target = _get_current_target()
 	if target == null: return
 
+	var dist = global_position.distance_to(target.global_position)
+	var attack_range = 450.0
+
 	if _type_enemy == TypeEnemy.STATIONARY:
-		# Стреляет только при приближении ближе 350
-		var dist = global_position.distance_to(target.global_position)
-		if dist > 350.0:
-			return
+		attack_range = 600.0
+	elif _type_enemy == TypeEnemy.HEAVY:
+		attack_range = 500.0
 
-	if target == _base:
-		if _detection_area == null or not _detection_area.overlaps_area(_base): return
-
-	if _is_target_visible():
+	# Если цель - база, мы должны быть достаточно близко или видеть ее
+	if dist <= attack_range and _is_target_visible():
 		_fire_at_target(target)
 
 func _on_detection_area_entered(body):
