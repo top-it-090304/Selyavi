@@ -279,4 +279,8 @@ _type_enemy = 3
 [node name="DestructibleWall" parent="." instance=ExtResource("5")]
 position = Vector2(466, 134)
 
+[node name="Enemy2" parent="." instance=ExtResource("22_n0sxv")]
+position = Vector2(1194, 874)
+_type_enemy = 0
+
 [connection signal="pressed" from="PlayerTank/PauseButton/PauseButton" to="." method="_on_TouchScreenButton_pressed"]

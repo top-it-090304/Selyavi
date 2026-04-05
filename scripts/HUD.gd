@@ -5,6 +5,7 @@ var _healthLabel: Label
 var _livesLabel: Label
 var _moneyLabel: Label
 var _basesLabel: Label
+var _levelLabel: Label # Метка для уровня
 var _basesIcon: Sprite2D # Иконка базы
 var _total_enemy_bases: int = 0
 var _destroyed_count: int = 0
@@ -21,9 +22,11 @@ func _ready():
 	_healthLabel = healthPanel.get_node_or_null("HealthLabel")
 	_livesLabel = healthPanel.get_node_or_null("LivesLabel")
 	_moneyLabel = healthPanel.get_node_or_null("MoneyLabel")
-	
+	_levelLabel = healthPanel.get_node_or_null("LevelLabel")
+
 	_setup_bases_label(healthPanel) # Создаем метку баз
 	_setup_ammo_selection()
+	_update_level_display() # Обновляем текст уровня
 
 	if _healthProgress == null or _healthLabel == null:
 		return
@@ -36,7 +39,36 @@ func _ready():
 
 	call_deferred("_find_player_and_connect")
 
+func _update_level_display():
+	if _levelLabel == null: return
+
+	var raw_level = 1
+	# Пытаемся получить уровень из меты SaveManager (как в Field.gd)
+	if SaveManager and SaveManager.has_meta("current_level"):
+		raw_level = SaveManager.get_meta("current_level")
+
+	# Логика: 1.1, 1.2 ... 1.5, потом 2.1
+	# (raw_level - 1) / 5 + 1  -> первая цифра (мир)
+	# (raw_level - 1) % 5 + 1  -> вторая цифра (уровень в мире)
+	var major = ((raw_level - 1) / 5) + 1
+	var minor = ((raw_level - 1) % 5) + 1
+
+	_levelLabel.text = "МИССИЯ " + str(major) + "." + str(minor)
+
+	# Каждый 5-й уровень делаем красным (это уровни X.5)
+	if raw_level % 5 == 0:
+		_levelLabel.add_theme_color_override("font_color", Color(1.0, 0.3, 0.3)) # Красный
+	else:
+		_levelLabel.add_theme_color_override("font_color", Color(1.0, 0.9, 0.4)) # Золотистый
+
 func _setup_bases_label(container: Control):
+	# Если контейнер уже есть, не создаем дубликат
+	if container.has_node("BasesContainer"):
+		var existing = container.get_node("BasesContainer")
+		_basesLabel = existing.get_node_or_null("BasesLabel")
+		call_deferred("_initialize_bases_count")
+		return
+
 	# Контейнер для иконки и текста
 	var bases_container = Control.new()
 	bases_container.name = "BasesContainer"

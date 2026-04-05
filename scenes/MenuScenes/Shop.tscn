@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://vja1k2m687in" path="res://scripts/MenuScripts/Shop.gd" id="1_shop"]
 [ext_resource type="FontFile" uid="uid://bsnvk4l0ue5ri" path="res://assets/fonts/ofont.ru_Shonen.ttf" id="2_font"]
-[ext_resource type="Texture2D" uid="uid://bpdqon4pc1ayv" path="res://assets/logo.png" id="3_l6lbb"]
+[ext_resource type="Texture2D" uid="uid://cbqbobkp1rlb" path="res://assets/Money.png" id="3_l6lbb"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_dark_bg"]
 bg_color = Color(0.14902, 0.172549, 0.14902, 1)
@@ -445,9 +445,9 @@ theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
 theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
 text = "Назад"
 
-[node name="Logo" type="Sprite2D" parent="."]
-position = Vector2(960, 49)
-scale = Vector2(0.21, 0.21)
+[node name="Money" type="Sprite2D" parent="."]
+position = Vector2(959, 47)
+scale = Vector2(0.149414, 0.149414)
 texture = ExtResource("3_l6lbb")
 
 [connection signal="pressed" from="Selectors/GunSelector/Left" to="." method="_on_gun_left_pressed"]
