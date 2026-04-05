@@ -33,12 +33,12 @@ func _ready():
 	_detection_area = get_node_or_null("DetectionArea")
 
 	if _ray_cast:
-		_ray_cast.collide_with_areas = true
+		_ray_cast.collide_with_areas = false # Не сталкиваемся с триггерами
 		_ray_cast.add_exception(self)
 
 	if _type_enemy == TypeEnemy.NONE: _randomize_enemy_type()
 	_apply_enemy_stats()
-	_setup_vision()
+	# _setup_vision() # Убираем, чтобы DetectionArea оставалась в корне с правильным масштабом
 
 	# Поиск целей
 	var players = get_tree().get_nodes_in_group("players")
@@ -121,8 +121,9 @@ func _update_ray_cast():
 	if _ray_cast == null: return
 	var target = _get_current_target()
 	if target:
-		_ray_cast.target_position = to_local(target.global_position)
+		_ray_cast.target_position = _ray_cast.to_local(target.global_position)
 		_ray_cast.enabled = true
+		_ray_cast.force_raycast_update() # Принудительно обновляем, чтобы данные были актуальны в этом же кадре
 
 func _is_target_visible() -> bool:
 	if _ray_cast == null or not _ray_cast.is_colliding(): return true
@@ -150,7 +151,7 @@ func _check_and_fire():
 				return
 
 	var dist = global_position.distance_to(target.global_position)
-	var attack_range = 600.0 if _type_enemy == TypeEnemy.STATIONARY else 450.0
+	var attack_range = 750.0 if _type_enemy == TypeEnemy.STATIONARY else 700.0
 
 	if dist <= attack_range and _is_target_visible():
 		_fire_at_pos(target.global_position)
@@ -186,19 +187,46 @@ func _get_reward() -> int:
 	return [50, 75, 100, 150][_type_enemy] if _type_enemy != TypeEnemy.NONE else 50
 
 func _apply_enemy_stats():
+	var hull_path: String = ""
+	var gun_path: String = ""
+	var gun_offset: float = 42.0
+
 	match _type_enemy:
-		TypeEnemy.LIGHT: _hp = 50; _damage = 10; _fire_rate = 1.0; _spread = 0.25
-		TypeEnemy.MEDIUM: _hp = 70; _damage = 25; _fire_rate = 1.2; _spread = 0.15
-		TypeEnemy.HEAVY: _hp = 100; _damage = 35; _fire_rate = 2.5; _spread = 0.1
-		TypeEnemy.STATIONARY: _hp = 100; _damage = 40; _fire_rate = 1.5; _spread = 0.05
+		TypeEnemy.LIGHT:
+			_hp = 50; _damage = 10; _fire_rate = 1.0; _spread = 0.25
+			hull_path = "res://assets/future_tanks/PNG/Hulls_Color_D/Hull_08.png"
+			gun_path = "res://assets/future_tanks/PNG/Weapon_Color_D/Gun_05.png"
+			gun_offset = 35.0
+		TypeEnemy.MEDIUM:
+			_hp = 70; _damage = 25; _fire_rate = 1.2; _spread = 0.15
+		TypeEnemy.HEAVY:
+			_hp = 100; _damage = 35; _fire_rate = 2.5; _spread = 0.1
+			hull_path = "res://assets/future_tanks/PNG/Hulls_Color_D/Hull_06.png"
+			gun_path = "res://assets/future_tanks/PNG/Weapon_Color_D/Gun_07.png"
+			gun_offset = 40.0
+		TypeEnemy.STATIONARY:
+			_hp = 100; _damage = 40; _fire_rate = 1.5; _spread = 0.05
+			hull_path = "res://assets/future_tanks/PNG/Hulls_Color_C/Hull_07.png"
+			gun_path = "res://assets/future_tanks/PNG/Weapon_Color_C/Gun_03.png"
+			gun_offset = 0.0
+
 	_max_hp = _hp
+
+	# Применяем текстуры, если они заданы
+	if _body and hull_path != "":
+		_body.texture = load(hull_path)
+	if _gun and gun_path != "":
+		_gun.texture = load(gun_path)
+		_gun.position.y = gun_offset
+		_gun.offset.y = -gun_offset
+		# Обновляем позицию спавна пули, так как пушка сместилась
+		if _bullet_position:
+			_bullet_position.position.y = -85 # Стандартное смещение для дула
 
 func _randomize_enemy_type():
 	_type_enemy = [TypeEnemy.LIGHT, TypeEnemy.MEDIUM, TypeEnemy.HEAVY][randi() % 3]
 
 func _setup_vision():
-	if not _detection_area or not _gun: return
-	if _detection_area.get_parent() != _gun:
-		_detection_area.get_parent().remove_child(_detection_area)
-		_gun.add_child(_detection_area)
-		_detection_area.position = Vector2.ZERO
+	# Метод оставлен пустым, чтобы не ломать логику вызова,
+	# но перемещение области отключено
+	pass

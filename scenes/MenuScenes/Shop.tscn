@@ -136,7 +136,7 @@ grow_horizontal = 2
 grow_vertical = 2
 
 [node name="Body" type="Sprite2D" parent="TankFrame/TankPreview"]
-scale = Vector2(1.5, 1.5)
+scale = Vector2(1.1, 1.1)
 
 [node name="Gun" type="Sprite2D" parent="TankFrame/TankPreview/Body"]
 position = Vector2(0, 35)

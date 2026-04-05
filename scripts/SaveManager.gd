@@ -4,6 +4,7 @@ const SAVE_FILE = "user://savegame.json"
 
 var save_data = {
 	"money": 0,
+	"unlocked_levels": 1, # Добавили поле для разблокированных уровней
 	"player_stats": {
 		"body_type": 1,
 		"gun_type": 1,
@@ -144,3 +145,8 @@ func set_player_stat(stat: String, value: int):
 
 func get_player_stat(stat: String, default: int) -> int:
 	return int(save_data.player_stats.get(stat, default))
+
+func unlock_level(level_num: int):
+	if level_num > save_data.get("unlocked_levels", 1):
+		save_data["unlocked_levels"] = level_num
+		save_game()

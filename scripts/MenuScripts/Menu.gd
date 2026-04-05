@@ -1,7 +1,8 @@
 extends Node2D
 
 func _on_Play_Button_pressed():
-	get_tree().change_scene_to_file("res://scenes/Field.tscn")
+	# Переход в выбор уровней
+	get_tree().change_scene_to_file("res://scenes/MenuScenes/LevelSelector.tscn")
 
 func _on_Shop_Button_pressed():
 	get_tree().change_scene_to_file("res://scenes/MenuScenes/Shop.tscn")
