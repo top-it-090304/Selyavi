@@ -1,21 +1,19 @@
-[gd_scene load_steps=20 format=4 uid="uid://dsgqbvu3xbmcr"]
+[gd_scene load_steps=18 format=4 uid="uid://c8y2vxtx0w1v"]
 
-[ext_resource type="Script" uid="uid://br7yr2dcfm5dk" path="res://scripts/MenuScripts/Menu.gd" id="1"]
+[ext_resource type="Script" uid="uid://bw3wldkknnu7n" path="res://scripts/MenuScripts/LevelSelector.gd" id="1"]
 [ext_resource type="FontFile" uid="uid://bsnvk4l0ue5ri" path="res://assets/fonts/ofont.ru_Shonen.ttf" id="2"]
-[ext_resource type="Texture2D" uid="uid://d0bnoilig7yxs" path="res://assets/ground_shaker_asset/Terrains/terrain.png" id="3_old_bg"]
-[ext_resource type="Texture2D" uid="uid://bwine470dqcde" path="res://assets/future_tanks/PNG/Hulls_Color_A/Hull_02.png" id="4_trwdx"]
-[ext_resource type="Texture2D" uid="uid://qe6yjbi5bg6s" path="res://assets/future_tanks/PNG/Weapon_Color_A/Gun_01.png" id="5_usdci"]
-[ext_resource type="Texture2D" uid="uid://dyk8ocdauyfc5" path="res://assets/future_tanks/PNG/Effects/Plasma.png" id="6_03djm"]
-[ext_resource type="Texture2D" uid="uid://bxw3l8w1aq5vj" path="res://assets/future_tanks/PNG/Effects/Explosion_A.png" id="7_ck0h4"]
-[ext_resource type="Texture2D" uid="uid://ich10xfcjdqx" path="res://assets/future_tanks/PNG/Hulls_Color_D/Hull_01.png" id="8_2mjt1"]
-[ext_resource type="Texture2D" uid="uid://bw6dsh2phgp22" path="res://assets/future_tanks/PNG/Weapon_Color_D/Gun_01.png" id="9_b8yjk"]
-[ext_resource type="Texture2D" uid="uid://btonbgvhua26t" path="res://assets/future_tanks/PNG/Hulls_Color_D/Hull_08.png" id="10_3nm56"]
-[ext_resource type="Texture2D" uid="uid://7on00xx11sco" path="res://assets/future_tanks/PNG/Weapon_Color_D/Gun_05.png" id="11_su3p4"]
-[ext_resource type="Texture2D" uid="uid://b2hkxhipx0ba" path="res://assets/backround/PNG/Props/Cactus_03.png" id="12_03djm"]
-[ext_resource type="Texture2D" uid="uid://cqerhxhohjo4n" path="res://assets/backround/PNG/Props/Cactus_01.png" id="13_ck0h4"]
+[ext_resource type="Texture2D" uid="uid://d0bnoilig7yxs" path="res://assets/ground_shaker_asset/Terrains/terrain.png" id="3"]
+[ext_resource type="Texture2D" uid="uid://bwine470dqcde" path="res://assets/future_tanks/PNG/Hulls_Color_A/Hull_02.png" id="3_llkjw"]
+[ext_resource type="Texture2D" uid="uid://qe6yjbi5bg6s" path="res://assets/future_tanks/PNG/Weapon_Color_A/Gun_01.png" id="4_67xkb"]
+[ext_resource type="Texture2D" uid="uid://ich10xfcjdqx" path="res://assets/future_tanks/PNG/Hulls_Color_D/Hull_01.png" id="5_nl27w"]
+[ext_resource type="Texture2D" uid="uid://bw6dsh2phgp22" path="res://assets/future_tanks/PNG/Weapon_Color_D/Gun_01.png" id="6_d47o7"]
+[ext_resource type="Texture2D" uid="uid://btonbgvhua26t" path="res://assets/future_tanks/PNG/Hulls_Color_D/Hull_08.png" id="7_tgwm7"]
+[ext_resource type="Texture2D" uid="uid://7on00xx11sco" path="res://assets/future_tanks/PNG/Weapon_Color_D/Gun_05.png" id="8_rwsex"]
+[ext_resource type="Texture2D" uid="uid://bxw3l8w1aq5vj" path="res://assets/future_tanks/PNG/Effects/Explosion_A.png" id="9_dscdh"]
+[ext_resource type="Texture2D" uid="uid://dyk8ocdauyfc5" path="res://assets/future_tanks/PNG/Effects/Plasma.png" id="10_tobk8"]
 
-[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_03djm"]
-texture = ExtResource("3_old_bg")
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_fv40w"]
+texture = ExtResource("3")
 texture_region_size = Vector2i(128, 128)
 0:0/0 = 0
 1:0/0 = 0
@@ -2258,210 +2256,170 @@ texture_region_size = Vector2i(128, 128)
 54:39/0 = 0
 55:39/0 = 0
 
-[sub_resource type="TileSet" id="TileSet_b8yjk"]
+[sub_resource type="TileSet" id="TileSet_cdygo"]
 tile_size = Vector2i(128, 128)
-sources/0 = SubResource("TileSetAtlasSource_03djm")
+sources/0 = SubResource("TileSetAtlasSource_fv40w")
 
 [sub_resource type="LabelSettings" id="LabelSettings_title"]
 font = ExtResource("2")
-font_size = 86
+font_size = 72
 font_color = Color(0.741176, 0.819608, 0.705882, 1)
-outline_size = 16
+outline_size = 14
 outline_color = Color(0.0784314, 0.0901961, 0.0784314, 1)
-shadow_size = 20
-shadow_color = Color(0, 0, 0, 0.470588)
-shadow_offset = Vector2(6, 6)
+shadow_size = 15
+shadow_color = Color(0, 0, 0, 0.4)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn_hover"]
-content_margin_left = 20.0
-content_margin_top = 10.0
-content_margin_right = 20.0
-content_margin_bottom = 10.0
 bg_color = Color(0.25098, 0.301961, 0.25098, 1)
 border_width_left = 2
 border_width_top = 2
 border_width_right = 2
 border_width_bottom = 6
 border_color = Color(0.439216, 0.501961, 0.380392, 1)
-corner_radius_top_left = 12
-corner_radius_top_right = 12
-corner_radius_bottom_right = 12
-corner_radius_bottom_left = 12
-shadow_color = Color(0.439216, 0.501961, 0.380392, 0.235294)
-shadow_size = 10
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn_pressed"]
-content_margin_left = 20.0
-content_margin_top = 14.0
-content_margin_right = 20.0
-content_margin_bottom = 6.0
 bg_color = Color(0.121569, 0.14902, 0.121569, 1)
 border_width_left = 2
 border_width_top = 4
 border_width_right = 2
 border_width_bottom = 2
 border_color = Color(0.0784314, 0.0901961, 0.0784314, 1)
-corner_radius_top_left = 12
-corner_radius_top_right = 12
-corner_radius_bottom_right = 12
-corner_radius_bottom_left = 12
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn_normal"]
-content_margin_left = 20.0
-content_margin_top = 10.0
-content_margin_right = 20.0
-content_margin_bottom = 10.0
 bg_color = Color(0.180392, 0.219608, 0.180392, 1)
 border_width_left = 2
 border_width_top = 2
 border_width_right = 2
 border_width_bottom = 6
 border_color = Color(0.290196, 0.341176, 0.25098, 1)
-corner_radius_top_left = 12
-corner_radius_top_right = 12
-corner_radius_bottom_right = 12
-corner_radius_bottom_left = 12
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
 
-[node name="Menu" type="Node2D"]
-position = Vector2(0, -2)
+[node name="LevelSelector" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 script = ExtResource("1")
 
 [node name="TileMapLayer2" type="TileMapLayer" parent="."]
 tile_map_data = PackedByteArray("AAAJAAUAAAAAAAEAAAAIAAUAAAAAAAEAAAAHAAUAAAAAAAEAAAAGAAUAAAABAAEAAAAFAAUAAAACAAEAAGAEAAUAAAADAAEAADADAAUAAAAAAAEAAAACAAUAAAACAAEAAGABAAUAAAAAAAEAAAAAAAUAAAAAAAEAAAAAAAQAAAABAAEAAAAAAAMAAAACAAEAADAAAAIAAAAAAAEAAAAAAAEAAAAAAAEAAAAAAAAAAAABAAEAAAABAAAAAAAAAAEAAAACAAAAAAACAAEAAFADAAAAAAAAAAEAAAAEAAAAAAABAAEAAAAFAAAAAAACAAEAAAAGAAAAAAAAAAEAAAAHAAAAAAADAAEAAAAIAAAAAAAAAAEAAAAJAAAAAAABAAEAAAAJAAEAAAAAAAEAAAAJAAIAAAADAAEAAFAJAAMAAAACAAEAAAAJAAQAAAABAAEAAAAIAAQAAAAAAAEAAAAHAAQAAAAEAAEAADAGAAQAAAADAAEAAFAFAAQAAAADAAEAAFAEAAQAAAAEAAEAAAADAAQAAAAAAAEAAAACAAQAAAAAAAEAAAABAAQAAAAAAAEAAAACAAMAAAAAAAEAAAACAAIAAAAAAAEAAAABAAIAAAABAAEAAAACAAEAAAAAAAEAAAABAAMAAAAAAAEAAAADAAMAAAAAAAEAAAADAAIAAAAAAAEAAAADAAEAAAAAAAEAAAABAAEAAAAAAAEAAAAEAAMAAAAAAAEAAAAFAAMAAAAAAAEAAAAGAAMAAAAAAAEAAAAGAAIAAAAAAAEAAAAHAAIAAAADAAEAAAAHAAEAAAADAAEAAAAGAAEAAAAAAAEAAAAFAAEAAAAAAAEAAAAEAAEAAAAAAAEAAAAEAAIAAAABAAEAAAAHAAMAAAAFAAEAAAAFAAIAAAAAAAEAAAAIAAMAAAAEAAEAADAIAAIAAAAEAAEAAAAIAAEAAAABAAEAAAA=")
-tile_set = SubResource("TileSet_b8yjk")
-
-[node name="BackgroundDim" type="ColorRect" parent="."]
-visible = false
-offset_right = 1280.0
-offset_bottom = 768.0
-color = Color(0.0784314, 0.0901961, 0.0784314, 0.470588)
-
-[node name="Title" type="Label" parent="."]
-offset_left = 445.0
-offset_top = 40.0
-offset_right = 835.0
-offset_bottom = 135.0
-text = "TANKS 2026"
-label_settings = SubResource("LabelSettings_title")
-horizontal_alignment = 1
-
-[node name="Buttons" type="VBoxContainer" parent="."]
-offset_left = 60.0
-offset_top = 180.0
-offset_right = 440.0
-offset_bottom = 740.0
-theme_override_constants/separation = 20
-
-[node name="Play_Button" type="Button" parent="Buttons"]
-custom_minimum_size = Vector2(0, 90)
-layout_mode = 2
-theme_override_colors/font_hover_color = Color(0.878431, 0.941176, 0.839216, 1)
-theme_override_fonts/font = ExtResource("2")
-theme_override_font_sizes/font_size = 40
-theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
-theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
-text = "Миссии"
-
-[node name="Shop_Button" type="Button" parent="Buttons"]
-custom_minimum_size = Vector2(0, 90)
-layout_mode = 2
-theme_override_colors/font_hover_color = Color(0.878431, 0.941176, 0.839216, 1)
-theme_override_fonts/font = ExtResource("2")
-theme_override_font_sizes/font_size = 40
-theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
-theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
-text = "МАГАЗИН"
-
-[node name="Settings_Button" type="Button" parent="Buttons"]
-custom_minimum_size = Vector2(0, 90)
-layout_mode = 2
-theme_override_colors/font_hover_color = Color(0.878431, 0.941176, 0.839216, 1)
-theme_override_fonts/font = ExtResource("2")
-theme_override_font_sizes/font_size = 40
-theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
-theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
-text = "НАСТРОЙКИ"
-
-[node name="Info_Button" type="Button" parent="Buttons"]
-custom_minimum_size = Vector2(0, 90)
-layout_mode = 2
-theme_override_colors/font_hover_color = Color(0.878431, 0.941176, 0.839216, 1)
-theme_override_fonts/font = ExtResource("2")
-theme_override_font_sizes/font_size = 40
-theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
-theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
-text = "ОБ ИГРЕ"
-
-[node name="Quit_Button" type="Button" parent="Buttons"]
-custom_minimum_size = Vector2(0, 90)
-layout_mode = 2
-theme_override_colors/font_hover_color = Color(0.878431, 0.941176, 0.839216, 1)
-theme_override_fonts/font = ExtResource("2")
-theme_override_font_sizes/font_size = 40
-theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
-theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
-text = "ВЫЙТИ"
+tile_set = SubResource("TileSet_cdygo")
 
 [node name="Player" type="Sprite2D" parent="."]
-position = Vector2(648, 252)
-rotation = -3.99065
-scale = Vector2(0.59671, 0.59671)
-texture = ExtResource("4_trwdx")
+position = Vector2(243, 246)
+rotation = 1.84277
+scale = Vector2(0.568397, 0.568397)
+texture = ExtResource("3_llkjw")
 
 [node name="Gun01" type="Sprite2D" parent="Player"]
-position = Vector2(18.9588, -17.8425)
-rotation = 0.359538
-texture = ExtResource("5_usdci")
-
-[node name="Plasma" type="Sprite2D" parent="Player/Gun01"]
-position = Vector2(10.494, -306.824)
-scale = Vector2(1.46517, 1.46517)
-texture = ExtResource("6_03djm")
-
-[node name="ExplosionA" type="Sprite2D" parent="Player/Gun01"]
-position = Vector2(-2.70374, -93.6885)
-rotation = -2.69304
-scale = Vector2(1.86916, 1.86916)
-texture = ExtResource("7_ck0h4")
+position = Vector2(-0.276793, 5.5566)
+rotation = -0.263479
+texture = ExtResource("4_67xkb")
 
 [node name="Enemy" type="Sprite2D" parent="."]
-position = Vector2(1147, 650)
-rotation = -0.388741
-scale = Vector2(0.548163, 0.548163)
-texture = ExtResource("8_2mjt1")
+position = Vector2(820, 237)
+rotation = -1.91807
+scale = Vector2(0.522154, 0.522154)
+texture = ExtResource("5_nl27w")
 
 [node name="Enemy1" type="Sprite2D" parent="Enemy"]
-position = Vector2(-21.6947, -21.0051)
-rotation = -0.39426
+position = Vector2(11.9204, -16.0528)
+rotation = 0.305062
 scale = Vector2(0.955, 0.955)
-texture = ExtResource("9_b8yjk")
+texture = ExtResource("6_d47o7")
 
 [node name="Enemy2" type="Sprite2D" parent="."]
-position = Vector2(810, 659)
-rotation = -0.107628
-scale = Vector2(0.622074, 0.622074)
-texture = ExtResource("10_3nm56")
+position = Vector2(877, 630)
+rotation = -0.689387
+scale = Vector2(0.592559, 0.592559)
+texture = ExtResource("7_tgwm7")
 
 [node name="Gun05" type="Sprite2D" parent="Enemy2"]
 position = Vector2(-9.62896, -38.0988)
 rotation = -0.182549
-texture = ExtResource("11_su3p4")
+texture = ExtResource("8_rwsex")
 
-[node name="Cactus03" type="Sprite2D" parent="."]
-position = Vector2(1196, 186)
-texture = ExtResource("12_03djm")
+[node name="ExplosionA" type="Sprite2D" parent="Enemy2"]
+position = Vector2(-28.3496, -130.369)
+rotation = -0.383106
+scale = Vector2(1.79295, 1.79295)
+texture = ExtResource("9_dscdh")
 
-[node name="Cactus01" type="Sprite2D" parent="."]
-position = Vector2(420, 122)
-texture = ExtResource("13_ck0h4")
+[node name="Plasma" type="Sprite2D" parent="Enemy2"]
+position = Vector2(-108.528, -454.695)
+rotation = 5.92977
+scale = Vector2(1.53494, 1.53494)
+texture = ExtResource("10_tobk8")
 
-[connection signal="pressed" from="Buttons/Play_Button" to="." method="_on_Play_Button_pressed"]
-[connection signal="pressed" from="Buttons/Shop_Button" to="." method="_on_Shop_Button_pressed"]
-[connection signal="pressed" from="Buttons/Settings_Button" to="." method="_on_Settings_Button_pressed"]
-[connection signal="pressed" from="Buttons/Info_Button" to="." method="_on_Info_Button_pressed"]
-[connection signal="pressed" from="Buttons/Quit_Button" to="." method="_on_Quit_Button_pressed"]
+[node name="Dim" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.0784314, 0.0901961, 0.0784314, 0.745098)
+
+[node name="Title" type="Label" parent="."]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -347.0
+offset_top = 15.0
+offset_right = 347.0
+offset_bottom = 115.0
+grow_horizontal = 2
+text = "ВЫБОР МИССИИ"
+label_settings = SubResource("LabelSettings_title")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="GridContainer" type="GridContainer" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -340.0
+offset_top = -237.0
+offset_right = 340.0
+offset_bottom = 303.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/h_separation = 20
+theme_override_constants/v_separation = 20
+columns = 5
+
+[node name="ReturnButton" type="Button" parent="."]
+layout_mode = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 26.0
+offset_top = -100.0
+offset_right = 226.0
+offset_bottom = -40.0
+grow_vertical = 0
+theme_override_fonts/font = ExtResource("2")
+theme_override_font_sizes/font_size = 28
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
+text = "В МЕНЮ"
+
+[connection signal="pressed" from="ReturnButton" to="." method="_on_Return_Button_pressed"]

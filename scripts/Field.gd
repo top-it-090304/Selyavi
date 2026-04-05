@@ -6,7 +6,13 @@ var _currentPause: Node
 var _enemyBase: Base
 var _playerBase: Base
 
+var current_level: int = 1
+
 func _ready():
+	# Получаем номер текущего уровня из SaveManager (установленный в LevelSelector)
+	if SaveManager and SaveManager.has_meta("current_level"):
+		current_level = SaveManager.get_meta("current_level")
+
 	_musicPlayer = get_node_or_null("MusicPlayer")
 	if _musicPlayer != null:
 		_musicPlayer.bus = "Music"
@@ -70,6 +76,10 @@ func _on_base_destroyed(type: int):
 func _show_game_over_screen(is_victory: bool, reason: String = ""):
 	get_tree().paused = true
 
+	if is_victory and SaveManager:
+		# Разблокируем следующий уровень
+		SaveManager.unlock_level(current_level + 1)
+
 	var canvas = CanvasLayer.new()
 	canvas.layer = 100
 	canvas.process_mode = Node.PROCESS_MODE_ALWAYS
@@ -83,7 +93,7 @@ func _show_game_over_screen(is_victory: bool, reason: String = ""):
 
 	# Основная панель
 	var panel = PanelContainer.new()
-	panel.custom_minimum_size = Vector2(450, 320)
+	panel.custom_minimum_size = Vector2(450, 420)
 	panel.set_anchors_and_offsets_preset(Control.PRESET_CENTER)
 	panel.grow_horizontal = Control.GROW_DIRECTION_BOTH
 	panel.grow_vertical = Control.GROW_DIRECTION_BOTH
@@ -106,13 +116,13 @@ func _show_game_over_screen(is_victory: bool, reason: String = ""):
 	panel.add_theme_stylebox_override("panel", style)
 
 	var vbox = VBoxContainer.new()
-	vbox.add_theme_constant_override("separation", 25)
+	vbox.add_theme_constant_override("separation", 15)
 	vbox.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	panel.add_child(vbox)
 
 	# Небольшой отступ сверху
 	var top_margin = Control.new()
-	top_margin.custom_minimum_size = Vector2(0, 10)
+	top_margin.custom_minimum_size = Vector2(0, 5)
 	vbox.add_child(top_margin)
 
 	var title = Label.new()
@@ -133,14 +143,14 @@ func _show_game_over_screen(is_victory: bool, reason: String = ""):
 
 	# Контейнер для кнопок
 	var btn_container = VBoxContainer.new()
-	btn_container.add_theme_constant_override("separation", 15)
+	btn_container.add_theme_constant_override("separation", 10)
 	btn_container.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	btn_container.alignment = BoxContainer.ALIGNMENT_CENTER
 	vbox.add_child(btn_container)
 
 	# Функция для стилизации кнопок
 	var style_btn = func(btn: Button):
-		btn.custom_minimum_size = Vector2(280, 55)
+		btn.custom_minimum_size = Vector2(320, 48)
 		btn.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 		var btn_style = StyleBoxFlat.new()
 		btn_style.bg_color = Color(0.18, 0.21, 0.18)
@@ -153,12 +163,35 @@ func _show_game_over_screen(is_victory: bool, reason: String = ""):
 		btn.add_theme_stylebox_override("normal", btn_style)
 		btn.add_theme_stylebox_override("hover", btn_style)
 		btn.add_theme_stylebox_override("pressed", btn_style)
-		btn.add_theme_font_size_override("font_size", 20)
+		btn.add_theme_font_size_override("font_size", 18)
+
+	# Кнопка СЛЕДУЮЩАЯ МИССИЯ (только при победе и до 20 уровня)
+	if is_victory and current_level < 20:
+		var btn_next = Button.new()
+		btn_next.text = "СЛЕДУЮЩАЯ МИССИЯ"
+		style_btn.call(btn_next)
+		btn_container.add_child(btn_next)
+		btn_next.pressed.connect(func():
+			_cleanup_global_objects()
+			get_tree().paused = false
+			SaveManager.set_meta("current_level", current_level + 1)
+			# Пытаемся загрузить следующий файл или общую сцену
+			var next_path = "res://scenes/Levels/Level_" + str(current_level + 1) + ".tscn"
+			if FileAccess.file_exists(next_path):
+				get_tree().change_scene_to_file(next_path)
+			else:
+				get_tree().change_scene_to_file("res://scenes/Field.tscn")
+		)
 
 	var btn_retry = Button.new()
 	btn_retry.text = "ИГРАТЬ СНОВА"
 	style_btn.call(btn_retry)
 	btn_container.add_child(btn_retry)
+
+	var btn_levels = Button.new()
+	btn_levels.text = "ВЫБОР МИССИИ"
+	style_btn.call(btn_levels)
+	btn_container.add_child(btn_levels)
 
 	var btn_menu = Button.new()
 	btn_menu.text = "В ГЛАВНОЕ МЕНЮ"
@@ -169,6 +202,12 @@ func _show_game_over_screen(is_victory: bool, reason: String = ""):
 		_cleanup_global_objects()
 		get_tree().paused = false
 		get_tree().reload_current_scene()
+	)
+
+	btn_levels.pressed.connect(func():
+		_cleanup_global_objects()
+		get_tree().paused = false
+		get_tree().change_scene_to_file("res://scenes/MenuScenes/LevelSelector.tscn")
 	)
 
 	btn_menu.pressed.connect(func():

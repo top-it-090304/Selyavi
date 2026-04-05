@@ -13,7 +13,7 @@
 [ext_resource type="AudioStream" uid="uid://dwnx2lsl0j4q8" path="res://assets/sounds/tracks_rattle_slow_01.mp3" id="11"]
 
 [sub_resource type="CircleShape2D" id="1"]
-radius = 350.0
+radius = 450.0
 
 [sub_resource type="CapsuleShape2D" id="2"]
 radius = 50.0

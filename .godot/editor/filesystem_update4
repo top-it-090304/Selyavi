@@ -6,4 +6,10 @@ res://scenes/MenuScenes/Shop.tscn
 res://scenes/MenuScenes/Menu.tscn
 res://scenes/Tank/Enemy.tscn
 res://scenes/Base.tscn
-res://scripts/Tank/Player.gd
+res://scenes/Tank/Player.tscn
+res://scenes/Tank/ChangeBullet.tscn
+res://scripts/MenuScripts/Menu.gd
+res://scenes/MenuScenes/LevelSelector.tscn
+res://scripts/MenuScripts/LevelSelector.gd
+res://scripts/Field.gd
+res://scenes/Levels/Level_1.tscn

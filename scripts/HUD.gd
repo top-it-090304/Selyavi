@@ -7,6 +7,7 @@ var _moneyLabel: Label
 var _basesLabel: Label
 var _basesIcon: Sprite2D # Иконка базы
 var _total_enemy_bases: int = 0
+var _destroyed_count: int = 0
 var _player
 var _ammo_buttons = {}
 
@@ -69,28 +70,30 @@ func _setup_bases_label(container: Control):
 	call_deferred("_initialize_bases_count")
 
 func _initialize_bases_count():
-	# Ждем два кадра, чтобы сцена полностью стабилизировалась
+	# Ждем несколько кадров для полной загрузки всех объектов в группы
+	await get_tree().process_frame
 	await get_tree().process_frame
 	await get_tree().process_frame
 
 	_total_enemy_bases = 0
+	_destroyed_count = 0
 	var all_bases = get_tree().get_nodes_in_group("bases")
 	for b in all_bases:
-		if b.type_base == 1: # ENEMY
+		if b.get("type_base") == 1: # ENEMY
 			_total_enemy_bases += 1
-	update_bases_count()
+
+	_update_label_text()
 
 func update_bases_count():
-	if _basesLabel == null: return
+	# Этот метод вызывается при каждой смерти базы
+	_destroyed_count += 1
+	_update_label_text()
 
-	var current_enemy_bases = 0
-	var all_bases = get_tree().get_nodes_in_group("bases")
-	for b in all_bases:
-		if b.type_base == 1: # ENEMY
-			current_enemy_bases += 1
-
-	var destroyed = _total_enemy_bases - current_enemy_bases
-	_basesLabel.text = str(destroyed) + "/" + str(_total_enemy_bases)
+func _update_label_text():
+	if _basesLabel:
+		# Ограничиваем количество уничтоженных баз общим количеством
+		var display_destroyed = min(_destroyed_count, _total_enemy_bases)
+		_basesLabel.text = str(display_destroyed) + "/" + str(_total_enemy_bases)
 
 func _find_player_and_connect():
 	# Универсальный поиск игрока через группу
@@ -223,9 +226,9 @@ func _setup_ammo_selection():
 	ammo_panel.add_theme_constant_override("separation", 20)
 
 	var textures = {
-		0: ["res://assets/PlasmaUntoched копия.png", "res://assets/PlasmaToched.png"],
-		1: ["res://assets/MediumBulletUntoched.png", "res://assets/MediumBulletToched.png"],
-		2: ["res://assets/LightBulletUntoched.png", "res://assets/LightBulletToched.png"]
+		0: "res://assets/future_tanks/PNG/Effects/Plasma.png",
+		1: "res://assets/future_tanks/PNG/Effects/Medium_Shell.png",
+		2: "res://assets/future_tanks/PNG/Effects/Light_Shell.png"
 	}
 
 	var ammo_types = ["PL", "MD", "LG"]
@@ -260,9 +263,9 @@ func _setup_ammo_selection():
 		# Иконка снаряда
 		var icon = Sprite2D.new()
 		icon.name = "Icon"
-		icon.texture = load(textures[i][0])
+		icon.texture = load(textures[i])
 		icon.position = Vector2(50, 55)
-		icon.scale = Vector2(0.2, 0.2)
+		icon.scale = Vector2(0.6, 0.6) # Масштаб для новых текстур
 		slot.add_child(icon)
 
 		# Тип снаряда (текст сверху слева)
@@ -297,23 +300,17 @@ func _on_ammo_changed(type: int):
 		# Клонируем стиль, чтобы изменения одного слота не влияли на другие
 		var style = bg.get_theme_stylebox("panel").duplicate()
 
-		var textures = {
-			0: ["res://assets/PlasmaUntoched копия.png", "res://assets/PlasmaToched.png"],
-			1: ["res://assets/MediumBulletUntoched.png", "res://assets/MediumBulletToched.png"],
-			2: ["res://assets/LightBulletUntoched.png", "res://assets/LightBulletToched.png"]
-		}
-
 		if ammo_type == type:
-			# Активный слот: золотая рамка и яркая иконка
+			# Активный слот: золотая рамка
 			style.border_color = Color(1.0, 0.8, 0.2)
 			style.bg_color = Color(0.2, 0.2, 0.15, 0.9)
-			icon.texture = load(textures[ammo_type][1])
 			slot.modulate.a = 1.0
+			icon.modulate = Color(1.3, 1.3, 1.3) # Свечение
 		else:
 			# Неактивный слот: серая рамка и прозрачность
 			style.border_color = Color(0.4, 0.4, 0.4)
 			style.bg_color = Color(0.1, 0.1, 0.1, 0.8)
-			icon.texture = load(textures[ammo_type][0])
-			slot.modulate.a = 0.6
+			slot.modulate.a = 0.5
+			icon.modulate = Color(0.7, 0.7, 0.7) # Приглушение
 
 		bg.add_theme_stylebox_override("panel", style)

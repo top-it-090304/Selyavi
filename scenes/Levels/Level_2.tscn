@@ -1,0 +1,282 @@
+[gd_scene load_steps=15 format=4 uid="uid://bpo7681ia1skr"]
+
+[ext_resource type="PackedScene" uid="uid://mfxaskty4hrm" path="res://scenes/Tank/Player.tscn" id="2"]
+[ext_resource type="Texture2D" uid="uid://d0bnoilig7yxs" path="res://assets/ground_shaker_asset/Terrains/terrain.png" id="2_mssve"]
+[ext_resource type="PackedScene" path="res://scenes/obtacles/wall.tscn" id="3"]
+[ext_resource type="PackedScene" path="res://scenes/IndestructibleWall.tscn" id="4"]
+[ext_resource type="PackedScene" path="res://scenes/DestructibleWall.tscn" id="5"]
+[ext_resource type="AudioStream" uid="uid://bxl5wv7crhm5" path="res://assets/Music/68. Sad Eyes.mp3" id="6"]
+[ext_resource type="Script" uid="uid://3wsw25sk74o6" path="res://scripts/Field.gd" id="8"]
+[ext_resource type="Texture2D" uid="uid://dsiq4t7qegc5x" path="res://assets/ButtonSprites/pause_594725.png" id="9"]
+[ext_resource type="PackedScene" uid="uid://bjw4bj0fr4c7q" path="res://scenes/Base.tscn" id="15"]
+[ext_resource type="PackedScene" uid="uid://336qfi6ddylt" path="res://scenes/Tank/HUD.tscn" id="21"]
+[ext_resource type="PackedScene" uid="uid://dfpgy8w1vxtx0" path="res://scenes/Tank/Enemy.tscn" id="22_n0sxv"]
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_2i15a"]
+texture = ExtResource("2_mssve")
+texture_region_size = Vector2i(128, 128)
+0:0/0 = 0
+1:0/0 = 0
+2:0/0 = 0
+3:0/0 = 0
+4:0/0 = 0
+5:0/0 = 0
+6:0/0 = 0
+0:1/0 = 0
+1:1/0 = 0
+2:1/0 = 0
+3:1/0 = 0
+4:1/0 = 0
+5:1/0 = 0
+6:1/0 = 0
+0:2/0 = 0
+1:2/0 = 0
+2:2/0 = 0
+3:2/0 = 0
+4:2/0 = 0
+5:2/0 = 0
+6:2/0 = 0
+0:3/0 = 0
+1:3/0 = 0
+2:3/0 = 0
+3:3/0 = 0
+4:3/0 = 0
+5:3/0 = 0
+6:3/0 = 0
+0:4/0 = 0
+1:4/0 = 0
+2:4/0 = 0
+3:4/0 = 0
+4:4/0 = 0
+5:4/0 = 0
+6:4/0 = 0
+
+[sub_resource type="TileSet" id="TileSet_4osdq"]
+tile_size = Vector2i(128, 128)
+sources/0 = SubResource("TileSetAtlasSource_2i15a")
+
+[sub_resource type="NavigationPolygon" id="2"]
+vertices = PackedVector2Array(250, 162.727, 250, 45.3203, 391.539, 220.844, 1439.5, 295.344, 1863.67, 33.2969, 1829.22, 1554.03, 1429.36, 438.32, 838.711, 1557.22, 1263.35, 450.828, 712.57, 1560.7, 712.742, 1557.63, 125.039, 606.57, 122.07, 153.727, 480.68, 331.367, 585.117, 460.883, -17.0703, 1104.3, -18.9219, 853.617, -10.3828, 854.141, -10.9531, 1103.89, -11.9688, 1559.96, -10.0078, 689.602, 947.219, 470.109, 453.047, 218.133, 485.711, 240.992, 1381.67, 272.922, 1273.55, 277.383, 1101.97, 305.25)
+polygons = Array[PackedInt32Array]([PackedInt32Array(0, 1, 2), PackedInt32Array(3, 4, 5, 6), PackedInt32Array(6, 5, 7, 8), PackedInt32Array(7, 9, 10, 8), PackedInt32Array(11, 12, 0, 2, 13, 14), PackedInt32Array(15, 16, 17, 18), PackedInt32Array(8, 10, 19, 18, 17), PackedInt32Array(8, 17, 20, 11, 21), PackedInt32Array(22, 23, 13, 2), PackedInt32Array(4, 3, 24), PackedInt32Array(4, 24, 25), PackedInt32Array(26, 4, 25), PackedInt32Array(26, 25, 8, 21), PackedInt32Array(21, 11, 14)])
+outlines = Array[PackedVector2Array]([PackedVector2Array(240, 17, 240, 152, 112, 143, 115, 601, -20, 684, -22, 1570, 1839, 1564, 1874, 19, 867, 19), PackedVector2Array(340, 300, 343, 372, 457, 380, 489, 362, 496, 236, 456, 208, 365, 212, 342, 236), PackedVector2Array(1283, 287, 1380, 283, 1429, 302, 1420, 429, 1274, 440), PackedVector2Array(867, 217, 995, 217, 999, 342, 867, 349), PackedVector2Array(992, 1563, 995, 1440, 709, 1442, 702, 1571), PackedVector2Array(720, 1192, 972, 1208, 998, 1082, 1118, 1066, 1114, 930, 731, 923, 703, 1127, 101, 1125, 142, 1410, 258, 1418, 262, 1556, 408, 1562, 432, 1278, 696, 1282), PackedVector2Array(241, 1097, 237, 859, -29, 843, -27, 1115)])
+
+[node name="Field" type="Node2D"]
+script = ExtResource("8")
+
+[node name="TileMapLayer" type="TileMapLayer" parent="."]
+z_index = -1
+tile_map_data = PackedByteArray("AAAHAAIAAAAAAAEAAAAAAAEAAAAAAAEAAAABAAEAAAABAAEAAAACAAEAAAAAAAEAAAADAAEAAAAAAAEAAAAEAAEAAAAAAAEAAAAFAAIAAAAAAAEAAAAGAAIAAAAAAAEAAAAGAAMAAAAAAAEAAAAGAAQAAAAAAAEAAAAFAAQAAAAAAAEAAAAEAAMAAAAAAAEAAAADAAMAAAAAAAEAAAACAAIAAAAAAAEAAAABAAIAAAAAAAEAAAADAAIAAAAAAAEAAAAEAAIAAAAAAAEAAAAAAAAAAAAAAAEAAAABAAAAAAAAAAEAAAACAAAAAAAAAAEAAAADAAAAAAAAAAEAAAAEAAAAAAAAAAEAAAAFAAAAAAAAAAEAAAAGAAAAAAABAAEAAAAHAAAAAAAAAAEAAAAIAAAAAAAAAAEAAAAJAAAAAAAAAAEAAAAKAAAAAAABAAEAAAALAAAAAAAAAAEAAAAMAAAAAAACAAEAAAANAAAAAAAAAAEAAAAOAAAAAAAAAAEAAAAOAAEAAAAAAAEAAAAOAAIAAAAAAAEAAAAOAAMAAAADAAEAAGAOAAQAAAAAAAEAAAAOAAUAAAAAAAEAAAAOAAYAAAAAAAEAAAAOAAcAAAABAAEAAAAOAAgAAAAAAAEAAAAOAAkAAAAAAAEAAAAOAAoAAAADAAEAAFAOAAsAAAAAAAEAAAAOAAwAAAAAAAEAAAANAAwAAAAAAAEAAAAMAAwAAAAAAAEAAAALAAwAAAABAAEAAAAKAAwAAAADAAEAAAAJAAwAAAAAAAEAAAAIAAwAAAAAAAEAAAAGAAwAAAAAAAEAAAAFAAwAAAAAAAEAAAAEAAwAAAAAAAEAAAADAAwAAAAAAAEAAAACAAwAAAAAAAEAAAABAAwAAAAAAAEAAAAAAAwAAAAAAAEAAAAAAAsAAAACAAEAAAAAAAoAAAAAAAEAAAAAAAkAAAAAAAEAAAAAAAgAAAAAAAEAAAAAAAcAAAAAAAEAAAAAAAYAAAABAAEAAAAAAAUAAAACAAEAAAAAAAQAAAAAAAEAAAAAAAMAAAAAAAEAAAAGAAgAAAAAAAEAAAAGAAcAAAAAAAEAAAAGAAYAAAAAAAEAAAAGAAUAAAAAAAEAAAAFAAUAAAAAAAEAAAAEAAUAAAAAAAEAAAAEAAQAAAAAAAEAAAADAAQAAAAAAAEAAAACAAQAAAAAAAEAAAACAAMAAAAAAAEAAAABAAMAAAAAAAEAAAABAAQAAAAAAAEAAAABAAUAAAAAAAEAAAABAAYAAAAAAAEAAAABAAcAAAAAAAEAAAABAAgAAAAAAAEAAAABAAkAAAAAAAEAAAABAAoAAAAAAAEAAAABAAsAAAAAAAEAAAACAAsAAAAAAAEAAAACAAoAAAAAAAEAAAACAAkAAAAAAAEAAAACAAgAAAAAAAEAAAACAAcAAAAAAAEAAAACAAYAAAAAAAEAAAACAAUAAAAAAAEAAAADAAUAAAAAAAEAAAADAAYAAAAAAAEAAAADAAcAAAAAAAEAAAADAAgAAAAAAAEAAAADAAkAAAAAAAEAAAADAAoAAAAAAAEAAAADAAsAAAAAAAEAAAAEAAsAAAABAAEAAAAEAAoAAAAAAAEAAAAEAAkAAAAAAAEAAAAEAAgAAAAAAAEAAAAEAAcAAAAAAAEAAAAEAAYAAAAAAAEAAAAFAAYAAAAAAAEAAAAFAAcAAAAAAAEAAAAFAAgAAAAAAAEAAAAFAAkAAAAAAAEAAAAFAAoAAAAAAAEAAAAFAAsAAAAAAAEAAAAGAAsAAAAAAAEAAAAGAAoAAAAAAAEAAAAGAAkAAAAAAAEAAAAHAAkAAAAAAAEAAAAHAAgAAAAAAAEAAAAHAAcAAAAAAAEAAAAHAAYAAAAAAAEAAAAHAAUAAAAAAAEAAAAHAAQAAAAAAAEAAAAHAAMAAAAAAAEAAAAIAAMAAAAAAAEAAAAIAAIAAAAAAAEAAAAIAAEAAAAAAAEAAAAHAAEAAAAAAAEAAAAGAAEAAAAAAAEAAAAFAAEAAAAAAAEAAAAJAAEAAAACAAEAAAAJAAIAAAAAAAEAAAAJAAMAAAAAAAEAAAAJAAQAAAAAAAEAAAAIAAQAAAAAAAEAAAAIAAUAAAAAAAEAAAAIAAYAAAAAAAEAAAAIAAcAAAAAAAEAAAAIAAgAAAAAAAEAAAAIAAkAAAABAAEAAAAIAAoAAAAAAAEAAAAHAAoAAAAAAAEAAAAIAAsAAAAAAAEAAAAJAAsAAAAAAAEAAAAJAAoAAAAAAAEAAAAJAAkAAAAAAAEAAAAJAAgAAAACAAEAAAAJAAcAAAAAAAEAAAAJAAYAAAAAAAEAAAAJAAUAAAAAAAEAAAAKAAUAAAAAAAEAAAAKAAQAAAAAAAEAAAAKAAMAAAAAAAEAAAAKAAIAAAAAAAEAAAAKAAEAAAAAAAEAAAALAAEAAAAAAAEAAAALAAIAAAAAAAEAAAALAAMAAAAAAAEAAAALAAQAAAAAAAEAAAALAAUAAAAAAAEAAAALAAYAAAAAAAEAAAAKAAYAAAAAAAEAAAAKAAcAAAAEAAEAAAAKAAgAAAADAAEAAAAKAAkAAAADAAEAAAAKAAoAAAAFAAEAAAAKAAsAAAADAAEAAAALAAsAAAAAAAEAAAALAAoAAAADAAEAAFALAAkAAAACAAEAAAALAAgAAAAAAAEAAAALAAcAAAADAAEAAFAMAAcAAAAEAAEAADAMAAYAAAADAAEAAAAMAAUAAAADAAEAAAAMAAQAAAADAAEAAAAMAAMAAAAEAAEAAAAMAAIAAAABAAEAAAAMAAEAAAAAAAEAAAANAAEAAAAAAAEAAAANAAIAAAAAAAEAAAANAAMAAAADAAEAAGANAAQAAAAAAAEAAAANAAUAAAACAAEAAAANAAYAAAAAAAEAAAANAAcAAAAAAAEAAAANAAgAAAAAAAEAAAAMAAgAAAAAAAEAAAAMAAkAAAAAAAEAAAAMAAoAAAADAAEAAFAMAAsAAAAAAAEAAAANAAsAAAACAAEAAAANAAoAAAADAAEAAFANAAkAAAAAAAEAAAAFAAMAAAAAAAEAAAAAAAIAAAAAAAEAAAAHAAsAAAAAAAEAAAAHAAwAAAAAAAEAAAA=")
+tile_set = SubResource("TileSet_4osdq")
+
+[node name="HUD" parent="." instance=ExtResource("21")]
+
+[node name="PlayerTank" parent="." instance=ExtResource("2")]
+position = Vector2(543, 318)
+
+[node name="Camera2D" type="Camera2D" parent="PlayerTank"]
+limit_left = 0
+limit_top = 0
+limit_right = 1800
+limit_bottom = 1600
+position_smoothing_enabled = true
+position_smoothing_speed = 10.0
+drag_horizontal_enabled = true
+drag_vertical_enabled = true
+drag_left_margin = 0.1
+drag_top_margin = 0.1
+drag_right_margin = 0.1
+drag_bottom_margin = 0.1
+
+[node name="PauseButton" type="CanvasLayer" parent="PlayerTank"]
+
+[node name="PauseButton" type="TouchScreenButton" parent="PlayerTank/PauseButton"]
+position = Vector2(18.0001, 4)
+scale = Vector2(0.177734, 0.177734)
+texture_normal = ExtResource("9")
+
+[node name="MusicPlayer" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("6")
+volume_db = -20.712
+autoplay = true
+bus = &"Music"
+
+[node name="IngameWalls" type="Node" parent="."]
+
+[node name="IndestructibleWall" parent="IngameWalls" instance=ExtResource("4")]
+position = Vector2(14, 122)
+
+[node name="IndestructibleWall2" parent="IngameWalls" instance=ExtResource("4")]
+position = Vector2(904, 115)
+
+[node name="IndestructibleWall3" parent="IngameWalls" instance=ExtResource("4")]
+position = Vector2(144, 117)
+
+[node name="DestructibleWall" parent="IngameWalls" instance=ExtResource("5")]
+position = Vector2(1433, 261)
+
+[node name="DestructibleWall2" parent="IngameWalls" instance=ExtResource("5")]
+position = Vector2(777, 590)
+
+[node name="DestructibleWall3" parent="IngameWalls" instance=ExtResource("5")]
+position = Vector2(13, 590)
+
+[node name="DestructibleWall4" parent="IngameWalls" instance=ExtResource("5")]
+position = Vector2(12, 466)
+
+[node name="DestructibleWall5" parent="IngameWalls" instance=ExtResource("5")]
+position = Vector2(12, 337)
+
+[node name="DestructibleWall6" parent="IngameWalls" instance=ExtResource("5")]
+position = Vector2(11, 955)
+
+[node name="DestructibleWall7" parent="IngameWalls" instance=ExtResource("5")]
+position = Vector2(142, 956)
+
+[node name="DestructibleWall8" parent="IngameWalls" instance=ExtResource("5")]
+position = Vector2(426, 837)
+
+[node name="DestructibleWall9" parent="IngameWalls" instance=ExtResource("5")]
+position = Vector2(556, 837)
+
+[node name="DestructibleWall10" parent="IngameWalls" instance=ExtResource("5")]
+position = Vector2(14, 1081)
+
+[node name="DestructibleWall11" parent="IngameWalls" instance=ExtResource("5")]
+position = Vector2(139, 1078)
+
+[node name="DestructibleWall12" parent="IngameWalls" instance=ExtResource("5")]
+position = Vector2(185, 1389)
+
+[node name="IndestructibleWall8" parent="IngameWalls" instance=ExtResource("4")]
+position = Vector2(326, 1379)
+
+[node name="IndestructibleWall9" parent="IngameWalls" instance=ExtResource("4")]
+position = Vector2(164, 1233)
+
+[node name="IndestructibleWall10" parent="IngameWalls" instance=ExtResource("4")]
+position = Vector2(323, 1530)
+
+[node name="DestructibleWall13" parent="IngameWalls" instance=ExtResource("5")]
+position = Vector2(1092, 1460)
+
+[node name="DestructibleWall14" parent="IngameWalls" instance=ExtResource("5")]
+position = Vector2(1616, 1193)
+
+[node name="DestructibleWall15" parent="IngameWalls" instance=ExtResource("5")]
+position = Vector2(895, 1178)
+
+[node name="DestructibleWall16" parent="IngameWalls" instance=ExtResource("5")]
+position = Vector2(752, 1162)
+
+[node name="DestructibleWall17" parent="IngameWalls" instance=ExtResource("5")]
+position = Vector2(749, 1031)
+
+[node name="DestructibleWall18" parent="IngameWalls" instance=ExtResource("5")]
+position = Vector2(888, 1034)
+
+[node name="DestructibleWall19" parent="IngameWalls" instance=ExtResource("5")]
+position = Vector2(1014, 1036)
+
+[node name="IndestructibleWall11" parent="IngameWalls" instance=ExtResource("4")]
+position = Vector2(1765, 124)
+
+[node name="IndestructibleWall12" parent="IngameWalls" instance=ExtResource("4")]
+position = Vector2(1422, 119)
+
+[node name="IndestructibleWall13" parent="IngameWalls" instance=ExtResource("4")]
+position = Vector2(1765, 616)
+
+[node name="IndestructibleWall4" parent="IngameWalls" instance=ExtResource("4")]
+position = Vector2(896, 1546)
+
+[node name="DestructibleWall20" parent="IngameWalls" instance=ExtResource("5")]
+position = Vector2(1684, 321)
+
+[node name="DestructibleWall21" parent="IngameWalls" instance=ExtResource("5")]
+position = Vector2(1324, 404)
+
+[node name="IndestructibleWall5" parent="IngameWalls" instance=ExtResource("4")]
+position = Vector2(751, 1548)
+
+[node name="IndestructibleWall6" parent="IngameWalls" instance=ExtResource("4")]
+position = Vector2(610, 1254)
+
+[node name="IndestructibleWall7" parent="IngameWalls" instance=ExtResource("4")]
+position = Vector2(468, 1235)
+
+[node name="IndestructibleWall14" parent="IngameWalls" instance=ExtResource("4")]
+position = Vector2(807, 384)
+
+[node name="IndestructibleWall15" parent="IngameWalls" instance=ExtResource("4")]
+position = Vector2(673, 404)
+
+[node name="IndestructibleWall16" parent="IngameWalls" instance=ExtResource("4")]
+position = Vector2(915, 254)
+
+[node name="BorderWalls" type="Node" parent="."]
+
+[node name="wall" parent="BorderWalls" instance=ExtResource("3")]
+position = Vector2(-15, 0)
+
+[node name="wall6" parent="BorderWalls" instance=ExtResource("3")]
+position = Vector2(1896, 610)
+
+[node name="wall7" parent="BorderWalls" instance=ExtResource("3")]
+position = Vector2(1899, 998)
+
+[node name="wall8" parent="BorderWalls" instance=ExtResource("3")]
+position = Vector2(-15, 604)
+
+[node name="wall9" parent="BorderWalls" instance=ExtResource("3")]
+position = Vector2(-12, 998)
+
+[node name="wall10" parent="BorderWalls" instance=ExtResource("3")]
+position = Vector2(1909, -8)
+rotation = 1.5708
+
+[node name="wall11" parent="BorderWalls" instance=ExtResource("3")]
+position = Vector2(1636, -12)
+rotation = 1.5708
+
+[node name="wall2" parent="BorderWalls" instance=ExtResource("3")]
+position = Vector2(1896, 0)
+
+[node name="wall5" parent="BorderWalls" instance=ExtResource("3")]
+position = Vector2(1919, 1583)
+rotation = 1.5708
+scale = Vector2(1, 1.75)
+
+[node name="wall3" parent="BorderWalls" instance=ExtResource("3")]
+position = Vector2(1058, 1582)
+rotation = 1.5708
+scale = Vector2(1, 1.75)
+
+[node name="wall4" parent="BorderWalls" instance=ExtResource("3")]
+position = Vector2(1036, -15)
+rotation = 1.5708
+scale = Vector2(1, 1.75)
+
+[node name="Base" parent="." instance=ExtResource("15")]
+position = Vector2(758, 137)
+type_base = 0
+
+[node name="Navigation2D" type="Node2D" parent="."]
+
+[node name="NavigationRegion2D" type="NavigationRegion2D" parent="Navigation2D"]
+position = Vector2(35, -12)
+navigation_polygon = SubResource("2")
+
+[node name="EnemyBase" parent="." instance=ExtResource("15")]
+position = Vector2(1608, 1417)
+
+[node name="EnemyBase2" parent="." instance=ExtResource("15")]
+position = Vector2(1569, 826)
+
+[node name="Enemy" parent="." instance=ExtResource("22_n0sxv")]
+position = Vector2(400, 1039)
+_type_enemy = 3
+
+[node name="DestructibleWall" parent="." instance=ExtResource("5")]
+position = Vector2(466, 134)
+
+[connection signal="pressed" from="PlayerTank/PauseButton/PauseButton" to="." method="_on_TouchScreenButton_pressed"]
