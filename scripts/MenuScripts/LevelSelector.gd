@@ -35,10 +35,17 @@ func _setup_grid():
 		var btn = Button.new()
 		btn.custom_minimum_size = Vector2(120, 120)
 		btn.name = "Level_" + str(i)
-		btn.text = str(i)
-		btn.add_theme_font_size_override("font_size", 42)
+
+		# Логика уровней X.1 - X.5
+		var major = ((i - 1) / 5) + 1
+		var minor = ((i - 1) % 5) + 1
+		btn.text = str(major) + "." + str(minor)
+
+		btn.add_theme_font_size_override("font_size", 34)
 
 		var is_locked = i > _unlocked_levels
+		var is_passed = i < _unlocked_levels
+		var is_boss = (i % 5 == 0) # Каждый 5-й уровень - босс
 
 		# Стиль кнопок
 		var style = StyleBoxFlat.new()
@@ -57,8 +64,27 @@ func _setup_grid():
 			btn.disabled = true
 			btn.add_theme_color_override("font_disabled_color", Color(0.5, 0.5, 0.5))
 		else:
-			style.bg_color = Color(0.2, 0.6, 0.9, 0.9) # Голубой
-			style.border_color = Color(1, 1, 1, 0.8)
+			if is_boss:
+				# Угрожающий стиль для босса
+				if is_passed:
+					style.bg_color = Color(0.35, 0.1, 0.1, 0.9) # Тусклый красный
+					style.border_color = Color(0.5, 0.2, 0.2, 0.8)
+					btn.add_theme_color_override("font_color", Color(0.6, 0.6, 0.6)) # Серый текст
+				else:
+					style.bg_color = Color(0.7, 0.1, 0.1, 0.9) # Яркий темно-красный
+					style.border_color = Color(1, 0.2, 0.2, 1) # Ярко-красная рамка
+					btn.add_theme_color_override("font_color", Color(1, 1, 1))
+					# Свечение только для активного босса
+					style.shadow_color = Color(0.5, 0, 0, 0.6)
+					style.shadow_size = 8
+			else:
+				# Обычный уровень
+				style.bg_color = Color(0.2, 0.6, 0.9, 0.9) # Голубой
+				style.border_color = Color(1, 1, 1, 0.8)
+
+				if is_passed:
+					btn.add_theme_color_override("font_color", Color(0.2, 0.9, 0.2)) # Зеленый текст
+
 			btn.pressed.connect(_on_level_pressed.bind(i))
 
 		btn.add_theme_stylebox_override("normal", style)
