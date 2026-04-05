@@ -263,7 +263,6 @@ type_base = 0
 [node name="Navigation2D" type="Node2D" parent="."]
 
 [node name="NavigationRegion2D" type="NavigationRegion2D" parent="Navigation2D"]
-visible = false
 position = Vector2(35, -12)
 navigation_polygon = SubResource("2")
 
