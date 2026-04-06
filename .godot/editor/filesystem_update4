@@ -1,6 +1,0 @@
-res://default_env.tres
-res://scenes/Levels/Level_2.tscn
-res://scenes/Levels/Level_1.tscn
-res://scripts/Tank/Player.gd
-res://scripts/Tank/Enemy.gd
-res://scenes/Levels/Level_3.tscn
