@@ -1,183 +1,185 @@
-[gd_scene load_steps=5 format=2]
+[gd_scene load_steps=12 format=3 uid="uid://dwdei3ebmswf5"]
 
-[ext_resource path="res://scripts/MenuScripts/Info.cs" type="Script" id=1]
-[ext_resource path="res://assets/fonts/ofont.ru_Shonen.ttf" type="DynamicFontData" id=2]
+[ext_resource type="Script" uid="uid://ctaqxuigqjc0u" path="res://scripts/MenuScripts/Info.gd" id="1"]
+[ext_resource type="FontFile" uid="uid://bsnvk4l0ue5ri" path="res://assets/fonts/ofont.ru_Shonen.ttf" id="2"]
 
-[sub_resource type="DynamicFont" id=2]
-size = 50
-use_filter = true
-font_data = ExtResource( 2 )
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bg"]
+bg_color = Color(0.109804, 0.121569, 0.109804, 1)
 
-[sub_resource type="DynamicFont" id=1]
-font_data = ExtResource( 2 )
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_panel"]
+bg_color = Color(0.14902, 0.172549, 0.14902, 1)
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 4
+border_color = Color(0.290196, 0.341176, 0.25098, 1)
+corner_radius_top_left = 20
+corner_radius_top_right = 20
+corner_radius_bottom_right = 20
+corner_radius_bottom_left = 20
+shadow_color = Color(0, 0, 0, 0.392157)
+shadow_size = 15
 
-[node name="Info" type="Node2D"]
-script = ExtResource( 1 )
+[sub_resource type="LabelSettings" id="LabelSettings_header"]
+font = ExtResource("2")
+font_size = 64
+font_color = Color(0.741176, 0.819608, 0.705882, 1)
+outline_size = 14
+outline_color = Color(0.0784314, 0.0901961, 0.0784314, 1)
 
-[node name="ColorRect" type="ColorRect" parent="."]
-margin_right = 1310.0
-margin_bottom = 769.0
-color = Color( 0.529412, 0.807843, 0.921569, 1 )
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn_hover"]
+content_margin_left = 20.0
+content_margin_top = 10.0
+content_margin_right = 20.0
+content_margin_bottom = 10.0
+bg_color = Color(0.25098, 0.301961, 0.25098, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 6
+border_color = Color(0.439216, 0.501961, 0.380392, 1)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+shadow_color = Color(0.439216, 0.501961, 0.380392, 0.235294)
+shadow_size = 10
 
-[node name="Return_Button" type="Button" parent="."]
-margin_left = 23.0
-margin_top = 33.0
-margin_right = 395.0
-margin_bottom = 171.0
-custom_fonts/font = SubResource( 2 )
-text = "назад"
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn_pressed"]
+content_margin_left = 20.0
+content_margin_top = 14.0
+content_margin_right = 20.0
+content_margin_bottom = 6.0
+bg_color = Color(0.121569, 0.14902, 0.121569, 1)
+border_width_left = 2
+border_width_top = 4
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.0784314, 0.0901961, 0.0784314, 1)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
 
-[node name="Description" type="TextEdit" parent="."]
-margin_left = 415.0
-margin_top = 16.0
-margin_right = 1269.0
-margin_bottom = 746.0
-custom_colors/font_color_readonly = Color( 0.882353, 0.882353, 0.882353, 1 )
-custom_fonts/font = SubResource( 1 )
-text = "[Intro]
-Ich will
-Ich will
-Ich will
-Ich will
-Ich will
-Ich will
-Ich will
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn_normal"]
+content_margin_left = 20.0
+content_margin_top = 10.0
+content_margin_right = 20.0
+content_margin_bottom = 10.0
+bg_color = Color(0.180392, 0.219608, 0.180392, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 6
+border_color = Color(0.290196, 0.341176, 0.25098, 1)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
 
-[Strophe 1]
-(Ich will) Ich will, dass ihr mir vertraut
-(Ich will) Ich will, dass ihr mir glaubt
-(Ich will) Ich will eure Blicke spüren
-(Ich will) Jeden Herzschlag kontrollieren
-(Ich will) Ich will eure Stimmen hören
-(Ich will) Ich will die Ruhe stören
-(Ich will) Ich will, dass ihr mich gut seht
-(Ich will) Ich will, dass ihr mich versteht
+[node name="Info" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1")
 
-[Strophe 2]
-(Ich will) Ich will eure Fantasie
-(Ich will) Ich will eure Energie
-(Ich will) Ich will eure Hände seh'n
-(Ich will) In Beifall untergeh'n
-You might also like
-Rammstein - Ich Will (English Translation)
-Genius English Translations
-Mein Herz brennt
-Rammstein
-Ohne dich
-Rammstein
-[Pre-Refrain]
-Seht ihr mich?
-Versteht ihr mich?
-Fühlt ihr mich?
-Hört ihr mich?
+[node name="Background" type="Panel" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_bg")
 
-[Refrain]
-Könnt ihr mich hören? (Wir hören dich)
-Könnt ihr mich seh'n? (Wir sehen dich)
-Könnt ihr mich fühlen? (Wir fühlen dich)
-Ich versteh' euch nicht
-Könnt ihr mich hören? (Wir hören dich)
-Könnt ihr mich seh'n? (Wir sehen dich)
-Könnt ihr mich fühlen? (Wir fühlen dich)
-Ich versteh' euch nicht
+[node name="MainPanel" type="Panel" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -500.0
+offset_top = -300.0
+offset_right = 500.0
+offset_bottom = 300.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
 
-[Post-Refrain]
-Ich will
-Ich will
-Ich will
-Ich will
+[node name="Header" type="Label" parent="MainPanel"]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -200.0
+offset_top = 30.0
+offset_right = 200.0
+offset_bottom = 100.0
+grow_horizontal = 2
+text = "ОБ ИГРЕ"
+label_settings = SubResource("LabelSettings_header")
+horizontal_alignment = 1
 
-[Bridge]
-Wir wollen, dass ihr uns vertraut
-Wir wollen, dass ihr uns alles glaubt
-Wir wollen eure Hände seh'n
-Wir wollen in Beifall untergeh'n, ja
-[Refrain]
-Könnt ihr mich hören? (Wir hören dich)
-Könnt ihr mich seh'n? (Wir sehen dich)
-Könnt ihr mich fühlen? (Wir fühlen dich)
-Ich versteh' euch nicht
-Könnt ihr uns hören? (Wir hören euch)
-Könnt ihr uns seh'n? (Wir sehen euch)
-Könnt ihr uns fühlen? (Wir fühlen euch)
-Wir versteh'n euch nicht
+[node name="DescriptionContainer" type="MarginContainer" parent="MainPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = 110.0
+offset_bottom = -110.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 40
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 40
+theme_override_constants/margin_bottom = 20
 
-[Outro]
-Ich will
-Ich will[Intro]
-Ich will
-Ich will
-Ich will
-Ich will
-Ich will
-Ich will
-Ich will
+[node name="Description" type="RichTextLabel" parent="MainPanel/DescriptionContainer"]
+layout_mode = 2
+theme_override_colors/default_color = Color(0.741176, 0.819608, 0.705882, 1)
+theme_override_fonts/normal_font = ExtResource("2")
+theme_override_font_sizes/normal_font_size = 24
+bbcode_enabled = true
+text = "[center][color=#bdcfb4][font_size=40]TANKS 2026[/font_size][/color][/center]
 
-[Strophe 1]
-(Ich will) Ich will, dass ihr mir vertraut
-(Ich will) Ich will, dass ihr mir glaubt
-(Ich will) Ich will eure Blicke spüren
-(Ich will) Jeden Herzschlag kontrollieren
-(Ich will) Ich will eure Stimmen hören
-(Ich will) Ich will die Ruhe stören
-(Ich will) Ich will, dass ihr mich gut seht
-(Ich will) Ich will, dass ihr mich versteht
+Готовы к танковому хаосу прямо в вашем кармане?
+[b]TANKS 2026[/b] — это динамичный мобильный экшен, где решает ваша реакция и мощь вашего орудия!
 
-[Strophe 2]
-(Ich will) Ich will eure Fantasie
-(Ich will) Ich will eure Energie
-(Ich will) Ich will eure Hände seh'n
-(Ich will) In Beifall untergeh'n
-You might also like
-Rammstein - Ich Will (English Translation)
-Genius English Translations
-Mein Herz brennt
-Rammstein
-Ohne dich
-Rammstein
-[Pre-Refrain]
-Seht ihr mich?
-Versteht ihr mich?
-Fühlt ihr mich?
-Hört ihr mich?
+[b]Особенности мобильной версии:[/b]
+🚀 [i]Быстрые сессии[/i] — сражайтесь в любое время и в любом месте.
+💰 [i]Прокачка и Магазин[/i] — собирайте монеты и улучшайте свой танк, чтобы стать непобедимым.
+🎮 [i]Touch-управление[/i] — максимально отзывчивый геймплей, оптимизированный под сенсорные экраны.
+🔋 [i]Оптимизация[/i] — плавная работа даже на бюджетных устройствах.
 
-[Refrain]
-Könnt ihr mich hören? (Wir hören dich)
-Könnt ihr mich seh'n? (Wir sehen dich)
-Könnt ihr mich fühlen? (Wir fühlen dich)
-Ich versteh' euch nicht
-Könnt ihr mich hören? (Wir hören dich)
-Könnt ihr mich seh'n? (Wir sehen dich)
-Könnt ihr mich fühlen? (Wir fühlen dich)
-Ich versteh' euch nicht
+[b]Управление:[/b]
+• [b]Левый стик[/b] — движение и маневрирование.
+• [b]Правая часть экрана[/b] — прицеливание и стрельба.
+• [b]Кнопка «Пауза»[/b] — выход в меню и настройки.
 
-[Post-Refrain]
-Ich will
-Ich will
-Ich will
-Ich will
+Станьте лучшим танкистом 2026 года!"
 
-[Bridge]
-Wir wollen, dass ihr uns vertraut
-Wir wollen, dass ihr uns alles glaubt
-Wir wollen eure Hände seh'n
-Wir wollen in Beifall untergeh'n, ja
-[Refrain]
-Könnt ihr mich hören? (Wir hören dich)
-Könnt ihr mich seh'n? (Wir sehen dich)
-Könnt ihr mich fühlen? (Wir fühlen dich)
-Ich versteh' euch nicht
-Könnt ihr uns hören? (Wir hören euch)
-Könnt ihr uns seh'n? (Wir sehen euch)
-Könnt ihr uns fühlen? (Wir fühlen euch)
-Wir versteh'n euch nicht
+[node name="Return_Button" type="Button" parent="MainPanel"]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -150.0
+offset_top = -100.0
+offset_right = 150.0
+offset_bottom = -30.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_fonts/font = ExtResource("2")
+theme_override_font_sizes/font_size = 28
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
+text = "НАЗАД"
 
-[Outro]
-Ich will
-Ich will"
-readonly = true
-bookmark_gutter = true
-fold_gutter = true
-smooth_scrolling = true
-
-[connection signal="pressed" from="Return_Button" to="." method="_on_Return_Button_pressed"]
+[connection signal="pressed" from="MainPanel/Return_Button" to="." method="_on_Return_Button_pressed"]

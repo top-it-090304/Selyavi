@@ -1,0 +1,462 @@
+[gd_scene load_steps=12 format=3 uid="uid://cdxfm038kd06l"]
+
+[ext_resource type="Script" uid="uid://vja1k2m687in" path="res://scripts/MenuScripts/Shop.gd" id="1_shop"]
+[ext_resource type="FontFile" uid="uid://bsnvk4l0ue5ri" path="res://assets/fonts/ofont.ru_Shonen.ttf" id="2_font"]
+[ext_resource type="Texture2D" uid="uid://cbqbobkp1rlb" path="res://assets/Money.png" id="3_l6lbb"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_dark_bg"]
+bg_color = Color(0.14902, 0.172549, 0.14902, 1)
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 4
+border_color = Color(0.290196, 0.341176, 0.25098, 1)
+corner_radius_top_left = 20
+corner_radius_top_right = 20
+corner_radius_bottom_right = 20
+corner_radius_bottom_left = 20
+shadow_color = Color(0, 0, 0, 0.392157)
+shadow_size = 15
+
+[sub_resource type="LabelSettings" id="LabelSettings_stats"]
+font = ExtResource("2_font")
+font_size = 32
+font_color = Color(0.741176, 0.819608, 0.705882, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn_hover"]
+content_margin_left = 20.0
+content_margin_top = 10.0
+content_margin_right = 20.0
+content_margin_bottom = 10.0
+bg_color = Color(0.25098, 0.301961, 0.25098, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 6
+border_color = Color(0.439216, 0.501961, 0.380392, 1)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+shadow_color = Color(0.439216, 0.501961, 0.380392, 0.235294)
+shadow_size = 10
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn_pressed"]
+content_margin_left = 20.0
+content_margin_top = 14.0
+content_margin_right = 20.0
+content_margin_bottom = 6.0
+bg_color = Color(0.121569, 0.14902, 0.121569, 1)
+border_width_left = 2
+border_width_top = 4
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.0784314, 0.0901961, 0.0784314, 1)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn_normal"]
+content_margin_left = 20.0
+content_margin_top = 10.0
+content_margin_right = 20.0
+content_margin_bottom = 10.0
+bg_color = Color(0.180392, 0.219608, 0.180392, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 6
+border_color = Color(0.290196, 0.341176, 0.25098, 1)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_color_fill"]
+bg_color = Color(1, 1, 1, 1)
+corner_radius_top_left = 5
+corner_radius_top_right = 5
+corner_radius_bottom_right = 5
+corner_radius_bottom_left = 5
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_black_border"]
+bg_color = Color(0.6, 0.6, 0.6, 0)
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 4
+border_color = Color(0.0784314, 0.0901961, 0.0784314, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="LabelSettings" id="LabelSettings_money"]
+font = ExtResource("2_font")
+font_size = 42
+font_color = Color(0.741176, 0.819608, 0.705882, 1)
+outline_size = 8
+outline_color = Color(0.0784314, 0.0901961, 0.0784314, 1)
+
+[node name="Shop" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_shop")
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.109804, 0.121569, 0.109804, 1)
+
+[node name="TankFrame" type="Panel" parent="."]
+layout_mode = 0
+offset_left = 64.0
+offset_top = 100.0
+offset_right = 514.0
+offset_bottom = 450.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_dark_bg")
+
+[node name="TankPreview" type="Control" parent="TankFrame"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Body" type="Sprite2D" parent="TankFrame/TankPreview"]
+scale = Vector2(1.1, 1.1)
+
+[node name="Gun" type="Sprite2D" parent="TankFrame/TankPreview/Body"]
+position = Vector2(0, 35)
+
+[node name="Stats" type="VBoxContainer" parent="."]
+layout_mode = 0
+offset_left = 64.0
+offset_top = 470.0
+offset_right = 514.0
+offset_bottom = 750.0
+theme_override_constants/separation = 20
+alignment = 1
+
+[node name="Damage" type="Label" parent="Stats"]
+layout_mode = 2
+text = "УРОН: x1.0"
+label_settings = SubResource("LabelSettings_stats")
+
+[node name="HP" type="Label" parent="Stats"]
+layout_mode = 2
+text = "ЗДОРОВЬЕ: 100"
+label_settings = SubResource("LabelSettings_stats")
+
+[node name="Speed" type="Label" parent="Stats"]
+layout_mode = 2
+text = "СКОРОСТЬ: 250"
+label_settings = SubResource("LabelSettings_stats")
+
+[node name="ROF" type="Label" parent="Stats"]
+layout_mode = 2
+text = "СКОРОСТРЕЛЬНОСТЬ: 1.0s"
+label_settings = SubResource("LabelSettings_stats")
+
+[node name="Selectors" type="VBoxContainer" parent="."]
+layout_mode = 0
+offset_left = 550.0
+offset_top = 80.0
+offset_right = 1250.0
+offset_bottom = 700.0
+theme_override_constants/separation = 40
+alignment = 1
+
+[node name="GunSelector" type="HBoxContainer" parent="Selectors"]
+layout_mode = 2
+theme_override_constants/separation = 20
+alignment = 1
+
+[node name="Left" type="Button" parent="Selectors/GunSelector"]
+custom_minimum_size = Vector2(80, 80)
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 40
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
+text = "<"
+
+[node name="Display" type="Control" parent="Selectors/GunSelector"]
+custom_minimum_size = Vector2(250, 180)
+layout_mode = 2
+
+[node name="Icon" type="TextureRect" parent="Selectors/GunSelector/Display"]
+custom_minimum_size = Vector2(140, 140)
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -70.0
+offset_right = 70.0
+offset_bottom = 140.0
+grow_horizontal = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Label" type="Label" parent="Selectors/GunSelector/Display"]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -125.0
+offset_top = -35.0
+offset_right = 125.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_colors/font_color = Color(0.741176, 0.819608, 0.705882, 1)
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 20
+text = "ПУШКА"
+horizontal_alignment = 1
+
+[node name="Right" type="Button" parent="Selectors/GunSelector"]
+custom_minimum_size = Vector2(80, 80)
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 40
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
+text = ">"
+
+[node name="BuyGun" type="Button" parent="Selectors/GunSelector"]
+custom_minimum_size = Vector2(180, 90)
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 30
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
+text = "КУПИТЬ"
+
+[node name="HullSelector" type="HBoxContainer" parent="Selectors"]
+layout_mode = 2
+theme_override_constants/separation = 20
+alignment = 1
+
+[node name="Left" type="Button" parent="Selectors/HullSelector"]
+custom_minimum_size = Vector2(80, 80)
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 40
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
+text = "<"
+
+[node name="Display" type="Control" parent="Selectors/HullSelector"]
+custom_minimum_size = Vector2(250, 180)
+layout_mode = 2
+
+[node name="Icon" type="TextureRect" parent="Selectors/HullSelector/Display"]
+custom_minimum_size = Vector2(140, 140)
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -70.0
+offset_right = 70.0
+offset_bottom = 140.0
+grow_horizontal = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Label" type="Label" parent="Selectors/HullSelector/Display"]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -125.0
+offset_top = -35.0
+offset_right = 125.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_colors/font_color = Color(0.741176, 0.819608, 0.705882, 1)
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 20
+text = "КОРПУС"
+horizontal_alignment = 1
+
+[node name="Right" type="Button" parent="Selectors/HullSelector"]
+custom_minimum_size = Vector2(80, 80)
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 40
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
+text = ">"
+
+[node name="BuyHull" type="Button" parent="Selectors/HullSelector"]
+custom_minimum_size = Vector2(180, 90)
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 30
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
+text = "КУПИТЬ"
+
+[node name="ColorSelector" type="HBoxContainer" parent="Selectors"]
+layout_mode = 2
+theme_override_constants/separation = 20
+alignment = 1
+
+[node name="Left" type="Button" parent="Selectors/ColorSelector"]
+custom_minimum_size = Vector2(80, 80)
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 40
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
+text = "<"
+
+[node name="Display" type="Control" parent="Selectors/ColorSelector"]
+custom_minimum_size = Vector2(250, 180)
+layout_mode = 2
+
+[node name="ColorBox" type="Control" parent="Selectors/ColorSelector/Display"]
+custom_minimum_size = Vector2(100, 100)
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -50.0
+offset_top = 20.0
+offset_right = 50.0
+offset_bottom = 120.0
+grow_horizontal = 2
+
+[node name="Fill" type="Panel" parent="Selectors/ColorSelector/Display/ColorBox"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 4.0
+offset_top = 4.0
+offset_right = -4.0
+offset_bottom = -4.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_color_fill")
+
+[node name="Border" type="Panel" parent="Selectors/ColorSelector/Display/ColorBox"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_black_border")
+
+[node name="Label" type="Label" parent="Selectors/ColorSelector/Display"]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -125.0
+offset_top = -35.0
+offset_right = 125.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_colors/font_color = Color(0.741176, 0.819608, 0.705882, 1)
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 20
+text = "ЦВЕТ"
+horizontal_alignment = 1
+
+[node name="Right" type="Button" parent="Selectors/ColorSelector"]
+custom_minimum_size = Vector2(80, 80)
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 40
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
+text = ">"
+
+[node name="BuyColor" type="Button" parent="Selectors/ColorSelector"]
+custom_minimum_size = Vector2(180, 90)
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 30
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
+text = "КУПИТЬ"
+
+[node name="MoneyLabel" type="Label" parent="."]
+layout_mode = 0
+offset_left = 1032.0
+offset_top = 20.0
+offset_right = 1432.0
+offset_bottom = 80.0
+text = "0"
+label_settings = SubResource("LabelSettings_money")
+
+[node name="BackButton" type="Button" parent="."]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -1269.0
+offset_top = 12.0
+offset_right = -1069.0
+offset_bottom = 92.0
+grow_horizontal = 0
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 36
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
+text = "Назад"
+
+[node name="Money" type="Sprite2D" parent="."]
+position = Vector2(959, 47)
+scale = Vector2(0.149414, 0.149414)
+texture = ExtResource("3_l6lbb")
+
+[connection signal="pressed" from="Selectors/GunSelector/Left" to="." method="_on_gun_left_pressed"]
+[connection signal="pressed" from="Selectors/GunSelector/Right" to="." method="_on_gun_right_pressed"]
+[connection signal="pressed" from="Selectors/GunSelector/BuyGun" to="." method="_on_buy_gun_pressed"]
+[connection signal="pressed" from="Selectors/HullSelector/Left" to="." method="_on_hull_left_pressed"]
+[connection signal="pressed" from="Selectors/HullSelector/Right" to="." method="_on_hull_right_pressed"]
+[connection signal="pressed" from="Selectors/HullSelector/BuyHull" to="." method="_on_buy_hull_pressed"]
+[connection signal="pressed" from="Selectors/ColorSelector/Left" to="." method="_on_color_left_pressed"]
+[connection signal="pressed" from="Selectors/ColorSelector/Right" to="." method="_on_color_right_pressed"]
+[connection signal="pressed" from="Selectors/ColorSelector/BuyColor" to="." method="_on_buy_color_pressed"]
+[connection signal="pressed" from="BackButton" to="." method="_on_back_button_pressed"]

@@ -1,0 +1,111 @@
+[gd_scene load_steps=6 format=3 uid="uid://336qfi6ddylt"]
+
+[ext_resource type="FontFile" uid="uid://bsnvk4l0ue5ri" path="res://assets/fonts/ofont.ru_Shonen.ttf" id="1"]
+[ext_resource type="Texture2D" uid="uid://gkllwxuihlub" path="res://assets/HP.png" id="2"]
+[ext_resource type="Script" uid="uid://ojrswod2mfck" path="res://scripts/HUD.gd" id="4"]
+[ext_resource type="Texture2D" uid="uid://cbqbobkp1rlb" path="res://assets/Money.png" id="4_mxnk6"]
+
+[sub_resource type="FontFile" id="1"]
+fallbacks = Array[Font]([ExtResource("1"), ExtResource("1")])
+subpixel_positioning = 0
+msdf_pixel_range = 14
+msdf_size = 128
+cache/0/16/0/ascent = 0.0
+cache/0/16/0/descent = 0.0
+cache/0/16/0/underline_position = 0.0
+cache/0/16/0/underline_thickness = 0.0
+cache/0/16/0/scale = 1.0
+cache/0/50/0/ascent = 0.0
+cache/0/50/0/descent = 0.0
+cache/0/50/0/underline_position = 0.0
+cache/0/50/0/underline_thickness = 0.0
+cache/0/50/0/scale = 1.0
+cache/0/40/0/ascent = 0.0
+cache/0/40/0/descent = 0.0
+cache/0/40/0/underline_position = 0.0
+cache/0/40/0/underline_thickness = 0.0
+cache/0/40/0/scale = 1.0
+cache/0/28/0/ascent = 0.0
+cache/0/28/0/descent = 0.0
+cache/0/28/0/underline_position = 0.0
+cache/0/28/0/underline_thickness = 0.0
+cache/0/28/0/scale = 1.0
+cache/0/32/0/ascent = 0.0
+cache/0/32/0/descent = 0.0
+cache/0/32/0/underline_position = 0.0
+cache/0/32/0/underline_thickness = 0.0
+cache/0/32/0/scale = 1.0
+
+[node name="HUD" type="CanvasLayer"]
+script = ExtResource("4")
+
+[node name="HealthPanel" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 0
+offset_left = 50.0
+offset_top = -1.0
+offset_right = 90.0
+offset_bottom = 39.0
+
+[node name="HealthProgress" type="ProgressBar" parent="HealthPanel"]
+layout_mode = 0
+offset_left = 972.0
+offset_top = 4.0
+offset_right = 1221.0
+offset_bottom = 66.0
+step = 1.0
+value = 100.0
+
+[node name="HealthLabel" type="Label" parent="HealthPanel"]
+layout_mode = 0
+offset_left = 991.0
+offset_top = 17.0
+offset_right = 1207.0
+offset_bottom = 58.0
+theme_override_fonts/font = SubResource("1")
+theme_override_font_sizes/font_size = 40
+text = "100/100"
+
+[node name="LivesLabel" type="Label" parent="HealthPanel"]
+layout_mode = 0
+offset_left = 967.0
+offset_top = 87.0
+offset_right = 1213.0
+offset_bottom = 124.0
+theme_override_fonts/font = SubResource("1")
+theme_override_font_sizes/font_size = 40
+text = "Жизни: 3"
+
+[node name="Hp" type="Sprite2D" parent="HealthPanel"]
+position = Vector2(934, 39)
+scale = Vector2(0.135254, 0.135254)
+texture = ExtResource("2")
+
+[node name="Money" type="Sprite2D" parent="HealthPanel"]
+position = Vector2(1003, 178)
+scale = Vector2(0.149414, 0.149414)
+texture = ExtResource("4_mxnk6")
+
+[node name="MoneyLabel" type="Label" parent="HealthPanel"]
+layout_mode = 0
+offset_left = 1043.0
+offset_top = 159.0
+offset_right = 1081.0
+offset_bottom = 196.0
+theme_override_fonts/font = SubResource("1")
+theme_override_font_sizes/font_size = 40
+text = "0"
+
+[node name="LevelLabel" type="Label" parent="HealthPanel"]
+layout_mode = 0
+offset_left = 270.0
+offset_top = 15.0
+offset_right = 470.0
+offset_bottom = 60.0
+theme_override_colors/font_color = Color(1, 0.901961, 0.4, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 1)
+theme_override_constants/shadow_offset_x = 2
+theme_override_constants/shadow_offset_y = 2
+theme_override_fonts/font = SubResource("1")
+theme_override_font_sizes/font_size = 32
+text = "МИССИЯ 1.1"

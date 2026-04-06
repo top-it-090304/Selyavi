@@ -1,0 +1,267 @@
+[gd_scene load_steps=15 format=4 uid="uid://bpo7681ia1skr"]
+
+[ext_resource type="PackedScene" uid="uid://mfxaskty4hrm" path="res://scenes/Tank/Player.tscn" id="2"]
+[ext_resource type="Texture2D" uid="uid://d0bnoilig7yxs" path="res://assets/ground_shaker_asset/Terrains/terrain.png" id="2_mssve"]
+[ext_resource type="PackedScene" path="res://scenes/obtacles/wall.tscn" id="3"]
+[ext_resource type="PackedScene" path="res://scenes/IndestructibleWall.tscn" id="4"]
+[ext_resource type="PackedScene" path="res://scenes/DestructibleWall.tscn" id="5"]
+[ext_resource type="AudioStream" uid="uid://bxl5wv7crhm5" path="res://assets/Music/68. Sad Eyes.mp3" id="6"]
+[ext_resource type="Script" uid="uid://3wsw25sk74o6" path="res://scripts/Field.gd" id="8"]
+[ext_resource type="Texture2D" uid="uid://dsiq4t7qegc5x" path="res://assets/ButtonSprites/pause_594725.png" id="9"]
+[ext_resource type="PackedScene" uid="uid://dfpgy8w1vxtx0" path="res://scenes/Tank/Enemy.tscn" id="11_fn4ql"]
+[ext_resource type="PackedScene" uid="uid://bjw4bj0fr4c7q" path="res://scenes/Base.tscn" id="15"]
+[ext_resource type="PackedScene" uid="uid://336qfi6ddylt" path="res://scenes/Tank/HUD.tscn" id="21"]
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_2i15a"]
+texture = ExtResource("2_mssve")
+texture_region_size = Vector2i(128, 128)
+0:0/0 = 0
+1:0/0 = 0
+2:0/0 = 0
+3:0/0 = 0
+4:0/0 = 0
+5:0/0 = 0
+6:0/0 = 0
+0:1/0 = 0
+1:1/0 = 0
+2:1/0 = 0
+3:1/0 = 0
+4:1/0 = 0
+5:1/0 = 0
+6:1/0 = 0
+0:2/0 = 0
+1:2/0 = 0
+2:2/0 = 0
+3:2/0 = 0
+4:2/0 = 0
+5:2/0 = 0
+6:2/0 = 0
+0:3/0 = 0
+1:3/0 = 0
+2:3/0 = 0
+3:3/0 = 0
+4:3/0 = 0
+5:3/0 = 0
+6:3/0 = 0
+0:4/0 = 0
+1:4/0 = 0
+2:4/0 = 0
+3:4/0 = 0
+4:4/0 = 0
+5:4/0 = 0
+6:4/0 = 0
+
+[sub_resource type="TileSet" id="TileSet_4osdq"]
+tile_size = Vector2i(128, 128)
+sources/0 = SubResource("TileSetAtlasSource_2i15a")
+
+[sub_resource type="NavigationPolygon" id="NavigationPolygon_0g6pg"]
+vertices = PackedVector2Array(2280.55, 643.68, 2297.25, -13.9063, 2676.45, -104, 2914.89, -104, 2905.1, 760.188, 2398.86, 770.203, 417.961, -494.023, 2697.44, -498.969, 1834.09, -18.0938, 1064.64, 855.93, 413.031, 860.922, 1827.91, 648.102, 2403.85, 1114, 1601, 1114, 1601, 998.094, 1069.64, 993.078)
+polygons = Array[PackedInt32Array]([PackedInt32Array(0, 1, 2, 3, 4, 5), PackedInt32Array(6, 7, 2, 1, 8), PackedInt32Array(9, 10, 6, 8, 11), PackedInt32Array(0, 5, 12, 13, 14, 11), PackedInt32Array(9, 11, 14, 15)])
+outlines = Array[PackedVector2Array]([PackedVector2Array(408, -504, 2708, -509, 2687, -114, 2925, -114, 2915, 770, 2409, 780, 2414, 1124, 1591, 1124, 1591, 1008, 1060, 1003, 1055, 866, 403, 871)])
+
+[node name="Field" type="Node2D"]
+script = ExtResource("8")
+
+[node name="TileMapLayer" type="TileMapLayer" parent="."]
+z_index = -1
+tile_map_data = PackedByteArray("AAAAAAAAAAAAAAEAAAAAAAEAAAAAAAEAAAAAAAIAAAAAAAEAAAAAAAMAAAAAAAEAAAAAAAQAAAADAAEAAFAAAAUAAAAAAAEAAAAAAAYAAAACAAEAAAAAAAcAAAAAAAEAAAAAAAgAAAAAAAEAAAABAAAAAAACAAEAAGABAAEAAAAAAAEAAAABAAIAAAAAAAEAAAABAAMAAAAAAAEAAAABAAQAAAADAAEAAFABAAUAAAAAAAEAAAABAAYAAAAAAAEAAAABAAcAAAABAAEAAAABAAgAAAAAAAEAAAACAAAAAAAAAAEAAAACAAEAAAAAAAEAAAACAAIAAAACAAEAADACAAMAAAAAAAEAAAACAAQAAAADAAEAAFACAAUAAAACAAEAAFACAAYAAAAAAAEAAAACAAcAAAAAAAEAAAACAAgAAAACAAEAAGADAAAAAAAAAAEAAAADAAEAAAAAAAEAAAADAAIAAAAAAAEAAAADAAMAAAAAAAEAAAADAAQAAAADAAEAAFADAAUAAAAAAAEAAAADAAYAAAAAAAEAAAADAAcAAAAAAAEAAAADAAgAAAAAAAEAAAAEAAAAAAAAAAEAAAAEAAEAAAAAAAEAAAAEAAIAAAAAAAEAAAAEAAMAAAAAAAEAAAAEAAQAAAADAAEAAFAEAAUAAAAAAAEAAAAEAAYAAAAAAAEAAAAEAAcAAAAAAAEAAAAEAAgAAAAAAAEAAAAFAAAAAAAAAAEAAAAFAAEAAAAAAAEAAAAFAAIAAAAEAAEAAAAFAAMAAAADAAEAADAFAAQAAAAEAAEAADAFAAUAAAAAAAEAAAAFAAYAAAAAAAEAAAAFAAcAAAAAAAEAAAAFAAgAAAAAAAEAAAAGAAAAAAAAAAEAAAAGAAEAAAAAAAEAAAAGAAIAAAADAAEAAFAGAAMAAAAAAAEAAAAGAAQAAAAAAAEAAAAGAAUAAAAAAAEAAAAGAAYAAAACAAEAAFAGAAcAAAAAAAEAAAAGAAgAAAAAAAEAAAAHAAAAAAAAAAEAAAAHAAEAAAAAAAEAAAAHAAIAAAADAAEAAFAHAAMAAAAAAAEAAAAHAAQAAAAAAAEAAAAHAAUAAAAAAAEAAAAHAAYAAAAAAAEAAAAHAAcAAAABAAEAAAAHAAgAAAAAAAEAAAAIAAAAAAAAAAEAAAAIAAEAAAAAAAEAAAAIAAIAAAADAAEAAFAIAAMAAAACAAEAADAIAAQAAAAAAAEAAAAIAAUAAAAAAAEAAAAIAAYAAAAAAAEAAAAIAAcAAAAAAAEAAAAIAAgAAAACAAEAAAAJAAAAAAAAAAEAAAAJAAEAAAABAAEAAGAJAAIAAAADAAEAAGAJAAMAAAAAAAEAAAAJAAQAAAAAAAEAAAAJAAUAAAAAAAEAAAAJAAYAAAAAAAEAAAAJAAcAAAAAAAEAAAAJAAgAAAAAAAEAAAAKAAAAAAADAAEAAAAKAAEAAAADAAEAAAAKAAIAAAAGAAEAAAAKAAMAAAADAAEAADAKAAQAAAADAAEAADAKAAUAAAADAAEAADAKAAYAAAADAAEAADAKAAcAAAAEAAEAAGAKAAgAAAAAAAEAAAALAAAAAAAAAAEAAAALAAEAAAAAAAEAAAALAAIAAAADAAEAAFALAAMAAAAAAAEAAAALAAQAAAAAAAEAAAALAAUAAAAAAAEAAAALAAYAAAAAAAEAAAALAAcAAAADAAEAAGALAAgAAAAAAAEAAAAMAAAAAAAAAAEAAAAMAAEAAAAAAAEAAAAMAAIAAAADAAEAAFAMAAMAAAACAAEAAFAMAAQAAAAAAAEAAAAMAAUAAAAAAAEAAAAMAAYAAAAAAAEAAAAMAAcAAAADAAEAAGAMAAgAAAAAAAEAAAANAAAAAAAAAAEAAAANAAEAAAAAAAEAAAANAAIAAAADAAEAAFANAAMAAAAAAAEAAAANAAQAAAAAAAEAAAANAAUAAAAAAAEAAAANAAYAAAAAAAEAAAANAAcAAAADAAEAAGANAAgAAAAAAAEAAAAOAAAAAAADAAEAAAAOAAEAAAADAAEAADAOAAIAAAAEAAEAADAOAAMAAAAAAAEAAAAOAAQAAAAAAAEAAAAOAAUAAAAAAAEAAAAOAAYAAAAAAAEAAAAOAAcAAAADAAEAAGAOAAgAAAAAAAEAAAAAAPz/AAAAAAEAAAAAAP3/AAAAAAEAAAAAAP7/AAAAAAEAAAAAAP//AAAAAAEAAAABAPz/AAAAAAEAAAABAP3/AAACAAEAAAABAP7/AAAAAAEAAAABAP//AAAAAAEAAAACAPz/AAAAAAEAAAACAP3/AAAAAAEAAAACAP7/AAAAAAEAAAACAP//AAAAAAEAAAADAPz/AAAAAAEAAAADAP3/AAAAAAEAAAADAP7/AAAAAAEAAAADAP//AAAAAAEAAAAEAPz/AAAAAAEAAAAEAP3/AAAAAAEAAAAEAP7/AAABAAEAAAAEAP//AAAAAAEAAAAFAPz/AAAAAAEAAAAFAP3/AAAAAAEAAAAFAP7/AAAAAAEAAAAFAP//AAAAAAEAAAAGAPz/AAACAAEAAFAGAP3/AAAAAAEAAAAGAP7/AAAAAAEAAAAGAP//AAAAAAEAAAAHAPz/AAAAAAEAAAAHAP3/AAAAAAEAAAAHAP7/AAAAAAEAAAAHAP//AAAAAAEAAAAIAPz/AAAAAAEAAAAIAP3/AAAAAAEAAAAIAP7/AAAAAAEAAAAIAP//AAAAAAEAAAAJAPz/AAACAAEAADAJAP3/AAAAAAEAAAAJAP7/AAAAAAEAAAAJAP//AAAAAAEAAAAKAPz/AAADAAEAAAAKAP3/AAADAAEAAAAKAP7/AAADAAEAAAAKAP//AAADAAEAAAALAPz/AAAAAAEAAAALAP3/AAAAAAEAAAALAP7/AAAAAAEAAAALAP//AAACAAEAADAMAPz/AAAAAAEAAAAMAP3/AAAAAAEAAAAMAP7/AAAAAAEAAAAMAP//AAAAAAEAAAANAPz/AAAAAAEAAAANAP3/AAABAAEAAFANAP7/AAAAAAEAAAANAP//AAAAAAEAAAAOAPz/AAAAAAEAAAAOAP3/AAAAAAEAAAAOAP7/AAAAAAEAAAAOAP//AAAEAAEAAAAPAPz/AAAAAAEAAAAPAP3/AAACAAEAAGAPAP7/AAAAAAEAAAAPAP//AAADAAEAAFAPAAAAAAAAAAEAAAAPAAEAAAAAAAEAAAAPAAIAAAABAAEAADAPAAMAAAAAAAEAAAAPAAQAAAAAAAEAAAAPAAUAAAABAAEAAGAPAAYAAAAAAAEAAAAPAAcAAAADAAEAAGAPAAgAAAAAAAEAAAAQAPz/AAAAAAEAAAAQAP3/AAAAAAEAAAAQAP7/AAAAAAEAAAAQAP//AAADAAEAAFAQAAAAAAAAAAEAAAAQAAEAAAAAAAEAAAAQAAIAAAAAAAEAAAAQAAMAAAAAAAEAAAAQAAQAAAAAAAEAAAAQAAUAAAAAAAEAAAAQAAYAAAAAAAEAAAAQAAcAAAADAAEAAGAQAAgAAAAAAAEAAAARAPz/AAADAAEAAAARAP3/AAADAAEAAAARAP7/AAADAAEAAAARAP//AAAFAAEAAGARAAAAAAACAAEAAAARAAEAAAAAAAEAAAARAAIAAAAAAAEAAAARAAMAAAACAAEAAAARAAQAAAAAAAEAAAARAAUAAAAAAAEAAAARAAYAAAAAAAEAAAARAAcAAAADAAEAAGARAAgAAAACAAEAAGASAPz/AAAAAAEAAAASAP3/AAAAAAEAAAASAP7/AAAAAAEAAAASAP//AAAEAAEAAFASAAAAAAADAAEAAAASAAEAAAADAAEAAAASAAIAAAADAAEAAAASAAMAAAADAAEAAAASAAQAAAAFAAEAAAASAAUAAAADAAEAAAASAAYAAAADAAEAAAASAAcAAAAEAAEAADASAAgAAAAAAAEAAAATAPz/AAAAAAEAAAATAP3/AAAAAAEAAAATAP7/AAAAAAEAAAATAP//AAAAAAEAAAATAAAAAAAAAAEAAAATAAEAAAAAAAEAAAATAAIAAAAAAAEAAAATAAMAAAAAAAEAAAATAAQAAAADAAEAAFATAAUAAAAAAAEAAAATAAYAAAAAAAEAAAATAAcAAAAAAAEAAAATAAgAAAAAAAEAAAAUAPz/AAAAAAEAAAAUAP3/AAAAAAEAAAAUAP7/AAAAAAEAAAAUAP//AAAAAAEAAAAUAAAAAAAAAAEAAAAUAAEAAAABAAEAADAUAAIAAAAAAAEAAAAUAAMAAAAAAAEAAAAUAAQAAAADAAEAAFAUAAUAAAAAAAEAAAAUAAYAAAAAAAEAAAAUAAcAAAAAAAEAAAAUAAgAAAAAAAEAAAAVAPz/AAAAAAEAAAAVAP3/AAAAAAEAAAAVAP7/AAAAAAEAAAAVAP//AAAAAAEAAAAVAAAAAAAAAAEAAAAVAAEAAAAAAAEAAAAVAAIAAAAAAAEAAAAVAAMAAAAAAAEAAAAVAAQAAAADAAEAAFAVAAUAAAAAAAEAAAAVAAYAAAAAAAEAAAAVAAcAAAAAAAEAAAAVAAgAAAABAAEAAFAWAPz/AAACAAEAAAAWAP3/AAAAAAEAAAAWAP7/AAAAAAEAAAAWAP//AAAAAAEAAAAWAAAAAAACAAEAAFAWAAEAAAAAAAEAAAAWAAIAAAAAAAEAAAAWAAMAAAAAAAEAAAAWAAQAAAADAAEAAFAWAAUAAAAAAAEAAAAWAAYAAAAAAAEAAAAWAAcAAAACAAEAADAWAAgAAAAAAAEAAAA=")
+tile_set = SubResource("TileSet_4osdq")
+
+[node name="HUD" parent="." instance=ExtResource("21")]
+
+[node name="PlayerTank" parent="." instance=ExtResource("2")]
+position = Vector2(543, 318)
+
+[node name="Camera2D" type="Camera2D" parent="PlayerTank"]
+limit_left = 0
+limit_top = -500
+limit_right = 2940
+limit_bottom = 1150
+position_smoothing_enabled = true
+position_smoothing_speed = 10.0
+drag_horizontal_enabled = true
+drag_vertical_enabled = true
+drag_left_margin = 0.1
+drag_top_margin = 0.1
+drag_right_margin = 0.1
+drag_bottom_margin = 0.1
+
+[node name="PauseButton" type="CanvasLayer" parent="PlayerTank"]
+
+[node name="PauseButton" type="TouchScreenButton" parent="PlayerTank/PauseButton"]
+position = Vector2(18.0001, 4)
+scale = Vector2(0.177734, 0.177734)
+texture_normal = ExtResource("9")
+
+[node name="MusicPlayer" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("6")
+volume_db = -20.712
+autoplay = true
+bus = &"Music"
+
+[node name="IngameWalls" type="Node" parent="."]
+
+[node name="IndestructibleWall" parent="IngameWalls" instance=ExtResource("4")]
+position = Vector2(10, 145)
+
+[node name="IndestructibleWall2" parent="IngameWalls" instance=ExtResource("4")]
+position = Vector2(137, 145)
+
+[node name="IndestructibleWall3" parent="IngameWalls" instance=ExtResource("4")]
+position = Vector2(269, 144)
+
+[node name="IndestructibleWall4" parent="IngameWalls" instance=ExtResource("4")]
+position = Vector2(14, 600)
+
+[node name="IndestructibleWall5" parent="IngameWalls" instance=ExtResource("4")]
+position = Vector2(148, 600)
+
+[node name="IndestructibleWall6" parent="IngameWalls" instance=ExtResource("4")]
+position = Vector2(275, 600)
+
+[node name="DestructibleWall" parent="IngameWalls" instance=ExtResource("5")]
+position = Vector2(354, 281)
+
+[node name="DestructibleWall2" parent="IngameWalls" instance=ExtResource("5")]
+position = Vector2(351, 410)
+
+[node name="DestructibleWall7" parent="IngameWalls" instance=ExtResource("5")]
+position = Vector2(1419, 500)
+
+[node name="DestructibleWall8" parent="IngameWalls" instance=ExtResource("5")]
+position = Vector2(1580, -88)
+
+[node name="DestructibleWall9" parent="IngameWalls" instance=ExtResource("5")]
+position = Vector2(1889, 576)
+
+[node name="DestructibleWall10" parent="IngameWalls" instance=ExtResource("5")]
+position = Vector2(1181, 1144)
+
+[node name="DestructibleWall11" parent="IngameWalls" instance=ExtResource("5")]
+position = Vector2(1315, 1138)
+
+[node name="DestructibleWall12" parent="IngameWalls" instance=ExtResource("5")]
+position = Vector2(1444, 1141)
+
+[node name="IndestructibleWall7" parent="IngameWalls" instance=ExtResource("4")]
+position = Vector2(2063, 174)
+
+[node name="IndestructibleWall8" parent="IngameWalls" instance=ExtResource("4")]
+position = Vector2(1998, 303)
+
+[node name="IndestructibleWall9" parent="IngameWalls" instance=ExtResource("4")]
+position = Vector2(1995, 435)
+
+[node name="IndestructibleWall10" parent="IngameWalls" instance=ExtResource("4")]
+position = Vector2(2076, 572)
+
+[node name="IndestructibleWall11" parent="IngameWalls" instance=ExtResource("4")]
+position = Vector2(2665, 925)
+
+[node name="IndestructibleWall12" parent="IngameWalls" instance=ExtResource("4")]
+position = Vector2(2809, 925)
+
+[node name="DestructibleWall15" parent="IngameWalls" instance=ExtResource("5")]
+position = Vector2(1572, -375)
+
+[node name="DestructibleWall16" parent="IngameWalls" instance=ExtResource("5")]
+position = Vector2(1575, -231)
+
+[node name="IndestructibleWall15" parent="IngameWalls" instance=ExtResource("4")]
+position = Vector2(2810, 1140)
+
+[node name="DestructibleWall17" parent="IngameWalls" instance=ExtResource("5")]
+position = Vector2(539, -379)
+
+[node name="DestructibleWall18" parent="IngameWalls" instance=ExtResource("5")]
+position = Vector2(911, 1007)
+
+[node name="IndestructibleWall13" parent="IngameWalls" instance=ExtResource("4")]
+position = Vector2(2828, -149)
+
+[node name="IndestructibleWall14" parent="IngameWalls" instance=ExtResource("4")]
+position = Vector2(2699, -149)
+
+[node name="DestructibleWall13" parent="IngameWalls" instance=ExtResource("5")]
+position = Vector2(2437, 928)
+
+[node name="DestructibleWall14" parent="IngameWalls" instance=ExtResource("5")]
+position = Vector2(2430, -223)
+
+[node name="DestructibleWall3" parent="IngameWalls" instance=ExtResource("5")]
+position = Vector2(414, 546)
+
+[node name="DestructibleWall4" parent="IngameWalls" instance=ExtResource("5")]
+position = Vector2(553, 119)
+
+[node name="DestructibleWall5" parent="IngameWalls" instance=ExtResource("5")]
+position = Vector2(907, 507)
+
+[node name="DestructibleWall6" parent="IngameWalls" instance=ExtResource("5")]
+position = Vector2(893, 221)
+
+[node name="BorderWalls" type="Node" parent="."]
+
+[node name="wall" parent="BorderWalls" instance=ExtResource("3")]
+position = Vector2(-15, 0)
+
+[node name="wall7" parent="BorderWalls" instance=ExtResource("3")]
+position = Vector2(-26, -528)
+
+[node name="wall8" parent="BorderWalls" instance=ExtResource("3")]
+position = Vector2(-15, 604)
+
+[node name="wall2" parent="BorderWalls" instance=ExtResource("3")]
+position = Vector2(2957, -519)
+scale = Vector2(1, 2.76)
+
+[node name="wall4" parent="BorderWalls" instance=ExtResource("3")]
+position = Vector2(3251, -520)
+rotation = 1.5708
+scale = Vector2(1, 5.7)
+
+[node name="wall11" parent="BorderWalls" instance=ExtResource("3")]
+position = Vector2(3251, 1171)
+rotation = 1.5708
+scale = Vector2(1, 5.7)
+
+[node name="Base" parent="." instance=ExtResource("15")]
+position = Vector2(154, 340)
+type_base = 0
+
+[node name="Navigation2D" type="Node2D" parent="."]
+
+[node name="NavigationRegion2D" type="NavigationRegion2D" parent="Navigation2D"]
+navigation_polygon = SubResource("NavigationPolygon_0g6pg")
+
+[node name="Polygon2D" type="Polygon2D" parent="Navigation2D/NavigationRegion2D"]
+position = Vector2(-516.869, -1.9021)
+scale = Vector2(1.24728, 1.05594)
+color = Color(1, 1, 1, 0)
+polygon = PackedVector2Array(1982.61, 51.0464, 2212.71, 47.2583, 2180.64, 306.742, 2235, 602, 1888, 606, 1900.03, 386.291)
+
+[node name="EnemyBase" parent="." instance=ExtResource("15")]
+position = Vector2(2647, 345)
+
+[node name="Enemy" parent="." instance=ExtResource("11_fn4ql")]
+position = Vector2(2248, 880)
+_type_enemy = 3
+
+[node name="Enemy2" parent="." instance=ExtResource("11_fn4ql")]
+position = Vector2(2346, -272)
+_type_enemy = 3
+
+[node name="Enemy3" parent="." instance=ExtResource("11_fn4ql")]
+position = Vector2(2829, 16)
+_type_enemy = 3
+
+[node name="Enemy4" parent="." instance=ExtResource("11_fn4ql")]
+position = Vector2(2835, 685)
+_type_enemy = 3
+
+[node name="Enemy5" parent="." instance=ExtResource("11_fn4ql")]
+position = Vector2(2211, 311)
+_type_enemy = 3
+
+[connection signal="pressed" from="PlayerTank/PauseButton/PauseButton" to="." method="_on_TouchScreenButton_pressed"]
