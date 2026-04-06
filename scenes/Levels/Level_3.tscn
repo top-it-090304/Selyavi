@@ -348,6 +348,18 @@ position = Vector2(596, 2294)
 [node name="DestructibleWall31" parent="IngameWalls" instance=ExtResource("5")]
 position = Vector2(461, 2273)
 
+[node name="IndestructibleWall36" parent="IngameWalls" instance=ExtResource("4")]
+position = Vector2(1193, 2294)
+
+[node name="IndestructibleWall37" parent="IngameWalls" instance=ExtResource("4")]
+position = Vector2(1193, 2163)
+
+[node name="IndestructibleWall38" parent="IngameWalls" instance=ExtResource("4")]
+position = Vector2(2412, 1952)
+
+[node name="IndestructibleWall39" parent="IngameWalls" instance=ExtResource("4")]
+position = Vector2(2412, 2083)
+
 [node name="BorderWalls" type="Node" parent="."]
 
 [node name="wall" parent="BorderWalls" instance=ExtResource("3")]
@@ -430,18 +442,6 @@ _type_enemy = 0
 [node name="Enemy6" parent="." instance=ExtResource("22_n0sxv")]
 position = Vector2(3229, 1531)
 _type_enemy = 1
-
-[node name="IndestructibleWall" parent="." instance=ExtResource("4")]
-position = Vector2(1193, 2294)
-
-[node name="IndestructibleWall2" parent="." instance=ExtResource("4")]
-position = Vector2(1193, 2163)
-
-[node name="IndestructibleWall3" parent="." instance=ExtResource("4")]
-position = Vector2(2412, 1952)
-
-[node name="IndestructibleWall4" parent="." instance=ExtResource("4")]
-position = Vector2(2412, 2083)
 
 [node name="Enemy7" parent="." instance=ExtResource("22_n0sxv")]
 position = Vector2(2161, 2081)
