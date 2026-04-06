@@ -316,8 +316,4 @@ _type_enemy = 3
 [node name="Area2D" parent="." instance=ExtResource("15")]
 position = Vector2(2586, 919)
 
-[node name="Enemy4" parent="." instance=ExtResource("11_fn4ql")]
-position = Vector2(429, 1011)
-_type_enemy = 3
-
 [connection signal="pressed" from="PlayerTank/PauseButton/PauseButton" to="." method="_on_TouchScreenButton_pressed"]

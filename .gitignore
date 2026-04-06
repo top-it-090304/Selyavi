@@ -1,3 +1,23 @@
-# Godot Mono files
-.mono/
-.mono/**
+# Godot 4.x standard ignores
+.godot/
+.import/
+*.import
+export_presets.cfg
+
+# Build and temporary files
+*.zip
+*.log
+*.tmp
+
+# Editor specific
+.vs/
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Project specific
+Tanks_2026.zip
+Tanks_2026_arm.rpm_buildroot/
+Tanks_2026_arm64.rpm_buildroot/
+the effect of taking the default
