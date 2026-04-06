@@ -1,0 +1,13 @@
+res://scripts/Tank/Enemy.gd
+res://default_env.tres
+res://scenes/Levels/Level_1.tscn
+res://scenes/Levels/Level_2.tscn
+res://scenes/Levels/Level_3.tscn
+res://scripts/Base.gd
+res://scripts/Field.gd
+res://scripts/SaveManager.gd
+res://scenes/Levels/Level_6.tscn
+res://scripts/MenuScripts/LevelSelector.gd
+res://scripts/MenuScripts/PauseScreen.gd
+res://scenes/Levels/Level_4.tscn
+res://scenes/Levels/Level_5.tscn
