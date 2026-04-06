@@ -96,6 +96,8 @@ func _setup_grid():
 
 func _on_level_pressed(level_num: int):
 	if SaveManager:
+		SaveManager.current_level = level_num
+		# Сохраняем и в метаданные для совместимости со старыми скриптами
 		SaveManager.set_meta("current_level", level_num)
 
 	var path = "res://scenes/Levels/Level_" + str(level_num) + ".tscn"

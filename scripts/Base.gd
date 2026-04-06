@@ -27,11 +27,14 @@ func _enter_tree():
 	add_to_group("bases")
 
 func _ready():
+	# Синхронизация уровня для спавна врагов
+	_sync_current_level()
+
 	# Установка здоровья в зависимости от типа базы
 	if type_base == TypeBase.ENEMY:
-		_max_hp = 250 # +150 к базовым 100
+		_max_hp = 250
 	else:
-		_max_hp = 150 # +50 к базовым 100
+		_max_hp = 150
 	_hp = _max_hp
 
 	area_entered.connect(_on_bullet_entered)
@@ -54,6 +57,18 @@ func _ready():
 	_heal_timer.start()
 
 	_setup_base_collision()
+
+func _sync_current_level():
+	if SaveManager == null: return
+
+	# Пытаемся вытащить номер уровня из имени текущей сцены (Level_1, Level_6 и т.д.)
+	var scene_name = get_tree().current_scene.name
+	if scene_name.contains("Level_"):
+		var lvl = scene_name.get_slice("_", 1).to_int()
+		if lvl > 0:
+			SaveManager.current_level = lvl
+	elif SaveManager.has_meta("current_level"):
+		SaveManager.current_level = SaveManager.get_meta("current_level")
 
 func _setup_base_collision():
 	_base_body = StaticBody2D.new()
@@ -132,12 +147,9 @@ func _count_enemies_on_scene() -> int:
 	var count = 0
 	for enemy in enemies:
 		if not is_instance_valid(enemy) or enemy.is_queued_for_deletion(): continue
-
-		# Стационарные боты (тип 3) не учитываются в лимите активных врагов
 		if enemy.has_method("get_enemy_type"):
-			if enemy.get_enemy_type() == 3: # 3 = STATIONARY
+			if enemy.get_enemy_type() == 3:
 				continue
-
 		count += 1
 	return count
 
@@ -201,7 +213,6 @@ func _is_pos_safe(pos: Vector2) -> bool:
 	shape_query.set_shape(shape)
 	shape_query.transform = Transform2D(0, pos)
 
-	# Исключаем саму базу и её физическое тело из проверки
 	var exclude_list = [self]
 	if is_instance_valid(_base_body):
 		exclude_list.append(_base_body)

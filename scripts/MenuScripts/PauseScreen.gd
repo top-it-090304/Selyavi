@@ -26,25 +26,99 @@ func _on_ReturnToGameButton_pressed():
 	queue_free()
 
 func _on_RestartButton_pressed():
-	get_tree().paused = false
-	get_tree().reload_current_scene()
+	_show_confirm_dialog("ПЕРЕЗАГРУЗИТЬ УРОВЕНЬ?", "Весь текущий прогресс будет потерян.", func():
+		get_tree().paused = false
+		get_tree().reload_current_scene()
+	)
 
 func _on_ReturnToSettingsButton_pressed():
-	if GameManager != null:
-		GameManager.set_meta("from_scene", get_tree().current_scene.scene_file_path)
-	get_tree().paused = false
-	get_tree().change_scene_to_file("res://scenes/MenuScenes/Settings.tscn")
+	_show_confirm_dialog("ВЫЙТИ В НАСТРОЙКИ?", "Прогресс миссии не сохранится.", func():
+		if GameManager != null:
+			GameManager.set_meta("from_scene", get_tree().current_scene.scene_file_path)
+		get_tree().paused = false
+		get_tree().change_scene_to_file("res://scenes/MenuScenes/Settings.tscn")
+	)
 
 func _on_LevelSelectorButton_pressed():
-	get_tree().paused = false
-	get_tree().change_scene_to_file("res://scenes/MenuScenes/LevelSelector.tscn")
+	_show_confirm_dialog("ВЫБОР МИССИИ?", "Вы покинете текущий бой.", func():
+		get_tree().paused = false
+		get_tree().change_scene_to_file("res://scenes/MenuScenes/LevelSelector.tscn")
+	)
 
 func _on_ReturnToMenuButton_pressed():
-	get_tree().paused = false
-	get_tree().change_scene_to_file("res://scenes/MenuScenes/Menu.tscn")
+	_show_confirm_dialog("В ГЛАВНОЕ МЕНЮ?", "Прогресс миссии будет утерян.", func():
+		get_tree().paused = false
+		get_tree().change_scene_to_file("res://scenes/MenuScenes/Menu.tscn")
+	)
+
+func _show_confirm_dialog(title_text: String, desc_text: String, on_confirm: Callable):
+	# Создаем оверлей для блокировки нажатий на паузу
+	var dialog_overlay = ColorRect.new()
+	dialog_overlay.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	dialog_overlay.color = Color(0, 0, 0, 0.4)
+	add_child(dialog_overlay)
+
+	var center = CenterContainer.new()
+	center.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	dialog_overlay.add_child(center)
+
+	var panel = PanelContainer.new()
+	panel.custom_minimum_size = Vector2(400, 250)
+	center.add_child(panel)
+
+	var style = StyleBoxFlat.new()
+	style.bg_color = Color(0.15, 0.16, 0.15, 0.95)
+	style.border_width_left = 4; style.border_width_top = 4; style.border_width_right = 4; style.border_width_bottom = 4
+	style.border_color = Color(0.9, 0.3, 0.3) # Красная рамка для предупреждения
+	style.corner_radius_top_left = 15; style.corner_radius_top_right = 15; style.corner_radius_bottom_left = 15; style.corner_radius_bottom_right = 15
+	panel.add_theme_stylebox_override("panel", style)
+
+	var vbox = VBoxContainer.new()
+	vbox.add_theme_constant_override("separation", 20)
+	vbox.alignment = BoxContainer.ALIGNMENT_CENTER
+	panel.add_child(vbox)
+
+	var title = Label.new()
+	title.text = title_text
+	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	title.add_theme_font_size_override("font_size", 32)
+	title.add_theme_color_override("font_color", Color(1, 0.8, 0.2))
+	vbox.add_child(title)
+
+	var desc = Label.new()
+	desc.text = desc_text
+	desc.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	desc.add_theme_font_size_override("font_size", 20)
+	vbox.add_child(desc)
+
+	var hbox = HBoxContainer.new()
+	hbox.add_theme_constant_override("separation", 30)
+	hbox.alignment = BoxContainer.ALIGNMENT_CENTER
+	vbox.add_child(hbox)
+
+	var btn_style = func(btn: Button, is_danger: bool):
+		btn.custom_minimum_size = Vector2(140, 50)
+		var b_style = StyleBoxFlat.new()
+		b_style.bg_color = Color(0.3, 0.1, 0.1) if is_danger else Color(0.2, 0.2, 0.2)
+		b_style.corner_radius_top_left = 8; b_style.corner_radius_top_right = 8
+		b_style.corner_radius_bottom_left = 8; b_style.corner_radius_bottom_right = 8
+		btn.add_theme_stylebox_override("normal", b_style)
+		btn.add_theme_stylebox_override("hover", b_style)
+		btn.add_theme_stylebox_override("pressed", b_style)
+
+	var btn_yes = Button.new()
+	btn_yes.text = "ДА"
+	btn_style.call(btn_yes, true)
+	hbox.add_child(btn_yes)
+	btn_yes.pressed.connect(on_confirm)
+
+	var btn_no = Button.new()
+	btn_no.text = "НЕТ"
+	btn_style.call(btn_no, false)
+	hbox.add_child(btn_no)
+	btn_no.pressed.connect(func(): dialog_overlay.queue_free())
 
 func _toggle_player_ui(is_visible: bool):
-	# Рекурсивно скрываем все CanvasLayer, кроме этого экрана паузы
 	_recursive_toggle_ui(get_tree().root, is_visible)
 
 func _recursive_toggle_ui(node: Node, is_visible: bool):

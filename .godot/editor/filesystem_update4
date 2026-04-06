@@ -5,3 +5,7 @@ res://scenes/Levels/Level_2.tscn
 res://scenes/Levels/Level_3.tscn
 res://scripts/Base.gd
 res://scripts/Field.gd
+res://scripts/SaveManager.gd
+res://scenes/Levels/Level_6.tscn
+res://scripts/MenuScripts/LevelSelector.gd
+res://scripts/MenuScripts/PauseScreen.gd

@@ -62,7 +62,7 @@ func _ready():
 	if players.size() > 0: _player = players[0]
 
 	for b in get_tree().get_nodes_in_group("bases"):
-		if b.type_base == 0: _base = b; break
+		if b.get("type_base") == 0: _base = b; break
 
 	if _detection_area:
 		_detection_area.body_entered.connect(_on_detection_area_entered)
@@ -244,7 +244,7 @@ func _apply_enemy_stats():
 			gun_offset = 0.0
 			scale = Vector2(2.0, 2.0)
 		TypeEnemy.TRIPLE:
-			_hp = 100; _damage = 30; _fire_rate = 1.2; _spread = 0.0
+			_hp = 100; _damage = 20; _fire_rate = 1.2; _spread = 0.0
 			hull_path = "res://assets/future_tanks/PNG/Hulls_Color_D/Hull_05.png"
 			gun_path = "res://assets/future_tanks/PNG/Weapon_Color_D/Gun_04.png"
 			gun_offset = 35.0
@@ -274,18 +274,16 @@ func _apply_enemy_stats():
 func _randomize_enemy_type():
 	var available_types = [TypeEnemy.LIGHT, TypeEnemy.MEDIUM, TypeEnemy.HEAVY]
 
-	# Проверяем текущий уровень. Если уровень > 1, добавляем тройного бота в список возможных
-	# Мета-данные в SaveManager хранят текущий уровень во время игры
+	# Используем централизованную переменную из SaveManager
 	var current_lvl = 1
-	if SaveManager and SaveManager.has_meta("current_level"):
-		current_lvl = SaveManager.get_meta("current_level")
+	if SaveManager:
+		current_lvl = SaveManager.current_level
 
-	if current_lvl > 1:
+	# Тройной выстрел разрешен только ПОСЛЕ пятого уровня (с уровня 2.1)
+	if current_lvl > 5:
 		available_types.append(TypeEnemy.TRIPLE)
 
 	_type_enemy = available_types[randi() % available_types.size()]
 
 func _setup_vision():
-	# Метод оставлен пустым, чтобы не ломать логику вызова,
-	# но перемещение области отключено
 	pass
