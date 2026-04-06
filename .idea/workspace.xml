@@ -4,14 +4,7 @@
     <option name="autoReloadType" value="NONE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="e3887325-b543-4879-bba0-c494d7c2e039" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/caches/deviceStreaming.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/caches/deviceStreaming.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Tanks_2026.zip" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/scripts/AudioManager.gd" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/AudioManager.gd" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/scripts/HUD.gd" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/HUD.gd" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/scripts/Tank/Player.gd" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/Tank/Player.gd" afterDir="false" />
-    </list>
+    <list default="true" id="e3887325-b543-4879-bba0-c494d7c2e039" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
