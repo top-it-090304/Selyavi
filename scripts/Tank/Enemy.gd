@@ -165,7 +165,7 @@ func _fire_at_pos(pos: Vector2):
 	bullet.global_rotation = angle
 
 	get_parent().add_child(bullet)
-	var b_type = 1 if _type_enemy == TypeEnemy.STATIONARY else 0
+	var b_type =2 if _type_enemy == TypeEnemy.STATIONARY else 0
 	bullet.init(b_type, false, _damage)
 
 	var flash = get_node_or_null("ShotAnimation")
@@ -206,9 +206,10 @@ func _apply_enemy_stats():
 			gun_offset = 40.0
 		TypeEnemy.STATIONARY:
 			_hp = 100; _damage = 40; _fire_rate = 1.5; _spread = 0.05
-			hull_path = "res://assets/future_tanks/PNG/Hulls_Color_C/Hull_07.png"
-			gun_path = "res://assets/future_tanks/PNG/Weapon_Color_C/Gun_03.png"
+			hull_path = "res://assets/turret/SniperTurretBase.png"
+			gun_path = "res://assets/turret/SniperTurretGun.png"
 			gun_offset = 0.0
+			scale = Vector2(2.0, 2.0)
 
 	_max_hp = _hp
 
