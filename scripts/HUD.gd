@@ -278,6 +278,16 @@ func _setup_ammo_selection():
 		bg.mouse_filter = Control.MOUSE_FILTER_IGNORE # Пропускаем нажатия к TouchArea
 		slot.add_child(bg)
 
+		# Индикатор перезарядки
+		var cooldown_overlay = ColorRect.new()
+		cooldown_overlay.name = "Cooldown"
+		cooldown_overlay.size = Vector2(100, 110)
+		cooldown_overlay.color = Color(0, 0, 0, 0.6)
+		cooldown_overlay.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		cooldown_overlay.visible = false
+		slot.add_child(cooldown_overlay)
+
+
 		# Базовый стиль слота (темный с закругленными углами)
 		var style = StyleBoxFlat.new()
 		style.bg_color = Color(0.1, 0.1, 0.1, 0.8)
@@ -322,6 +332,36 @@ func _setup_ammo_selection():
 				if _player:
 					_player._on_ammo_selected(i)
 		)
+
+func _process(_delta):
+	_update_ammo_cooldowns()
+
+func _update_ammo_cooldowns():
+	if _player == null or not is_instance_valid(_player): return
+
+	var reload_timer = _player.get("_shoot_timer")
+	if reload_timer == null or not is_instance_valid(reload_timer): return
+
+	var time_left = reload_timer.time_left
+	var wait_time = reload_timer.wait_time
+	var current_type = _player.get("_type_bullet")
+
+	for i in range(3):
+		if not _ammo_buttons.has(i): continue
+		var slot = _ammo_buttons[i]
+		var cooldown = slot.get_node_or_null("Cooldown")
+		if cooldown == null: continue
+
+		# Показываем КД только на выбранном типе или на всех?
+		# Обычно лучше на всех, если КД общий, но пользователь просил на выбранном.
+		if i == current_type and time_left > 0:
+			cooldown.visible = true
+			# Высота затемнения уменьшается сверху вниз по мере перезарядки
+			var ratio = time_left / wait_time
+			cooldown.size.y = 110 * ratio
+			cooldown.position.y = 110 * (1.0 - ratio)
+		else:
+			cooldown.visible = false
 
 func _on_ammo_changed(type: int):
 	for ammo_type in _ammo_buttons:

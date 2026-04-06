@@ -89,8 +89,7 @@ func use_move_vector(move_vector: Vector2):
 	_handle_movement_sound(velocity)
 
 func fire_touch():
-	if _shoot_timer.time_left > 0:
-		return
+	if _shoot_timer.time_left > 0: return
 	
 	var bullet = _bullet_scene.instantiate()
 	bullet.global_position = _bullet_position.global_position
@@ -104,7 +103,7 @@ func fire_touch():
 		muzzle_flash.frame = 0
 		muzzle_flash.play("Fire")
 	_shoot_timer.start()
-	
+
 func use_move_vector_aim(move_vector: Vector2):
 	_gun.global_rotation_degrees = rad_to_deg(move_vector.angle()) + 90
 
@@ -113,11 +112,11 @@ func _physics_process(_delta):
 	move_and_slide()
 	queue_redraw()
 
-#func _unhandled_input(event):
-	#if (event is InputEventMouseButton or event is InputEventScreenTouch) and event.pressed:
-		#if _joystick and _joystick.has_method("is_pos_inside") and _joystick.is_pos_inside(event.position): return
-		#if _aim and _aim.has_method("is_pos_inside") and _aim.is_pos_inside(event.position): return
-		#fire_touch()
+func _unhandled_input(event):
+	if (event is InputEventMouseButton or event is InputEventScreenTouch) and event.pressed:
+		if _joystick and _joystick.has_method("is_pos_inside") and _joystick.is_pos_inside(event.position): return
+		if _aim and _aim.has_method("is_pos_inside") and _aim.is_pos_inside(event.position): return
+		fire_touch()
 
 func _get_input():
 	var input_dir = Vector2.ZERO

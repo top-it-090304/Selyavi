@@ -4,7 +4,14 @@
     <option name="autoReloadType" value="NONE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="e3887325-b543-4879-bba0-c494d7c2e039" name="Changes" comment="" />
+    <list default="true" id="e3887325-b543-4879-bba0-c494d7c2e039" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/caches/deviceStreaming.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/caches/deviceStreaming.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Tanks_2026.zip" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/AudioManager.gd" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/AudioManager.gd" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/HUD.gd" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/HUD.gd" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/Tank/Player.gd" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/Tank/Player.gd" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -22,12 +29,12 @@
     &quot;assignee&quot;: &quot;RomanShaburov&quot;
   }
 }</component>
-  <component name="GithubPullRequestsUISettings">{
-  &quot;selectedUrlAndAccountId&quot;: {
-    &quot;url&quot;: &quot;https://github.com/top-it-090304/Selyavi.git&quot;,
-    &quot;accountId&quot;: &quot;e8612725-56bd-4723-a7cb-524e4278dfc0&quot;
+  <component name="GithubPullRequestsUISettings"><![CDATA[{
+  "selectedUrlAndAccountId": {
+    "url": "https://github.com/top-it-090304/Selyavi",
+    "accountId": "9a72e3d7-0dad-469f-a77f-2d24cb4edf7f"
   }
-}</component>
+}]]></component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 5
 }</component>
@@ -45,11 +52,13 @@
     "RunOnceActivity.readMode.enableVisualFormatting": "true",
     "cf.first.check.clang-format": "false",
     "cidr.known.project.marker": "true",
-    "git-widget-placeholder": "main",
+    "dart.analysis.tool.window.visible": "false",
+    "git-widget-placeholder": "Rebasing main",
     "ignore.virus.scanning.warn.message": "true",
     "kotlin-language-version-configured": "true",
     "last_opened_file_path": "C:/Users/Пользователь/Desktop/tanks2026",
-    "settings.editor.selected.configurable": "com.android.studio.ml.bot.mainConfigurable"
+    "settings.editor.selected.configurable": "com.android.studio.ml.bot.mainConfigurable",
+    "show.migrate.to.gradle.popup": "false"
   }
 }]]></component>
   <component name="SharedIndexes">

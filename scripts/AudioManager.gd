@@ -19,7 +19,7 @@ func play_bullet_sound(type: int, global_position: Vector2):
 		var sound = AudioStreamPlayer.new()
 		sound.bus = "SFX"
 		sound.volume_db = -15.0
-		
+
 		var path = ""
 		match type:
 			0:  # TypeBullet.Plasma
@@ -28,7 +28,7 @@ func play_bullet_sound(type: int, global_position: Vector2):
 				path = "res://assets/sounds/vystrel-tanka.mp3"
 			2:  # TypeBullet.Light3D
 				path = "res://assets/sounds/light_bullet.mp3"
-		
+
 		sound.stream = load(path)
 		add_child(sound)
 		_bullet_sound_players[type] = sound
