@@ -1,8 +1,13 @@
 class_name Enemy
 extends Tank
 
+signal enemy_died(type: int)
+
 enum State { PATROL, CHASE }
-enum TypeEnemy { LIGHT, MEDIUM, HEAVY, STATIONARY, NONE }
+enum TypeEnemy { LIGHT, MEDIUM, HEAVY, STATIONARY, TRIPLE, NONE }
+
+# Ссылка на базу, которая создала этого врага
+var creator_base: Node = null
 
 # region Поля ИИ
 var _current_state: int = State.PATROL
@@ -11,10 +16,11 @@ var _base: Node
 var _nav2d: NavigationAgent2D
 var _ray_cast: RayCast2D
 var _detection_area: Area2D
+var _shot_flash: AnimatedSprite2D
 
 @export var _type_enemy: TypeEnemy = TypeEnemy.NONE
 @export var _patrol_speed: int = 90
-@export var _chase_speed: int = 100
+@export var _chase_speed: int = 60 # Медленное приближение к игроку
 
 var _fire_rate: float = 1.0
 var _spread: float = 0.15
@@ -24,6 +30,9 @@ var _scan_wait_timer: float = 0.0
 var _scan_limit: float = 45.0
 # endregion
 
+func get_enemy_type() -> int:
+	return _type_enemy
+
 func _ready():
 	add_to_group("enemies")
 	_init_base_tank() # Инициализация из Tank.gd
@@ -31,6 +40,7 @@ func _ready():
 	_nav2d = get_node_or_null("NavigationAgent2D")
 	_ray_cast = get_node_or_null("RayCast2D")
 	_detection_area = get_node_or_null("DetectionArea")
+	_shot_flash = get_node_or_null("ShotAnimation")
 
 	if _ray_cast:
 		_ray_cast.collide_with_areas = false # Не сталкиваемся с триггерами
@@ -38,14 +48,21 @@ func _ready():
 
 	if _type_enemy == TypeEnemy.NONE: _randomize_enemy_type()
 	_apply_enemy_stats()
-	# _setup_vision() # Убираем, чтобы DetectionArea оставалась в корне с правильным масштабом
+
+	# Привязываем вспышку к дулу
+	if _shot_flash and _bullet_position:
+		if _shot_flash.get_parent() != _bullet_position:
+			_shot_flash.get_parent().remove_child(_shot_flash)
+			_bullet_position.add_child(_shot_flash)
+		_shot_flash.position = Vector2.ZERO
+		_shot_flash.rotation = 0
 
 	# Поиск целей
 	var players = get_tree().get_nodes_in_group("players")
 	if players.size() > 0: _player = players[0]
 
 	for b in get_tree().get_nodes_in_group("bases"):
-		if b.type_base == 0: _base = b; break
+		if b.get("type_base") == 0: _base = b; break
 
 	if _detection_area:
 		_detection_area.body_entered.connect(_on_detection_area_entered)
@@ -107,12 +124,13 @@ func _aim_gun(delta: float):
 func _move_enemy():
 	if _nav2d == null or _type_enemy == TypeEnemy.STATIONARY:
 		velocity = Vector2.ZERO; return
-	
-	var should_move = _current_state == State.PATROL or not _is_target_visible()
-	
-	if should_move and not _nav2d.is_navigation_finished():
+
+	# Враг едет к цели в обоих состояниях, если навигация не закончена
+	if not _nav2d.is_navigation_finished():
 		var dir = (_nav2d.get_next_path_position() - global_position).normalized()
-		velocity = dir * (_patrol_speed if _current_state == State.PATROL else _chase_speed)
+		# Выбираем скорость в зависимости от состояния
+		var current_speed = _chase_speed if _current_state == State.CHASE else _patrol_speed
+		velocity = dir * current_speed
 		rotation = dir.angle() + PI/2
 	else:
 		velocity = Vector2.ZERO
@@ -126,13 +144,20 @@ func _update_ray_cast():
 		_ray_cast.force_raycast_update() # Принудительно обновляем, чтобы данные были актуальны в этом же кадре
 
 func _is_target_visible() -> bool:
-	if _ray_cast == null or not _ray_cast.is_colliding(): return true
-	var collider = _ray_cast.get_collider()
-	if not collider: return false
+	if _ray_cast == null: return false
+	if not _ray_cast.is_colliding(): return true
 
-	if collider == _player: return true
-	if collider == _base or (collider.get_parent() != null and collider.get_parent() == _base): return true
-	if collider.has_method("take_damage"): return true
+	var collider = _ray_cast.get_collider()
+	var target = _get_current_target()
+	if target == null: return false
+
+	if collider == target: return true
+
+	# Проверка для базы (у неё могут быть дочерние коллизии)
+	if target == _base:
+		if collider == _base or (collider.get_parent() != null and collider.get_parent() == _base):
+			return true
+
 	return false
 
 func _get_current_target():
@@ -142,34 +167,40 @@ func _check_and_fire():
 	var target = _get_current_target()
 	if target == null: return
 
-	# Проверка препятствий (стен)
-	if _ray_cast and _ray_cast.is_colliding():
-		var col = _ray_cast.get_collider()
-		if col and col != _player and col != _base and col.has_method("take_damage"):
-			if global_position.distance_to(col.global_position) < 300.0:
-				_fire_at_pos(col.global_position)
-				return
-
 	var dist = global_position.distance_to(target.global_position)
-	var attack_range = 750.0 if _type_enemy == TypeEnemy.STATIONARY else 700.0
+	# Дальность турели уменьшена до 650
+	var attack_range = 650.0 if _type_enemy == TypeEnemy.STATIONARY else 700.0
 
+	# Стреляем только при наличии прямой видимости цели
 	if dist <= attack_range and _is_target_visible():
 		_fire_at_pos(target.global_position)
 
 func _fire_at_pos(pos: Vector2):
 	if _shoot_timer.time_left > 0: return
 
-	var bullet = _bullet_scene.instantiate()
-	var angle = (pos - _gun.global_position).angle() + PI/2 + randf_range(-_spread, _spread)
-	bullet.global_position = _bullet_position.global_position
-	bullet.global_rotation = angle
+	var base_angle = (pos - _gun.global_position).angle() + PI/2
 
-	get_parent().add_child(bullet)
-	var b_type =2 if _type_enemy == TypeEnemy.STATIONARY else 0
-	bullet.init(b_type, false, _damage)
+	if _type_enemy == TypeEnemy.TRIPLE:
+		# Стрельба веером (3 пули) - Увеличили разлет до 0.4
+		var angles = [base_angle, base_angle - 0.4, base_angle + 0.4]
+		for angle in angles:
+			var bullet = _bullet_scene.instantiate()
+			bullet.global_position = _bullet_position.global_position
+			bullet.global_rotation = angle
+			get_parent().add_child(bullet)
+			# Используем тип пули 0 (обычная)
+			bullet.init(0, false, _damage)
+	else:
+		# Обычная стрельба
+		var bullet = _bullet_scene.instantiate()
+		var angle = base_angle + randf_range(-_spread, _spread)
+		bullet.global_position = _bullet_position.global_position
+		bullet.global_rotation = angle
+		get_parent().add_child(bullet)
+		var b_type = 2 if _type_enemy == TypeEnemy.STATIONARY else 0
+		bullet.init(b_type, false, _damage)
 
-	var flash = get_node_or_null("ShotAnimation")
-	if flash: flash.play("Fire")
+	if _shot_flash: _shot_flash.play("Fire")
 	_shoot_timer.start()
 
 func _on_detection_area_entered(body):
@@ -179,11 +210,13 @@ func _on_detection_area_exited(body):
 	if body == _player: _current_state = State.PATROL
 
 func _destroy():
+	enemy_died.emit(_type_enemy)
 	if is_instance_valid(_player) and _player.has_method("add_money"):
 		_player.add_money(_get_reward())
 	super._destroy()
 
 func _get_reward() -> int:
+	if _type_enemy == TypeEnemy.TRIPLE: return 40
 	return [50, 75, 100, 150][_type_enemy] if _type_enemy != TypeEnemy.NONE else 50
 
 func _apply_enemy_stats():
@@ -210,8 +243,14 @@ func _apply_enemy_stats():
 			gun_path = "res://assets/turret/SniperTurretGun.png"
 			gun_offset = 0.0
 			scale = Vector2(2.0, 2.0)
+		TypeEnemy.TRIPLE:
+			_hp = 100; _damage = 20; _fire_rate = 1.2; _spread = 0.0
+			hull_path = "res://assets/future_tanks/PNG/Hulls_Color_D/Hull_05.png"
+			gun_path = "res://assets/future_tanks/PNG/Weapon_Color_D/Gun_04.png"
+			gun_offset = 35.0
 
 	_max_hp = _hp
+	_shoot_timer.wait_time = _fire_rate
 
 	# Применяем текстуры, если они заданы
 	if _body and hull_path != "":
@@ -224,10 +263,27 @@ func _apply_enemy_stats():
 		if _bullet_position:
 			_bullet_position.position.y = -85 # Стандартное смещение для дула
 
+	# Корректируем масштаб вспышки выстрела
+	if _shot_flash:
+		# Целевой глобальный масштаб анимации 0.3.
+		# Т.к. она теперь внутри BodyTank (0.5), то формула:
+		# scale.x (врага) * 0.5 (корпуса) * flash_local_scale = 0.3
+		var needed_scale = 0.6 / scale.x
+		_shot_flash.scale = Vector2(needed_scale, needed_scale)
+
 func _randomize_enemy_type():
-	_type_enemy = [TypeEnemy.LIGHT, TypeEnemy.MEDIUM, TypeEnemy.HEAVY][randi() % 3]
+	var available_types = [TypeEnemy.LIGHT, TypeEnemy.MEDIUM, TypeEnemy.HEAVY]
+
+	# Используем централизованную переменную из SaveManager
+	var current_lvl = 1
+	if SaveManager:
+		current_lvl = SaveManager.current_level
+
+	# Тройной выстрел разрешен только ПОСЛЕ пятого уровня (с уровня 2.1)
+	if current_lvl > 5:
+		available_types.append(TypeEnemy.TRIPLE)
+
+	_type_enemy = available_types[randi() % available_types.size()]
 
 func _setup_vision():
-	# Метод оставлен пустым, чтобы не ломать логику вызова,
-	# но перемещение области отключено
 	pass

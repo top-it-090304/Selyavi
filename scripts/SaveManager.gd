@@ -4,16 +4,16 @@ const SAVE_FILE = "user://savegame.json"
 
 var save_data = {
 	"money": 0,
-	"unlocked_levels": 1, # Добавили поле для разблокированных уровней
+	"unlocked_levels": 1,
 	"player_stats": {
 		"body_type": 1,
 		"gun_type": 1,
 		"color_type": 0
 	},
 	"purchased": {
-		"bodies": [1], # Средний корпус по умолчанию
-		"guns": [1],   # Средняя пушка по умолчанию
-		"colors": [0]  # Коричневый цвет по умолчанию
+		"bodies": [1],
+		"guns": [1],
+		"colors": [0]
 	}
 }
 
@@ -32,6 +32,9 @@ const SETTINGS_FILE = "user://settings.cfg"
 
 signal money_loaded(amount)
 signal settings_changed
+
+# Текущий выбранный уровень для логики сложности и спавна
+var current_level: int = 1
 
 func _ready():
 	load_game()
@@ -58,10 +61,7 @@ func get_setting(section: String, key: String, default):
 	var s = section
 	var k = key
 	if k == "scope_enabled": k = "opt_scope_active"
-
-	# Унификация секций для упрощения доступа
 	if s == "controls": s = "game"
-
 	if settings_data.has(s) and settings_data[s].has(k):
 		return settings_data[s][k]
 	return default
@@ -70,18 +70,13 @@ func set_setting(section: String, key: String, value):
 	var s = section
 	var k = key
 	if k == "scope_enabled": k = "opt_scope_active"
-
 	if s == "controls": s = "game"
-
 	if settings_data.has(s) and settings_data[s].has(k):
 		settings_data[s][k] = value
 		save_settings()
 		settings_changed.emit()
 
-# --- Сохранение и Загрузка ---
-
 func save_game():
-	# Обновляем деньги из игрока, если он активен
 	var player_money = _get_money_from_active_player()
 	if player_money != -1:
 		save_data["money"] = player_money
@@ -106,7 +101,6 @@ func load_game():
 			_merge_dict(save_data, data)
 			money_loaded.emit(int(save_data.get("money", 0)))
 
-# Рекурсивное слияние словарей для надежной загрузки
 func _merge_dict(target: Dictionary, source: Dictionary):
 	for key in source.keys():
 		if target.has(key):
@@ -126,7 +120,6 @@ func _get_money_from_active_player() -> int:
 
 func is_purchased(category: String, item_id: int) -> bool:
 	if save_data.purchased.has(category):
-		# Приводим к int, так как JSON может вернуть float
 		for id in save_data.purchased[category]:
 			if int(id) == item_id:
 				return true

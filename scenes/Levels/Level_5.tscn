@@ -180,9 +180,6 @@ position = Vector2(1014, 1036)
 [node name="IndestructibleWall11" parent="IngameWalls" instance=ExtResource("4")]
 position = Vector2(1765, 124)
 
-[node name="IndestructibleWall12" parent="IndestructibleWall12" instance=ExtResource("4")]
-position = Vector2(1422, 119)
-
 [node name="IndestructibleWall13" parent="IngameWalls" instance=ExtResource("4")]
 position = Vector2(1765, 616)
 
@@ -212,6 +209,9 @@ position = Vector2(673, 404)
 
 [node name="IndestructibleWall16" parent="IngameWalls" instance=ExtResource("4")]
 position = Vector2(915, 254)
+
+[node name="IndestructibleWall12#IndestructibleWall12" parent="." instance=ExtResource("4")]
+position = Vector2(1422, 119)
 
 [node name="BorderWalls" type="Node" parent="."]
 

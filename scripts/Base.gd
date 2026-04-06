@@ -3,16 +3,17 @@ extends Area2D
 
 enum TypeBase { PLAYER, ENEMY }
 
-signal base_state()
+signal base_state(type: int)
 
 @export var type_base: int = TypeBase.ENEMY
-@export var _hp: int = 100 # Здоровье базы (примерно на 3-4 выстрела игрока)
+@export var _hp: int = 100 # Здоровье базы
 @export var _max_hp: int = 100
 
 var _spawn_timer: Timer
 var _heal_timer: Timer
 var _enemy_position: Marker2D
 var _enemy_scene: PackedScene
+var _base_body: StaticBody2D # Ссылка на физическое тело базы
 
 @export var _max_enemies: int = 3
 @export var _heal_amount: int = 5
@@ -26,6 +27,16 @@ func _enter_tree():
 	add_to_group("bases")
 
 func _ready():
+	# Синхронизация уровня для спавна врагов
+	_sync_current_level()
+
+	# Установка здоровья в зависимости от типа базы
+	if type_base == TypeBase.ENEMY:
+		_max_hp = 250
+	else:
+		_max_hp = 150
+	_hp = _max_hp
+
 	area_entered.connect(_on_bullet_entered)
 	_enemy_scene = load("res://scenes/Tank/Enemy.tscn")
 	_enemy_position = get_node_or_null("EnemyPosition")
@@ -47,9 +58,22 @@ func _ready():
 
 	_setup_base_collision()
 
+func _sync_current_level():
+	if SaveManager == null: return
+
+	# Пытаемся вытащить номер уровня из имени текущей сцены (Level_1, Level_6 и т.д.)
+	var scene_name = get_tree().current_scene.name
+	if scene_name.contains("Level_"):
+		var lvl = scene_name.get_slice("_", 1).to_int()
+		if lvl > 0:
+			SaveManager.current_level = lvl
+	elif SaveManager.has_meta("current_level"):
+		SaveManager.current_level = SaveManager.get_meta("current_level")
+
 func _setup_base_collision():
-	var sb = StaticBody2D.new()
-	add_child(sb)
+	_base_body = StaticBody2D.new()
+	_base_body.name = "BaseStaticBody"
+	add_child(_base_body)
 	var cs = CollisionShape2D.new()
 	var circle = CircleShape2D.new()
 
@@ -60,7 +84,7 @@ func _setup_base_collision():
 		circle.radius = 60.0
 
 	cs.shape = circle
-	sb.add_child(cs)
+	_base_body.add_child(cs)
 
 func _on_bullet_entered(area):
 	if area.has_method("is_player"):
@@ -90,10 +114,8 @@ func _setup_base_appearance():
 	var sprite = get_node_or_null("Sprite2D")
 	if sprite != null:
 		if type_base == TypeBase.ENEMY:
-			# Вражеская база - красная
 			sprite.modulate = Color(1.0, 0.4, 0.4)
 		else:
-			# База игрока - сине-зеленая
 			sprite.modulate = Color(0.5, 1.0, 0.8)
 
 func take_damage(amount: int):
@@ -103,18 +125,14 @@ func take_damage(amount: int):
 		_destroy()
 
 func _update_damage_visuals():
-	# Эффект мигания при попадании
 	var sprite = get_node_or_null("Sprite2D")
 	if sprite == null:
 		sprite = self
 
-	# Определяем целевой цвет в зависимости от типа базы
 	var target_color = Color(1.0, 0.4, 0.4) if type_base == TypeBase.ENEMY else Color(0.5, 1.0, 0.8)
 
 	var tween = create_tween()
-	# Вспышка (белый/яркий)
 	tween.tween_property(sprite, "modulate", Color(5, 5, 5), 0.05)
-	# Возврат к исходному цвету базы, а не к чисто белому
 	tween.tween_property(sprite, "modulate", target_color, 0.05)
 
 func destroy():
@@ -128,20 +146,12 @@ func _count_enemies_on_scene() -> int:
 	var enemies = get_tree().get_nodes_in_group("enemies")
 	var count = 0
 	for enemy in enemies:
+		if not is_instance_valid(enemy) or enemy.is_queued_for_deletion(): continue
 		if enemy.has_method("get_enemy_type"):
-			if enemy.get_enemy_type() != 3: # 3 = STATIONARY
-				count += 1
-		else:
-			count += 1
+			if enemy.get_enemy_type() == 3:
+				continue
+		count += 1
 	return count
-
-func _is_enemy_on_base() -> bool:
-	var all_enemies = get_tree().get_nodes_in_group("enemies")
-	for enemy in all_enemies:
-		var distance = global_position.distance_to(enemy.global_position)
-		if distance < _spawn_radius:
-			return true
-	return false
 
 func _spawn_enemy():
 	if type_base == TypeBase.PLAYER:
@@ -155,10 +165,9 @@ func _spawn_enemy():
 	if spawn_pos != Vector2.ZERO:
 		var enemy = _enemy_scene.instantiate()
 		enemy.global_position = spawn_pos
-		# Добавляем врага на уровень (в родителя базы), а не в корень
 		get_parent().add_child(enemy)
 
-func _get_safe_spawn_pos(is_stationary: bool = false) -> Vector2:
+func _get_safe_spawn_pos() -> Vector2:
 	var player = get_node_or_null("/root/Field/PlayerTank")
 	var player_base = null
 
@@ -203,7 +212,11 @@ func _is_pos_safe(pos: Vector2) -> bool:
 	var shape_query = PhysicsShapeQueryParameters2D.new()
 	shape_query.set_shape(shape)
 	shape_query.transform = Transform2D(0, pos)
-	shape_query.exclude = [self]
+
+	var exclude_list = [self]
+	if is_instance_valid(_base_body):
+		exclude_list.append(_base_body)
+	shape_query.exclude = exclude_list
 
 	var results = space_state.intersect_shape(shape_query)
 	for result in results:
