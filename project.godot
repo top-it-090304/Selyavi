@@ -11,7 +11,7 @@ config_version=5
 [application]
 
 config/name="Tanks 2026"
-run/main_scene="res://scenes/Field.tscn"
+run/main_scene="uid://dsgqbvu3xbmcr"
 config/features=PackedStringArray("4.4")
 config/icon="res://icon.png"
 
