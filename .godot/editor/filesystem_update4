@@ -10,3 +10,4 @@ res://scenes/Levels/Level_6.tscn
 res://scripts/MenuScripts/LevelSelector.gd
 res://scripts/MenuScripts/PauseScreen.gd
 res://scenes/Levels/Level_4.tscn
+res://scenes/Levels/Level_5.tscn

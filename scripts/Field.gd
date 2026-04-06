@@ -74,16 +74,21 @@ func _on_player_lives_changed(lives: int):
 func _on_enemy_died(_type: int):
 	call_deferred("_check_victory_conditions")
 
-func _on_base_destroyed(_type: int):
-	# Если база уничтожена, даем игроку деньги
-	var players = get_tree().get_nodes_in_group("players")
-	if players.size() > 0 and players[0].has_method("add_money"):
-		players[0].add_money(200)
+func _on_base_destroyed(type: int):
+	# Если это вражеская база (тип 1), даем деньги
+	if type == 1: # ENEMY
+		var players = get_tree().get_nodes_in_group("players")
+		if players.size() > 0 and players[0].has_method("add_money"):
+			players[0].add_money(200)
 
-	var huds = get_tree().get_nodes_in_group("hud")
-	if huds.size() > 0: huds[0].update_bases_count()
+		var huds = get_tree().get_nodes_in_group("hud")
+		if huds.size() > 0: huds[0].update_bases_count()
 
-	call_deferred("_check_victory_conditions")
+	# Если уничтожена база игрока (тип 0), это проигрыш
+	if type == 0: # PLAYER
+		_show_game_over_screen(false, "Ваша база уничтожена!")
+	else:
+		call_deferred("_check_victory_conditions")
 
 func _check_victory_conditions():
 	if get_tree().paused: return # Не проверяем, если игра уже на паузе (победа/поражение)
@@ -135,7 +140,9 @@ func _show_game_over_screen(is_victory: bool, reason: String = ""):
 	center_container.mouse_filter = Control.MOUSE_FILTER_IGNORE
 
 	var panel = PanelContainer.new()
-	panel.custom_minimum_size = Vector2(450, 420)
+	# Уменьшена высота с 420 до 380 для победы и с учетом контента
+	var panel_height = 360 if not is_victory else 400
+	panel.custom_minimum_size = Vector2(450, panel_height)
 	center_container.add_child(panel)
 
 	var style = StyleBoxFlat.new()
