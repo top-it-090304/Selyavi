@@ -4,7 +4,17 @@
     <option name="autoReloadType" value="NONE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="e3887325-b543-4879-bba0-c494d7c2e039" name="Changes" comment="" />
+    <list default="true" id="e3887325-b543-4879-bba0-c494d7c2e039" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/assets/Money.png.import" beforeDir="false" afterPath="$PROJECT_DIR$/assets/Money.png.import" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/turret/SniperTurretBase.png.import" beforeDir="false" afterPath="$PROJECT_DIR$/assets/turret/SniperTurretBase.png.import" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/turret/SniperTurretGun.png.import" beforeDir="false" afterPath="$PROJECT_DIR$/assets/turret/SniperTurretGun.png.import" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/icons/108.png.import" beforeDir="false" afterPath="$PROJECT_DIR$/icons/108.png.import" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/icons/128.png.import" beforeDir="false" afterPath="$PROJECT_DIR$/icons/128.png.import" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/icons/172.png.import" beforeDir="false" afterPath="$PROJECT_DIR$/icons/172.png.import" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/icons/86.png.import" beforeDir="false" afterPath="$PROJECT_DIR$/icons/86.png.import" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/project.godot" beforeDir="false" afterPath="$PROJECT_DIR$/project.godot" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scenes/MenuScenes/Menu.tscn" beforeDir="false" afterPath="$PROJECT_DIR$/scenes/MenuScenes/Menu.tscn" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -22,12 +32,12 @@
     &quot;assignee&quot;: &quot;RomanShaburov&quot;
   }
 }</component>
-  <component name="GithubPullRequestsUISettings"><![CDATA[{
-  "selectedUrlAndAccountId": {
-    "url": "https://github.com/top-it-090304/Selyavi",
-    "accountId": "9a72e3d7-0dad-469f-a77f-2d24cb4edf7f"
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/top-it-090304/Selyavi&quot;,
+    &quot;accountId&quot;: &quot;9a72e3d7-0dad-469f-a77f-2d24cb4edf7f&quot;
   }
-}]]></component>
+}</component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 5
 }</component>
@@ -46,7 +56,7 @@
     "cf.first.check.clang-format": "false",
     "cidr.known.project.marker": "true",
     "dart.analysis.tool.window.visible": "false",
-    "git-widget-placeholder": "Rebasing main",
+    "git-widget-placeholder": "boss",
     "ignore.virus.scanning.warn.message": "true",
     "kotlin-language-version-configured": "true",
     "last_opened_file_path": "C:/Users/Пользователь/Desktop/tanks2026",

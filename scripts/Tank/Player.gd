@@ -199,6 +199,15 @@ func add_money(amount: int):
 func get_money() -> int:
 	return _money
 
+func get_lives() -> int:
+	return _lives
+
+func get_current_health() -> int:
+	return _hp
+
+func get_max_health() -> int:
+	return _max_hp
+
 func _update_appearance():
 	var color_f = "Color_A" if _color == COLOR_BROWN else "Color_B" if _color == COLOR_GREEN else "Color_C"
 	var b_name = ["Hull_05", "Hull_02", "Hull_06", "Hull_01", "Hull_03"][_type_body]
