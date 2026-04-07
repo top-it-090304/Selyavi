@@ -16,7 +16,7 @@ var _enemy_scene: PackedScene
 var _base_body: StaticBody2D # Ссылка на физическое тело базы
 
 @export var _max_enemies: int = 3
-@export var _heal_amount: int = 5
+@export var _heal_amount: int = 7
 @export var _heal_interval: float = 1.0
 @export var _heal_radius: float = 300.0
 @export var _spawn_interval: float = 6.0
@@ -61,6 +61,9 @@ func _ready():
 
 	_setup_base_collision()
 
+	# Динамический интервал спавна в зависимости от уровня
+	_update_spawn_interval()
+
 func _sync_current_level():
 	if SaveManager == null: return
 
@@ -72,6 +75,17 @@ func _sync_current_level():
 			SaveManager.current_level = lvl
 	elif SaveManager.has_meta("current_level"):
 		SaveManager.current_level = SaveManager.get_meta("current_level")
+
+func _update_spawn_interval():
+	var lvl = 1
+	if SaveManager: lvl = SaveManager.current_level
+
+	if lvl <= 5:
+		_spawn_interval = 10.0
+	elif lvl <= 10:
+		_spawn_interval = 8.0
+	else:
+		_spawn_interval = 6.0
 
 func _setup_base_collision():
 	_base_body = StaticBody2D.new()
@@ -104,7 +118,8 @@ func _on_heal_timeout():
 	if type_base != TypeBase.PLAYER:
 		return
 
-	var player = get_node_or_null("/root/Field/PlayerTank")
+	# Используем группу вместо жесткого пути, так как имя корневого узла может меняться (Field, Level_4 и т.д.)
+	var player = get_tree().get_first_node_in_group("players")
 	if player == null or not is_instance_valid(player):
 		return
 
@@ -172,7 +187,7 @@ func _spawn_enemy():
 		_my_spawned_enemies.append(enemy)
 
 func _get_safe_spawn_pos() -> Vector2:
-	var player = get_node_or_null("/root/Field/PlayerTank")
+	var player = get_tree().get_first_node_in_group("players")
 	var player_base = null
 
 	var bases = get_tree().get_nodes_in_group("bases")

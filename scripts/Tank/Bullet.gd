@@ -102,11 +102,11 @@ func _update_type():
 			_bullet_sprite.texture = load("res://assets/future_tanks/PNG/Effects/Medium_Shell.png")
 			_bullet_speed = 4
 			_damage = 40
-			_max_range = 400.0
+			_max_range = 275.0
 		LIGHT:
 			_bullet_sprite.texture = load("res://assets/future_tanks/PNG/Effects/Light_Shell.png")
 			_bullet_speed = 6
-			_damage = 35
+			_damage = 20
 			_max_range = 900.0
 
 	if AudioManager != null:
@@ -121,7 +121,7 @@ func _update_appearance():
 		MEDIUM:
 			_bullet_sprite.texture = load("res://assets/future_tanks/PNG/Effects/Medium_Shell.png")
 			_bullet_speed = 4
-			_max_range = 400.0
+			_max_range = 275.0
 		LIGHT:
 			_bullet_sprite.texture = load("res://assets/future_tanks/PNG/Effects/Light_Shell.png")
 			_bullet_speed = 6

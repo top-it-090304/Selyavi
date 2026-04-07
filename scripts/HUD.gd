@@ -23,6 +23,9 @@ func _ready():
 
 	if _levelLabel:
 		_levelLabel.position.y = 0
+		# Дублируем настройки, чтобы не менять оригинальный ресурс
+		if _levelLabel.label_settings:
+			_levelLabel.label_settings = _levelLabel.label_settings.duplicate()
 
 	_setup_bases_label()
 	_setup_ammo_selection()
@@ -77,8 +80,25 @@ func _update_label_text():
 
 func _update_level_display():
 	if !_levelLabel: return
-	var lvl = SaveManager.get_meta("current_level") if SaveManager and SaveManager.has_meta("current_level") else 1
+
+	var lvl = 1
+	if SaveManager:
+		lvl = SaveManager.current_level
+
 	_levelLabel.text = "МИССИЯ " + str(((lvl-1)/5)+1) + "." + str(((lvl-1)%5)+1)
+
+	# В Godot 4 LabelSettings имеют приоритет над theme_override
+	if _levelLabel.label_settings:
+		if lvl % 5 == 0:
+			_levelLabel.label_settings.font_color = Color(1, 0, 0) # Красный
+		else:
+			# Возвращаем исходный желтый цвет (из HUD.tscn)
+			_levelLabel.label_settings.font_color = Color(1, 0.9, 0.4)
+	else:
+		if lvl % 5 == 0:
+			_levelLabel.add_theme_color_override("font_color", Color(1, 0, 0))
+		else:
+			_levelLabel.remove_theme_color_override("font_color")
 
 func _find_player_and_connect():
 	var p = get_tree().get_first_node_in_group("players")

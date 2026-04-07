@@ -56,8 +56,8 @@ tile_size = Vector2i(128, 128)
 sources/0 = SubResource("TileSetAtlasSource_2i15a")
 
 [sub_resource type="NavigationPolygon" id="NavigationPolygon_0g6pg"]
-vertices = PackedVector2Array(2280.55, 643.68, 2297.25, -13.9063, 2676.45, -104, 2914.89, -104, 2905.1, 760.188, 2398.86, 770.203, 417.961, -494.023, 2697.44, -498.969, 1834.09, -18.0938, 1064.64, 855.93, 413.031, 860.922, 1827.91, 648.102, 2403.85, 1114, 1601, 1114, 1601, 998.094, 1069.64, 993.078)
-polygons = Array[PackedInt32Array]([PackedInt32Array(0, 1, 2, 3, 4, 5), PackedInt32Array(6, 7, 2, 1, 8), PackedInt32Array(9, 10, 6, 8, 11), PackedInt32Array(0, 5, 12, 13, 14, 11), PackedInt32Array(9, 11, 14, 15)])
+vertices = PackedVector2Array(1584.59, 344.844, 1379, 348.156, 1078.24, 336.75, 1036.41, 261, 1028.55, 66.5938, 2676.45, -104, 2914.89, -104, 2905.1, 760.188, 2398.86, 770.203, 2283.18, 643.648, 2213.13, 321.563, 2254.56, 6.84375, 850.156, 363.07, 849.531, 261, 1592.42, 533.844, 1843.13, 403.688, 1827.32, 648.102, 1601, 998.094, 1069.64, 993.078, 417.961, -494.023, 2697.44, -498.969, 1998.07, 31.6172, 1073.79, 551.188, 1379, 537.156, 2403.85, 1114, 1601, 1114, 1064.64, 855.93, 846.82, 546.813, 413.031, 860.922, 857.391, 90.2266)
+polygons = Array[PackedInt32Array]([PackedInt32Array(0, 1, 2, 3, 4), PackedInt32Array(5, 6, 7, 8, 9, 10, 11), PackedInt32Array(3, 2, 12, 13), PackedInt32Array(14, 15, 16, 17, 18), PackedInt32Array(15, 14, 0), PackedInt32Array(19, 20, 5, 11, 21), PackedInt32Array(19, 21, 15, 0, 4), PackedInt32Array(22, 2, 1, 23), PackedInt32Array(9, 8, 24, 25, 17, 16), PackedInt32Array(23, 14, 18, 26, 22), PackedInt32Array(27, 22, 26, 28), PackedInt32Array(12, 27, 28, 19, 13), PackedInt32Array(29, 13, 19), PackedInt32Array(19, 4, 29)])
 outlines = Array[PackedVector2Array]([PackedVector2Array(408, -504, 2708, -509, 2687, -114, 2925, -114, 2915, 770, 2409, 780, 2414, 1124, 1591, 1124, 1591, 1008, 1060, 1003, 1055, 866, 403, 871)])
 
 [node name="Field" type="Node2D"]
@@ -233,13 +233,27 @@ type_base = 0
 [node name="Navigation2D" type="Node2D" parent="."]
 
 [node name="NavigationRegion2D" type="NavigationRegion2D" parent="Navigation2D"]
+visible = false
 navigation_polygon = SubResource("NavigationPolygon_0g6pg")
 
 [node name="Polygon2D" type="Polygon2D" parent="Navigation2D/NavigationRegion2D"]
+visible = false
 position = Vector2(-516.869, -1.9021)
 scale = Vector2(1.24728, 1.05594)
 color = Color(1, 1, 1, 0)
-polygon = PackedVector2Array(1982.61, 51.0464, 2212.71, 47.2583, 2180.64, 306.742, 2235, 602, 1888, 606, 1900.03, 386.291)
+polygon = PackedVector2Array(2021.89, 40.6293, 2212.71, 18.8478, 2180.64, 306.742, 2235, 602, 1888, 606, 1900.03, 386.291)
+
+[node name="Polygon2D2" type="Polygon2D" parent="Navigation2D/NavigationRegion2D"]
+visible = false
+polygon = PackedVector2Array(867, 99, 860, 251, 1026, 251, 1019, 78)
+
+[node name="Polygon2D3" type="Polygon2D" parent="Navigation2D/NavigationRegion2D"]
+visible = false
+polygon = PackedVector2Array(860, 372, 857, 537, 1064, 541, 1068, 348)
+
+[node name="Polygon2D4" type="Polygon2D" parent="Navigation2D/NavigationRegion2D"]
+visible = false
+polygon = PackedVector2Array(1389, 358, 1389, 527, 1582, 524, 1575, 355)
 
 [node name="EnemyBase" parent="." instance=ExtResource("15")]
 position = Vector2(2647, 345)

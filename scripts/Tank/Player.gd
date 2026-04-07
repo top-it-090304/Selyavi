@@ -90,7 +90,6 @@ func _toggle_scope(checkbox_value: bool):
 
 func use_move_vector(move_vector: Vector2):
 	velocity = move_vector * _speed
-	move_and_slide()
 	rotation = move_vector.angle() + PI/2
 	_handle_movement_sound(velocity)
 
@@ -214,7 +213,7 @@ func _draw():
 		# Определяем длину луча в зависимости от типа снаряда
 		var range_len = 600.0 # PLASMA по умолчанию
 		match _type_bullet:
-			MEDIUM: range_len = 400.0
+			MEDIUM: range_len = 275.0
 			LIGHT: range_len = 900.0
 
 		draw_line(to_local(_bullet_position.global_position), to_local(_bullet_position.global_position + direction * range_len), Color(1, 0, 0, 0.5), 2.0)
