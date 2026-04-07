@@ -1,4 +1,4 @@
-[gd_scene load_steps=9 format=3 uid="uid://brr1ry45o4hvq"]
+[gd_scene load_steps=10 format=3 uid="uid://brr1ry45o4hvq"]
 
 [ext_resource type="FontFile" uid="uid://bsnvk4l0ue5ri" path="res://assets/fonts/ofont.ru_Shonen.ttf" id="1"]
 [ext_resource type="Script" uid="uid://brru0wn57mrkb" path="res://scripts/MenuScripts/PauseScreen.gd" id="2"]
@@ -11,6 +11,20 @@ corner_radius_top_right = 25
 corner_radius_bottom_right = 25
 shadow_color = Color(0, 0, 0, 0.588235)
 shadow_size = 20
+
+[sub_resource type="LabelSettings" id="LabelSettings_pause"]
+font = ExtResource("1")
+font_size = 48
+font_color = Color(0.741176, 0.819608, 0.705882, 1)
+outline_size = 12
+outline_color = Color(0.0784314, 0.0901961, 0.0784314, 1)
+shadow_size = 15
+shadow_color = Color(0, 0, 0, 0.470588)
+shadow_offset = Vector2(4, 4)
+
+[sub_resource type="StyleBoxLine" id="StyleBoxLine_separator"]
+color = Color(0.290196, 0.341176, 0.25098, 1)
+thickness = 4
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn_normal"]
 content_margin_left = 20.0
@@ -62,19 +76,7 @@ corner_radius_top_right = 12
 corner_radius_bottom_right = 12
 corner_radius_bottom_left = 12
 
-[sub_resource type="LabelSettings" id="LabelSettings_pause"]
-font = ExtResource("1")
-font_size = 56
-font_color = Color(0.741176, 0.819608, 0.705882, 1)
-outline_size = 12
-outline_color = Color(0.0784314, 0.0901961, 0.0784314, 1)
-shadow_size = 15
-shadow_color = Color(0, 0, 0, 0.470588)
-shadow_offset = Vector2(4, 4)
-
-[sub_resource type="StyleBoxLine" id="StyleBoxLine_separator"]
-color = Color(0.290196, 0.341176, 0.25098, 1)
-thickness = 4
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_scroll"]
 
 [node name="PauseScreen" type="CanvasLayer"]
 process_mode = 3
@@ -90,36 +92,48 @@ grow_vertical = 2
 color = Color(0, 0, 0, 0.470588)
 
 [node name="Sidebar" type="Panel" parent="."]
+custom_minimum_size = Vector2(320, 0)
 anchors_preset = 9
 anchor_bottom = 1.0
 offset_right = 320.0
 grow_vertical = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_sidebar")
 
-[node name="VBoxContainer" type="VBoxContainer" parent="Sidebar"]
+[node name="ScrollContainer" type="ScrollContainer" parent="Sidebar"]
 layout_mode = 1
-anchors_preset = 5
-anchor_left = 0.5
-anchor_right = 0.5
-offset_left = -130.0
-offset_top = 60.0
-offset_right = 130.0
-offset_bottom = 800.0
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
 grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxEmpty_scroll")
+horizontal_scroll_mode = 0
+
+[node name="MarginContainer" type="MarginContainer" parent="Sidebar/ScrollContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/margin_left = 30
+theme_override_constants/margin_top = 60
+theme_override_constants/margin_right = 30
+theme_override_constants/margin_bottom = 60
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Sidebar/ScrollContainer/MarginContainer"]
+layout_mode = 2
 theme_override_constants/separation = 28
 
-[node name="Title" type="Label" parent="Sidebar/VBoxContainer"]
+[node name="Title" type="Label" parent="Sidebar/ScrollContainer/MarginContainer/VBoxContainer"]
 layout_mode = 2
 text = "ПАУЗА"
 label_settings = SubResource("LabelSettings_pause")
 horizontal_alignment = 1
 
-[node name="HSeparator" type="HSeparator" parent="Sidebar/VBoxContainer"]
+[node name="HSeparator" type="HSeparator" parent="Sidebar/ScrollContainer/MarginContainer/VBoxContainer"]
 layout_mode = 2
 theme_override_constants/separation = 40
 theme_override_styles/separator = SubResource("StyleBoxLine_separator")
 
-[node name="ReturnToGameButton" type="Button" parent="Sidebar/VBoxContainer"]
+[node name="ReturnToGameButton" type="Button" parent="Sidebar/ScrollContainer/MarginContainer/VBoxContainer"]
 custom_minimum_size = Vector2(0, 85)
 layout_mode = 2
 theme_override_colors/font_hover_color = Color(0.878431, 0.941176, 0.839216, 1)
@@ -130,7 +144,7 @@ theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
 text = "ПРОДОЛЖИТЬ"
 
-[node name="RestartButton" type="Button" parent="Sidebar/VBoxContainer"]
+[node name="RestartButton" type="Button" parent="Sidebar/ScrollContainer/MarginContainer/VBoxContainer"]
 custom_minimum_size = Vector2(0, 85)
 layout_mode = 2
 theme_override_colors/font_hover_color = Color(0.878431, 0.941176, 0.839216, 1)
@@ -141,7 +155,7 @@ theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
 text = "ЗАНОВО"
 
-[node name="ReturnToSettingsButton" type="Button" parent="Sidebar/VBoxContainer"]
+[node name="ReturnToSettingsButton" type="Button" parent="Sidebar/ScrollContainer/MarginContainer/VBoxContainer"]
 custom_minimum_size = Vector2(0, 85)
 layout_mode = 2
 theme_override_colors/font_hover_color = Color(0.878431, 0.941176, 0.839216, 1)
@@ -152,7 +166,7 @@ theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
 text = "НАСТРОЙКИ"
 
-[node name="ReturnToMenuButton" type="Button" parent="Sidebar/VBoxContainer"]
+[node name="ReturnToMenuButton" type="Button" parent="Sidebar/ScrollContainer/MarginContainer/VBoxContainer"]
 custom_minimum_size = Vector2(0, 85)
 layout_mode = 2
 theme_override_colors/font_hover_color = Color(0.878431, 0.941176, 0.839216, 1)
@@ -163,7 +177,7 @@ theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
 text = "В МЕНЮ"
 
-[connection signal="pressed" from="Sidebar/VBoxContainer/ReturnToGameButton" to="." method="_on_ReturnToGameButton_pressed"]
-[connection signal="pressed" from="Sidebar/VBoxContainer/RestartButton" to="." method="_on_RestartButton_pressed"]
-[connection signal="pressed" from="Sidebar/VBoxContainer/ReturnToSettingsButton" to="." method="_on_ReturnToSettingsButton_pressed"]
-[connection signal="pressed" from="Sidebar/VBoxContainer/ReturnToMenuButton" to="." method="_on_ReturnToMenuButton_pressed"]
+[connection signal="pressed" from="Sidebar/ScrollContainer/MarginContainer/VBoxContainer/ReturnToGameButton" to="." method="_on_ReturnToGameButton_pressed"]
+[connection signal="pressed" from="Sidebar/ScrollContainer/MarginContainer/VBoxContainer/RestartButton" to="." method="_on_RestartButton_pressed"]
+[connection signal="pressed" from="Sidebar/ScrollContainer/MarginContainer/VBoxContainer/ReturnToSettingsButton" to="." method="_on_ReturnToSettingsButton_pressed"]
+[connection signal="pressed" from="Sidebar/ScrollContainer/MarginContainer/VBoxContainer/ReturnToMenuButton" to="." method="_on_ReturnToMenuButton_pressed"]

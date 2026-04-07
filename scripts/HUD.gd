@@ -5,384 +5,229 @@ var _healthLabel: Label
 var _livesLabel: Label
 var _moneyLabel: Label
 var _basesLabel: Label
-var _levelLabel: Label # Метка для уровня
-var _basesIcon: Sprite2D # Иконка базы
+var _levelLabel: Label
+var _basesIcon: TextureRect
 var _total_enemy_bases: int = 0
 var _destroyed_count: int = 0
 var _player
 var _ammo_buttons = {}
 
 func _ready():
-	add_to_group("hud") # Регистрация для Field.gd
-	var healthPanel = get_node_or_null("HealthPanel")
-	if healthPanel == null:
-		return
+	add_to_group("hud")
 	
-	_healthProgress = healthPanel.get_node_or_null("HealthProgress")
-	_healthLabel = healthPanel.get_node_or_null("HealthLabel")
-	_livesLabel = healthPanel.get_node_or_null("LivesLabel")
-	_moneyLabel = healthPanel.get_node_or_null("MoneyLabel")
-	_levelLabel = healthPanel.get_node_or_null("LevelLabel")
+	_healthProgress = find_child("HealthProgress", true)
+	_healthLabel = find_child("HealthLabel", true)
+	_livesLabel = find_child("LivesLabel", true)
+	_moneyLabel = find_child("MoneyLabel", true)
+	_levelLabel = find_child("LevelLabel", true)
 
-	_setup_bases_label(healthPanel) # Создаем метку баз
+	if _levelLabel:
+		_levelLabel.position.y = 0
+
+	_setup_bases_label()
 	_setup_ammo_selection()
-	_update_level_display() # Обновляем текст уровня
+	_update_level_display()
 
-	if _healthProgress == null or _healthLabel == null:
-		return
-	
-	_setup_progress_bar_style()
-	_healthProgress.min_value = 0
-	_healthProgress.max_value = 100
-	_healthProgress.value = 100
-	_healthProgress.show_percentage = false
+	if _healthProgress:
+		_setup_progress_bar_style()
+		_healthProgress.value = 100
 
 	call_deferred("_find_player_and_connect")
 
-func _update_level_display():
-	if _levelLabel == null: return
+func _setup_bases_label():
+	var stats_container = find_child("Stats", true)
+	if !stats_container: return
 
-	var raw_level = 1
-	# Пытаемся получить уровень из меты SaveManager (как в Field.gd)
-	if SaveManager and SaveManager.has_meta("current_level"):
-		raw_level = SaveManager.get_meta("current_level")
+	var bases_row = HBoxContainer.new()
+	bases_row.name = "BasesRow"
+	bases_row.alignment = BoxContainer.ALIGNMENT_END
+	stats_container.add_child(bases_row)
 
-	# Логика: 1.1, 1.2 ... 1.5, потом 2.1
-	# (raw_level - 1) / 5 + 1  -> первая цифра (мир)
-	# (raw_level - 1) % 5 + 1  -> вторая цифра (уровень в мире)
-	var major = ((raw_level - 1) / 5) + 1
-	var minor = ((raw_level - 1) % 5) + 1
-
-	_levelLabel.text = "МИССИЯ " + str(major) + "." + str(minor)
-
-	# Каждый 5-й уровень делаем красным (это уровни X.5)
-	if raw_level % 5 == 0:
-		_levelLabel.add_theme_color_override("font_color", Color(1.0, 0.3, 0.3)) # Красный
-	else:
-		_levelLabel.add_theme_color_override("font_color", Color(1.0, 0.9, 0.4)) # Золотистый
-
-func _setup_bases_label(container: Control):
-	# Если контейнер уже есть, не создаем дубликат
-	if container.has_node("BasesContainer"):
-		var existing = container.get_node("BasesContainer")
-		_basesLabel = existing.get_node_or_null("BasesLabel")
-		call_deferred("_initialize_bases_count")
-		return
-
-	# Контейнер для иконки и текста
-	var bases_container = Control.new()
-	bases_container.name = "BasesContainer"
-	bases_container.position = Vector2(130, 15)
-	container.add_child(bases_container)
-
-	_basesIcon = Sprite2D.new()
+	_basesIcon = TextureRect.new()
 	_basesIcon.texture = load("res://assets/backround/PNG/Props/Platform.png")
-	_basesIcon.scale = Vector2(0.5, 0.5)
-	_basesIcon.centered = true
-	_basesIcon.position = Vector2(40, 40) # Центр иконки в контейнере
-	_basesIcon.modulate = Color(1.0, 0.2, 0.2, 0.8) # Чуть прозрачный красный
-	bases_container.add_child(_basesIcon)
+	_basesIcon.custom_minimum_size = Vector2(40, 40)
+	_basesIcon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	_basesIcon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	_basesIcon.modulate = Color(1.0, 0.3, 0.3, 0.8)
+	bases_row.add_child(_basesIcon)
 
 	_basesLabel = Label.new()
 	_basesLabel.name = "BasesLabel"
-	# Центрируем текст прямо поверх иконки
-	_basesLabel.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	_basesLabel.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	_basesLabel.size = Vector2(80, 80) # Размер совпадает с областью иконки
-	_basesLabel.position = Vector2(0, 0)
-
-	# Применяем стиль как у валюты
-	_basesLabel.add_theme_font_size_override("font_size", 26)
+	_basesLabel.add_theme_font_size_override("font_size", 32)
 	_basesLabel.add_theme_color_override("font_shadow_color", Color.BLACK)
-	_basesLabel.add_theme_constant_override("shadow_offset_x", 2)
-	_basesLabel.add_theme_constant_override("shadow_offset_y", 2)
-	_basesLabel.add_theme_constant_override("shadow_outline_size", 1)
-	bases_container.add_child(_basesLabel)
+	_basesLabel.add_theme_constant_override("shadow_outline_size", 4)
+	bases_row.add_child(_basesLabel)
 
 	call_deferred("_initialize_bases_count")
 
 func _initialize_bases_count():
-	# Ждем несколько кадров для полной загрузки всех объектов в группы
 	await get_tree().process_frame
 	await get_tree().process_frame
-	await get_tree().process_frame
-
-	_total_enemy_bases = 0
+	_total_enemy_bases = get_tree().get_nodes_in_group("bases").filter(func(b): return b.get("type_base") == 1).size()
 	_destroyed_count = 0
-	var all_bases = get_tree().get_nodes_in_group("bases")
-	for b in all_bases:
-		if b.get("type_base") == 1: # ENEMY
-			_total_enemy_bases += 1
-
 	_update_label_text()
 
 func update_bases_count():
-	# Этот метод вызывается при каждой смерти базы
 	_destroyed_count += 1
 	_update_label_text()
 
 func _update_label_text():
 	if _basesLabel:
-		# Ограничиваем количество уничтоженных баз общим количеством
-		var display_destroyed = min(_destroyed_count, _total_enemy_bases)
-		_basesLabel.text = str(display_destroyed) + "/" + str(_total_enemy_bases)
+		_basesLabel.text = str(min(_destroyed_count, _total_enemy_bases)) + "/" + str(_total_enemy_bases)
+
+func _update_level_display():
+	if !_levelLabel: return
+	var lvl = SaveManager.get_meta("current_level") if SaveManager and SaveManager.has_meta("current_level") else 1
+	_levelLabel.text = "МИССИЯ " + str(((lvl-1)/5)+1) + "." + str(((lvl-1)%5)+1)
 
 func _find_player_and_connect():
-	# Универсальный поиск игрока через группу
-	var players = get_tree().get_nodes_in_group("players")
-	if players.size() > 0:
-		_player = players[0]
-	
-	if _player != null:
-		# Правильное подключение сигналов в Godot 4
-		if _player.has_signal("health_changed") and not _player.health_changed.is_connected(_on_health_changed):
+	var p = get_tree().get_first_node_in_group("players")
+	if p != null:
+		_player = p
+		if not _player.health_changed.is_connected(_on_health_changed):
 			_player.health_changed.connect(_on_health_changed)
-
-		if _player.has_signal("lives_changed") and not _player.lives_changed.is_connected(_on_lives_changed):
+		if not _player.lives_changed.is_connected(_on_lives_changed):
 			_player.lives_changed.connect(_on_lives_changed)
-
-		if _player.has_signal("money_changed") and not _player.money_changed.is_connected(_on_money_changed):
+		if not _player.money_changed.is_connected(_on_money_changed):
 			_player.money_changed.connect(_on_money_changed)
-
 		if _player.has_signal("ammo_changed") and not _player.ammo_changed.is_connected(_on_ammo_changed):
 			_player.ammo_changed.connect(_on_ammo_changed)
-			_on_ammo_changed(_player._type_bullet)
 
-		var current_health = 100
-		var max_health = 100
-		var current_lives = 3
-		var current_money = 0
+		_on_health_changed(_player.get_current_health(), _player.get_max_health())
+		_on_lives_changed(_player.get_lives())
+		_on_money_changed(_player.get_money())
+		_on_ammo_changed(_player._type_bullet)
 
-		if _player.has_method("get_current_health"):
-			current_health = _player.get_current_health()
-		if _player.has_method("get_max_health"):
-			max_health = _player.get_max_health()
-		if _player.has_method("get_lives"):
-			current_lives = _player.get_lives()
-		if _player.has_method("get_money"):
-			current_money = _player.get_money()
+		var joy = find_child("Joystick", true)
+		var aim = find_child("Aim", true)
 
-		var display_health = max(0, current_health)
+		if joy:
+			if not joy.use_move_vector.is_connected(_player.use_move_vector):
+				joy.use_move_vector.connect(_player.use_move_vector)
 
-		_healthProgress.max_value = max_health
-		_healthProgress.value = display_health
-		_healthLabel.text = str(display_health) + "/" + str(max_health)
-
-		if _livesLabel != null:
-			_livesLabel.text = "Жизни: " + str(current_lives)
-
-		if _moneyLabel != null:
-			_moneyLabel.text = str(current_money)
-
-		_update_health_color(display_health, max_health)
+		if aim:
+			aim.init(true)
+			if not aim.use_move_vector.is_connected(_player.use_move_vector_aim):
+				aim.use_move_vector.connect(_player.use_move_vector_aim)
+			if not aim.fire_touch.is_connected(_player.fire_touch):
+				aim.fire_touch.connect(_player.fire_touch)
 	else:
 		get_tree().create_timer(0.5).timeout.connect(_find_player_and_connect)
 
 func _setup_progress_bar_style():
-	if _healthProgress == null:
-		return
-	
-	var background_style = StyleBoxFlat.new()
-	background_style.bg_color = Color(0.1, 0.1, 0.1)
-	background_style.border_width_bottom = 2
-	background_style.border_width_top = 2
-	background_style.border_width_left = 2
-	background_style.border_width_right = 2
-	background_style.border_color = Color(0.3, 0.3, 0.3)
-	background_style.corner_radius_bottom_left = 5
-	background_style.corner_radius_bottom_right = 5
-	background_style.corner_radius_top_left = 5
-	background_style.corner_radius_top_right = 5
+	var style = StyleBoxFlat.new()
+	style.bg_color = Color(0.2, 0.8, 0.2)
+	style.set_corner_radius_all(5)
+	_healthProgress.add_theme_stylebox_override("fill", style)
 
-	var progress_style = StyleBoxFlat.new()
-	progress_style.bg_color = Color(0.2, 0.8, 0.2)
-	progress_style.corner_radius_bottom_left = 5
-	progress_style.corner_radius_bottom_right = 5
-	progress_style.corner_radius_top_left = 5
-	progress_style.corner_radius_top_right = 5
+func _on_health_changed(curr, m):
+	if !_healthProgress: return
+	_healthProgress.max_value = m
+	_healthProgress.value = curr
+	_healthLabel.text = str(max(0,curr)) + "/" + str(m)
+	_update_health_color(curr, m)
 
-	_healthProgress.add_theme_stylebox_override("under", background_style)
-	_healthProgress.add_theme_stylebox_override("fill", progress_style)
+func _update_health_color(curr, m):
+	var p = float(curr)/m
+	var style = _healthProgress.get_theme_stylebox("fill").duplicate()
+	style.bg_color = Color(1,0.2,0.2) if p <= 0.3 else (Color(1,0.8,0.2) if p <= 0.6 else Color(0.2,0.8,0.2))
+	_healthProgress.add_theme_stylebox_override("fill", style)
 
-func _on_health_changed(current_health: int, max_health: int):
-	if _healthProgress == null or _healthLabel == null:
-		return
-
-	var display_health = max(0, current_health)
-
-	_healthProgress.value = display_health
-	_healthLabel.text = str(display_health) + "/" + str(max_health)
-	_update_health_color(display_health, max_health)
-
-func _on_lives_changed(current_lives: int):
-	if _livesLabel == null:
-		return
-	_livesLabel.text = "Жизни: " + str(current_lives)
-
-func _on_money_changed(current_money: int):
-	if _moneyLabel == null:
-		return
-	_moneyLabel.text = str(current_money)
-
-func _update_health_color(current_health: int, max_health: int):
-	var percent = float(current_health) / float(max_health)
-	var style = _healthProgress.get_theme_stylebox("fill")
-	if style is StyleBoxFlat:
-		var flat_style = style as StyleBoxFlat
-		if percent <= 0.3:
-			flat_style.bg_color = Color(1, 0.2, 0.2)
-		elif percent <= 0.6:
-			flat_style.bg_color = Color(1, 0.8, 0.2)
-		else:
-			flat_style.bg_color = Color(0.2, 0.8, 0.2)
-
-		_healthProgress.add_theme_stylebox_override("fill", flat_style)
+func _on_lives_changed(l): if _livesLabel: _livesLabel.text = "Жизни: " + str(l)
+func _on_money_changed(m): if _moneyLabel: _moneyLabel.text = str(m)
 
 func _setup_ammo_selection():
-	if has_node("AmmoPanel"):
-		get_node("AmmoPanel").queue_free()
+	if has_node("AmmoPanelContainer"): get_node("AmmoPanelContainer").queue_free()
 
-	_ammo_buttons.clear()
+	var ammo_container = MarginContainer.new()
+	ammo_container.name = "AmmoPanelContainer"
+	add_child(ammo_container)
+	# Центрируем по горизонтали и привязываем к низу
+	ammo_container.set_anchors_and_offsets_preset(Control.PRESET_CENTER_BOTTOM)
+	ammo_container.grow_horizontal = Control.GROW_DIRECTION_BOTH
+	ammo_container.offset_top = -140 # Сдвинул чуть выше из-за увеличения размера
 
-	# Используем HBoxContainer для автоматического выравнивания и центрирования
 	var ammo_panel = HBoxContainer.new()
 	ammo_panel.name = "AmmoPanel"
-	add_child(ammo_panel)
-
-	# Центрируем панель внизу экрана (12 = PRESET_BOTTOM_CENTER)
-	ammo_panel.set_anchors_and_offsets_preset(12)
-	ammo_panel.grow_horizontal = Control.GROW_DIRECTION_BOTH
-	ammo_panel.grow_vertical = Control.GROW_DIRECTION_BEGIN
-	ammo_panel.position.y -= 25 # Опустили максимально низко к краю
 	ammo_panel.alignment = BoxContainer.ALIGNMENT_CENTER
-	ammo_panel.add_theme_constant_override("separation", 20)
+	ammo_container.add_child(ammo_panel)
 
-	var textures = {
-		0: "res://assets/future_tanks/PNG/Effects/Plasma.png",
-		1: "res://assets/future_tanks/PNG/Effects/Medium_Shell.png",
-		2: "res://assets/future_tanks/PNG/Effects/Light_Shell.png"
-	}
+	var btn_size = 120 # Увеличил размер кнопок
+	ammo_panel.add_theme_constant_override("separation", 25)
 
-	var ammo_types = ["PL", "MD", "LG"]
+	var tex = [
+		"res://assets/future_tanks/PNG/Effects/Plasma.png",
+		"res://assets/future_tanks/PNG/Effects/Medium_Shell.png",
+		"res://assets/future_tanks/PNG/Effects/Light_Shell.png"
+	]
 
 	for i in range(3):
 		var slot = Control.new()
 		slot.name = "Slot_" + str(i)
-		slot.custom_minimum_size = Vector2(100, 110)
+		slot.custom_minimum_size = Vector2(btn_size, btn_size)
 		ammo_panel.add_child(slot)
 
-		# Фон и рамка (Panel)
-		var bg = Panel.new()
-		bg.name = "BG"
-		bg.size = Vector2(100, 110)
-		bg.mouse_filter = Control.MOUSE_FILTER_IGNORE # Пропускаем нажатия к TouchArea
-		slot.add_child(bg)
+		var btn = Button.new()
+		btn.name = "Button"
+		btn.size = Vector2(btn_size, btn_size)
 
-		# Индикатор перезарядки
-		var cooldown_overlay = ColorRect.new()
-		cooldown_overlay.name = "Cooldown"
-		cooldown_overlay.size = Vector2(100, 110)
-		cooldown_overlay.color = Color(0, 0, 0, 0.6)
-		cooldown_overlay.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		cooldown_overlay.visible = false
-		slot.add_child(cooldown_overlay)
-
-
-		# Базовый стиль слота (темный с закругленными углами)
 		var style = StyleBoxFlat.new()
-		style.bg_color = Color(0.1, 0.1, 0.1, 0.8)
-		style.border_width_left = 2
-		style.border_width_top = 2
-		style.border_width_right = 2
-		style.border_width_bottom = 2
+		style.bg_color = Color(0.1, 0.1, 0.1, 0.6)
+		style.set_corner_radius_all(15)
+		style.set_border_width_all(3)
 		style.border_color = Color(0.4, 0.4, 0.4)
-		style.corner_radius_top_left = 10
-		style.corner_radius_top_right = 10
-		style.corner_radius_bottom_left = 10
-		style.corner_radius_bottom_right = 10
-		bg.add_theme_stylebox_override("panel", style)
 
-		# Иконка снаряда
-		var icon = Sprite2D.new()
-		icon.name = "Icon"
-		icon.texture = load(textures[i])
-		icon.position = Vector2(50, 55)
-		icon.scale = Vector2(0.6, 0.6) # Масштаб для новых текстур
-		slot.add_child(icon)
+		btn.add_theme_stylebox_override("normal", style)
+		slot.add_child(btn)
 
-		# Тип снаряда (текст сверху слева)
-		var label = Label.new()
-		label.text = ammo_types[i]
-		label.position = Vector2(8, 5)
-		label.add_theme_font_size_override("font_size", 18)
-		label.add_theme_color_override("font_shadow_color", Color.BLACK)
-		slot.add_child(label)
+		var icon = TextureRect.new()
+		icon.texture = load(tex[i])
+		icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		icon.size = Vector2(84, 84) # Увеличил иконку пропорционально
+		icon.position = Vector2(18, 18) # Центрирование
+		icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		btn.add_child(icon)
 
-		# Невидимая область для нажатия через gui_input (без встроенных эффектов "кругов")
-		var touch_area = Control.new()
-		touch_area.name = "TouchArea"
-		touch_area.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-		slot.add_child(touch_area)
+		var cooldown = ColorRect.new()
+		cooldown.name = "Cooldown"
+		cooldown.color = Color(0, 0, 0, 0.7)
+		cooldown.size = Vector2(btn_size, btn_size)
+		cooldown.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		cooldown.visible = false
+		btn.add_child(cooldown)
 
 		_ammo_buttons[i] = slot
-
-		# Обработка нажатия (тач или мышь) без визуального фидбека
-		touch_area.gui_input.connect(func(event):
-			if (event is InputEventScreenTouch and event.pressed) or (event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT):
-				if _player:
-					_player._on_ammo_selected(i)
-		)
+		btn.pressed.connect(func(): if _player: _player._on_ammo_selected(i))
 
 func _process(_delta):
 	_update_ammo_cooldowns()
 
 func _update_ammo_cooldowns():
 	if _player == null or not is_instance_valid(_player): return
-
-	var reload_timer = _player.get("_shoot_timer")
-	if reload_timer == null or not is_instance_valid(reload_timer): return
-
-	var time_left = reload_timer.time_left
-	var wait_time = reload_timer.wait_time
-	var current_type = _player.get("_type_bullet")
+	var timer = _player.get("_shoot_timer")
 
 	for i in range(3):
 		if not _ammo_buttons.has(i): continue
-		var slot = _ammo_buttons[i]
-		var cooldown = slot.get_node_or_null("Cooldown")
-		if cooldown == null: continue
+		var cd = _ammo_buttons[i].get_node("Button/Cooldown")
 
-		# Показываем КД только на выбранном типе или на всех?
-		# Обычно лучше на всех, если КД общий, но пользователь просил на выбранном.
-		if i == current_type and time_left > 0:
-			cooldown.visible = true
-			# Высота затемнения уменьшается сверху вниз по мере перезарядки
-			var ratio = time_left / wait_time
-			cooldown.size.y = 110 * ratio
-			cooldown.position.y = 110 * (1.0 - ratio)
+		if timer and not timer.is_stopped() and i == _player.get("_type_bullet"):
+			cd.visible = true
+			var ratio = timer.time_left / timer.wait_time
+			var h = _ammo_buttons[i].custom_minimum_size.y
+			cd.size.y = h * ratio
+			cd.position.y = h * (1.0 - ratio)
 		else:
-			cooldown.visible = false
+			cd.visible = false
 
-func _on_ammo_changed(type: int):
-	for ammo_type in _ammo_buttons:
-		var slot = _ammo_buttons[ammo_type]
-		var bg = slot.get_node("BG")
-		var icon = slot.get_node("Icon")
-
-		# Клонируем стиль, чтобы изменения одного слота не влияли на другие
-		var style = bg.get_theme_stylebox("panel").duplicate()
-
-		if ammo_type == type:
-			# Активный слот: золотая рамка
-			style.border_color = Color(1.0, 0.8, 0.2)
-			style.bg_color = Color(0.2, 0.2, 0.15, 0.9)
-			slot.modulate.a = 1.0
-			icon.modulate = Color(1.3, 1.3, 1.3) # Свечение
+func _on_ammo_changed(type):
+	for i in _ammo_buttons:
+		var btn = _ammo_buttons[i].get_node("Button")
+		var style = btn.get_theme_stylebox("normal").duplicate()
+		if i == type:
+			style.border_color = Color(1, 0.8, 0.2)
+			_ammo_buttons[i].modulate.a = 1.0
 		else:
-			# Неактивный слот: серая рамка и прозрачность
 			style.border_color = Color(0.4, 0.4, 0.4)
-			style.bg_color = Color(0.1, 0.1, 0.1, 0.8)
-			slot.modulate.a = 0.5
-			icon.modulate = Color(0.7, 0.7, 0.7) # Приглушение
-
-		bg.add_theme_stylebox_override("panel", style)
+			_ammo_buttons[i].modulate.a = 0.6
+		btn.add_theme_stylebox_override("normal", style)

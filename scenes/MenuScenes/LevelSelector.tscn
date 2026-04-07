@@ -1,4 +1,4 @@
-[gd_scene load_steps=18 format=4 uid="uid://c8y2vxtx0w1v"]
+[gd_scene load_steps=19 format=4 uid="uid://c8y2vxtx0w1v"]
 
 [ext_resource type="Script" uid="uid://bw3wldkknnu7n" path="res://scripts/MenuScripts/LevelSelector.gd" id="1"]
 [ext_resource type="FontFile" uid="uid://bsnvk4l0ue5ri" path="res://assets/fonts/ofont.ru_Shonen.ttf" id="2"]
@@ -64,6 +64,8 @@ outline_color = Color(0.0784314, 0.0901961, 0.0784314, 1)
 shadow_size = 15
 shadow_color = Color(0, 0, 0, 0.4)
 
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_scroll"]
+
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn_hover"]
 bg_color = Color(0.25098, 0.301961, 0.25098, 1)
 border_width_left = 2
@@ -113,47 +115,56 @@ script = ExtResource("1")
 tile_map_data = PackedByteArray("AAAJAAUAAAAAAAEAAAAIAAUAAAAAAAEAAAAHAAUAAAAAAAEAAAAGAAUAAAABAAEAAAAFAAUAAAACAAEAAGAEAAUAAAADAAEAADADAAUAAAAAAAEAAAACAAUAAAACAAEAAGABAAUAAAAAAAEAAAAAAAUAAAAAAAEAAAAAAAQAAAABAAEAAAAAAAMAAAACAAEAADAAAAIAAAAAAAEAAAAAAAEAAAAAAAEAAAAAAAAAAAABAAEAAAABAAAAAAAAAAEAAAACAAAAAAACAAEAAFADAAAAAAAAAAEAAAAEAAAAAAABAAEAAAAFAAAAAAACAAEAAAAGAAAAAAAAAAEAAAAHAAAAAAADAAEAAAAIAAAAAAAAAAEAAAAJAAAAAAABAAEAAAAJAAEAAAAAAAEAAAAJAAIAAAADAAEAAFAJAAMAAAACAAEAAAAJAAQAAAABAAEAAAAIAAQAAAAAAAEAAAAHAAQAAAAEAAEAADAGAAQAAAADAAEAAFAFAAQAAAADAAEAAFAEAAQAAAAEAAEAAAADAAQAAAAAAAEAAAACAAQAAAAAAAEAAAABAAQAAAAAAAEAAAACAAMAAAAAAAEAAAACAAIAAAAAAAEAAAABAAIAAAABAAEAAAACAAEAAAAAAAEAAAABAAMAAAAAAAEAAAADAAMAAAAAAAEAAAADAAIAAAAAAAEAAAADAAEAAAAAAAEAAAABAAEAAAAAAAEAAAAEAAMAAAAAAAEAAAAFAAMAAAAAAAEAAAAGAAMAAAAAAAEAAAAGAAIAAAAAAAEAAAAHAAIAAAADAAEAAAAHAAEAAAADAAEAAAAGAAEAAAAAAAEAAAAFAAEAAAAAAAEAAAAEAAEAAAAAAAEAAAAEAAIAAAABAAEAAAAHAAMAAAAFAAEAAAAFAAIAAAAAAAEAAAAIAAMAAAAEAAEAADAIAAIAAAAEAAEAAAAIAAEAAAABAAEAAAA=")
 tile_set = SubResource("TileSet_cdygo")
 
-[node name="Player" type="Sprite2D" parent="."]
+[node name="Decorations" type="Control" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="Player" type="Sprite2D" parent="Decorations"]
 position = Vector2(243, 246)
 rotation = 1.84277
 scale = Vector2(0.568397, 0.568397)
 texture = ExtResource("3_llkjw")
 
-[node name="Gun01" type="Sprite2D" parent="Player"]
+[node name="Gun01" type="Sprite2D" parent="Decorations/Player"]
 position = Vector2(-0.276793, 5.5566)
 rotation = -0.263479
 texture = ExtResource("4_67xkb")
 
-[node name="Enemy" type="Sprite2D" parent="."]
+[node name="Enemy" type="Sprite2D" parent="Decorations"]
 position = Vector2(820, 237)
 rotation = -1.91807
 scale = Vector2(0.522154, 0.522154)
 texture = ExtResource("5_nl27w")
 
-[node name="Enemy1" type="Sprite2D" parent="Enemy"]
+[node name="Enemy1" type="Sprite2D" parent="Decorations/Enemy"]
 position = Vector2(11.9204, -16.0528)
 rotation = 0.305062
 scale = Vector2(0.955, 0.955)
 texture = ExtResource("6_d47o7")
 
-[node name="Enemy2" type="Sprite2D" parent="."]
+[node name="Enemy2" type="Sprite2D" parent="Decorations"]
 position = Vector2(877, 630)
 rotation = -0.689387
 scale = Vector2(0.592559, 0.592559)
 texture = ExtResource("7_tgwm7")
 
-[node name="Gun05" type="Sprite2D" parent="Enemy2"]
+[node name="Gun05" type="Sprite2D" parent="Decorations/Enemy2"]
 position = Vector2(-9.62896, -38.0988)
 rotation = -0.182549
 texture = ExtResource("8_rwsex")
 
-[node name="ExplosionA" type="Sprite2D" parent="Enemy2"]
+[node name="ExplosionA" type="Sprite2D" parent="Decorations/Enemy2"]
 position = Vector2(-28.3496, -130.369)
 rotation = -0.383106
 scale = Vector2(1.79295, 1.79295)
 texture = ExtResource("9_dscdh")
 
-[node name="Plasma" type="Sprite2D" parent="Enemy2"]
+[node name="Plasma" type="Sprite2D" parent="Decorations/Enemy2"]
 position = Vector2(-108.528, -454.695)
 rotation = 5.92977
 scale = Vector2(1.53494, 1.53494)
@@ -168,47 +179,64 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(0.0784314, 0.0901961, 0.0784314, 0.745098)
 
-[node name="Title" type="Label" parent="."]
+[node name="UI" type="Control" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="Title" type="Label" parent="UI"]
 layout_mode = 1
 anchors_preset = 5
 anchor_left = 0.5
 anchor_right = 0.5
 offset_left = -347.0
-offset_top = 15.0
+offset_top = 30.0
 offset_right = 347.0
-offset_bottom = 115.0
+offset_bottom = 130.0
 grow_horizontal = 2
 text = "ВЫБОР МИССИИ"
 label_settings = SubResource("LabelSettings_title")
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="GridContainer" type="GridContainer" parent="."]
+[node name="CenterContainer" type="CenterContainer" parent="UI"]
 layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -340.0
-offset_top = -237.0
-offset_right = 340.0
-offset_bottom = 303.0
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = 130.0
+offset_bottom = -100.0
 grow_horizontal = 2
 grow_vertical = 2
+mouse_filter = 2
+
+[node name="LevelScroll" type="ScrollContainer" parent="UI/CenterContainer"]
+custom_minimum_size = Vector2(720, 500)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxEmpty_scroll")
+horizontal_scroll_mode = 0
+
+[node name="GridContainer" type="GridContainer" parent="UI/CenterContainer/LevelScroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
 theme_override_constants/h_separation = 20
 theme_override_constants/v_separation = 20
 columns = 5
 
-[node name="ReturnButton" type="Button" parent="."]
+[node name="ReturnButton" type="Button" parent="UI"]
 layout_mode = 1
 anchors_preset = 2
 anchor_top = 1.0
 anchor_bottom = 1.0
-offset_left = 26.0
-offset_top = -100.0
-offset_right = 226.0
-offset_bottom = -40.0
+offset_left = 30.0
+offset_top = -90.0
+offset_right = 230.0
+offset_bottom = -30.0
 grow_vertical = 0
 theme_override_fonts/font = ExtResource("2")
 theme_override_font_sizes/font_size = 28
@@ -217,4 +245,4 @@ theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
 theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
 text = "В МЕНЮ"
 
-[connection signal="pressed" from="ReturnButton" to="." method="_on_Return_Button_pressed"]
+[connection signal="pressed" from="UI/ReturnButton" to="." method="_on_Return_Button_pressed"]

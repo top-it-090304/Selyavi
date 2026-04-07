@@ -1,19 +1,19 @@
 extends Control
 
-@onready var tank_preview_body = $TankFrame/TankPreview/Body
-@onready var tank_preview_gun = $TankFrame/TankPreview/Body/Gun
-@onready var money_label = $MoneyLabel
+@onready var tank_preview_body = find_child("Body", true)
+@onready var tank_preview_gun = find_child("Gun", true)
+@onready var money_label = find_child("MoneyLabel", true)
 
-@onready var damage_label = $Stats/Damage
-@onready var hp_label = $Stats/HP
-@onready var speed_label = $Stats/Speed
-@onready var rof_label = $Stats/ROF
+@onready var damage_label = find_child("Damage", true)
+@onready var hp_label = find_child("HP", true)
+@onready var speed_label = find_child("Speed", true)
+@onready var rof_label = find_child("ROF", true)
 
-@onready var buy_gun_btn = $Selectors/GunSelector/BuyGun
-@onready var buy_hull_btn = $Selectors/HullSelector/BuyHull
-@onready var buy_color_btn = $Selectors/ColorSelector/BuyColor
+@onready var buy_gun_btn = find_child("BuyGun", true)
+@onready var buy_hull_btn = find_child("BuyHull", true)
+@onready var buy_color_btn = find_child("BuyColor", true)
 
-@onready var color_fill = $Selectors/ColorSelector/Display/ColorBox/Fill
+@onready var color_fill = find_child("Fill", true)
 
 # Item Data с уменьшенными значениями offset (отрицательные значения поднимают пушку выше)
 var bodies = [
@@ -60,6 +60,8 @@ func _ready():
 	update_ui()
 
 func update_ui():
+	if money_label == null: return
+
 	# Принудительно приводим к int, чтобы убрать запятые и цифры после них
 	money_label.text = str(int(money))
 
@@ -74,40 +76,46 @@ func update_ui():
 	var body_tex = load(body_path)
 	var gun_tex = load(gun_path)
 
-	tank_preview_body.texture = body_tex
-	tank_preview_gun.texture = gun_tex
+	if tank_preview_body: tank_preview_body.texture = body_tex
+	if tank_preview_gun: tank_preview_gun.texture = gun_tex
 
 	# Корректировка позиции пушки на превью
-	tank_preview_gun.position = Vector2(0, body.offset)
+	if tank_preview_gun: tank_preview_gun.position = Vector2(0, body.offset)
 
 	# Update Stats
-	damage_label.text = "УРОН: x" + str(gun.dmg_mod)
-	hp_label.text = "ЗДОРОВЬЕ: " + str(body.hp + color.hp_bonus)
-	speed_label.text = "СКОРОСТЬ: " + str(body.speed + color.speed_bonus)
-	rof_label.text = "СКОРОСТРЕЛЬНОСТЬ: " + str(gun.rof + color.rof_bonus) + " сек"
+	if damage_label: damage_label.text = "УРОН: x" + str(gun.dmg_mod)
+	if hp_label: hp_label.text = "ЗДОРОВЬЕ: " + str(body.hp + color.hp_bonus)
+	if speed_label: speed_label.text = "СКОРОСТЬ: " + str(body.speed + color.speed_bonus)
+	if rof_label: rof_label.text = "СКОРОСТРЕЛЬНОСТЬ: " + str(gun.rof + color.rof_bonus) + " сек"
 
-	# Update Selectors with icons and names
-	$Selectors/GunSelector/Display/Icon.texture = gun_tex
-	$Selectors/GunSelector/Display/Label.text = gun.name
+	# Update Selectors with icons and names - safely access icons/labels
+	var gun_icon = find_child("GunSelector", true).find_child("Icon", true)
+	var gun_name = find_child("GunSelector", true).find_child("Label", true)
+	if gun_icon: gun_icon.texture = gun_tex
+	if gun_name: gun_name.text = gun.name
 
-	$Selectors/HullSelector/Display/Icon.texture = body_tex
-	$Selectors/HullSelector/Display/Label.text = body.name
+	var hull_icon = find_child("HullSelector", true).find_child("Icon", true)
+	var hull_name = find_child("HullSelector", true).find_child("Label", true)
+	if hull_icon: hull_icon.texture = body_tex
+	if hull_name: hull_name.text = body.name
 
 	# Update Color Square - safely accessing stylebox
-	var stylebox = color_fill.get_theme_stylebox("panel").duplicate()
-	if stylebox is StyleBoxFlat:
-		stylebox.bg_color = color.color
-		color_fill.add_theme_stylebox_override("panel", stylebox)
+	if color_fill:
+		var stylebox = color_fill.get_theme_stylebox("panel").duplicate()
+		if stylebox is StyleBoxFlat:
+			stylebox.bg_color = color.color
+			color_fill.add_theme_stylebox_override("panel", stylebox)
 
-	$Selectors/ColorSelector/Display/Label.text = color.name
+	var color_name = find_child("ColorSelector", true).find_child("Label", true)
+	if color_name: color_name.text = color.name
 
 	# Update individual buy buttons
 	_update_selector_buttons()
 
 func _update_selector_buttons():
-	_update_btn(buy_gun_btn, "guns", current_gun_idx, guns[current_gun_idx].price, "gun_type")
-	_update_btn(buy_hull_btn, "bodies", current_body_idx, bodies[current_body_idx].price, "body_type")
-	_update_btn(buy_color_btn, "colors", current_color_idx, colors[current_color_idx].price, "color_type")
+	if buy_gun_btn: _update_btn(buy_gun_btn, "guns", current_gun_idx, guns[current_gun_idx].price, "gun_type")
+	if buy_hull_btn: _update_btn(buy_hull_btn, "bodies", current_body_idx, bodies[current_body_idx].price, "body_type")
+	if buy_color_btn: _update_btn(buy_color_btn, "colors", current_color_idx, colors[current_color_idx].price, "color_type")
 
 func _update_btn(btn: Button, category: String, id: int, price: int, stat_name: String):
 	var owned = SaveManager.is_purchased(category, id)
