@@ -1,4 +1,4 @@
-[gd_scene load_steps=15 format=4 uid="uid://caamteij6msit"]
+[gd_scene load_steps=14 format=4 uid="uid://caamteij6msit"]
 
 [ext_resource type="PackedScene" uid="uid://mfxaskty4hrm" path="res://scenes/Tank/Player.tscn" id="2"]
 [ext_resource type="Texture2D" uid="uid://d0bnoilig7yxs" path="res://assets/ground_shaker_asset/Terrains/terrain.png" id="2_mssve"]
@@ -8,9 +8,8 @@
 [ext_resource type="AudioStream" uid="uid://bxl5wv7crhm5" path="res://assets/Music/68. Sad Eyes.mp3" id="6"]
 [ext_resource type="Script" uid="uid://3wsw25sk74o6" path="res://scripts/Field.gd" id="8"]
 [ext_resource type="Texture2D" uid="uid://dsiq4t7qegc5x" path="res://assets/ButtonSprites/pause_594725.png" id="9"]
-[ext_resource type="PackedScene" uid="uid://bjw4bj0fr4c7q" path="res://scenes/Base.tscn" id="15"]
+[ext_resource type="PackedScene" uid="uid://bnndy2jvcxdmq" path="res://scenes/Tank/Boss.tscn" id="10_advns"]
 [ext_resource type="PackedScene" uid="uid://336qfi6ddylt" path="res://scenes/Tank/HUD.tscn" id="21"]
-[ext_resource type="PackedScene" uid="uid://dfpgy8w1vxtx0" path="res://scenes/Tank/Enemy.tscn" id="22_n0sxv"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_2i15a"]
 texture = ExtResource("2_mssve")
@@ -256,27 +255,17 @@ position = Vector2(1036, -15)
 rotation = 1.5708
 scale = Vector2(1, 1.75)
 
-[node name="Base" parent="." instance=ExtResource("15")]
-position = Vector2(758, 137)
-type_base = 0
-
 [node name="Navigation2D" type="Node2D" parent="."]
 
 [node name="NavigationRegion2D" type="NavigationRegion2D" parent="Navigation2D"]
+visible = false
 position = Vector2(35, -12)
 navigation_polygon = SubResource("2")
 
-[node name="EnemyBase" parent="." instance=ExtResource("15")]
-position = Vector2(1608, 1417)
-
-[node name="EnemyBase2" parent="." instance=ExtResource("15")]
-position = Vector2(1569, 826)
-
-[node name="Enemy" parent="." instance=ExtResource("22_n0sxv")]
-position = Vector2(400, 1039)
-_type_enemy = 3
-
 [node name="DestructibleWall" parent="." instance=ExtResource("5")]
 position = Vector2(466, 134)
+
+[node name="Boss" parent="." instance=ExtResource("10_advns")]
+position = Vector2(1120, 824)
 
 [connection signal="pressed" from="PlayerTank/PauseButton/PauseButton" to="." method="_on_TouchScreenButton_pressed"]
