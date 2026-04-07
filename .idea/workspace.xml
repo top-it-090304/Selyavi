@@ -5,15 +5,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="e3887325-b543-4879-bba0-c494d7c2e039" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/assets/Money.png.import" beforeDir="false" afterPath="$PROJECT_DIR$/assets/Money.png.import" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/turret/SniperTurretBase.png.import" beforeDir="false" afterPath="$PROJECT_DIR$/assets/turret/SniperTurretBase.png.import" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/turret/SniperTurretGun.png.import" beforeDir="false" afterPath="$PROJECT_DIR$/assets/turret/SniperTurretGun.png.import" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/icons/108.png.import" beforeDir="false" afterPath="$PROJECT_DIR$/icons/108.png.import" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/icons/128.png.import" beforeDir="false" afterPath="$PROJECT_DIR$/icons/128.png.import" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/icons/172.png.import" beforeDir="false" afterPath="$PROJECT_DIR$/icons/172.png.import" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/icons/86.png.import" beforeDir="false" afterPath="$PROJECT_DIR$/icons/86.png.import" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/project.godot" beforeDir="false" afterPath="$PROJECT_DIR$/project.godot" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/scenes/MenuScenes/Menu.tscn" beforeDir="false" afterPath="$PROJECT_DIR$/scenes/MenuScenes/Menu.tscn" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/scenes/Tank/Boss.tscn" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/scripts/Tank/Boss.gd" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/Tank/Enemy.gd" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/Tank/Enemy.gd" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
