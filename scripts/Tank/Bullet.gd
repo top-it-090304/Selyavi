@@ -8,6 +8,8 @@ var _type_bullet: int
 var _bullet_sprite: Sprite2D
 var _damage: int = 0
 var _is_player: bool = false
+var _traveled_distance: float = 0.0
+var _max_range: float = 1000.0
 
 const PLASMA: int = 0
 const MEDIUM: int = 1
@@ -34,7 +36,12 @@ func _ready():
 		_visibility_bullet.screen_exited.connect(_on_screen_exited)
 
 func _move():
-	position += _velocity * _bullet_speed
+	var move_step = _velocity * _bullet_speed
+	position += move_step
+	_traveled_distance += move_step.length()
+
+	if _traveled_distance >= _max_range:
+		_destroy()
 
 func _fade_sound():
 	# Создаем Tween только когда он нужен
@@ -90,14 +97,17 @@ func _update_type():
 			_bullet_sprite.texture = load("res://assets/future_tanks/PNG/Effects/Plasma.png")
 			_bullet_speed = 7
 			_damage = 25
+			_max_range = 600.0
 		MEDIUM:
 			_bullet_sprite.texture = load("res://assets/future_tanks/PNG/Effects/Medium_Shell.png")
 			_bullet_speed = 4
 			_damage = 40
+			_max_range = 400.0
 		LIGHT:
 			_bullet_sprite.texture = load("res://assets/future_tanks/PNG/Effects/Light_Shell.png")
 			_bullet_speed = 6
 			_damage = 35
+			_max_range = 900.0
 
 	if AudioManager != null:
 		AudioManager.play_bullet_sound(_type_bullet, global_position)
@@ -107,12 +117,15 @@ func _update_appearance():
 		PLASMA:
 			_bullet_sprite.texture = load("res://assets/future_tanks/PNG/Effects/Plasma.png")
 			_bullet_speed = 7
+			_max_range = 600.0
 		MEDIUM:
 			_bullet_sprite.texture = load("res://assets/future_tanks/PNG/Effects/Medium_Shell.png")
 			_bullet_speed = 4
+			_max_range = 400.0
 		LIGHT:
 			_bullet_sprite.texture = load("res://assets/future_tanks/PNG/Effects/Light_Shell.png")
 			_bullet_speed = 6
+			_max_range = 900.0
 
 	if AudioManager != null:
 		AudioManager.play_bullet_sound(_type_bullet, global_position)

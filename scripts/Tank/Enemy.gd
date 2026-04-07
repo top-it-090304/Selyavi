@@ -4,7 +4,7 @@ extends Tank
 signal enemy_died(type: int)
 
 enum State { PATROL, CHASE }
-enum TypeEnemy { LIGHT, MEDIUM, HEAVY, STATIONARY, TRIPLE, NONE }
+enum TypeEnemy { LIGHT, MEDIUM, HEAVY, STATIONARY, TRIPLE, BOSS, NONE }
 
 # Ссылка на базу, которая создала этого врага
 var creator_base: Node = null
@@ -71,10 +71,13 @@ func _ready():
 	_shoot_timer.wait_time = _fire_rate
 
 func _physics_process(delta):
-	# Если цели потеряны (например, после перезагрузки), пробуем найти их снова
-	if not is_instance_valid(_player) or not is_instance_valid(_base):
+	# Если цели потеряны, пробуем найти их снова
+	if not is_instance_valid(_player) or (not is_instance_valid(_base) and _base != null):
 		_find_targets()
-		if not is_instance_valid(_base): return # Если базы всё ещё нет, стоим
+
+	# Если нет ни игрока, ни базы — стоим
+	var target = _get_current_target()
+	if not is_instance_valid(target): return
 	
 	_update_target()
 	_aim_gun(delta)
@@ -93,15 +96,20 @@ func _find_targets():
 
 	# Ищем базу игрока (type_base == 0)
 	var bases = get_tree().get_nodes_in_group("bases")
+	_base = null
 	for b in bases:
 		if b.get("type_base") == 0:
 			_base = b
 			break
 
+	# Если базы нет (уровень с боссом), переходим в состояние преследования
+	if _base == null:
+		_current_state = State.CHASE
+
 func _update_target():
 	if _nav2d == null or _type_enemy == TypeEnemy.STATIONARY: return
 	
-	if _current_state == State.CHASE and is_instance_valid(_player):
+	if is_instance_valid(_player) and (_current_state == State.CHASE or _base == null):
 		_nav2d.target_position = _player.global_position
 	elif is_instance_valid(_base):
 		_nav2d.target_position = _base.global_position
@@ -161,7 +169,9 @@ func _is_target_visible() -> bool:
 	return false
 
 func _get_current_target():
-	return _player if (_current_state == State.CHASE and is_instance_valid(_player)) else _base
+	if is_instance_valid(_player) and (_current_state == State.CHASE or _base == null):
+		return _player
+	return _base
 
 func _check_and_fire():
 	var target = _get_current_target()
@@ -248,6 +258,12 @@ func _apply_enemy_stats():
 			hull_path = "res://assets/future_tanks/PNG/Hulls_Color_D/Hull_05.png"
 			gun_path = "res://assets/future_tanks/PNG/Weapon_Color_D/Gun_04.png"
 			gun_offset = 35.0
+		TypeEnemy.BOSS:
+			_hp = 1000; _damage = 40; _fire_rate = 0.8; _spread = 0.1
+			hull_path = "res://assets/future_tanks/PNG/Hulls_Color_D/Hull_03.png"
+			gun_path = "res://assets/future_tanks/PNG/Weapon_Color_D/Gun_08.png"
+			gun_offset = 40.0
+			scale = Vector2(2, 2)
 
 	_max_hp = _hp
 	_shoot_timer.wait_time = _fire_rate

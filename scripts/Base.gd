@@ -161,6 +161,11 @@ func _spawn_enemy():
 	var spawn_pos = _get_safe_spawn_pos()
 	if spawn_pos != Vector2.ZERO:
 		var enemy = _enemy_scene.instantiate()
+
+		# Гарантируем, что база не создаст босса, если в сцене по умолчанию стоит BOSS
+		if enemy.get("type_enemy") == 5: # TypeEnemy.BOSS = 5
+			enemy.set("type_enemy", randi() % 3) # Сбрасываем на Light/Medium/Heavy
+
 		enemy.global_position = spawn_pos
 		get_parent().add_child(enemy)
 		# Добавляем в локальный список
