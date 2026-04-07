@@ -189,9 +189,15 @@ func _setup_ammo_selection():
 		icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		btn.add_child(icon)
 
-		var cooldown = ColorRect.new()
+		# Теперь используем Panel вместо ColorRect для поддержки закругленных углов
+		var cooldown = Panel.new()
 		cooldown.name = "Cooldown"
-		cooldown.color = Color(0, 0, 0, 0.7)
+
+		var cd_style = StyleBoxFlat.new()
+		cd_style.bg_color = Color(0, 0, 0, 0.7)
+		cd_style.set_corner_radius_all(15) # Те же закругления, что у кнопок
+		cooldown.add_theme_stylebox_override("panel", cd_style)
+
 		cooldown.size = Vector2(btn_size, btn_size)
 		cooldown.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		cooldown.visible = false
