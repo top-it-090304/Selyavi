@@ -11,10 +11,12 @@ func _ready():
 	# 1. Номер уровня
 	if SaveManager and SaveManager.has_meta("current_level"):
 		current_level = SaveManager.get_meta("current_level")
+		SaveManager.current_level = current_level # Синхронизируем с синглтоном
 	else:
 		var s_name = name
 		if s_name.contains("_"):
 			current_level = s_name.get_slice("_", 1).to_int()
+			if SaveManager: SaveManager.current_level = current_level
 
 	# 2. Музыка
 	_musicPlayer = get_node_or_null("MusicPlayer")
@@ -209,6 +211,7 @@ func _show_game_over_screen(is_victory: bool, reason: String = ""):
 			_cleanup_global_objects()
 			get_tree().paused = false
 			SaveManager.set_meta("current_level", current_level + 1)
+			SaveManager.current_level = current_level + 1 # СРАЗУ обновляем номер уровня
 			var next_path = "res://scenes/Levels/Level_" + str(current_level + 1) + ".tscn"
 			get_tree().change_scene_to_file(next_path if FileAccess.file_exists(next_path) else "res://scenes/MenuScenes/LevelSelector.tscn")
 		)

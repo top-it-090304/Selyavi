@@ -28,6 +28,10 @@ var _scan_angle: float = 0.0
 var _scan_dir: int = 1
 var _scan_wait_timer: float = 0.0
 var _scan_limit: float = 45.0
+
+# Переменные для задержки выстрела (реакция)
+var _reaction_timer: float = 0.0
+var _target_in_sight: bool = false
 # endregion
 
 func get_enemy_type() -> int:
@@ -77,11 +81,22 @@ func _physics_process(delta):
 
 	# Если нет ни игрока, ни базы — стоим
 	var target = _get_current_target()
-	if not is_instance_valid(target): return
+	if not is_instance_valid(target):
+		_target_in_sight = false
+		_reaction_timer = 0.0
+		return
 	
 	_update_target()
 	_aim_gun(delta)
 	_update_ray_cast()
+
+	# Обновление таймера реакции
+	_target_in_sight = _is_target_visible()
+	if _target_in_sight:
+		_reaction_timer += delta
+	else:
+		_reaction_timer = 0.0
+
 	_check_and_fire()
 	_move_enemy()
 
@@ -166,6 +181,11 @@ func _is_target_visible() -> bool:
 		if collider == _base or (collider.get_parent() != null and collider.get_parent() == _base):
 			return true
 
+	# Если на пути разрушаемая стена, считаем цель "видимой", чтобы бот начал стрелять сквозь неё
+	if collider is IngameWall:
+		if collider.destroyable():
+			return true
+
 	return false
 
 func _get_current_target():
@@ -182,8 +202,13 @@ func _check_and_fire():
 	var attack_range = 650.0 if _type_enemy == TypeEnemy.STATIONARY else 700.0
 
 	# Стреляем только при наличии прямой видимости цели
-	if dist <= attack_range and _is_target_visible():
-		_fire_at_pos(target.global_position)
+	if dist <= attack_range and _target_in_sight:
+		# Для турелей добавляем задержку в 1 секунду
+		if _type_enemy == TypeEnemy.STATIONARY:
+			if _reaction_timer >= 1.0:
+				_fire_at_pos(target.global_position)
+		else:
+			_fire_at_pos(target.global_position)
 
 func _fire_at_pos(pos: Vector2):
 	if _shoot_timer.time_left > 0: return
@@ -223,7 +248,23 @@ func _destroy():
 	enemy_died.emit(_type_enemy)
 	if is_instance_valid(_player) and _player.has_method("add_money"):
 		_player.add_money(_get_reward())
+
+	# Шанс 20% на выпадение аптечки, для турелей - 100%
+	if _type_enemy == TypeEnemy.STATIONARY or randf() <= 0.2:
+		_spawn_heal_pickup()
+
 	super._destroy()
+
+func _spawn_heal_pickup():
+	var pickup_script = load("res://scripts/HealPickup.gd")
+	if not pickup_script:
+		return
+
+	var pickup = Area2D.new()
+	pickup.set_script(pickup_script)
+	pickup.global_position = global_position
+	# Используем call_deferred, чтобы избежать ошибок при изменении состояния физики
+	get_parent().call_deferred("add_child", pickup)
 
 func _get_reward() -> int:
 	match _type_enemy:
@@ -231,7 +272,7 @@ func _get_reward() -> int:
 		TypeEnemy.MEDIUM: return 75
 		TypeEnemy.HEAVY: return 100
 		TypeEnemy.STATIONARY: return 150
-		TypeEnemy.TRIPLE: return 40
+		TypeEnemy.TRIPLE: return 200
 		TypeEnemy.BOSS: return 500
 		_: return 50
 
@@ -239,6 +280,9 @@ func _apply_enemy_stats():
 	var hull_path: String = ""
 	var gun_path: String = ""
 	var gun_offset: float = 42.0
+
+	var lvl = 1
+	if SaveManager: lvl = SaveManager.current_level
 
 	match _type_enemy:
 		TypeEnemy.LIGHT:
@@ -249,12 +293,16 @@ func _apply_enemy_stats():
 		TypeEnemy.MEDIUM:
 			_hp = 70; _damage = 25; _fire_rate = 1.2; _spread = 0.15
 		TypeEnemy.HEAVY:
-			_hp = 100; _damage = 35; _fire_rate = 2.5; _spread = 0.1
+			# На уровнях 1-5 здоровье снижено до 80
+			_hp = 80 if lvl <= 5 else 100
+			_damage = 35; _fire_rate = 2.5; _spread = 0.1
 			hull_path = "res://assets/future_tanks/PNG/Hulls_Color_D/Hull_06.png"
 			gun_path = "res://assets/future_tanks/PNG/Weapon_Color_D/Gun_07.png"
 			gun_offset = 40.0
 		TypeEnemy.STATIONARY:
-			_hp = 100; _damage = 40; _fire_rate = 1.5; _spread = 0.05
+			# На уровнях 1-5 здоровье снижено до 75
+			_hp = 75 if lvl <= 5 else 100
+			_damage = 40; _fire_rate = 1.5; _spread = 0.05
 			hull_path = "res://assets/turret/SniperTurretBase.png"
 			gun_path = "res://assets/turret/SniperTurretGun.png"
 			gun_offset = 0.0
@@ -265,7 +313,7 @@ func _apply_enemy_stats():
 			gun_path = "res://assets/future_tanks/PNG/Weapon_Color_D/Gun_04.png"
 			gun_offset = 35.0
 		TypeEnemy.BOSS:
-			_hp = 1000; _damage = 40; _fire_rate = 0.8; _spread = 0.1
+			_hp = 1000; _damage = 30; _fire_rate = 0.8; _spread = 0.1
 			hull_path = "res://assets/future_tanks/PNG/Hulls_Color_D/Hull_03.png"
 			gun_path = "res://assets/future_tanks/PNG/Weapon_Color_D/Gun_08.png"
 			gun_offset = 40.0
