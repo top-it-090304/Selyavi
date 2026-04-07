@@ -27,10 +27,13 @@ func _ready():
 		_music_slider.value_changed.connect(_on_music_slider_changed)
 	
 	if _scope_toggler != null:
-		_scope_toggler.toggled.connect(_on_check_button_toggled)
+		# Соединяем сигнал переключения
+		if not _scope_toggler.toggled.is_connected(_on_check_button_toggled):
+			_scope_toggler.toggled.connect(_on_check_button_toggled)
 
 	if _left_hand_toggler != null:
-		_left_hand_toggler.toggled.connect(_on_left_hand_toggled)
+		if not _left_hand_toggler.toggled.is_connected(_on_left_hand_toggled):
+			_left_hand_toggler.toggled.connect(_on_left_hand_toggled)
 
 func _load_ui_values():
 	if SaveManager == null: return
@@ -52,12 +55,13 @@ func _load_ui_values():
 func _update_return_button_text():
 	if _return_button == null: return
 
-	# Если мы пришли из игры (через паузу), текст должен быть "НАЗАД В ИГРУ"
-	# Если из главного меню - "В МЕНЮ"
-	if GameManager.has_meta("from_scene") and GameManager.get_meta("from_scene").contains("Field.tscn"):
-		_return_button.text = "НАЗАД В ИГРУ"
-	else:
-		_return_button.text = "В МЕНЮ"
+	if GameManager.has_meta("from_scene"):
+		var last_scene = GameManager.get_meta("from_scene")
+		if not last_scene.contains("Menu.tscn"):
+			_return_button.text = "ПРОДОЛЖИТЬ"
+			return
+
+	_return_button.text = "В МЕНЮ"
 
 func _on_music_slider_changed(value: float):
 	if SaveManager != null:

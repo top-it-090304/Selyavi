@@ -108,58 +108,52 @@ grow_horizontal = 2
 grow_vertical = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_bg")
 
-[node name="MainPanel" type="Panel" parent="."]
+[node name="CenterContainer" type="CenterContainer" parent="."]
 layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -500.0
-offset_top = -300.0
-offset_right = 500.0
-offset_bottom = 300.0
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+
+[node name="MainPanel" type="Panel" parent="CenterContainer"]
+custom_minimum_size = Vector2(900, 600)
+layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
 
-[node name="Header" type="Label" parent="MainPanel"]
+[node name="VBoxContainer" type="VBoxContainer" parent="CenterContainer/MainPanel"]
 layout_mode = 1
-anchors_preset = 5
-anchor_left = 0.5
-anchor_right = 0.5
-offset_left = -200.0
-offset_top = 30.0
-offset_right = 200.0
-offset_bottom = 100.0
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
 grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 40
+alignment = 1
+
+[node name="Header" type="Label" parent="CenterContainer/MainPanel/VBoxContainer"]
+layout_mode = 2
 text = "НАСТРОЙКИ"
 label_settings = SubResource("LabelSettings_header")
 horizontal_alignment = 1
 
-[node name="GridContainer" type="GridContainer" parent="MainPanel"]
-layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -400.0
-offset_top = -120.0
-offset_right = 400.0
-offset_bottom = 150.0
-grow_horizontal = 2
-grow_vertical = 2
+[node name="MarginContainer" type="MarginContainer" parent="CenterContainer/MainPanel/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/margin_left = 50
+theme_override_constants/margin_right = 50
+
+[node name="GridContainer" type="GridContainer" parent="CenterContainer/MainPanel/VBoxContainer/MarginContainer"]
+layout_mode = 2
 theme_override_constants/h_separation = 40
 theme_override_constants/v_separation = 30
 columns = 2
 
-[node name="MusicLabel" type="Label" parent="MainPanel/GridContainer"]
+[node name="MusicLabel" type="Label" parent="CenterContainer/MainPanel/VBoxContainer/MarginContainer/GridContainer"]
 layout_mode = 2
 text = "Музыка"
 label_settings = SubResource("LabelSettings_label")
 
-[node name="HSlider" type="HSlider" parent="MainPanel/GridContainer"]
+[node name="HSlider" type="HSlider" parent="CenterContainer/MainPanel/VBoxContainer/MarginContainer/GridContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 4
@@ -170,12 +164,12 @@ max_value = 1.0
 step = 0.05
 value = 0.5
 
-[node name="SfxLabel" type="Label" parent="MainPanel/GridContainer"]
+[node name="SfxLabel" type="Label" parent="CenterContainer/MainPanel/VBoxContainer/MarginContainer/GridContainer"]
 layout_mode = 2
 text = "Эффекты"
 label_settings = SubResource("LabelSettings_label")
 
-[node name="HSlider2" type="HSlider" parent="MainPanel/GridContainer"]
+[node name="HSlider2" type="HSlider" parent="CenterContainer/MainPanel/VBoxContainer/MarginContainer/GridContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 4
@@ -186,37 +180,32 @@ max_value = 1.0
 step = 0.05
 value = 0.5
 
-[node name="ScopeLabel" type="Label" parent="MainPanel/GridContainer"]
+[node name="ScopeLabel" type="Label" parent="CenterContainer/MainPanel/VBoxContainer/MarginContainer/GridContainer"]
 layout_mode = 2
 text = "Лазерный прицел"
 label_settings = SubResource("LabelSettings_label")
 
-[node name="CheckButton" type="CheckButton" parent="MainPanel/GridContainer"]
+[node name="CheckButton" type="CheckButton" parent="CenterContainer/MainPanel/VBoxContainer/MarginContainer/GridContainer"]
 layout_mode = 2
 size_flags_horizontal = 0
 
-[node name="LeftHandLabel" type="Label" parent="MainPanel/GridContainer"]
+[node name="LeftHandLabel" type="Label" parent="CenterContainer/MainPanel/VBoxContainer/MarginContainer/GridContainer"]
 layout_mode = 2
 text = "Режим для левшей"
 label_settings = SubResource("LabelSettings_label")
 
-[node name="CheckButton_LeftHand" type="CheckButton" parent="MainPanel/GridContainer"]
+[node name="CheckButton_LeftHand" type="CheckButton" parent="CenterContainer/MainPanel/VBoxContainer/MarginContainer/GridContainer"]
 layout_mode = 2
 size_flags_horizontal = 0
 
-[node name="Return_Button" type="Button" parent="MainPanel"]
-layout_mode = 1
-anchors_preset = 7
-anchor_left = 0.5
-anchor_top = 1.0
-anchor_right = 0.5
-anchor_bottom = 1.0
-offset_left = -150.0
-offset_top = -100.0
-offset_right = 150.0
-offset_bottom = -30.0
-grow_horizontal = 2
-grow_vertical = 0
+[node name="Control" type="Control" parent="CenterContainer/MainPanel/VBoxContainer"]
+custom_minimum_size = Vector2(0, 20)
+layout_mode = 2
+
+[node name="Return_Button" type="Button" parent="CenterContainer/MainPanel/VBoxContainer"]
+custom_minimum_size = Vector2(300, 70)
+layout_mode = 2
+size_flags_horizontal = 4
 theme_override_fonts/font = ExtResource("2")
 theme_override_font_sizes/font_size = 28
 theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
@@ -224,4 +213,4 @@ theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
 theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
 text = "НАЗАД"
 
-[connection signal="pressed" from="MainPanel/Return_Button" to="." method="_on_Return_Button_pressed"]
+[connection signal="pressed" from="CenterContainer/MainPanel/VBoxContainer/Return_Button" to="." method="_on_Return_Button_pressed"]

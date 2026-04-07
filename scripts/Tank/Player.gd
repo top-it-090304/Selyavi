@@ -36,35 +36,34 @@ func _ready():
 	call_deferred("_connect_hud_controls")
 
 	if AudioManager != null:
-		AudioManager.sfx_volume_changed.connect(_on_sfx_volume_changed)
+		if not AudioManager.sfx_volume_changed.is_connected(_on_sfx_volume_changed):
+			AudioManager.sfx_volume_changed.connect(_on_sfx_volume_changed)
 	
 	if GameManager != null:
-		GameManager.on_visual_scope_updated.connect(_toggle_scope)
+		if not GameManager.on_visual_scope_updated.is_connected(_toggle_scope):
+			GameManager.on_visual_scope_updated.connect(_toggle_scope)
 		is_scope_on = GameManager.is_scope_currently_enabled()
 
 func _connect_hud_controls():
 	var hud = get_tree().get_first_node_in_group("hud")
 	if hud:
-		_joystick = hud.get_node_or_null("HealthPanel/BottomLeft/Joystick")
-		_aim = hud.get_node_or_null("HealthPanel/BottomRight/Aim")
+		# Теперь ищем рекурсивно, так как джойстики внутри MarginContainers
+		_joystick = hud.find_child("Joystick", true)
+		_aim = hud.find_child("Aim", true)
 
 		if _joystick:
-			if _joystick.use_move_vector.is_connected(use_move_vector):
-				_joystick.use_move_vector.disconnect(use_move_vector)
-			_joystick.use_move_vector.connect(use_move_vector)
+			if not _joystick.use_move_vector.is_connected(use_move_vector):
+				_joystick.use_move_vector.connect(use_move_vector)
 		if _aim:
 			_aim.init(true)
-			if _aim.use_move_vector.is_connected(use_move_vector_aim):
-				_aim.use_move_vector.disconnect(use_move_vector_aim)
-			if _aim.fire_touch.is_connected(fire_touch):
-				_aim.fire_touch.disconnect(fire_touch)
-			_aim.use_move_vector.connect(use_move_vector_aim)
-			_aim.fire_touch.connect(fire_touch)
+			if not _aim.use_move_vector.is_connected(use_move_vector_aim):
+				_aim.use_move_vector.connect(use_move_vector_aim)
+			if not _aim.fire_touch.is_connected(fire_touch):
+				_aim.fire_touch.connect(fire_touch)
 
 func _load_all_data():
 	if SaveManager != null:
 		SaveManager.load_game()
-		# Важно: берем деньги через get_player_stat или напрямую из словаря по ключу
 		_money = SaveManager.save_data.get("money", 0)
 		_type_body = SaveManager.get_player_stat("body_type", 1)
 		_type_gun = SaveManager.get_player_stat("gun_type", 1)

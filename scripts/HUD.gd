@@ -6,7 +6,7 @@ var _livesLabel: Label
 var _moneyLabel: Label
 var _basesLabel: Label
 var _levelLabel: Label
-var _basesIcon: Sprite2D
+var _basesIcon: TextureRect
 var _total_enemy_bases: int = 0
 var _destroyed_count: int = 0
 var _player
@@ -15,17 +15,16 @@ var _ammo_buttons = {}
 func _ready():
 	add_to_group("hud")
 	
-	var healthPanel = get_node_or_null("HealthPanel")
-	if healthPanel:
-		_healthProgress = healthPanel.get_node_or_null("HealthProgress")
-		_healthLabel = healthPanel.get_node_or_null("HealthLabel")
-		_livesLabel = healthPanel.get_node_or_null("LivesLabel")
-		_moneyLabel = healthPanel.get_node_or_null("MoneyLabel")
-		_levelLabel = healthPanel.get_node_or_null("LevelLabel")
+	_healthProgress = find_child("HealthProgress", true)
+	_healthLabel = find_child("HealthLabel", true)
+	_livesLabel = find_child("LivesLabel", true)
+	_moneyLabel = find_child("MoneyLabel", true)
+	_levelLabel = find_child("LevelLabel", true)
 
-		if _levelLabel: _levelLabel.position.y = 20
-		_setup_bases_label(healthPanel)
+	if _levelLabel:
+		_levelLabel.position.y = 0
 
+	_setup_bases_label()
 	_setup_ammo_selection()
 	_update_level_display()
 
@@ -35,28 +34,29 @@ func _ready():
 
 	call_deferred("_find_player_and_connect")
 
-func _setup_bases_label(container: Control):
-	var bases_root = Control.new()
-	bases_root.name = "BasesRoot"
-	bases_root.position = Vector2(180, 50)
-	container.add_child(bases_root)
+func _setup_bases_label():
+	var stats_container = find_child("Stats", true)
+	if !stats_container: return
 
-	_basesIcon = Sprite2D.new()
+	var bases_row = HBoxContainer.new()
+	bases_row.name = "BasesRow"
+	bases_row.alignment = BoxContainer.ALIGNMENT_END
+	stats_container.add_child(bases_row)
+
+	_basesIcon = TextureRect.new()
 	_basesIcon.texture = load("res://assets/backround/PNG/Props/Platform.png")
-	_basesIcon.scale = Vector2(0.35, 0.35)
-	_basesIcon.modulate = Color(1.0, 0.3, 0.3, 0.5)
-	bases_root.add_child(_basesIcon)
+	_basesIcon.custom_minimum_size = Vector2(40, 40)
+	_basesIcon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	_basesIcon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	_basesIcon.modulate = Color(1.0, 0.3, 0.3, 0.8)
+	bases_row.add_child(_basesIcon)
 
 	_basesLabel = Label.new()
 	_basesLabel.name = "BasesLabel"
-	_basesLabel.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	_basesLabel.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	_basesLabel.size = Vector2(60, 60)
-	_basesLabel.position = Vector2(-30, -30)
-	_basesLabel.add_theme_font_size_override("font_size", 18)
+	_basesLabel.add_theme_font_size_override("font_size", 32)
 	_basesLabel.add_theme_color_override("font_shadow_color", Color.BLACK)
 	_basesLabel.add_theme_constant_override("shadow_outline_size", 4)
-	bases_root.add_child(_basesLabel)
+	bases_row.add_child(_basesLabel)
 
 	call_deferred("_initialize_bases_count")
 
@@ -98,19 +98,15 @@ func _find_player_and_connect():
 		_on_money_changed(_player.get_money())
 		_on_ammo_changed(_player._type_bullet)
 
-		var joy = get_node_or_null("Joystick")
-		var aim = get_node_or_null("Aim")
-		var screen = get_viewport().get_visible_rect().size
+		var joy = find_child("Joystick", true)
+		var aim = find_child("Aim", true)
 
-		# Опускаем джойстики еще на 30 пикселей (было screen.y - 270, стало screen.y - 240)
 		if joy:
-			joy.position = Vector2(50, screen.y - 240)
 			if not joy.use_move_vector.is_connected(_player.use_move_vector):
 				joy.use_move_vector.connect(_player.use_move_vector)
 
 		if aim:
 			aim.init(true)
-			aim.position = Vector2(screen.x - 250, screen.y - 240)
 			if not aim.use_move_vector.is_connected(_player.use_move_vector_aim):
 				aim.use_move_vector.connect(_player.use_move_vector_aim)
 			if not aim.fire_touch.is_connected(_player.fire_touch):
@@ -141,15 +137,22 @@ func _on_lives_changed(l): if _livesLabel: _livesLabel.text = "Жизни: " + s
 func _on_money_changed(m): if _moneyLabel: _moneyLabel.text = str(m)
 
 func _setup_ammo_selection():
-	if has_node("AmmoPanel"): get_node("AmmoPanel").queue_free()
+	if has_node("AmmoPanelContainer"): get_node("AmmoPanelContainer").queue_free()
+
+	var ammo_container = MarginContainer.new()
+	ammo_container.name = "AmmoPanelContainer"
+	add_child(ammo_container)
+	# Центрируем по горизонтали и привязываем к низу
+	ammo_container.set_anchors_and_offsets_preset(Control.PRESET_CENTER_BOTTOM)
+	ammo_container.grow_horizontal = Control.GROW_DIRECTION_BOTH
+	ammo_container.offset_top = -140 # Сдвинул чуть выше из-за увеличения размера
+
 	var ammo_panel = HBoxContainer.new()
 	ammo_panel.name = "AmmoPanel"
-	add_child(ammo_panel)
+	ammo_panel.alignment = BoxContainer.ALIGNMENT_CENTER
+	ammo_container.add_child(ammo_panel)
 
-	var screen = get_viewport().get_visible_rect().size
-	# Увеличиваем размер кнопок и панель (было 100x100, стало 130x130)
-	var btn_size = 130
-	ammo_panel.position = Vector2(screen.x/2 - 215, screen.y - 170)
+	var btn_size = 120 # Увеличил размер кнопок
 	ammo_panel.add_theme_constant_override("separation", 25)
 
 	var tex = [
@@ -181,8 +184,8 @@ func _setup_ammo_selection():
 		icon.texture = load(tex[i])
 		icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 		icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-		icon.size = Vector2(90, 90)
-		icon.position = Vector2(20, 20)
+		icon.size = Vector2(84, 84) # Увеличил иконку пропорционально
+		icon.position = Vector2(18, 18) # Центрирование
 		icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		btn.add_child(icon)
 
@@ -211,7 +214,6 @@ func _update_ammo_cooldowns():
 		if timer and not timer.is_stopped() and i == _player.get("_type_bullet"):
 			cd.visible = true
 			var ratio = timer.time_left / timer.wait_time
-			# Используем актуальный размер кнопки для кулдауна
 			var h = _ammo_buttons[i].custom_minimum_size.y
 			cd.size.y = h * ratio
 			cd.position.y = h * (1.0 - ratio)

@@ -129,7 +129,7 @@ func _show_game_over_screen(is_victory: bool, reason: String = ""):
 
 	# Затемнение фона
 	var overlay = ColorRect.new()
-	overlay.color = Color(0, 0, 0, 0.6)
+	overlay.color = Color(0, 0, 0, 0.7)
 	canvas.add_child(overlay)
 	overlay.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 
@@ -139,54 +139,66 @@ func _show_game_over_screen(is_victory: bool, reason: String = ""):
 	center_container.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	center_container.mouse_filter = Control.MOUSE_FILTER_IGNORE
 
+	# Основная панель
 	var panel = PanelContainer.new()
-	# Уменьшена высота с 420 до 380 для победы и с учетом контента
-	var panel_height = 360 if not is_victory else 400
-	panel.custom_minimum_size = Vector2(450, panel_height)
+	panel.custom_minimum_size = Vector2(480, 0) # Адаптивная ширина
 	center_container.add_child(panel)
 
 	var style = StyleBoxFlat.new()
-	style.bg_color = Color(0.11, 0.12, 0.11, 0.98)
-	style.border_width_left = 4; style.border_width_top = 4; style.border_width_right = 4; style.border_width_bottom = 4
-	style.border_color = Color(0.29, 0.34, 0.25)
-	style.corner_radius_top_left = 20; style.corner_radius_top_right = 20; style.corner_radius_bottom_left = 20; style.corner_radius_bottom_right = 20
-	style.shadow_size = 15; style.shadow_color = Color(0, 0, 0, 0.5)
+	style.bg_color = Color(0.1, 0.11, 0.1, 0.96)
+	style.set_border_width_all(4)
+	style.border_color = Color(0.3, 0.35, 0.25)
+	style.set_corner_radius_all(20)
+	style.shadow_size = 20
+	style.shadow_color = Color(0, 0, 0, 0.6)
 	panel.add_theme_stylebox_override("panel", style)
 
-	var vbox = VBoxContainer.new()
-	vbox.add_theme_constant_override("separation", 15)
-	panel.add_child(vbox)
+	# Внутренние отступы
+	var margin = MarginContainer.new()
+	margin.add_theme_constant_override("margin_left", 30)
+	margin.add_theme_constant_override("margin_right", 30)
+	margin.add_theme_constant_override("margin_top", 30)
+	margin.add_theme_constant_override("margin_bottom", 30)
+	panel.add_child(margin)
 
+	var vbox = VBoxContainer.new()
+	vbox.add_theme_constant_override("separation", 20)
+	margin.add_child(vbox)
+
+	# Заголовок
 	var title = Label.new()
 	title.text = "ПОБЕДА!" if is_victory else "ПОРАЖЕНИЕ"
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	title.add_theme_font_size_override("font_size", 44)
-	title.add_theme_color_override("font_color", Color(0.9, 0.8, 0.2) if is_victory else Color(0.9, 0.3, 0.3))
+	title.add_theme_font_size_override("font_size", 48)
+	title.add_theme_color_override("font_color", Color(1, 0.85, 0.2) if is_victory else Color(1, 0.3, 0.3))
 	vbox.add_child(title)
 
+	# Описание с автопереносом
 	var desc = Label.new()
 	desc.text = reason
 	desc.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	desc.add_theme_font_size_override("font_size", 22)
+	desc.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	desc.custom_minimum_size = Vector2(400, 0)
+	desc.add_theme_font_size_override("font_size", 24)
 	vbox.add_child(desc)
 
+	# Контейнер кнопок
 	var btn_container = VBoxContainer.new()
-	btn_container.add_theme_constant_override("separation", 10)
-	btn_container.alignment = BoxContainer.ALIGNMENT_CENTER
+	btn_container.add_theme_constant_override("separation", 12)
 	vbox.add_child(btn_container)
 
 	var style_btn = func(btn: Button):
-		btn.custom_minimum_size = Vector2(320, 48)
-		btn.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+		btn.custom_minimum_size = Vector2(0, 56)
+		btn.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		var btn_style = StyleBoxFlat.new()
-		btn_style.bg_color = Color(0.18, 0.21, 0.18)
-		btn_style.border_width_bottom = 3
-		btn_style.border_color = Color(0.29, 0.34, 0.25)
-		btn_style.corner_radius_top_left = 10; btn_style.corner_radius_top_right = 10
-		btn_style.corner_radius_bottom_left = 10; btn_style.corner_radius_bottom_right = 10
+		btn_style.bg_color = Color(0.2, 0.22, 0.2)
+		btn_style.border_width_bottom = 4
+		btn_style.border_color = Color(0.3, 0.35, 0.25)
+		btn_style.set_corner_radius_all(12)
 		btn.add_theme_stylebox_override("normal", btn_style)
 		btn.add_theme_stylebox_override("hover", btn_style)
 		btn.add_theme_stylebox_override("pressed", btn_style)
+		btn.add_theme_font_size_override("font_size", 24)
 
 	if is_victory and current_level < 20:
 		var btn_next = Button.new()

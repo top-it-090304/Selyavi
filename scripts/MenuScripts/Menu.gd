@@ -1,4 +1,4 @@
-extends Node2D
+extends Control
 
 func _on_Play_Button_pressed():
 	# Переход в выбор уровней

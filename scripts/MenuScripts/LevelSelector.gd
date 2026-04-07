@@ -1,33 +1,68 @@
 extends Control
 
-# ВАЖНО: Этот скрипт ДОЛЖЕН наследоваться от Control, так как сцена LevelSelector.tscn - это Control.
-
-@onready var grid = $GridContainer
+@onready var scroll_container = $UI/CenterContainer/LevelScroll
+@onready var grid = $UI/CenterContainer/LevelScroll/GridContainer
 
 var _level_count = 20
 var _unlocked_levels = 1
 
+# Параметры для плавной прокрутки
+var target_scroll = 0.0
+var scroll_speed = 0.15 # Чем меньше, тем плавнее (0.1 - 0.2 оптимально)
+
 func _ready():
-	# Принудительная проверка типа при запуске для отладки
 	if not self is Control:
-		print("ОШИБКА: Скрипт привязан к узлу, который не является Control!")
 		return
 
-	# Переименовываем заголовок, если узел найден
-	if has_node("Title"):
-		get_node("Title").text = "ВЫБОР МИССИИ"
+	if has_node("UI/Title"):
+		get_node("UI/Title").text = "ВЫБОР МИССИИ"
 
 	if SaveManager != null:
 		_unlocked_levels = SaveManager.save_data.get("unlocked_levels", 1)
 
 	_setup_grid()
 
+	# Инициализируем целевую позицию прокрутки
+	if scroll_container:
+		target_scroll = scroll_container.scroll_vertical
+		# Соединяем сигнал ввода для перехвата колесика мыши
+		scroll_container.gui_input.connect(_on_scroll_input)
+
+func _process(_delta):
+	if scroll_container:
+		# Плавное приближение текущей прокрутки к целевой
+		var current = scroll_container.scroll_vertical
+		if abs(current - target_scroll) > 0.1:
+			scroll_container.scroll_vertical = lerp(current, int(target_scroll), scroll_speed)
+		else:
+			scroll_container.scroll_vertical = int(target_scroll)
+
+func _on_scroll_input(event):
+	if event is InputEventMouseButton:
+		var step = 150 # Размер шага прокрутки
+		if event.button_index == MOUSE_BUTTON_WHEEL_UP:
+			target_scroll -= step
+			_clamp_scroll()
+			accept_event() # Поглощаем событие, чтобы стандартная прокрутка не дергалась
+		elif event.button_index == MOUSE_BUTTON_WHEEL_DOWN:
+			target_scroll += step
+			_clamp_scroll()
+			accept_event()
+
+	# Если пользователь тянет пальцем или мышкой (Drag), обновляем цель, чтобы не было конфликтов
+	if event is InputEventMouseMotion and event.button_mask & MOUSE_BUTTON_MASK_LEFT:
+		target_scroll = scroll_container.scroll_vertical
+
+func _clamp_scroll():
+	if not scroll_container: return
+	var max_scroll = scroll_container.get_v_scroll_bar().max_value - scroll_container.size.y
+	target_scroll = clamp(target_scroll, 0, max_scroll)
+
 func _setup_grid():
 	if grid == null:
-		push_error("GridContainer не найден в сцене LevelSelector!")
+		push_error("GridContainer не найден!")
 		return
 
-	# Очистка старых кнопок
 	for child in grid.get_children():
 		child.queue_free()
 
@@ -36,18 +71,15 @@ func _setup_grid():
 		btn.custom_minimum_size = Vector2(120, 120)
 		btn.name = "Level_" + str(i)
 
-		# Логика уровней X.1 - X.5
 		var major = ((i - 1) / 5) + 1
 		var minor = ((i - 1) % 5) + 1
 		btn.text = str(major) + "." + str(minor)
-
 		btn.add_theme_font_size_override("font_size", 34)
 
 		var is_locked = i > _unlocked_levels
 		var is_passed = i < _unlocked_levels
-		var is_boss = (i % 5 == 0) # Каждый 5-й уровень - босс
+		var is_boss = (i % 5 == 0)
 
-		# Стиль кнопок
 		var style = StyleBoxFlat.new()
 		style.corner_radius_top_left = 15
 		style.corner_radius_top_right = 15
@@ -65,25 +97,21 @@ func _setup_grid():
 			btn.add_theme_color_override("font_disabled_color", Color(0.5, 0.5, 0.5))
 		else:
 			if is_boss:
-				# Угрожающий стиль для босса
 				if is_passed:
-					style.bg_color = Color(0.35, 0.1, 0.1, 0.9) # Тусклый красный
+					style.bg_color = Color(0.35, 0.1, 0.1, 0.9)
 					style.border_color = Color(0.5, 0.2, 0.2, 0.8)
-					btn.add_theme_color_override("font_color", Color(0.6, 0.6, 0.6)) # Серый текст
+					btn.add_theme_color_override("font_color", Color(0.6, 0.6, 0.6))
 				else:
-					style.bg_color = Color(0.7, 0.1, 0.1, 0.9) # Яркий темно-красный
-					style.border_color = Color(1, 0.2, 0.2, 1) # Ярко-красная рамка
+					style.bg_color = Color(0.7, 0.1, 0.1, 0.9)
+					style.border_color = Color(1, 0.2, 0.2, 1)
 					btn.add_theme_color_override("font_color", Color(1, 1, 1))
-					# Свечение только для активного босса
 					style.shadow_color = Color(0.5, 0, 0, 0.6)
 					style.shadow_size = 8
 			else:
-				# Обычный уровень
-				style.bg_color = Color(0.2, 0.6, 0.9, 0.9) # Голубой
+				style.bg_color = Color(0.2, 0.6, 0.9, 0.9)
 				style.border_color = Color(1, 1, 1, 0.8)
-
 				if is_passed:
-					btn.add_theme_color_override("font_color", Color(0.2, 0.9, 0.2)) # Зеленый текст
+					btn.add_theme_color_override("font_color", Color(0.2, 0.9, 0.2))
 
 			btn.pressed.connect(_on_level_pressed.bind(i))
 
@@ -97,7 +125,6 @@ func _setup_grid():
 func _on_level_pressed(level_num: int):
 	if SaveManager:
 		SaveManager.current_level = level_num
-		# Сохраняем и в метаданные для совместимости со старыми скриптами
 		SaveManager.set_meta("current_level", level_num)
 
 	var path = "res://scenes/Levels/Level_" + str(level_num) + ".tscn"

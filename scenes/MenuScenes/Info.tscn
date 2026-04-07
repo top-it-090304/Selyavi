@@ -95,54 +95,48 @@ grow_horizontal = 2
 grow_vertical = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_bg")
 
-[node name="MainPanel" type="Panel" parent="."]
-layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -500.0
-offset_top = -300.0
-offset_right = 500.0
-offset_bottom = 300.0
-grow_horizontal = 2
-grow_vertical = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
-
-[node name="Header" type="Label" parent="MainPanel"]
-layout_mode = 1
-anchors_preset = 5
-anchor_left = 0.5
-anchor_right = 0.5
-offset_left = -200.0
-offset_top = 30.0
-offset_right = 200.0
-offset_bottom = 100.0
-grow_horizontal = 2
-text = "ОБ ИГРЕ"
-label_settings = SubResource("LabelSettings_header")
-horizontal_alignment = 1
-
-[node name="DescriptionContainer" type="MarginContainer" parent="MainPanel"]
+[node name="CenterContainer" type="CenterContainer" parent="."]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_top = 110.0
-offset_bottom = -110.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_constants/margin_left = 40
-theme_override_constants/margin_top = 20
-theme_override_constants/margin_right = 40
-theme_override_constants/margin_bottom = 20
 
-[node name="Description" type="RichTextLabel" parent="MainPanel/DescriptionContainer"]
+[node name="MainPanel" type="Panel" parent="CenterContainer"]
+custom_minimum_size = Vector2(900, 650)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CenterContainer/MainPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 20
+alignment = 1
+
+[node name="Header" type="Label" parent="CenterContainer/MainPanel/VBoxContainer"]
+layout_mode = 2
+text = "ОБ ИГРЕ"
+label_settings = SubResource("LabelSettings_header")
+horizontal_alignment = 1
+
+[node name="DescriptionContainer" type="MarginContainer" parent="CenterContainer/MainPanel/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/margin_left = 40
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 40
+theme_override_constants/margin_bottom = 10
+
+[node name="Description" type="RichTextLabel" parent="CenterContainer/MainPanel/VBoxContainer/DescriptionContainer"]
 layout_mode = 2
 theme_override_colors/default_color = Color(0.741176, 0.819608, 0.705882, 1)
 theme_override_fonts/normal_font = ExtResource("2")
-theme_override_font_sizes/normal_font_size = 24
+theme_override_font_sizes/normal_font_size = 22
 bbcode_enabled = true
 text = "[center][color=#bdcfb4][font_size=40]TANKS 2026[/font_size][/color][/center]
 
@@ -162,19 +156,10 @@ text = "[center][color=#bdcfb4][font_size=40]TANKS 2026[/font_size][/color][/cen
 
 Станьте лучшим танкистом 2026 года!"
 
-[node name="Return_Button" type="Button" parent="MainPanel"]
-layout_mode = 1
-anchors_preset = 7
-anchor_left = 0.5
-anchor_top = 1.0
-anchor_right = 0.5
-anchor_bottom = 1.0
-offset_left = -150.0
-offset_top = -100.0
-offset_right = 150.0
-offset_bottom = -30.0
-grow_horizontal = 2
-grow_vertical = 0
+[node name="Return_Button" type="Button" parent="CenterContainer/MainPanel/VBoxContainer"]
+custom_minimum_size = Vector2(300, 70)
+layout_mode = 2
+size_flags_horizontal = 4
 theme_override_fonts/font = ExtResource("2")
 theme_override_font_sizes/font_size = 28
 theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
@@ -182,4 +167,8 @@ theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
 theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
 text = "НАЗАД"
 
-[connection signal="pressed" from="MainPanel/Return_Button" to="." method="_on_Return_Button_pressed"]
+[node name="Control" type="Control" parent="CenterContainer/MainPanel/VBoxContainer"]
+custom_minimum_size = Vector2(0, 10)
+layout_mode = 2
+
+[connection signal="pressed" from="CenterContainer/MainPanel/VBoxContainer/Return_Button" to="." method="_on_Return_Button_pressed"]

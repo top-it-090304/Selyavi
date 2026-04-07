@@ -23,7 +23,7 @@ var settings_data = {
 		"music_volume": 1.0
 	},
 	"game": {
-		"opt_scope_active": true,
+		"scope_enabled": true,
 		"lefty_mode": false
 	}
 }
@@ -43,38 +43,32 @@ func _ready():
 func load_settings():
 	var config = ConfigFile.new()
 	if config.load(SETTINGS_FILE) == OK:
-		settings_data.audio.sfx_volume = config.get_value("audio", "sfx_volume", 1.0)
-		settings_data.audio.music_volume = config.get_value("audio", "music_volume", 1.0)
-		settings_data.game.opt_scope_active = config.get_value("game", "scope_enabled", true)
-		settings_data.game.lefty_mode = config.get_value("controls", "lefty_mode", false)
+		settings_data["audio"]["sfx_volume"] = config.get_value("audio", "sfx_volume", 1.0)
+		settings_data["audio"]["music_volume"] = config.get_value("audio", "music_volume", 1.0)
+		settings_data["game"]["scope_enabled"] = config.get_value("game", "scope_enabled", true)
+		settings_data["game"]["lefty_mode"] = config.get_value("game", "lefty_mode", false)
 	settings_changed.emit()
 
 func save_settings():
 	var config = ConfigFile.new()
-	config.set_value("audio", "sfx_volume", settings_data.audio.sfx_volume)
-	config.set_value("audio", "music_volume", settings_data.audio.music_volume)
-	config.set_value("game", "scope_enabled", settings_data.game.opt_scope_active)
-	config.set_value("controls", "lefty_mode", settings_data.game.lefty_mode)
+	config.set_value("audio", "sfx_volume", settings_data["audio"]["sfx_volume"])
+	config.set_value("audio", "music_volume", settings_data["audio"]["music_volume"])
+	config.set_value("game", "scope_enabled", settings_data["game"]["scope_enabled"])
+	config.set_value("game", "lefty_mode", settings_data["game"]["lefty_mode"])
 	config.save(SETTINGS_FILE)
 
 func get_setting(section: String, key: String, default):
-	var s = section
-	var k = key
-	if k == "scope_enabled": k = "opt_scope_active"
-	if s == "controls": s = "game"
-	if settings_data.has(s) and settings_data[s].has(k):
-		return settings_data[s][k]
+	if settings_data.has(section) and settings_data[section].has(key):
+		return settings_data[section][key]
 	return default
 
 func set_setting(section: String, key: String, value):
-	var s = section
-	var k = key
-	if k == "scope_enabled": k = "opt_scope_active"
-	if s == "controls": s = "game"
-	if settings_data.has(s) and settings_data[s].has(k):
-		settings_data[s][k] = value
-		save_settings()
-		settings_changed.emit()
+	if not settings_data.has(section):
+		settings_data[section] = {}
+
+	settings_data[section][key] = value
+	save_settings()
+	settings_changed.emit()
 
 func save_game():
 	var player_money = _get_money_from_active_player()
