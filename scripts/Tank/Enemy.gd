@@ -226,8 +226,14 @@ func _destroy():
 	super._destroy()
 
 func _get_reward() -> int:
-	if _type_enemy == TypeEnemy.TRIPLE: return 40
-	return [50, 75, 100, 150][_type_enemy] if _type_enemy != TypeEnemy.NONE else 50
+	match _type_enemy:
+		TypeEnemy.LIGHT: return 50
+		TypeEnemy.MEDIUM: return 75
+		TypeEnemy.HEAVY: return 100
+		TypeEnemy.STATIONARY: return 150
+		TypeEnemy.TRIPLE: return 40
+		TypeEnemy.BOSS: return 500
+		_: return 50
 
 func _apply_enemy_stats():
 	var hull_path: String = ""

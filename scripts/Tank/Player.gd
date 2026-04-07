@@ -210,4 +210,11 @@ func take_heal(amount: int):
 func _draw():
 	if is_scope_on and _aim != null and _aim.get_is_joystick_active():
 		var direction = Vector2(0, -1).rotated(_gun.global_rotation)
-		draw_line(to_local(_bullet_position.global_position), to_local(_bullet_position.global_position + direction * 1000), Color(1, 0, 0, 0.5), 2.0)
+
+		# Определяем длину луча в зависимости от типа снаряда
+		var range_len = 600.0 # PLASMA по умолчанию
+		match _type_bullet:
+			MEDIUM: range_len = 400.0
+			LIGHT: range_len = 900.0
+
+		draw_line(to_local(_bullet_position.global_position), to_local(_bullet_position.global_position + direction * range_len), Color(1, 0, 0, 0.5), 2.0)
