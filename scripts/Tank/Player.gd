@@ -58,8 +58,10 @@ func _connect_hud_controls():
 			_aim.init(true)
 			if not _aim.use_move_vector.is_connected(use_move_vector_aim):
 				_aim.use_move_vector.connect(use_move_vector_aim)
-			if not _aim.fire_touch.is_connected(fire_touch):
-				_aim.fire_touch.connect(fire_touch)
+			# Убираем прямое соединение с fire_touch при отпускании,
+			# теперь стрельба будет в _physics_process
+			# if not _aim.fire_touch.is_connected(fire_touch):
+			# 	_aim.fire_touch.connect(fire_touch)
 
 func _load_all_data():
 	if SaveManager != null:
@@ -113,8 +115,16 @@ func use_move_vector_aim(move_vector: Vector2):
 
 func _physics_process(_delta):
 	_get_input()
+	_handle_auto_shoot()
 	move_and_slide()
 	queue_redraw()
+
+func _handle_auto_shoot():
+	# Если джойстик прицеливания активен и отклонен достаточно сильно - стреляем автоматически
+	if _aim != null and _aim.get_is_joystick_active():
+		# Проверяем длину вектора, чтобы не стрелять при малейшем касании центра
+		if _aim.move_vector.length() > 0.2:
+			fire_touch()
 
 func _get_input():
 	if _joystick == null or not _joystick.get_is_joystick_active():
