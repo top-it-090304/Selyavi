@@ -263,7 +263,7 @@ func _apply_enemy_stats():
 			hull_path = "res://assets/future_tanks/PNG/Hulls_Color_D/Hull_03.png"
 			gun_path = "res://assets/future_tanks/PNG/Weapon_Color_D/Gun_08.png"
 			gun_offset = 40.0
-			scale = Vector2(1.5, 1.5)
+			scale = Vector2(2, 2)
 
 	_max_hp = _hp
 	_shoot_timer.wait_time = _fire_rate

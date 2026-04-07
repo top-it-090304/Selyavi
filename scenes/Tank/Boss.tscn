@@ -1,6 +1,6 @@
 [gd_scene load_steps=15 format=3 uid="uid://bnndy2jvcxdmq"]
 
-[ext_resource type="Script" path="res://scripts/Tank/Boss.gd" id="1"]
+[ext_resource type="Script" uid="uid://dn7hhibc30ihe" path="res://scripts/Tank/Boss.gd" id="1"]
 [ext_resource type="Texture2D" uid="uid://dhn7jrx5ylpaq" path="res://assets/future_tanks/PNG/Weapon_Color_D/Gun_03.png" id="2"]
 [ext_resource type="Texture2D" uid="uid://ich10xfcjdqx" path="res://assets/future_tanks/PNG/Hulls_Color_D/Hull_01.png" id="3"]
 [ext_resource type="Texture2D" uid="uid://ckbpx037n4exd" path="res://assets/future_tanks/PNG/Effects/Explosion_C.png" id="4"]

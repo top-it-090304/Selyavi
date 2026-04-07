@@ -5,8 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="e3887325-b543-4879-bba0-c494d7c2e039" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/scenes/Tank/Boss.tscn" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/scripts/Tank/Boss.gd" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scenes/Levels/Level_1.tscn" beforeDir="false" afterPath="$PROJECT_DIR$/scenes/Levels/Level_1.tscn" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/Tank/Boss.gd" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/Tank/Boss.gd" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/scripts/Tank/Enemy.gd" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/Tank/Enemy.gd" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
