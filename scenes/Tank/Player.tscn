@@ -3,7 +3,6 @@
 [ext_resource type="Texture2D" uid="uid://qe6yjbi5bg6s" path="res://assets/future_tanks/PNG/Weapon_Color_A/Gun_01.png" id="1"]
 [ext_resource type="AudioStream" uid="uid://dwnx2lsl0j4q8" path="res://assets/sounds/tracks_rattle_slow_01.mp3" id="2"]
 [ext_resource type="Texture2D" uid="uid://bwine470dqcde" path="res://assets/future_tanks/PNG/Hulls_Color_A/Hull_02.png" id="3"]
-[ext_resource type="PackedScene" path="res://scenes/Tank/MobileJoystick.tscn" id="4"]
 [ext_resource type="Script" uid="uid://cdr230ecwbyny" path="res://scripts/Tank/Player.gd" id="5"]
 [ext_resource type="Texture2D" uid="uid://ckbpx037n4exd" path="res://assets/future_tanks/PNG/Effects/Explosion_C.png" id="6"]
 [ext_resource type="Texture2D" uid="uid://cxcea5x72q078" path="res://assets/future_tanks/PNG/Effects/Explosion_B.png" id="7"]
@@ -78,11 +77,3 @@ animation = &"Fire"
 [node name="MovingSound" type="AudioStreamPlayer" parent="."]
 stream = ExtResource("2")
 volume_db = -10.0
-
-[node name="Joystick" parent="." instance=ExtResource("4")]
-offset = Vector2(70, 180)
-transform = Transform2D(1, 0, 0, 1, 70, 180)
-
-[node name="Aim" parent="." instance=ExtResource("4")]
-offset = Vector2(1000, 180)
-transform = Transform2D(1, 0, 0, 1, 1000, 180)

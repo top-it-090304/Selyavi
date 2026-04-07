@@ -120,9 +120,9 @@ color = Color(0.109804, 0.121569, 0.109804, 1)
 [node name="TankFrame" type="Panel" parent="."]
 layout_mode = 0
 offset_left = 64.0
-offset_top = 100.0
+offset_top = 143.0
 offset_right = 514.0
-offset_bottom = 450.0
+offset_bottom = 493.0
 theme_override_styles/panel = SubResource("StyleBoxFlat_dark_bg")
 
 [node name="TankPreview" type="Control" parent="TankFrame"]
@@ -422,9 +422,9 @@ text = "КУПИТЬ"
 [node name="MoneyLabel" type="Label" parent="."]
 layout_mode = 0
 offset_left = 1032.0
-offset_top = 20.0
+offset_top = 47.0
 offset_right = 1432.0
-offset_bottom = 80.0
+offset_bottom = 107.0
 text = "0"
 label_settings = SubResource("LabelSettings_money")
 
@@ -433,10 +433,10 @@ layout_mode = 1
 anchors_preset = 1
 anchor_left = 1.0
 anchor_right = 1.0
-offset_left = -1269.0
-offset_top = 12.0
-offset_right = -1069.0
-offset_bottom = 92.0
+offset_left = -1219.0
+offset_top = 30.0
+offset_right = -1019.0
+offset_bottom = 110.0
 grow_horizontal = 0
 theme_override_fonts/font = ExtResource("2_font")
 theme_override_font_sizes/font_size = 36
@@ -446,7 +446,7 @@ theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
 text = "Назад"
 
 [node name="Money" type="Sprite2D" parent="."]
-position = Vector2(959, 47)
+position = Vector2(959, 65)
 scale = Vector2(0.149414, 0.149414)
 texture = ExtResource("3_l6lbb")
 
