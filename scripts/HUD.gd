@@ -12,6 +12,9 @@ var _destroyed_count: int = 0
 var _player
 var _ammo_buttons = {}
 
+# Константа для размера кнопок снарядов
+const AMMO_BTN_SIZE = 120
+
 func _ready():
 	add_to_group("hud")
 	
@@ -23,7 +26,6 @@ func _ready():
 
 	if _levelLabel:
 		_levelLabel.position.y = 0
-		# Дублируем настройки, чтобы не менять оригинальный ресурс
 		if _levelLabel.label_settings:
 			_levelLabel.label_settings = _levelLabel.label_settings.duplicate()
 
@@ -87,18 +89,11 @@ func _update_level_display():
 
 	_levelLabel.text = "МИССИЯ " + str(((lvl-1)/5)+1) + "." + str(((lvl-1)%5)+1)
 
-	# В Godot 4 LabelSettings имеют приоритет над theme_override
 	if _levelLabel.label_settings:
 		if lvl % 5 == 0:
-			_levelLabel.label_settings.font_color = Color(1, 0, 0) # Красный
+			_levelLabel.label_settings.font_color = Color(1, 0, 0)
 		else:
-			# Возвращаем исходный желтый цвет (из HUD.tscn)
 			_levelLabel.label_settings.font_color = Color(1, 0.9, 0.4)
-	else:
-		if lvl % 5 == 0:
-			_levelLabel.add_theme_color_override("font_color", Color(1, 0, 0))
-		else:
-			_levelLabel.remove_theme_color_override("font_color")
 
 func _find_player_and_connect():
 	var p = get_tree().get_first_node_in_group("players")
@@ -162,17 +157,17 @@ func _setup_ammo_selection():
 	var ammo_container = MarginContainer.new()
 	ammo_container.name = "AmmoPanelContainer"
 	add_child(ammo_container)
-	# Центрируем по горизонтали и привязываем к низу
 	ammo_container.set_anchors_and_offsets_preset(Control.PRESET_CENTER_BOTTOM)
 	ammo_container.grow_horizontal = Control.GROW_DIRECTION_BOTH
-	ammo_container.offset_top = -140 # Сдвинул чуть выше из-за увеличения размера
+	# Сдвигаем контейнер вверх на высоту кнопок + отступ (поднят на 50 пикселей)
+	ammo_container.offset_bottom = -50
+	ammo_container.offset_top = -190
 
 	var ammo_panel = HBoxContainer.new()
 	ammo_panel.name = "AmmoPanel"
 	ammo_panel.alignment = BoxContainer.ALIGNMENT_CENTER
 	ammo_container.add_child(ammo_panel)
 
-	var btn_size = 120 # Увеличил размер кнопок
 	ammo_panel.add_theme_constant_override("separation", 25)
 
 	var tex = [
@@ -182,49 +177,54 @@ func _setup_ammo_selection():
 	]
 
 	for i in range(3):
-		var slot = Control.new()
+		var slot = Panel.new()
 		slot.name = "Slot_" + str(i)
-		slot.custom_minimum_size = Vector2(btn_size, btn_size)
-		ammo_panel.add_child(slot)
-
-		var btn = Button.new()
-		btn.name = "Button"
-		btn.size = Vector2(btn_size, btn_size)
+		slot.custom_minimum_size = Vector2(AMMO_BTN_SIZE, AMMO_BTN_SIZE)
+		# Принуждаем слоты быть снизу контейнера
+		slot.size_flags_vertical = Control.SIZE_SHRINK_END
 
 		var style = StyleBoxFlat.new()
 		style.bg_color = Color(0.1, 0.1, 0.1, 0.6)
 		style.set_corner_radius_all(15)
 		style.set_border_width_all(3)
 		style.border_color = Color(0.4, 0.4, 0.4)
+		slot.add_theme_stylebox_override("panel", style)
 
-		btn.add_theme_stylebox_override("normal", style)
-		slot.add_child(btn)
+		ammo_panel.add_child(slot)
 
 		var icon = TextureRect.new()
 		icon.texture = load(tex[i])
 		icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 		icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-		icon.size = Vector2(84, 84) # Увеличил иконку пропорционально
-		icon.position = Vector2(18, 18) # Центрирование
+		icon.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+		icon.offset_left = 18
+		icon.offset_top = 18
+		icon.offset_right = -18
+		icon.offset_bottom = -18
 		icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		btn.add_child(icon)
+		slot.add_child(icon)
 
-		# Теперь используем Panel вместо ColorRect для поддержки закругленных углов
 		var cooldown = Panel.new()
 		cooldown.name = "Cooldown"
-
 		var cd_style = StyleBoxFlat.new()
 		cd_style.bg_color = Color(0, 0, 0, 0.7)
-		cd_style.set_corner_radius_all(15) # Те же закругления, что у кнопок
+		cd_style.set_corner_radius_all(15)
 		cooldown.add_theme_stylebox_override("panel", cd_style)
-
-		cooldown.size = Vector2(btn_size, btn_size)
+		cooldown.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 		cooldown.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		cooldown.visible = false
-		btn.add_child(cooldown)
+		slot.add_child(cooldown)
+
+		var touch_btn = TouchScreenButton.new()
+		touch_btn.name = "TouchBtn"
+		var shape = RectangleShape2D.new()
+		shape.size = Vector2(AMMO_BTN_SIZE, AMMO_BTN_SIZE)
+		touch_btn.shape = shape
+		touch_btn.position = Vector2(AMMO_BTN_SIZE/2, AMMO_BTN_SIZE/2)
+		touch_btn.pressed.connect(func(): if _player: _player._on_ammo_selected(i))
+		slot.add_child(touch_btn)
 
 		_ammo_buttons[i] = slot
-		btn.pressed.connect(func(): if _player: _player._on_ammo_selected(i))
 
 func _process(_delta):
 	_update_ammo_cooldowns()
@@ -235,25 +235,30 @@ func _update_ammo_cooldowns():
 
 	for i in range(3):
 		if not _ammo_buttons.has(i): continue
-		var cd = _ammo_buttons[i].get_node("Button/Cooldown")
+		var slot = _ammo_buttons[i]
+		var cd = slot.get_node("Cooldown")
 
 		if timer and not timer.is_stopped() and i == _player.get("_type_bullet"):
 			cd.visible = true
 			var ratio = timer.time_left / timer.wait_time
-			var h = _ammo_buttons[i].custom_minimum_size.y
-			cd.size.y = h * ratio
-			cd.position.y = h * (1.0 - ratio)
+
+			cd.anchor_top = 1.0 - ratio
+			cd.anchor_bottom = 1.0
+			cd.offset_top = 0
+			cd.offset_bottom = 0
+			cd.offset_left = 0
+			cd.offset_right = 0
 		else:
 			cd.visible = false
 
 func _on_ammo_changed(type):
 	for i in _ammo_buttons:
-		var btn = _ammo_buttons[i].get_node("Button")
-		var style = btn.get_theme_stylebox("normal").duplicate()
+		var slot = _ammo_buttons[i]
+		var style = slot.get_theme_stylebox("panel").duplicate()
 		if i == type:
 			style.border_color = Color(1, 0.8, 0.2)
-			_ammo_buttons[i].modulate.a = 1.0
+			slot.modulate.a = 1.0
 		else:
 			style.border_color = Color(0.4, 0.4, 0.4)
-			_ammo_buttons[i].modulate.a = 0.6
-		btn.add_theme_stylebox_override("normal", style)
+			slot.modulate.a = 0.6
+		slot.add_theme_stylebox_override("panel", style)
