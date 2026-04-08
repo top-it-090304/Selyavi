@@ -4,13 +4,7 @@
     <option name="autoReloadType" value="NONE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="33129e0a-8a1f-4647-8ff9-20d5e301da8a" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/icons/108.png.import" beforeDir="false" afterPath="$PROJECT_DIR$/icons/108.png.import" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/icons/86.png.import" beforeDir="false" afterPath="$PROJECT_DIR$/icons/86.png.import" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/project.godot" beforeDir="false" afterPath="$PROJECT_DIR$/project.godot" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/scripts/MenuScripts/LevelSelector.gd" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/MenuScripts/LevelSelector.gd" afterDir="false" />
-    </list>
+    <list default="true" id="33129e0a-8a1f-4647-8ff9-20d5e301da8a" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
