@@ -23,20 +23,29 @@ func _ready():
 	_setup_grid()
 
 	if scroll_container:
+		# Настраиваем контейнер для мобильных устройств
+		scroll_container.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+		scroll_container.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_AUTO
 		target_scroll = scroll_container.scroll_vertical
 		scroll_container.gui_input.connect(_on_scroll_input)
 
 func _process(_delta):
 	if scroll_container:
+		# Если экран зажат (пальцем или мышкой), отключаем авто-скролл, чтобы не мешать ручному перемещению
+		if Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT):
+			target_scroll = scroll_container.scroll_vertical
+			return
+
 		var current = scroll_container.scroll_vertical
 		if abs(current - target_scroll) > 0.1:
-			scroll_container.scroll_vertical = lerp(current, int(target_scroll), scroll_speed)
+			scroll_container.scroll_vertical = lerp(float(current), float(target_scroll), scroll_speed)
 		else:
 			scroll_container.scroll_vertical = int(target_scroll)
 
 func _on_scroll_input(event):
+	# Колесо мыши (ПК)
 	if event is InputEventMouseButton:
-		var step = 150
+		var step = 180
 		if event.button_index == MOUSE_BUTTON_WHEEL_UP:
 			target_scroll -= step
 			_clamp_scroll()
@@ -46,7 +55,11 @@ func _on_scroll_input(event):
 			_clamp_scroll()
 			accept_event()
 
-	if event is InputEventMouseMotion and event.button_mask & MOUSE_BUTTON_MASK_LEFT:
+	# Перетаскивание (Палец/Мышь)
+	if event is InputEventMouseMotion and (event.button_mask & MOUSE_BUTTON_MASK_LEFT):
+		target_scroll = scroll_container.scroll_vertical
+
+	if event is InputEventScreenDrag:
 		target_scroll = scroll_container.scroll_vertical
 
 func _clamp_scroll():
@@ -64,6 +77,9 @@ func _setup_grid():
 		var btn = Button.new()
 		btn.custom_minimum_size = Vector2(120, 120)
 		btn.name = "Level_" + str(i)
+
+		# ОЧЕНЬ ВАЖНО: PASS позволяет ScrollContainer видеть жесты прокрутки поверх кнопок
+		btn.mouse_filter = Control.MOUSE_FILTER_PASS
 
 		var major = ((i - 1) / 5) + 1
 		var minor = ((i - 1) % 5) + 1
@@ -122,7 +138,6 @@ func _on_level_pressed(level_num: int):
 
 	var path = "res://scenes/Levels/Level_" + str(level_num) + ".tscn"
 
-	# Сначала проверяем существование, чтобы не плодить ошибки в консоли
 	if ResourceLoader.exists(path):
 		get_tree().change_scene_to_file(path)
 	else:
@@ -130,7 +145,6 @@ func _on_level_pressed(level_num: int):
 		if ResourceLoader.exists(alt_path):
 			get_tree().change_scene_to_file(alt_path)
 		else:
-			# Если файла нет (как вашего 10-го уровня), пишем в лог и грузим затычку
 			print("СЦЕНА НЕ НАЙДЕНА: ", path)
 			get_tree().change_scene_to_file("res://scenes/Field.tscn")
 
