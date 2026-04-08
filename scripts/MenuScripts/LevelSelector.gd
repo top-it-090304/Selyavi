@@ -27,6 +27,10 @@ func _ready():
 		scroll_container.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_AUTO
 		target_scroll = scroll_container.scroll_vertical
 		scroll_container.gui_input.connect(_on_scroll_input)
+		
+		# Включаем прокрутку для сенсорного ввода
+		scroll_container.scroll_deadzone = 0
+		scroll_container.get_v_scroll_bar().mouse_default_cursor_shape = Control.CURSOR_DRAG
 
 func _process(_delta):
 	if scroll_container:
@@ -75,7 +79,7 @@ func _on_scroll_input(event):
 
 func _clamp_scroll():
 	if not scroll_container: return
-	var max_scroll = scroll_container.get_v_scroll_bar().max_value - scroll_container.size.y
+	var max_scroll = max(0, scroll_container.get_v_scroll_bar().max_value - scroll_container.size.y)
 	target_scroll = clamp(target_scroll, 0, max_scroll)
 
 func _setup_grid():
@@ -86,7 +90,7 @@ func _setup_grid():
 
 	for i in range(1, _level_count + 1):
 		var btn = Button.new()
-		btn.custom_minimum_size = Vector2(120, 120)
+		btn.custom_minimum_size = Vector2(120, 120)  
 		btn.name = "Level_" + str(i)
 
 		# ОЧЕНЬ ВАЖНО для Android: PASS позволяет ScrollContainer видеть жесты прокрутки поверх кнопок
@@ -149,6 +153,7 @@ func _on_level_pressed(level_num: int):
 
 	if SaveManager:
 		SaveManager.current_level = level_num
+		SaveManager.set_meta("current_level", level_num)
 
 	var path = "res://scenes/Levels/Level_" + str(level_num) + ".tscn"
 	if ResourceLoader.exists(path):

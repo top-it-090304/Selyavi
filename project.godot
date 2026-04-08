@@ -13,6 +13,7 @@ config_version=5
 config/name="Tanks 2026"
 run/main_scene="uid://dsgqbvu3xbmcr"
 config/features=PackedStringArray("4.4")
+boot_splash/image="uid://dqn3kxp3syx7t"
 config/icon="res://icon.png"
 
 [autoload]
@@ -27,7 +28,6 @@ window/size/viewport_width=1280
 window/size/viewport_height=720
 window/stretch/mode="canvas_items"
 window/stretch/aspect="expand"
-window/handheld/orientation=1
 
 [editor_plugins]
 
