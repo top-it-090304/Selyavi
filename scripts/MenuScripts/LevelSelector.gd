@@ -10,6 +10,8 @@ var _unlocked_levels = 1
 var target_scroll = 0.0
 var scroll_speed = 0.15
 var is_dragging = false
+var touch_start_pos = Vector2.ZERO
+var scroll_start_pos = 0.0
 
 func _ready():
 	if not self is Control: return
@@ -27,28 +29,27 @@ func _ready():
 		scroll_container.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_AUTO
 		target_scroll = scroll_container.scroll_vertical
 		scroll_container.gui_input.connect(_on_scroll_input)
-		
-		# Включаем прокрутку для сенсорного ввода
-		scroll_container.scroll_deadzone = 0
-		scroll_container.get_v_scroll_bar().mouse_default_cursor_shape = Control.CURSOR_DRAG
 
 func _process(_delta):
 	if scroll_container:
 		var current = scroll_container.scroll_vertical
 
-		# Если мы тянем пальцем или зажали левую кнопку мыши, обновляем цель
-		if is_dragging or Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT):
+		# На ПК проверяем зажатую кнопку мыши для синхронизации
+		if !OS.has_feature("mobile") and Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT):
 			target_scroll = current
 			return
 
-		# Плавная докрутка до цели (после колесика или отпускания пальца)
+		# Если тащим пальцем, не лерпим
+		if is_dragging:
+			return
+
+		# Плавная докрутка
 		if abs(current - target_scroll) > 0.5:
 			scroll_container.scroll_vertical = lerp(float(current), float(target_scroll), scroll_speed)
 		else:
 			scroll_container.scroll_vertical = int(target_scroll)
 
 func _on_scroll_input(event):
-	# Колесо мыши (ПК)
 	if event is InputEventMouseButton:
 		if event.button_index == MOUSE_BUTTON_WHEEL_UP:
 			target_scroll -= 180
@@ -58,17 +59,12 @@ func _on_scroll_input(event):
 			target_scroll += 180
 			_clamp_scroll()
 			accept_event()
-		elif event.button_index == MOUSE_BUTTON_LEFT:
-			if event.pressed:
-				is_dragging = true
-			else:
-				is_dragging = false
-				target_scroll = scroll_container.scroll_vertical
 
-	# Сенсорный ввод (Android)
+	# Обработка тача для самого контейнера (если попали мимо кнопок)
 	if event is InputEventScreenTouch:
 		if event.pressed:
 			is_dragging = true
+			target_scroll = scroll_container.scroll_vertical
 		else:
 			is_dragging = false
 			target_scroll = scroll_container.scroll_vertical
@@ -76,6 +72,7 @@ func _on_scroll_input(event):
 
 	if event is InputEventScreenDrag:
 		is_dragging = true
+		target_scroll = scroll_container.scroll_vertical
 
 func _clamp_scroll():
 	if not scroll_container: return
@@ -90,11 +87,9 @@ func _setup_grid():
 
 	for i in range(1, _level_count + 1):
 		var btn = Button.new()
-		btn.custom_minimum_size = Vector2(120, 120)  
+		btn.custom_minimum_size = Vector2(120, 120)
 		btn.name = "Level_" + str(i)
-
-		# ОЧЕНЬ ВАЖНО для Android: PASS позволяет ScrollContainer видеть жесты прокрутки поверх кнопок
-		btn.mouse_filter = Control.MOUSE_FILTER_PASS
+		btn.mouse_filter = Control.MOUSE_FILTER_PASS # Важно для прокрутки
 
 		var major = ((i - 1) / 5) + 1
 		var minor = ((i - 1) % 5) + 1
@@ -102,58 +97,76 @@ func _setup_grid():
 		btn.add_theme_font_size_override("font_size", 34)
 
 		var is_locked = i > _unlocked_levels
-		var is_passed = i < _unlocked_levels
-		var is_boss = (i % 5 == 0)
 
-		var style = StyleBoxFlat.new()
-		style.corner_radius_top_left = 15
-		style.corner_radius_top_right = 15
-		style.corner_radius_bottom_left = 15
-		style.corner_radius_bottom_right = 15
-		style.border_width_left = 4
-		style.border_width_top = 4
-		style.border_width_right = 4
-		style.border_width_bottom = 4
+		# Стили
+		_apply_button_style(btn, i, is_locked)
 
-		if is_locked:
-			style.bg_color = Color(0.2, 0.2, 0.2, 0.8)
-			style.border_color = Color(0.1, 0.1, 0.1)
-			btn.disabled = true
-			btn.add_theme_color_override("font_disabled_color", Color(0.5, 0.5, 0.5))
-		else:
-			if is_boss:
-				if is_passed:
-					style.bg_color = Color(0.35, 0.1, 0.1, 0.9)
-					style.border_color = Color(0.5, 0.2, 0.2, 0.8)
-					btn.add_theme_color_override("font_color", Color(0.6, 0.6, 0.6))
-				else:
-					style.bg_color = Color(0.7, 0.1, 0.1, 0.9)
-					style.border_color = Color(1, 0.2, 0.2, 1)
-					btn.add_theme_color_override("font_color", Color(1, 1, 1))
-					style.shadow_color = Color(0.5, 0, 0, 0.6)
-					style.shadow_size = 8
-			else:
-				style.bg_color = Color(0.2, 0.6, 0.9, 0.9)
-				style.border_color = Color(1, 1, 1, 0.8)
-				if is_passed:
-					btn.add_theme_color_override("font_color", Color(0.2, 0.9, 0.2))
-
-			btn.pressed.connect(_on_level_pressed.bind(i))
-
-		btn.add_theme_stylebox_override("normal", style)
-		btn.add_theme_stylebox_override("disabled", style)
-		btn.add_theme_stylebox_override("hover", style)
-		btn.add_theme_stylebox_override("pressed", style)
+		if !is_locked:
+			# Используем gui_input для более надежного определения клика на мобилках
+			btn.gui_input.connect(_on_level_btn_gui_input.bind(i))
 
 		grid.add_child(btn)
 
-func _on_level_pressed(level_num: int):
-	# Если мы находимся в процессе перетаскивания, не даем кнопке сработать как нажатие на уровень
-	if is_dragging: return
+func _apply_button_style(btn, i, is_locked):
+	var is_passed = i < _unlocked_levels
+	var is_boss = (i % 5 == 0)
+	var style = StyleBoxFlat.new()
+	style.set_corner_radius_all(15)
+	style.set_border_width_all(4)
 
+	if is_locked:
+		style.bg_color = Color(0.2, 0.2, 0.2, 0.8)
+		style.border_color = Color(0.1, 0.1, 0.1)
+		btn.add_theme_color_override("font_disabled_color", Color(0.5, 0.5, 0.5))
+		btn.disabled = true
+	else:
+		if is_boss:
+			style.bg_color = Color(0.35, 0.1, 0.1, 0.9) if is_passed else Color(0.7, 0.1, 0.1, 0.9)
+			style.border_color = Color(0.5, 0.2, 0.2, 0.8) if is_passed else Color(1, 0.2, 0.2, 1)
+		else:
+			style.bg_color = Color(0.2, 0.6, 0.9, 0.9)
+			style.border_color = Color(1, 1, 1, 0.8)
+			if is_passed: btn.add_theme_color_override("font_color", Color(0.2, 0.9, 0.2))
+
+	btn.add_theme_stylebox_override("normal", style)
+	btn.add_theme_stylebox_override("hover", style)
+	btn.add_theme_stylebox_override("pressed", style)
+	btn.add_theme_stylebox_override("disabled", style)
+
+func _on_level_btn_gui_input(event, level_num):
+	if event is InputEventScreenTouch:
+		if event.pressed:
+			is_dragging = false
+			touch_start_pos = event.position
+			scroll_start_pos = scroll_container.scroll_vertical
+		else:
+			# Если палец отпущен и мы почти не сдвинули его и не прокрутили список
+			var drag_dist = event.position.distance_to(touch_start_pos)
+			var scroll_dist = abs(scroll_container.scroll_vertical - scroll_start_pos)
+
+			if drag_dist < 20 and scroll_dist < 10:
+				_on_level_pressed(level_num)
+
+			is_dragging = false
+			target_scroll = scroll_container.scroll_vertical
+
+	if event is InputEventScreenDrag:
+		is_dragging = true
+		target_scroll = scroll_container.scroll_vertical
+
+	# Поддержка мыши для тестов в редакторе
+	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
+		if event.pressed:
+			touch_start_pos = event.position
+			scroll_start_pos = scroll_container.scroll_vertical
+		else:
+			var drag_dist = event.position.distance_to(touch_start_pos)
+			if drag_dist < 10:
+				_on_level_pressed(level_num)
+
+func _on_level_pressed(level_num: int):
 	if SaveManager:
 		SaveManager.current_level = level_num
-		SaveManager.set_meta("current_level", level_num)
 
 	var path = "res://scenes/Levels/Level_" + str(level_num) + ".tscn"
 	if ResourceLoader.exists(path):
@@ -163,7 +176,6 @@ func _on_level_pressed(level_num: int):
 		if ResourceLoader.exists(alt_path):
 			get_tree().change_scene_to_file(alt_path)
 		else:
-			print("СЦЕНА НЕ НАЙДЕНА: ", path)
 			get_tree().change_scene_to_file("res://scenes/Field.tscn")
 
 func _on_Return_Button_pressed():
