@@ -235,7 +235,12 @@ func _fire_at_pos(pos: Vector2):
 		var b_type = 2 if _type_enemy == TypeEnemy.STATIONARY else 0
 		bullet.init(b_type, false, _damage)
 
-	if _shot_flash: _shot_flash.play("Fire")
+	if _shot_flash:
+		if _type_enemy == TypeEnemy.BOSS:
+			_shot_flash.position = Vector2(0, -40)
+		else:
+			_shot_flash.position = Vector2.ZERO
+		_shot_flash.play("Fire")
 	_shoot_timer.start()
 
 func _on_detection_area_entered(body):
