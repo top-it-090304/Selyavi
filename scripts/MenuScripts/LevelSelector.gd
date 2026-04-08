@@ -80,9 +80,7 @@ func _clamp_scroll():
 	target_scroll = clamp(target_scroll, 0, max_scroll)
 
 func _setup_grid():
-	if grid == null:
-		push_error("GridContainer не найден!")
-		return
+	if grid == null: return
 
 	for child in grid.get_children():
 		child.queue_free()
@@ -149,10 +147,18 @@ func _on_level_pressed(level_num: int):
 		SaveManager.set_meta("current_level", level_num)
 
 	var path = "res://scenes/Levels/Level_" + str(level_num) + ".tscn"
+
+	# Сначала проверяем существование, чтобы не плодить ошибки в консоли
 	if ResourceLoader.exists(path):
 		get_tree().change_scene_to_file(path)
 	else:
-		get_tree().change_scene_to_file("res://scenes/Field.tscn")
+		var alt_path = path.replace(".tscn", ".scn")
+		if ResourceLoader.exists(alt_path):
+			get_tree().change_scene_to_file(alt_path)
+		else:
+			# Если файла нет (как вашего 10-го уровня), пишем в лог и грузим затычку
+			print("СЦЕНА НЕ НАЙДЕНА: ", path)
+			get_tree().change_scene_to_file("res://scenes/Field.tscn")
 
 func _on_Return_Button_pressed():
 	get_tree().change_scene_to_file("res://scenes/MenuScenes/Menu.tscn")
