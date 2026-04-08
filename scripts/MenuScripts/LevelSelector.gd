@@ -125,12 +125,16 @@ func _setup_grid():
 func _on_level_pressed(level_num: int):
 	if SaveManager:
 		SaveManager.current_level = level_num
+		# Сохраняем и в мету на всякий случай
 		SaveManager.set_meta("current_level", level_num)
 
+	# Используем ResourceLoader.exists, чтобы уровни находились после экспорта (в APK)
 	var path = "res://scenes/Levels/Level_" + str(level_num) + ".tscn"
-	if FileAccess.file_exists(path):
+	if ResourceLoader.exists(path):
 		get_tree().change_scene_to_file(path)
 	else:
+		# Если .tscn не найден (в экспорте он может быть .scn или .res), пробуем без расширения или просто проверяем лоадером
+		# ResourceLoader.exists достаточно умен, чтобы понять подмену расширений при экспорте
 		get_tree().change_scene_to_file("res://scenes/Field.tscn")
 
 func _on_Return_Button_pressed():
