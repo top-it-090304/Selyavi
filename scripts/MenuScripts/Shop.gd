@@ -45,6 +45,9 @@ var current_color_idx = 0
 var money = 0
 
 func _ready():
+	if has_node("/root/AudioManager"):
+		get_node("/root/AudioManager").play_menu()
+
 	# Load current selection from SaveManager
 	current_body_idx = SaveManager.get_player_stat("body_type", 1)
 	current_gun_idx = SaveManager.get_player_stat("gun_type", 1)

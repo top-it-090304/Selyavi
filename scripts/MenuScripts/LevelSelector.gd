@@ -16,6 +16,9 @@ var scroll_start_pos = 0.0
 func _ready():
 	if not self is Control: return
 
+	if has_node("/root/AudioManager"):
+		get_node("/root/AudioManager").play_menu()
+
 	if has_node("UI/Title"):
 		get_node("UI/Title").text = "ВЫБОР МИССИИ"
 
@@ -167,6 +170,14 @@ func _on_level_btn_gui_input(event, level_num):
 func _on_level_pressed(level_num: int):
 	if SaveManager:
 		SaveManager.current_level = level_num
+
+	# Управление музыкой
+	if has_node("/root/AudioManager"):
+		var am = get_node("/root/AudioManager")
+		if level_num % 5 == 0:
+			am.play_boss()
+		else:
+			am.stop()
 
 	var path = "res://scenes/Levels/Level_" + str(level_num) + ".tscn"
 	if ResourceLoader.exists(path):
