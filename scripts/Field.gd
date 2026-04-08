@@ -210,9 +210,19 @@ func _show_game_over_screen(is_victory: bool, reason: String = ""):
 		btn_next.pressed.connect(func():
 			_cleanup_global_objects()
 			get_tree().paused = false
-			SaveManager.set_meta("current_level", current_level + 1)
-			SaveManager.current_level = current_level + 1 # СРАЗУ обновляем номер уровня
-			var next_path = "res://scenes/Levels/Level_" + str(current_level + 1) + ".tscn"
+			var next_lvl_num = current_level + 1
+			SaveManager.set_meta("current_level", next_lvl_num)
+			SaveManager.current_level = next_lvl_num
+
+			# Управление музыкой при переходе на следующий уровень
+			if has_node("/root/AudioManager"):
+				var am = get_node("/root/AudioManager")
+				if next_lvl_num % 5 == 0:
+					am.play_boss()
+				else:
+					am.stop()
+
+			var next_path = "res://scenes/Levels/Level_" + str(next_lvl_num) + ".tscn"
 			get_tree().change_scene_to_file(next_path if FileAccess.file_exists(next_path) else "res://scenes/MenuScenes/LevelSelector.tscn")
 		)
 
