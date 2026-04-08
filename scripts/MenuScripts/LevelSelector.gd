@@ -8,7 +8,7 @@ var _unlocked_levels = 1
 
 # Параметры для плавной прокрутки
 var target_scroll = 0.0
-var scroll_speed = 0.15 # Чем меньше, тем плавнее (0.1 - 0.2 оптимально)
+var scroll_speed = 0.15
 
 func _ready():
 	if not self is Control:
@@ -22,15 +22,12 @@ func _ready():
 
 	_setup_grid()
 
-	# Инициализируем целевую позицию прокрутки
 	if scroll_container:
 		target_scroll = scroll_container.scroll_vertical
-		# Соединяем сигнал ввода для перехвата колесика мыши
 		scroll_container.gui_input.connect(_on_scroll_input)
 
 func _process(_delta):
 	if scroll_container:
-		# Плавное приближение текущей прокрутки к целевой
 		var current = scroll_container.scroll_vertical
 		if abs(current - target_scroll) > 0.1:
 			scroll_container.scroll_vertical = lerp(current, int(target_scroll), scroll_speed)
@@ -39,17 +36,16 @@ func _process(_delta):
 
 func _on_scroll_input(event):
 	if event is InputEventMouseButton:
-		var step = 150 # Размер шага прокрутки
+		var step = 150
 		if event.button_index == MOUSE_BUTTON_WHEEL_UP:
 			target_scroll -= step
 			_clamp_scroll()
-			accept_event() # Поглощаем событие, чтобы стандартная прокрутка не дергалась
+			accept_event()
 		elif event.button_index == MOUSE_BUTTON_WHEEL_DOWN:
 			target_scroll += step
 			_clamp_scroll()
 			accept_event()
 
-	# Если пользователь тянет пальцем или мышкой (Drag), обновляем цель, чтобы не было конфликтов
 	if event is InputEventMouseMotion and event.button_mask & MOUSE_BUTTON_MASK_LEFT:
 		target_scroll = scroll_container.scroll_vertical
 
@@ -59,9 +55,7 @@ func _clamp_scroll():
 	target_scroll = clamp(target_scroll, 0, max_scroll)
 
 func _setup_grid():
-	if grid == null:
-		push_error("GridContainer не найден!")
-		return
+	if grid == null: return
 
 	for child in grid.get_children():
 		child.queue_free()
@@ -125,17 +119,20 @@ func _setup_grid():
 func _on_level_pressed(level_num: int):
 	if SaveManager:
 		SaveManager.current_level = level_num
-		# Сохраняем и в мету на всякий случай
-		SaveManager.set_meta("current_level", level_num)
 
-	# Используем ResourceLoader.exists, чтобы уровни находились после экспорта (в APK)
 	var path = "res://scenes/Levels/Level_" + str(level_num) + ".tscn"
+
+	# Сначала проверяем существование, чтобы не плодить ошибки в консоли
 	if ResourceLoader.exists(path):
 		get_tree().change_scene_to_file(path)
 	else:
-		# Если .tscn не найден (в экспорте он может быть .scn или .res), пробуем без расширения или просто проверяем лоадером
-		# ResourceLoader.exists достаточно умен, чтобы понять подмену расширений при экспорте
-		get_tree().change_scene_to_file("res://scenes/Field.tscn")
+		var alt_path = path.replace(".tscn", ".scn")
+		if ResourceLoader.exists(alt_path):
+			get_tree().change_scene_to_file(alt_path)
+		else:
+			# Если файла нет (как вашего 10-го уровня), пишем в лог и грузим затычку
+			print("СЦЕНА НЕ НАЙДЕНА: ", path)
+			get_tree().change_scene_to_file("res://scenes/Field.tscn")
 
 func _on_Return_Button_pressed():
 	get_tree().change_scene_to_file("res://scenes/MenuScenes/Menu.tscn")
