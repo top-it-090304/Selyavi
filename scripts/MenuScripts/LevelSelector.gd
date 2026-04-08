@@ -9,10 +9,10 @@ var _unlocked_levels = 1
 # Параметры для плавной прокрутки
 var target_scroll = 0.0
 var scroll_speed = 0.15
+var is_dragging = false
 
 func _ready():
-	if not self is Control:
-		return
+	if not self is Control: return
 
 	if has_node("UI/Title"):
 		get_node("UI/Title").text = "ВЫБОР МИССИИ"
@@ -23,7 +23,6 @@ func _ready():
 	_setup_grid()
 
 	if scroll_container:
-		# Настраиваем контейнер для мобильных устройств
 		scroll_container.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 		scroll_container.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_AUTO
 		target_scroll = scroll_container.scroll_vertical
@@ -31,13 +30,15 @@ func _ready():
 
 func _process(_delta):
 	if scroll_container:
-		# Если экран зажат (пальцем или мышкой), отключаем авто-скролл, чтобы не мешать ручному перемещению
-		if Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT):
-			target_scroll = scroll_container.scroll_vertical
+		var current = scroll_container.scroll_vertical
+
+		# Если мы тянем пальцем или зажали левую кнопку мыши, обновляем цель
+		if is_dragging or Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT):
+			target_scroll = current
 			return
 
-		var current = scroll_container.scroll_vertical
-		if abs(current - target_scroll) > 0.1:
+		# Плавная докрутка до цели (после колесика или отпускания пальца)
+		if abs(current - target_scroll) > 0.5:
 			scroll_container.scroll_vertical = lerp(float(current), float(target_scroll), scroll_speed)
 		else:
 			scroll_container.scroll_vertical = int(target_scroll)
@@ -45,22 +46,32 @@ func _process(_delta):
 func _on_scroll_input(event):
 	# Колесо мыши (ПК)
 	if event is InputEventMouseButton:
-		var step = 180
 		if event.button_index == MOUSE_BUTTON_WHEEL_UP:
-			target_scroll -= step
+			target_scroll -= 180
 			_clamp_scroll()
 			accept_event()
 		elif event.button_index == MOUSE_BUTTON_WHEEL_DOWN:
-			target_scroll += step
+			target_scroll += 180
 			_clamp_scroll()
 			accept_event()
+		elif event.button_index == MOUSE_BUTTON_LEFT:
+			if event.pressed:
+				is_dragging = true
+			else:
+				is_dragging = false
+				target_scroll = scroll_container.scroll_vertical
 
-	# Перетаскивание (Палец/Мышь)
-	if event is InputEventMouseMotion and (event.button_mask & MOUSE_BUTTON_MASK_LEFT):
-		target_scroll = scroll_container.scroll_vertical
+	# Сенсорный ввод (Android)
+	if event is InputEventScreenTouch:
+		if event.pressed:
+			is_dragging = true
+		else:
+			is_dragging = false
+			target_scroll = scroll_container.scroll_vertical
+			_clamp_scroll()
 
 	if event is InputEventScreenDrag:
-		target_scroll = scroll_container.scroll_vertical
+		is_dragging = true
 
 func _clamp_scroll():
 	if not scroll_container: return
@@ -78,7 +89,7 @@ func _setup_grid():
 		btn.custom_minimum_size = Vector2(120, 120)
 		btn.name = "Level_" + str(i)
 
-		# ОЧЕНЬ ВАЖНО: PASS позволяет ScrollContainer видеть жесты прокрутки поверх кнопок
+		# ОЧЕНЬ ВАЖНО для Android: PASS позволяет ScrollContainer видеть жесты прокрутки поверх кнопок
 		btn.mouse_filter = Control.MOUSE_FILTER_PASS
 
 		var major = ((i - 1) / 5) + 1
@@ -133,11 +144,13 @@ func _setup_grid():
 		grid.add_child(btn)
 
 func _on_level_pressed(level_num: int):
+	# Если мы находимся в процессе перетаскивания, не даем кнопке сработать как нажатие на уровень
+	if is_dragging: return
+
 	if SaveManager:
 		SaveManager.current_level = level_num
 
 	var path = "res://scenes/Levels/Level_" + str(level_num) + ".tscn"
-
 	if ResourceLoader.exists(path):
 		get_tree().change_scene_to_file(path)
 	else:
