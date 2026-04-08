@@ -87,7 +87,7 @@ func _setup_grid():
 
 	for i in range(1, _level_count + 1):
 		var btn = Button.new()
-		btn.custom_minimum_size = Vector2(120, 120)  # Увеличил для удобства на телефоне
+		btn.custom_minimum_size = Vector2(120, 120)  
 		btn.name = "Level_" + str(i)
 
 		var major = ((i - 1) / 5) + 1
