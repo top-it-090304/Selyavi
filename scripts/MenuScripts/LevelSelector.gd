@@ -9,13 +9,10 @@ var _unlocked_levels = 1
 # Параметры для плавной прокрутки
 var target_scroll = 0.0
 var scroll_speed = 0.15
-var drag_start_y = 0.0
-var drag_start_scroll = 0.0
 var is_dragging = false
 
 func _ready():
-	if not self is Control:
-		return
+	if not self is Control: return
 
 	if has_node("UI/Title"):
 		get_node("UI/Title").text = "ВЫБОР МИССИИ"
@@ -26,6 +23,8 @@ func _ready():
 	_setup_grid()
 
 	if scroll_container:
+		scroll_container.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+		scroll_container.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_AUTO
 		target_scroll = scroll_container.scroll_vertical
 		scroll_container.gui_input.connect(_on_scroll_input)
 		
@@ -36,43 +35,47 @@ func _ready():
 func _process(_delta):
 	if scroll_container:
 		var current = scroll_container.scroll_vertical
-		if not is_dragging and abs(current - target_scroll) > 0.5:
-			scroll_container.scroll_vertical = lerp(current, int(target_scroll), scroll_speed)
+
+		# Если мы тянем пальцем или зажали левую кнопку мыши, обновляем цель
+		if is_dragging or Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT):
+			target_scroll = current
+			return
+
+		# Плавная докрутка до цели (после колесика или отпускания пальца)
+		if abs(current - target_scroll) > 0.5:
+			scroll_container.scroll_vertical = lerp(float(current), float(target_scroll), scroll_speed)
 		else:
 			scroll_container.scroll_vertical = int(target_scroll)
 
 func _on_scroll_input(event):
-	# Обработка мыши (десктоп)
+	# Колесо мыши (ПК)
 	if event is InputEventMouseButton:
-		var step = 150
 		if event.button_index == MOUSE_BUTTON_WHEEL_UP:
-			target_scroll -= step
+			target_scroll -= 180
 			_clamp_scroll()
 			accept_event()
 		elif event.button_index == MOUSE_BUTTON_WHEEL_DOWN:
-			target_scroll += step
+			target_scroll += 180
 			_clamp_scroll()
 			accept_event()
-	
-	# Обработка сенсорного экрана (телефон)
-	elif event is InputEventScreenDrag:
-		if is_dragging:
-			var delta_y = event.relative.y
-			target_scroll = drag_start_scroll - delta_y
-			_clamp_scroll()
-			scroll_container.scroll_vertical = int(target_scroll)
-	
-	elif event is InputEventScreenTouch:
+		elif event.button_index == MOUSE_BUTTON_LEFT:
+			if event.pressed:
+				is_dragging = true
+			else:
+				is_dragging = false
+				target_scroll = scroll_container.scroll_vertical
+
+	# Сенсорный ввод (Android)
+	if event is InputEventScreenTouch:
 		if event.pressed:
-			# Начало касания
 			is_dragging = true
-			drag_start_y = event.position.y
-			drag_start_scroll = scroll_container.scroll_vertical
 		else:
-			# Конец касания
 			is_dragging = false
-			_clamp_scroll()
 			target_scroll = scroll_container.scroll_vertical
+			_clamp_scroll()
+
+	if event is InputEventScreenDrag:
+		is_dragging = true
 
 func _clamp_scroll():
 	if not scroll_container: return
@@ -89,6 +92,9 @@ func _setup_grid():
 		var btn = Button.new()
 		btn.custom_minimum_size = Vector2(120, 120)  
 		btn.name = "Level_" + str(i)
+
+		# ОЧЕНЬ ВАЖНО для Android: PASS позволяет ScrollContainer видеть жесты прокрутки поверх кнопок
+		btn.mouse_filter = Control.MOUSE_FILTER_PASS
 
 		var major = ((i - 1) / 5) + 1
 		var minor = ((i - 1) % 5) + 1
@@ -142,13 +148,14 @@ func _setup_grid():
 		grid.add_child(btn)
 
 func _on_level_pressed(level_num: int):
+	# Если мы находимся в процессе перетаскивания, не даем кнопке сработать как нажатие на уровень
+	if is_dragging: return
+
 	if SaveManager:
 		SaveManager.current_level = level_num
 		SaveManager.set_meta("current_level", level_num)
 
 	var path = "res://scenes/Levels/Level_" + str(level_num) + ".tscn"
-
-	# Сначала проверяем существование, чтобы не плодить ошибки в консоли
 	if ResourceLoader.exists(path):
 		get_tree().change_scene_to_file(path)
 	else:
@@ -156,7 +163,6 @@ func _on_level_pressed(level_num: int):
 		if ResourceLoader.exists(alt_path):
 			get_tree().change_scene_to_file(alt_path)
 		else:
-			# Если файла нет (как вашего 10-го уровня), пишем в лог и грузим затычку
 			print("СЦЕНА НЕ НАЙДЕНА: ", path)
 			get_tree().change_scene_to_file("res://scenes/Field.tscn")
 
