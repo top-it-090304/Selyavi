@@ -1,7 +1,6 @@
 # 🛡️ Tanks 2026
 
 ![Godot Engine](https://img.shields.io/badge/Engine-Godot%204.x-blue?logo=godot-engine&logoColor=white)
-![Platform](https://img.shields.io/badge/Platform-Android%20%7C%20Windows-green)
 ![License](https://img.shields.io/badge/License-MIT-yellow)
 
 **Tanks 2026** — это динамичный аркадный танковый экшен, вдохновленный классикой, но перенесенный в сеттинг недалекого будущего. Сражайся, улучшай свой танк и уничтожай базы противника!
@@ -25,11 +24,6 @@
 - **Правый джойстик (Aim):** Поворот башни и прицеливание.
 - **Тап по иконкам снарядов:** Смена типа боеприпасов.
 
-### Windows (Desktop)
-- **WASD:** Движение.
-- **Mouse:** Прицеливание и стрельба.
-- **Цифры 1-3:** Смена снарядов.
-
 ---
 
 ## 🛠️ Технологии
@@ -42,31 +36,3 @@
 
 ---
 
-## 📸 Скриншоты
-
-<p align="center">
-  <img src="icon.png" width="200" alt="Game Icon">
-</p>
-
-*(Добавь свои скриншоты в папку и укажи пути здесь для красоты!)*
-
----
-
-## 📥 Установка и запуск
-
-1. Установи [Godot Engine 4.x](https://godotengine.org/).
-2. Клонируй репозиторий:
-   ```bash
-   git clone https://github.com/your-username/tanks2026.git
-   ```
-3. Открой `project.godot` в редакторе.
-4. Для Android: Настрой экспорт и собери APK (в корне уже есть готовый пример `Tanks 2026.apk`).
-
----
-
-## 📝 Лицензия
-
-Проект распространяется под лицензией MIT. Подробности в файле [LICENSE](LICENSE).
-
----
-<p align="center">Разработано с ❤️ для фанатов танковых баталий.</p>
