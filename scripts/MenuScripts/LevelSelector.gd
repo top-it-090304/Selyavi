@@ -9,6 +9,9 @@ var _unlocked_levels = 1
 # Параметры для плавной прокрутки
 var target_scroll = 0.0
 var scroll_speed = 0.15
+var drag_start_y = 0.0
+var drag_start_scroll = 0.0
+var is_dragging = false
 
 func _ready():
 	if not self is Control:
@@ -25,16 +28,21 @@ func _ready():
 	if scroll_container:
 		target_scroll = scroll_container.scroll_vertical
 		scroll_container.gui_input.connect(_on_scroll_input)
+		
+		# Включаем прокрутку для сенсорного ввода
+		scroll_container.scroll_deadzone = 0
+		scroll_container.get_v_scroll_bar().mouse_default_cursor_shape = Control.CURSOR_DRAG
 
 func _process(_delta):
 	if scroll_container:
 		var current = scroll_container.scroll_vertical
-		if abs(current - target_scroll) > 0.1:
+		if not is_dragging and abs(current - target_scroll) > 0.5:
 			scroll_container.scroll_vertical = lerp(current, int(target_scroll), scroll_speed)
 		else:
 			scroll_container.scroll_vertical = int(target_scroll)
 
 func _on_scroll_input(event):
+	# Обработка мыши (десктоп)
 	if event is InputEventMouseButton:
 		var step = 150
 		if event.button_index == MOUSE_BUTTON_WHEEL_UP:
@@ -45,13 +53,30 @@ func _on_scroll_input(event):
 			target_scroll += step
 			_clamp_scroll()
 			accept_event()
-
-	if event is InputEventMouseMotion and event.button_mask & MOUSE_BUTTON_MASK_LEFT:
-		target_scroll = scroll_container.scroll_vertical
+	
+	# Обработка сенсорного экрана (телефон)
+	elif event is InputEventScreenDrag:
+		if is_dragging:
+			var delta_y = event.relative.y
+			target_scroll = drag_start_scroll - delta_y
+			_clamp_scroll()
+			scroll_container.scroll_vertical = int(target_scroll)
+	
+	elif event is InputEventScreenTouch:
+		if event.pressed:
+			# Начало касания
+			is_dragging = true
+			drag_start_y = event.position.y
+			drag_start_scroll = scroll_container.scroll_vertical
+		else:
+			# Конец касания
+			is_dragging = false
+			_clamp_scroll()
+			target_scroll = scroll_container.scroll_vertical
 
 func _clamp_scroll():
 	if not scroll_container: return
-	var max_scroll = scroll_container.get_v_scroll_bar().max_value - scroll_container.size.y
+	var max_scroll = max(0, scroll_container.get_v_scroll_bar().max_value - scroll_container.size.y)
 	target_scroll = clamp(target_scroll, 0, max_scroll)
 
 func _setup_grid():
@@ -62,7 +87,7 @@ func _setup_grid():
 
 	for i in range(1, _level_count + 1):
 		var btn = Button.new()
-		btn.custom_minimum_size = Vector2(120, 120)
+		btn.custom_minimum_size = Vector2(120, 120)  # Увеличил для удобства на телефоне
 		btn.name = "Level_" + str(i)
 
 		var major = ((i - 1) / 5) + 1
@@ -119,6 +144,7 @@ func _setup_grid():
 func _on_level_pressed(level_num: int):
 	if SaveManager:
 		SaveManager.current_level = level_num
+		SaveManager.set_meta("current_level", level_num)
 
 	var path = "res://scenes/Levels/Level_" + str(level_num) + ".tscn"
 
