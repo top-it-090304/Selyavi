@@ -34,7 +34,7 @@ func _setup_hp_bar():
 	_hp_bar.anchor_left = 0.5
 	_hp_bar.anchor_right = 0.5
 	_hp_bar.anchor_top = 1.0
-	_hp_bar.anchor_bottom = 1.0
+	_hp_bar.anchor_bottom = 0.2
 
 	# Центрируем (смещение влево на 200 при ширине 400) и поднимаем от нижнего края
 	_hp_bar.offset_left = -200

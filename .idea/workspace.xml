@@ -4,13 +4,9 @@
     <option name="autoReloadType" value="NONE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="e3887325-b543-4879-bba0-c494d7c2e039" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/project.godot" beforeDir="false" afterPath="$PROJECT_DIR$/project.godot" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/scenes/Levels/Level_1.tscn" beforeDir="false" afterPath="$PROJECT_DIR$/scenes/Levels/Level_1.tscn" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/scenes/MenuScenes/Menu.tscn" beforeDir="false" afterPath="$PROJECT_DIR$/scenes/MenuScenes/Menu.tscn" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/scenes/Tank/Boss.tscn" beforeDir="false" afterPath="$PROJECT_DIR$/scenes/Tank/Boss.tscn" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/scripts/Tank/Boss.gd" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/Tank/Boss.gd" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/scripts/Tank/Player.gd" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/Tank/Player.gd" afterDir="false" />
+    <list default="true" id="33129e0a-8a1f-4647-8ff9-20d5e301da8a" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/caches/deviceStreaming.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/caches/deviceStreaming.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -26,7 +22,7 @@
   <component name="GitHubPullRequestSearchHistory">{
   &quot;lastFilter&quot;: {
     &quot;state&quot;: &quot;OPEN&quot;,
-    &quot;assignee&quot;: &quot;RomanShaburov&quot;
+    &quot;assignee&quot;: &quot;Max252t&quot;
   }
 }</component>
   <component name="GithubPullRequestsUISettings">{
@@ -36,45 +32,36 @@
   }
 }</component>
   <component name="ProjectColorInfo">{
+  &quot;customColor&quot;: &quot;&quot;,
   &quot;associatedIndex&quot;: 5
 }</component>
-  <component name="ProjectId" id="3Bh5WdyPvdd8tIaqX4Jhy7F4R58" />
+  <component name="ProjectId" id="3C4TQccaqpLL3jpMoVe4FxPyCvk" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "ModuleVcsDetector.initialDetectionPerformed": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.cidr.known.project.marker": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "RunOnceActivity.readMode.enableVisualFormatting": "true",
-    "cf.first.check.clang-format": "false",
-    "cidr.known.project.marker": "true",
-    "dart.analysis.tool.window.visible": "false",
-    "git-widget-placeholder": "main",
-    "ignore.virus.scanning.warn.message": "true",
-    "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "C:/Users/Пользователь/Desktop/tanks2026",
-    "settings.editor.selected.configurable": "com.android.studio.ml.bot.mainConfigurable",
-    "show.migrate.to.gradle.popup": "false"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.cidr.known.project.marker&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.readMode.enableVisualFormatting&quot;: &quot;true&quot;,
+    &quot;cf.first.check.clang-format&quot;: &quot;false&quot;,
+    &quot;cidr.known.project.marker&quot;: &quot;true&quot;,
+    &quot;dart.analysis.tool.window.visible&quot;: &quot;false&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;show.migrate.to.gradle.popup&quot;: &quot;false&quot;
   }
-}]]></component>
-  <component name="SharedIndexes">
-    <attachedChunks>
-      <set>
-        <option value="bundled-python-sdk-4e2b1448bda8-9a97661f3031-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-252.27397.106" />
-      </set>
-    </attachedChunks>
-  </component>
+}</component>
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
-      <changelist id="e3887325-b543-4879-bba0-c494d7c2e039" name="Changes" comment="" />
-      <created>1774928494240</created>
+      <changelist id="33129e0a-8a1f-4647-8ff9-20d5e301da8a" name="Changes" comment="" />
+      <created>1775643829295</created>
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
-      <updated>1774928494240</updated>
+      <updated>1775643829295</updated>
     </task>
     <servers />
   </component>
