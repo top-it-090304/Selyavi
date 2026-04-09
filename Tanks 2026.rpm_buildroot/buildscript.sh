@@ -1,0 +1,1 @@
+rpmbuild --define '_topdir /home/markc_ubuntu/Desktop/GodotProjects/Tanks_2026/Tanks 2026.rpm_buildroot' -ba --without debug --without debuginfo "/home/markc_ubuntu/Desktop/GodotProjects/Tanks_2026/Tanks 2026.rpm_buildroot/SPECS/org.selyavi.tanks.tanks2026.spec"
