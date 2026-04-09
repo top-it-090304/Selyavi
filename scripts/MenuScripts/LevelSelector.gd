@@ -36,17 +36,11 @@ func _ready():
 func _process(_delta):
 	if scroll_container:
 		var current = scroll_container.scroll_vertical
-
-		# На ПК проверяем зажатую кнопку мыши для синхронизации
 		if !OS.has_feature("mobile") and Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT):
 			target_scroll = current
 			return
-
-		# Если тащим пальцем, не лерпим
 		if is_dragging:
 			return
-
-		# Плавная докрутка
 		if abs(current - target_scroll) > 0.5:
 			scroll_container.scroll_vertical = lerp(float(current), float(target_scroll), scroll_speed)
 		else:
@@ -63,7 +57,6 @@ func _on_scroll_input(event):
 			_clamp_scroll()
 			accept_event()
 
-	# Обработка тача для самого контейнера (если попали мимо кнопок)
 	if event is InputEventScreenTouch:
 		if event.pressed:
 			is_dragging = true
@@ -84,7 +77,6 @@ func _clamp_scroll():
 
 func _setup_grid():
 	if grid == null: return
-
 	for child in grid.get_children():
 		child.queue_free()
 
@@ -92,7 +84,7 @@ func _setup_grid():
 		var btn = Button.new()
 		btn.custom_minimum_size = Vector2(120, 120)
 		btn.name = "Level_" + str(i)
-		btn.mouse_filter = Control.MOUSE_FILTER_PASS # Важно для прокрутки
+		btn.mouse_filter = Control.MOUSE_FILTER_PASS
 
 		var major = ((i - 1) / 5) + 1
 		var minor = ((i - 1) % 5) + 1
@@ -100,14 +92,10 @@ func _setup_grid():
 		btn.add_theme_font_size_override("font_size", 34)
 
 		var is_locked = i > _unlocked_levels
-
-		# Стили
 		_apply_button_style(btn, i, is_locked)
 
 		if !is_locked:
-			# Используем gui_input для более надежного определения клика на мобилках
 			btn.gui_input.connect(_on_level_btn_gui_input.bind(i))
-
 		grid.add_child(btn)
 
 func _apply_button_style(btn, i, is_locked):
@@ -143,13 +131,10 @@ func _on_level_btn_gui_input(event, level_num):
 			touch_start_pos = event.position
 			scroll_start_pos = scroll_container.scroll_vertical
 		else:
-			# Если палец отпущен и мы почти не сдвинули его и не прокрутили список
 			var drag_dist = event.position.distance_to(touch_start_pos)
 			var scroll_dist = abs(scroll_container.scroll_vertical - scroll_start_pos)
-
 			if drag_dist < 20 and scroll_dist < 10:
 				_on_level_pressed(level_num)
-
 			is_dragging = false
 			target_scroll = scroll_container.scroll_vertical
 
@@ -157,7 +142,6 @@ func _on_level_btn_gui_input(event, level_num):
 		is_dragging = true
 		target_scroll = scroll_container.scroll_vertical
 
-	# Поддержка мыши для тестов в редакторе
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
 		if event.pressed:
 			touch_start_pos = event.position
@@ -171,7 +155,7 @@ func _on_level_pressed(level_num: int):
 	if SaveManager:
 		SaveManager.current_level = level_num
 
-	# Управление музыкой
+	# Управление музыкой: останавливаем все лишнее перед переходом
 	if has_node("/root/AudioManager"):
 		var am = get_node("/root/AudioManager")
 		if level_num % 5 == 0:

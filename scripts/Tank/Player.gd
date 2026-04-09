@@ -47,7 +47,6 @@ func _ready():
 func _connect_hud_controls():
 	var hud = get_tree().get_first_node_in_group("hud")
 	if hud:
-		# Теперь ищем рекурсивно, так как джойстики внутри MarginContainers
 		_joystick = hud.find_child("Joystick", true)
 		_aim = hud.find_child("Aim", true)
 
@@ -58,10 +57,6 @@ func _connect_hud_controls():
 			_aim.init(true)
 			if not _aim.use_move_vector.is_connected(use_move_vector_aim):
 				_aim.use_move_vector.connect(use_move_vector_aim)
-			# Убираем прямое соединение с fire_touch при отпускании,
-			# теперь стрельба будет в _physics_process
-			# if not _aim.fire_touch.is_connected(fire_touch):
-			# 	_aim.fire_touch.connect(fire_touch)
 
 func _load_all_data():
 	if SaveManager != null:
@@ -95,7 +90,11 @@ func use_move_vector(move_vector: Vector2):
 
 func fire_touch():
 	if _shoot_timer.time_left > 0: return
-	
+
+	# Воспроизводим звук выстрела игрока здесь, так как из пули он удален
+	if AudioManager != null:
+		AudioManager.play_bullet_sound(_type_bullet, global_position)
+
 	var bullet = _bullet_scene.instantiate()
 	bullet.global_position = _bullet_position.global_position
 	bullet.rotation_degrees = _gun.global_rotation_degrees
@@ -119,9 +118,7 @@ func _physics_process(_delta):
 	queue_redraw()
 
 func _handle_auto_shoot():
-	# Если джойстик прицеливания активен и отклонен достаточно сильно - стреляем автоматически
 	if _aim != null and _aim.get_is_joystick_active():
-		# Проверяем длину вектора, чтобы не стрелять при малейшем касании центра
 		if _aim.move_vector.length() > 0.2:
 			fire_touch()
 
@@ -209,11 +206,8 @@ func take_heal(amount: int):
 func _draw():
 	if is_scope_on and _aim != null and _aim.get_is_joystick_active():
 		var direction = Vector2(0, -1).rotated(_gun.global_rotation)
-
-		# Определяем длину луча в зависимости от типа снаряда
-		var range_len = 600.0 # PLASMA по умолчанию
+		var range_len = 600.0
 		match _type_bullet:
 			MEDIUM: range_len = 275.0
 			LIGHT: range_len = 900.0
-
 		draw_line(to_local(_bullet_position.global_position), to_local(_bullet_position.global_position + direction * range_len), Color(1, 0, 0, 0.5), 2.0)

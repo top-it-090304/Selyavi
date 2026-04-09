@@ -8,21 +8,31 @@ var _victory_timer: Timer # Таймер для периодической пр�
 @export var current_level: int = 1
 
 func _ready():
-	# 1. Номер уровня
-	if SaveManager and SaveManager.has_meta("current_level"):
-		current_level = SaveManager.get_meta("current_level")
-		SaveManager.current_level = current_level # Синхронизируем с синглтоном
-	else:
-		var s_name = name
-		if s_name.contains("_"):
-			current_level = s_name.get_slice("_", 1).to_int()
+	# 1. Номер уровня - берем из синглтона
+	if SaveManager:
+		current_level = SaveManager.current_level
+
+	# Подстраховка по имени сцены (например, если запустить сцену отдельно через F6)
+	if name.contains("_"):
+		var extracted = name.get_slice("_", 1).to_int()
+		if extracted > 0:
+			current_level = extracted
 			if SaveManager: SaveManager.current_level = current_level
 
 	# 2. Музыка
 	_musicPlayer = get_node_or_null("MusicPlayer")
+	var am = get_node_or_null("/root/AudioManager")
+
 	if _musicPlayer != null:
 		_musicPlayer.bus = "Music"
-		_musicPlayer.play()
+		if current_level % 5 == 0:
+			# Уровень босса: выключаем локальный плеер, включаем музыку босса в AudioManager
+			_musicPlayer.stop()
+			if am: am.play_boss()
+		else:
+			# Обычный уровень: выключаем AudioManager (если играла музыка босса), включаем локальную
+			if am: am.stop()
+			_musicPlayer.play()
 
 	# 3. Следим за объектами
 	get_tree().node_added.connect(_on_node_added)
@@ -77,7 +87,6 @@ func _on_enemy_died(_type: int):
 	call_deferred("_check_victory_conditions")
 
 func _on_base_destroyed(type: int):
-	# Если это вражеская база (тип 1), даем деньги
 	if type == 1: # ENEMY
 		var players = get_tree().get_nodes_in_group("players")
 		if players.size() > 0 and players[0].has_method("add_money"):
@@ -86,14 +95,13 @@ func _on_base_destroyed(type: int):
 		var huds = get_tree().get_nodes_in_group("hud")
 		if huds.size() > 0: huds[0].update_bases_count()
 
-	# Если уничтожена база игрока (тип 0), это проигрыш
 	if type == 0: # PLAYER
 		_show_game_over_screen(false, "Ваша база уничтожена!")
 	else:
 		call_deferred("_check_victory_conditions")
 
 func _check_victory_conditions():
-	if get_tree().paused: return # Не проверяем, если игра уже на паузе (победа/поражение)
+	if get_tree().paused: return
 
 	var bases_count = _count_enemy_bases()
 	var enemies_count = _count_all_enemies()
@@ -105,8 +113,7 @@ func _count_enemy_bases() -> int:
 	var count = 0
 	for b in get_tree().get_nodes_in_group("bases"):
 		if is_instance_valid(b) and not b.is_queued_for_deletion():
-			# В Godot 4 лучше использовать get() для Area2D
-			if b.get("type_base") == 1: # 1 = ENEMY
+			if b.get("type_base") == 1:
 				count += 1
 	return count
 
@@ -129,21 +136,18 @@ func _show_game_over_screen(is_victory: bool, reason: String = ""):
 	canvas.process_mode = Node.PROCESS_MODE_ALWAYS
 	add_child(canvas)
 
-	# Затемнение фона
 	var overlay = ColorRect.new()
 	overlay.color = Color(0, 0, 0, 0.7)
 	canvas.add_child(overlay)
 	overlay.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 
-	# Контейнер для центровки
 	var center_container = CenterContainer.new()
 	canvas.add_child(center_container)
 	center_container.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	center_container.mouse_filter = Control.MOUSE_FILTER_IGNORE
 
-	# Основная панель
 	var panel = PanelContainer.new()
-	panel.custom_minimum_size = Vector2(480, 0) # Адаптивная ширина
+	panel.custom_minimum_size = Vector2(480, 0)
 	center_container.add_child(panel)
 
 	var style = StyleBoxFlat.new()
@@ -155,7 +159,6 @@ func _show_game_over_screen(is_victory: bool, reason: String = ""):
 	style.shadow_color = Color(0, 0, 0, 0.6)
 	panel.add_theme_stylebox_override("panel", style)
 
-	# Внутренние отступы
 	var margin = MarginContainer.new()
 	margin.add_theme_constant_override("margin_left", 30)
 	margin.add_theme_constant_override("margin_right", 30)
@@ -167,7 +170,6 @@ func _show_game_over_screen(is_victory: bool, reason: String = ""):
 	vbox.add_theme_constant_override("separation", 20)
 	margin.add_child(vbox)
 
-	# Заголовок
 	var title = Label.new()
 	title.text = "ПОБЕДА!" if is_victory else "ПОРАЖЕНИЕ"
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -175,7 +177,6 @@ func _show_game_over_screen(is_victory: bool, reason: String = ""):
 	title.add_theme_color_override("font_color", Color(1, 0.85, 0.2) if is_victory else Color(1, 0.3, 0.3))
 	vbox.add_child(title)
 
-	# Описание с автопереносом
 	var desc = Label.new()
 	desc.text = reason
 	desc.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -184,7 +185,6 @@ func _show_game_over_screen(is_victory: bool, reason: String = ""):
 	desc.add_theme_font_size_override("font_size", 24)
 	vbox.add_child(desc)
 
-	# Контейнер кнопок
 	var btn_container = VBoxContainer.new()
 	btn_container.add_theme_constant_override("separation", 12)
 	vbox.add_child(btn_container)
@@ -211,10 +211,8 @@ func _show_game_over_screen(is_victory: bool, reason: String = ""):
 			_cleanup_global_objects()
 			get_tree().paused = false
 			var next_lvl_num = current_level + 1
-			SaveManager.set_meta("current_level", next_lvl_num)
-			SaveManager.current_level = next_lvl_num
+			if SaveManager: SaveManager.current_level = next_lvl_num
 
-			# Управление музыкой при переходе на следующий уровень
 			if has_node("/root/AudioManager"):
 				var am = get_node("/root/AudioManager")
 				if next_lvl_num % 5 == 0:
@@ -223,7 +221,14 @@ func _show_game_over_screen(is_victory: bool, reason: String = ""):
 					am.stop()
 
 			var next_path = "res://scenes/Levels/Level_" + str(next_lvl_num) + ".tscn"
-			get_tree().change_scene_to_file(next_path if FileAccess.file_exists(next_path) else "res://scenes/MenuScenes/LevelSelector.tscn")
+			if ResourceLoader.exists(next_path):
+				get_tree().change_scene_to_file(next_path)
+			else:
+				var alt_path = next_path.replace(".tscn", ".scn")
+				if ResourceLoader.exists(alt_path):
+					get_tree().change_scene_to_file(alt_path)
+				else:
+					get_tree().change_scene_to_file("res://scenes/MenuScenes/LevelSelector.tscn")
 		)
 
 	var btn_retry = Button.new()

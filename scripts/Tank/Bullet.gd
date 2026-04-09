@@ -44,7 +44,6 @@ func _move():
 		_destroy()
 
 func _fade_sound():
-	# Создаем Tween только когда он нужен
 	var tween = create_tween()
 	tween.tween_property(_bullet_sound, "volume_db", -80, 1.0)
 	tween.finished.connect(_on_fade_complete)
@@ -109,9 +108,6 @@ func _update_type():
 			_damage = 20
 			_max_range = 900.0
 
-	if AudioManager != null:
-		AudioManager.play_bullet_sound(_type_bullet, global_position)
-
 func _update_appearance():
 	match _type_bullet:
 		PLASMA:
@@ -126,9 +122,6 @@ func _update_appearance():
 			_bullet_sprite.texture = load("res://assets/future_tanks/PNG/Effects/Light_Shell.png")
 			_bullet_speed = 6
 			_max_range = 900.0
-
-	if AudioManager != null:
-		AudioManager.play_bullet_sound(_type_bullet, global_position)
 
 func _process(delta):
 	_move()
