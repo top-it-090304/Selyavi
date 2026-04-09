@@ -5,13 +5,15 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="33129e0a-8a1f-4647-8ff9-20d5e301da8a" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/caches/deviceStreaming.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/caches/deviceStreaming.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scenes/Levels/Level_5.tscn" beforeDir="false" afterPath="$PROJECT_DIR$/scenes/Levels/Level_5.tscn" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/scripts/AudioManager.gd" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/AudioManager.gd" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/scripts/MenuScripts/Info.gd" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/MenuScripts/Info.gd" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/Field.gd" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/Field.gd" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/scripts/MenuScripts/LevelSelector.gd" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/MenuScripts/LevelSelector.gd" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/scripts/MenuScripts/Menu.gd" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/MenuScripts/Menu.gd" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/scripts/MenuScripts/Shop.gd" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/MenuScripts/Shop.gd" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/scripts/Tank/Bullet.gd" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/Tank/Bullet.gd" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/Tank/Enemy.gd" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/Tank/Enemy.gd" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/Tank/Player.gd" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/Tank/Player.gd" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -45,22 +47,22 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "ModuleVcsDetector.initialDetectionPerformed": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.cidr.known.project.marker": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "RunOnceActivity.readMode.enableVisualFormatting": "true",
-    "cf.first.check.clang-format": "false",
-    "cidr.known.project.marker": "true",
-    "dart.analysis.tool.window.visible": "false",
-    "git-widget-placeholder": "newgd",
-    "kotlin-language-version-configured": "true",
-    "settings.editor.selected.configurable": "com.google.gct.login2.settings.GoogleLoginApplicationSettingsConfigurableProvider",
-    "show.migrate.to.gradle.popup": "false"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.cidr.known.project.marker&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.readMode.enableVisualFormatting&quot;: &quot;true&quot;,
+    &quot;cf.first.check.clang-format&quot;: &quot;false&quot;,
+    &quot;cidr.known.project.marker&quot;: &quot;true&quot;,
+    &quot;dart.analysis.tool.window.visible&quot;: &quot;false&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;newgd&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;com.google.gct.login2.settings.GoogleLoginApplicationSettingsConfigurableProvider&quot;,
+    &quot;show.migrate.to.gradle.popup&quot;: &quot;false&quot;
   }
-}]]></component>
+}</component>
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
       <changelist id="33129e0a-8a1f-4647-8ff9-20d5e301da8a" name="Changes" comment="" />

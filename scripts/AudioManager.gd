@@ -17,14 +17,16 @@ enum Track { NONE, MENU, BOSS }
 var current_track = Track.NONE
 
 func _ready():
+	# Включаем зацикливание для фоновых треков
+	if music_menu is AudioStreamMP3: music_menu.loop = true
+	if music_boss is AudioStreamMP3: music_boss.loop = true
+
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	_player = AudioStreamPlayer.new()
-	_player.bus = "Music" # Глобальная шина из default_bus_layout.tres
+	_player.bus = "Music"
 	add_child(_player)
 
-	# Загружаем сохраненную громкость при старте
 	if SaveManager:
-		# Даем кадру пройти, чтобы AudioServer успел инициализироваться
 		call_deferred("_init_volumes")
 
 func _init_volumes():
@@ -36,15 +38,12 @@ func _init_volumes():
 func play_menu():
 	if current_track == Track.MENU: return
 	_play(music_menu)
-	# Устанавливаем громкость плеера на -12 dB.
-	# Это приглушит трек ОТНОСИТЕЛЬНО громкости шины "Music" в настройках.
 	_player.volume_db = -12.0
 	current_track = Track.MENU
 
 func play_boss():
 	if current_track == Track.BOSS: return
 	_play(music_boss)
-	# Музыка босса играет на 0 dB (в полную громкость шины "Music")
 	_player.volume_db = 0.0
 	current_track = Track.BOSS
 
@@ -58,11 +57,9 @@ func _play(stream: AudioStream):
 	_player.stream = stream
 	_player.play()
 
-# Функции настройки AudioServer (эти шины созданы в Godot по умолчанию)
 func set_music_volume(value: float):
 	var bus_idx = AudioServer.get_bus_index("Music")
 	if bus_idx != -1:
-		# Используем логарифмическую шкалу для ползунка
 		AudioServer.set_bus_volume_db(bus_idx, linear_to_db(max(0.0001, value)))
 	music_volume_changed.emit(value)
 
@@ -72,12 +69,11 @@ func set_sfx_volume(value: float):
 		AudioServer.set_bus_volume_db(bus_idx, linear_to_db(max(0.0001, value)))
 	sfx_volume_changed.emit(value)
 
-# Звук выстрела (привязан к шине SFX)
 func play_bullet_sound(type: int, _pos: Vector2 = Vector2.ZERO):
 	var sfx_player = AudioStreamPlayer.new()
 	add_child(sfx_player)
 	sfx_player.bus = "SFX"
-	sfx_player.volume_db = -5.0 # Небольшое занижение для баланса
+	sfx_player.volume_db = -5.0
 
 	match type:
 		0: sfx_player.stream = sfx_plasma

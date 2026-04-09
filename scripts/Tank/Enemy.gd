@@ -215,6 +215,11 @@ func _fire_at_pos(pos: Vector2):
 
 	var base_angle = (pos - _gun.global_position).angle() + PI/2
 
+	# Определяем тип звука и играем ЕГО ОДИН РАЗ
+	var sound_type = 2 if _type_enemy == TypeEnemy.STATIONARY else 0
+	if AudioManager:
+		AudioManager.play_bullet_sound(sound_type, global_position)
+
 	if _type_enemy == TypeEnemy.TRIPLE:
 		# Стрельба веером (3 пули) - Увеличили разлет до 0.4
 		var angles = [base_angle, base_angle - 0.4, base_angle + 0.4]
