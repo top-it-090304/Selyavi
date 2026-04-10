@@ -8,6 +8,7 @@ signal tank_health_changed(current, max_hp)
 var _hp: int
 var _max_hp: int
 var _damage: int = 30
+var _armor: float = 0.0 # Сопротивление урону (0.0 - 1.0)
 var _bullet_scene: PackedScene
 
 var _body: Sprite2D
@@ -39,7 +40,9 @@ func _init_base_tank():
 	_setup_damage_effects()
 
 func take_damage(damage: int):
-	_hp -= damage
+	# Применяем сопротивление: итоговый урон = урон * (1 - броня)
+	var final_damage = int(damage * (1.0 - _armor))
+	_hp -= final_damage
 	tank_health_changed.emit(_hp, _max_hp)
 	_update_damage_visuals()
 	if _hp <= 0:

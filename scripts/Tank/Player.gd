@@ -91,7 +91,6 @@ func use_move_vector(move_vector: Vector2):
 func fire_touch():
 	if _shoot_timer.time_left > 0: return
 
-	# Воспроизводим звук выстрела игрока здесь, так как из пули он удален
 	if AudioManager != null:
 		AudioManager.play_bullet_sound(_type_bullet, global_position)
 
@@ -165,25 +164,32 @@ func select_type(body_type: int, gun_type: int, color_type: int):
 	_update_appearance()
 
 func _update_stats():
-	var hp_base = 100; var speed_base = 250; var dmg_mod = 1.0; var reload_base = 1.0
+	var hp_base = 100; var speed_base = 250; var dmg_mod = 1.0; var reload_base = 1.0; var armor_base = 0.0
 	match _type_body:
-		BODY_LIGHT: hp_base = 80; speed_base = 300
-		BODY_MEDIUM: hp_base = 100; speed_base = 250
-		BODY_HEAVY: hp_base = 150; speed_base = 180
-		BODY_LMEDIUM: hp_base = 120; speed_base = 220
-		BODY_MHEAVY: hp_base = 135; speed_base = 200
+		BODY_LIGHT: hp_base = 80; speed_base = 280; armor_base = -0.15
+		BODY_MEDIUM: hp_base = 100; speed_base = 250; armor_base = 0.0
+		BODY_HEAVY: hp_base = 250; speed_base = 200; armor_base = 0.3
+		BODY_LMEDIUM: hp_base = 120; speed_base = 260; armor_base = 0.1
+		BODY_MHEAVY: hp_base = 175; speed_base = 220; armor_base = 0.2
 	match _type_gun:
-		GUN_LIGHT: dmg_mod = 0.8; reload_base = 0.5
+		GUN_LIGHT: dmg_mod = 0.7; reload_base = 0.65
 		GUN_MEDIUM: dmg_mod = 1.0; reload_base = 1.0
-		GUN_HEAVY: dmg_mod = 1.5; reload_base = 2.5
-		GUN_LMEDIUM: dmg_mod = 1.1; reload_base = 0.8
-		GUN_MHEAVY: dmg_mod = 1.3; reload_base = 1.8
+		GUN_HEAVY: dmg_mod = 2.5; reload_base = 1.8
+		GUN_LMEDIUM: dmg_mod = 1.15; reload_base = 0.9
+		GUN_MHEAVY: dmg_mod = 1.3; reload_base = 0.8
 
-	_max_hp = hp_base + (20 if _color == COLOR_AZURE else 10 if _color == COLOR_GREEN else 0)
+	var hp_bonus = 0; var speed_bonus = 0; var armor_bonus = 0.0; var rof_bonus = 0.0
+	match _color:
+		COLOR_GREEN: hp_bonus = 30; speed_bonus = -15; armor_bonus = 0.1; rof_bonus = 0.1
+		COLOR_AZURE: hp_bonus = 5; speed_bonus = 20; armor_bonus = -0.1; rof_bonus = 0.05
+
+	_max_hp = hp_base + hp_bonus
 	_hp = _max_hp
-	_speed = speed_base + (20 if _color == COLOR_GREEN else -10 if _color == COLOR_AZURE else 0)
+	_speed = speed_base + speed_bonus
 	_damage = int(30 * dmg_mod)
-	if _shoot_timer: _shoot_timer.wait_time = max(0.1, reload_base)
+	_armor = clamp(armor_base + armor_bonus, -0.9, 0.9)
+
+	if _shoot_timer: _shoot_timer.wait_time = max(0.1, reload_base + rof_bonus)
 	health_changed.emit(_hp, _max_hp)
 
 func add_money(amount: int):
@@ -197,7 +203,9 @@ func _update_appearance():
 	var g_name = ["Gun_01", "Gun_03", "Gun_08", "Gun_04", "Gun_07"][_type_gun]
 	if _body: _body.texture = load("res://assets/future_tanks/PNG/Hulls_" + color_f + "/" + b_name + ".png")
 	if _gun: _gun.texture = load("res://assets/future_tanks/PNG/Weapon_" + color_f + "/" + g_name + ".png")
-	if _gun: _gun.position = Vector2(0, 0 if (_type_body == BODY_LIGHT or _type_body == BODY_LMEDIUM) else 35)
+
+	var body_offsets = [-15, -20, -15, -5, -10]
+	if _gun: _gun.position = Vector2(0, body_offsets[_type_body])
 
 func take_heal(amount: int):
 	_hp = min(_hp + amount, _max_hp)
