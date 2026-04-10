@@ -55,6 +55,7 @@ animations = [{
 }]
 
 [node name="Boss" type="CharacterBody2D"]
+floor_max_angle = 0.0
 script = ExtResource("1")
 _type_enemy = 5
 

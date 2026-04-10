@@ -1,4 +1,4 @@
-[gd_scene load_steps=15 format=3 uid="uid://mfxaskty4hrm"]
+[gd_scene load_steps=14 format=3 uid="uid://mfxaskty4hrm"]
 
 [ext_resource type="Texture2D" uid="uid://qe6yjbi5bg6s" path="res://assets/future_tanks/PNG/Weapon_Color_A/Gun_01.png" id="1"]
 [ext_resource type="AudioStream" uid="uid://dwnx2lsl0j4q8" path="res://assets/sounds/tracks_rattle_slow_01.mp3" id="2"]
@@ -52,6 +52,7 @@ animations = [{
 }]
 
 [node name="PlayerTank" type="CharacterBody2D"]
+floor_max_angle = 0.0
 script = ExtResource("5")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]

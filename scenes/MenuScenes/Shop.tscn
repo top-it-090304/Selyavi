@@ -1,4 +1,4 @@
-[gd_scene load_steps=11 format=3 uid="uid://cdxfm038kd06l"]
+[gd_scene load_steps=12 format=3 uid="uid://cdxfm038kd06l"]
 
 [ext_resource type="Script" uid="uid://vja1k2m687in" path="res://scripts/MenuScripts/Shop.gd" id="1_shop"]
 [ext_resource type="FontFile" uid="uid://bsnvk4l0ue5ri" path="res://assets/fonts/ofont.ru_Shonen.ttf" id="2_font"]
@@ -92,6 +92,15 @@ corner_radius_top_right = 8
 corner_radius_bottom_right = 8
 corner_radius_bottom_left = 8
 
+[sub_resource type="LabelSettings" id="LabelSettings_title"]
+font = ExtResource("2_font")
+font_size = 72
+font_color = Color(0.741176, 0.819608, 0.705882, 1)
+outline_size = 14
+outline_color = Color(0.0784314, 0.0901961, 0.0784314, 1)
+shadow_size = 15
+shadow_color = Color(0, 0, 0, 0.4)
+
 [node name="Shop" type="Control"]
 layout_mode = 3
 anchors_preset = 15
@@ -118,9 +127,9 @@ anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
 offset_left = -600.0
-offset_top = -240.0
+offset_top = -220.0
 offset_right = 600.0
-offset_bottom = 360.0
+offset_bottom = 380.0
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_constants/separation = 60
@@ -129,10 +138,10 @@ alignment = 1
 [node name="LeftView" type="VBoxContainer" parent="Content"]
 custom_minimum_size = Vector2(320, 0)
 layout_mode = 2
-theme_override_constants/separation = 60
+theme_override_constants/separation = 20
 
 [node name="TankFrame" type="Panel" parent="Content/LeftView"]
-custom_minimum_size = Vector2(280, 350)
+custom_minimum_size = Vector2(280, 280)
 layout_mode = 2
 size_flags_horizontal = 4
 theme_override_styles/panel = SubResource("StyleBoxFlat_dark_bg")
@@ -156,7 +165,7 @@ position = Vector2(0, 35)
 [node name="Stats" type="VBoxContainer" parent="Content/LeftView"]
 custom_minimum_size = Vector2(300, 0)
 layout_mode = 2
-theme_override_constants/separation = 20
+theme_override_constants/separation = 6
 
 [node name="Damage" type="Label" parent="Content/LeftView/Stats"]
 custom_minimum_size = Vector2(300, 0)
@@ -169,6 +178,13 @@ autowrap_mode = 3
 custom_minimum_size = Vector2(300, 0)
 layout_mode = 2
 text = "ЗДОРОВЬЕ: 100"
+label_settings = SubResource("LabelSettings_stats")
+autowrap_mode = 3
+
+[node name="Armor" type="Label" parent="Content/LeftView/Stats"]
+custom_minimum_size = Vector2(300, 0)
+layout_mode = 2
+text = "БРОНЯ: 0%"
 label_settings = SubResource("LabelSettings_stats")
 autowrap_mode = 3
 
@@ -443,12 +459,27 @@ offset_bottom = 120.0
 grow_horizontal = 2
 mouse_filter = 2
 
+[node name="ShopTitle" type="Label" parent="Header"]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -347.0
+offset_top = 15.0
+offset_right = 347.0
+offset_bottom = 115.0
+grow_horizontal = 2
+text = "МАГАЗИН"
+label_settings = SubResource("LabelSettings_title")
+horizontal_alignment = 1
+vertical_alignment = 1
+
 [node name="BackButton" type="Button" parent="Header"]
 layout_mode = 1
 offset_left = 30.0
-offset_top = 30.0
+offset_top = 15.0
 offset_right = 230.0
-offset_bottom = 100.0
+offset_bottom = 85.0
 theme_override_fonts/font = ExtResource("2_font")
 theme_override_font_sizes/font_size = 32
 theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
@@ -462,9 +493,9 @@ anchors_preset = 1
 anchor_left = 1.0
 anchor_right = 1.0
 offset_left = -300.0
-offset_top = 30.0
+offset_top = 15.0
 offset_right = -30.0
-offset_bottom = 100.0
+offset_bottom = 85.0
 grow_horizontal = 0
 theme_override_constants/separation = 15
 alignment = 2
