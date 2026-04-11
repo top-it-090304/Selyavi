@@ -244,9 +244,9 @@ func take_damage(damage: int):
 	super.take_damage(damage)
 	health_changed.emit(_hp, _max_hp)
 
-	# Щит на 2 секунды после получения урона (если игрок выжил)
+	# Щит на 1 секунду после получения урона (если игрок выжил)
 	if _hp > 0:
-		_start_invulnerability(2.0)
+		_start_invulnerability(1.0)
 
 func _destroy():
 	_lives -= 1
