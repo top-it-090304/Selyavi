@@ -22,6 +22,7 @@ var _base_body: StaticBody2D # Ссылка на физическое тело �
 @export var _spawn_interval: float = 6.0
 var _time_since_last_check: float = 0.0
 var _spawn_radius: float = 60.0
+var _is_destroying: bool = false
 
 # Бонусы "Домашней области"
 @export var _damage_bonus: float = 1.3  # +30% урона
@@ -121,6 +122,8 @@ func _setup_base_collision():
 	_base_body.add_child(cs)
 
 func _on_bullet_entered(area):
+	if _is_destroying:
+		return
 	if area.has_method("is_player"):
 		var is_player_bullet = area.is_player()
 		if (is_player_bullet and type_base == TypeBase.ENEMY) or (not is_player_bullet and type_base == TypeBase.PLAYER):
@@ -179,7 +182,36 @@ func destroy():
 	_destroy()
 
 func _destroy():
+	if _is_destroying:
+		return
+	_is_destroying = true
 	base_state.emit(type_base)
+
+	if is_instance_valid(_spawn_timer):
+		_spawn_timer.stop()
+	if is_instance_valid(_heal_timer):
+		_heal_timer.stop()
+
+	monitoring = false
+	monitorable = false
+	if _base_body:
+		_base_body.set_deferred("collision_layer", 0)
+		_base_body.set_deferred("collision_mask", 0)
+
+	var sprite = get_node_or_null("Sprite2D")
+	if sprite == null:
+		queue_free()
+		return
+
+	var tw = create_tween()
+	tw.set_trans(Tween.TRANS_QUAD)
+	tw.set_ease(Tween.EASE_IN)
+	tw.tween_property(sprite, "modulate", Color(2.2, 0.45, 0.15, 1.0), 0.1)
+	tw.set_parallel(true)
+	tw.tween_property(sprite, "modulate", Color(0.12, 0.12, 0.12, 0.0), 0.55)
+	tw.tween_property(sprite, "scale", Vector2.ZERO, 0.55)
+	tw.tween_property(sprite, "rotation", sprite.rotation + PI * 0.65, 0.55)
+	await tw.finished
 	queue_free()
 
 func _spawn_enemy():

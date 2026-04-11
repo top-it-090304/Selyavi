@@ -48,6 +48,11 @@ func _ready():
 			GameManager.on_visual_scope_updated.connect(_toggle_scope)
 		is_scope_on = GameManager.is_scope_currently_enabled()
 
+	if SaveManager != null:
+		if not SaveManager.settings_changed.is_connected(_apply_camera_fov):
+			SaveManager.settings_changed.connect(_apply_camera_fov)
+	call_deferred("_apply_camera_fov")
+
 func _connect_hud_controls():
 	var hud = get_tree().get_first_node_in_group("hud")
 	if hud:
@@ -327,12 +332,24 @@ func _update_appearance():
 	if _body: _body.texture = load("res://assets/future_tanks/PNG/Hulls_" + color_f + "/" + b_name + ".png")
 	if _gun: _gun.texture = load("res://assets/future_tanks/PNG/Weapon_" + color_f + "/" + g_name + ".png")
 
-	var body_offsets = [-15, -20, -15, -5, -10]
-	if _gun: _gun.position = Vector2(0, body_offsets[_type_body])
+	# Крепление к корпусу: как у Enemy — offset.y = -position.y, иначе спрайт «уезжает» по Y.
+	var gun_mount_y := [40.0, 42.0, 40.0, 36.0, 38.0]
+	if _gun:
+		var my: float = gun_mount_y[_type_body]
+		_gun.position = Vector2(0, my)
+		_gun.offset = Vector2(0, -my)
 
 func take_heal(amount: int):
 	_hp = min(_hp + amount, _max_hp)
 	health_changed.emit(_hp, _max_hp)
+	_update_damage_visuals()
+
+func _apply_camera_fov():
+	var cam = get_node_or_null("Camera2D") as Camera2D
+	if cam == null or GameManager == null:
+		return
+	var z = GameManager.get_camera_zoom_from_settings()
+	cam.zoom = Vector2(z, z)
 
 func _draw():
 	if is_scope_on and _aim != null and _aim.get_is_joystick_active():

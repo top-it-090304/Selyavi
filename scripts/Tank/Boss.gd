@@ -4,7 +4,7 @@ var _spawn_timer: Timer
 var _enemy_scene: PackedScene
 var _hp_bar: ProgressBar
 var _spawn_attempts: int = 0
-var _max_spawn_attempts: int = 10
+var _max_spawn_attempts: int = 28
 
 func _ready():
 	_type_enemy = TypeEnemy.BOSS
@@ -57,12 +57,41 @@ func take_damage(damage: int):
 	if _hp_bar:
 		_hp_bar.value = _hp
 
+const MINION_SEPARATION: float = 72.0
+
 func _is_valid_spawn_position(pos: Vector2) -> bool:
 	var space_state = get_world_2d().direct_space_state
 	var query = PhysicsRayQueryParameters2D.create(global_position, pos)
 	query.exclude = [self]
 	var result = space_state.intersect_ray(query)
-	return result.is_empty()
+	if not result.is_empty():
+		return false
+	if not _is_clear_of_other_units(pos):
+		return false
+	return true
+
+func _is_clear_of_other_units(pos: Vector2) -> bool:
+	for node in get_tree().get_nodes_in_group("enemies"):
+		if not is_instance_valid(node) or node == self:
+			continue
+		if node.is_queued_for_deletion():
+			continue
+		if node.global_position.distance_squared_to(pos) < MINION_SEPARATION * MINION_SEPARATION:
+			return false
+
+	var space_state = get_world_2d().direct_space_state
+	var shape = CircleShape2D.new()
+	shape.radius = 40.0
+	var shape_query = PhysicsShapeQueryParameters2D.new()
+	shape_query.set_shape(shape)
+	shape_query.transform = Transform2D(0, pos)
+	shape_query.exclude = [self]
+	var hits = space_state.intersect_shape(shape_query)
+	for hit in hits:
+		var c = hit.collider
+		if c is TileMap or c is StaticBody2D or c is CharacterBody2D:
+			return false
+	return true
 
 func _get_valid_spawn_position() -> Vector2:
 	var distance = randf_range(250, 400)
@@ -73,6 +102,7 @@ func _get_valid_spawn_position() -> Vector2:
 	_spawn_attempts = 0
 	while not _is_valid_spawn_position(candidate) and _spawn_attempts < _max_spawn_attempts:
 		angle = randf_range(0, TAU)
+		distance = randf_range(220, 420)
 		offset = Vector2(cos(angle), sin(angle)) * distance
 		candidate = global_position + offset
 		_spawn_attempts += 1
