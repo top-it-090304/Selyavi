@@ -25,9 +25,7 @@ var _time_since_last_check: float = 0.0
 # Эффекты частиц
 var _smoke_particles: CPUParticles2D
 var _fire_particles: CPUParticles2D
-
-# Флаги состояний повреждений (чтобы не перезапускать эмиттеры)
-var _damage_tier: int = 0 # 0: целая, 1: 70%, 2: 40%, 3: 15%
+var _damage_tier: int = 0
 
 # Бонусы
 @export var _damage_bonus: float = 1.3
@@ -61,24 +59,20 @@ func _ready():
 	queue_redraw()
 
 func _setup_particles():
-	# Настройка дыма
 	_smoke_particles = CPUParticles2D.new()
 	_smoke_particles.texture = load("res://assets/future_tanks/PNG/Effects/Smoke_A.png")
 	_smoke_particles.emission_shape = CPUParticles2D.EMISSION_SHAPE_SPHERE
 	_smoke_particles.emission_sphere_radius = 35.0
 	_smoke_particles.spread = 180.0
 	_smoke_particles.gravity = Vector2(0, -120)
-	_smoke_particles.initial_velocity_min = 20.0
-	_smoke_particles.initial_velocity_max = 40.0
 	_smoke_particles.scale_amount_min = 0.2
 	_smoke_particles.scale_amount_max = 0.6
 	_smoke_particles.emitting = false
 	_smoke_particles.amount = 40
 	_smoke_particles.lifetime = 1.5
-	_smoke_particles.preprocess = 1.0 # Начинаем с уже летящим дымом
+	_smoke_particles.preprocess = 1.0
 	add_child(_smoke_particles)
 
-	# Настройка огня
 	_fire_particles = CPUParticles2D.new()
 	_fire_particles.texture = load("res://assets/future_tanks/PNG/Effects/Smoke_A.png")
 	_fire_particles.emission_shape = CPUParticles2D.EMISSION_SHAPE_SPHERE
@@ -91,14 +85,9 @@ func _setup_particles():
 	_fire_particles.emitting = false
 	_fire_particles.amount = 80
 	_fire_particles.lifetime = 0.5
-
 	var gradient = Gradient.new()
-	gradient.set_color(0, Color(1, 0.9, 0.2, 1))
-	gradient.add_point(0.2, Color(1, 0.4, 0, 1))
-	gradient.add_point(0.5, Color(0.8, 0.1, 0, 0.8))
-	gradient.add_point(1.0, Color(0.2, 0.2, 0.2, 0))
+	gradient.set_color(0, Color(1, 0.9, 0.2, 1)); gradient.add_point(0.2, Color(1, 0.4, 0, 1)); gradient.add_point(0.5, Color(0.8, 0.1, 0, 0.8)); gradient.add_point(1.0, Color(0.2, 0.2, 0.2, 0))
 	_fire_particles.color_ramp = gradient
-
 	add_child(_fire_particles)
 
 func _draw():
@@ -129,8 +118,7 @@ func _on_bullet_entered(area):
 	if area.has_method("is_player"):
 		var is_player_bullet = area.is_player()
 		if (is_player_bullet and type_base == TypeBase.ENEMY) or (not is_player_bullet and type_base == TypeBase.PLAYER):
-			var damage = area.get("_damage") if "_damage" in area else 25
-			take_damage(damage)
+			take_damage(area.get("_damage") if "_damage" in area else 25)
 			if area.has_method("_destroy"): area._destroy()
 			else: area.queue_free()
 
@@ -149,41 +137,22 @@ func take_damage(amount: int):
 	_hp -= amount
 	_update_damage_visuals()
 	_update_destruction_effects()
-
 	if type_base == TypeBase.PLAYER:
 		var hud = get_tree().get_first_node_in_group("hud")
-		if hud and hud.has_method("trigger_base_attack_warning"):
-			hud.trigger_base_attack_warning(global_position)
-
+		if hud and hud.has_method("trigger_base_attack_warning"): hud.trigger_base_attack_warning(global_position)
 	if _hp <= 0: _destroy()
 
 func _update_destruction_effects():
 	var hp_percent = float(_hp) / float(_max_hp)
-
-	# Смена уровней повреждений (Damage Tiers)
-	# Используем только один вызов настроек при переходе на новый тир
-
 	if hp_percent <= 0.15:
 		if _damage_tier < 3:
-			_damage_tier = 3
-			_smoke_particles.emitting = true
-			_smoke_particles.amount = 60
-			_smoke_particles.color = Color(0.05, 0.05, 0.05, 0.9)
-			_fire_particles.emitting = true
+			_damage_tier = 3; _smoke_particles.emitting = true; _smoke_particles.amount = 60; _smoke_particles.color = Color(0.05, 0.05, 0.05, 0.9); _fire_particles.emitting = true
 	elif hp_percent <= 0.4:
 		if _damage_tier < 2:
-			_damage_tier = 2
-			_smoke_particles.emitting = true
-			_smoke_particles.amount = 45
-			_smoke_particles.color = Color(0.1, 0.1, 0.1, 0.8)
-			_fire_particles.emitting = false
+			_damage_tier = 2; _smoke_particles.emitting = true; _smoke_particles.amount = 45; _smoke_particles.color = Color(0.1, 0.1, 0.1, 0.8); _fire_particles.emitting = false
 	elif hp_percent <= 0.7:
 		if _damage_tier < 1:
-			_damage_tier = 1
-			_smoke_particles.emitting = true
-			_smoke_particles.amount = 20
-			_smoke_particles.color = Color(0.5, 0.5, 0.5, 0.6)
-			_fire_particles.emitting = false
+			_damage_tier = 1; _smoke_particles.emitting = true; _smoke_particles.amount = 20; _smoke_particles.color = Color(0.5, 0.5, 0.5, 0.6); _fire_particles.emitting = false
 
 func _update_damage_visuals():
 	var sprite = get_node_or_null("Sprite2D") if get_node_or_null("Sprite2D") else self
@@ -198,6 +167,10 @@ func _destroy():
 
 func _spawn_enemy():
 	if type_base == TypeBase.PLAYER: return
+
+	# БЛОКИРОВКА СПАВНА ВО ВРЕМЯ ОБУЧЕНИЯ
+	if get_tree().has_group("tutorial"): return
+
 	_my_spawned_enemies = _my_spawned_enemies.filter(func(enemy): return is_instance_valid(enemy) and not enemy.is_queued_for_deletion())
 	if _my_spawned_enemies.size() >= _max_enemies: return
 	var spawn_pos = _get_safe_spawn_pos()
@@ -225,8 +198,13 @@ func _is_pos_safe(pos: Vector2) -> bool:
 	var space_state = get_world_2d().direct_space_state
 	var shape = CircleShape2D.new(); shape.radius = 45.0
 	var query = PhysicsShapeQueryParameters2D.new(); query.set_shape(shape); query.transform = Transform2D(0, pos)
-	query.exclude = [get_rid()]
-	if is_instance_valid(_base_body): query.exclude.append(_base_body.get_rid())
+
+	# ФИКС ОШИБКИ RID
+	var exclude_list: Array[RID] = []
+	exclude_list.append(get_rid())
+	if is_instance_valid(_base_body): exclude_list.append(_base_body.get_rid())
+	query.exclude = exclude_list
+
 	var results = space_state.intersect_shape(query)
 	for result in results:
 		if result.collider is TileMap or result.collider is StaticBody2D or result.collider is CharacterBody2D: return false

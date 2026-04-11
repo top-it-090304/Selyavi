@@ -61,12 +61,14 @@ func _setup_warning_label():
 	var center_top = find_child("TopCenter", true)
 	if !center_top or !_levelLabel: return
 
+	# Создаем VBoxContainer для предотвращения наложения текстов
 	var vbox = VBoxContainer.new()
 	vbox.name = "HeaderVBox"
 	vbox.set_anchors_and_offsets_preset(Control.PRESET_CENTER_TOP)
 	vbox.add_theme_constant_override("separation", 10)
 	center_top.add_child(vbox)
 
+	# Перемещаем LevelLabel в новый контейнер
 	if _levelLabel.get_parent():
 		_levelLabel.get_parent().remove_child(_levelLabel)
 	vbox.add_child(_levelLabel)
@@ -80,6 +82,7 @@ func _setup_warning_label():
 	_warningLabel.add_theme_color_override("font_outline_color", Color.BLACK)
 	_warningLabel.add_theme_constant_override("outline_size", 8)
 	_warningLabel.visible = false
+
 	vbox.add_child(_warningLabel)
 
 func trigger_base_attack_warning(base_pos: Vector2):
@@ -196,6 +199,7 @@ func _setup_ammo_selection():
 	ammo_container.offset_left = -500
 	ammo_container.offset_right = 500
 	var ammo_panel = HBoxContainer.new()
+	ammo_panel.name = "AmmoPanel"
 	ammo_panel.add_theme_constant_override("separation", 25)
 	ammo_container.add_child(ammo_panel)
 	var tex = ["res://assets/future_tanks/PNG/Effects/Plasma.png","res://assets/future_tanks/PNG/Effects/Medium_Shell.png","res://assets/future_tanks/PNG/Effects/Light_Shell.png"]

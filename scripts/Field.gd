@@ -53,6 +53,16 @@ func _ready():
 	_pauseScene = load("res://scenes/MenuScenes/PauseScreen.tscn")
 	call_deferred("_connect_player_lives")
 
+	# ЗАПУСК ОБУЧЕНИЯ на первом уровне
+	if current_level == 1:
+		call_deferred("_launch_tutorial")
+
+func _launch_tutorial():
+	var tutorial_scene = load("res://scenes/MenuScenes/TutorialOverlay.tscn")
+	if tutorial_scene:
+		var tutorial = tutorial_scene.instantiate()
+		add_child(tutorial)
+
 func _on_node_added(node):
 	if node.is_in_group("bases"):
 		_connect_base(node)

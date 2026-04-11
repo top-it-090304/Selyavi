@@ -1,0 +1,120 @@
+[gd_scene load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://scripts/MenuScripts/TutorialOverlay.gd" id="1"]
+[ext_resource type="Shader" path="res://assets/shaders/spotlight.gdshader" id="2"]
+[ext_resource type="FontFile" uid="uid://bsnvk4l0ue5ri" path="res://assets/fonts/ofont.ru_Shonen.ttf" id="3"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_1"]
+shader = ExtResource("2")
+shader_parameter/hole_center = Vector2(0, 0)
+shader_parameter/hole_radius = 0.0
+shader_parameter/blur = 0.2
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_panel"]
+bg_color = Color(0.14902, 0.172549, 0.14902, 0.9)
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 4
+border_color = Color(0.290196, 0.341176, 0.25098, 1)
+corner_radius_top_left = 20
+corner_radius_top_right = 20
+corner_radius_bottom_right = 20
+corner_radius_bottom_left = 20
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn"]
+bg_color = Color(0.25098, 0.301961, 0.25098, 1)
+border_width_bottom = 4
+border_color = Color(0.121569, 0.14902, 0.121569, 1)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+
+[node name="TutorialOverlay" type="CanvasLayer"]
+process_mode = 3
+layer = 120
+script = ExtResource("1")
+
+[node name="Background" type="ColorRect" parent="."]
+material = SubResource("ShaderMaterial_1")
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="Control" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="DialogPanel" type="PanelContainer" parent="Control"]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -450.0
+offset_top = -250.0
+offset_right = 450.0
+offset_bottom = -50.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
+
+[node name="MarginContainer" type="MarginContainer" parent="Control/DialogPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 30
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 30
+theme_override_constants/margin_bottom = 20
+
+[node name="Label" type="Label" parent="Control/DialogPanel/MarginContainer"]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("3")
+theme_override_font_sizes/font_size = 32
+text = "Добро пожаловать, Командир! Рады видеть тебя в строю."
+autowrap_mode = 3
+
+[node name="SkipButton" type="Button" parent="Control"]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -220.0
+offset_top = 30.0
+offset_right = -30.0
+offset_bottom = 80.0
+grow_horizontal = 0
+theme_override_fonts/font = ExtResource("3")
+theme_override_font_sizes/font_size = 24
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn")
+text = "ПРОПУСТИТЬ"
+
+[node name="Hint" type="Label" parent="Control"]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -200.0
+offset_top = -40.0
+offset_right = 200.0
+offset_bottom = -10.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_colors/font_color = Color(0.741176, 0.819608, 0.705882, 0.6)
+theme_override_fonts/font = ExtResource("3")
+theme_override_font_sizes/font_size = 18
+text = "Нажми, чтобы продолжить..."
+horizontal_alignment = 1
+
+[connection signal="pressed" from="Control/SkipButton" to="." method="_on_skip_pressed"]

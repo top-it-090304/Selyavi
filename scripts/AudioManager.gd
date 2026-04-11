@@ -7,19 +7,21 @@ var _player: AudioStreamPlayer
 
 var music_menu = preload("res://assets/Music/Hitman(chosic.com).mp3")
 var music_boss = preload("res://assets/Music/Time-and-Space-Dramatic-Epic-Music(chosic.com).mp3")
+var music_tutorial = preload("res://assets/Music/Hearts-of-Iron-chosic.com_.mp3")
 
 # Звуки выстрелов
 var sfx_plasma = preload("res://assets/sounds/plasma_gun_06.mp3")
 var sfx_medium = preload("res://assets/sounds/vystrel-tanka.mp3")
 var sfx_light = preload("res://assets/sounds/light_bullet.mp3")
 
-enum Track { NONE, MENU, BOSS }
+enum Track { NONE, MENU, BOSS, TUTORIAL }
 var current_track = Track.NONE
 
 func _ready():
 	# Включаем зацикливание для фоновых треков
 	if music_menu is AudioStreamMP3: music_menu.loop = true
 	if music_boss is AudioStreamMP3: music_boss.loop = true
+	if music_tutorial is AudioStreamMP3: music_tutorial.loop = true
 
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	_player = AudioStreamPlayer.new()
@@ -46,6 +48,12 @@ func play_boss():
 	_play(music_boss)
 	_player.volume_db = 0.0
 	current_track = Track.BOSS
+
+func play_tutorial():
+	if current_track == Track.TUTORIAL: return
+	_play(music_tutorial)
+	_player.volume_db = -12.0
+	current_track = Track.TUTORIAL
 
 func stop():
 	_player.stop()
