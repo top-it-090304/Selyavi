@@ -10,6 +10,8 @@ var _warningLabel: Label
 var _basesIcon: TextureRect
 var _buffIcon: TextureRect
 var _marker_overlay: Control
+var _move_joy_c: MarginContainer
+var _aim_joy_c: MarginContainer
 
 var _total_enemy_bases: int = 0
 var _destroyed_count: int = 0
@@ -54,6 +56,12 @@ func _ready():
 	if _healthProgress:
 		_setup_progress_bar_style()
 		_healthProgress.value = 100
+
+	_move_joy_c = find_child("MoveJoystickContainer", true, false) as MarginContainer
+	_aim_joy_c = find_child("AimJoystickContainer", true, false) as MarginContainer
+	if SaveManager != null and not SaveManager.settings_changed.is_connected(_on_settings_changed_hud):
+		SaveManager.settings_changed.connect(_on_settings_changed_hud)
+	call_deferred("_apply_lefty_joystick_layout")
 
 	call_deferred("_find_player_and_connect")
 
@@ -119,6 +127,56 @@ func _setup_buff_icon():
 
 func set_buff_icon_visible(is_visible: bool):
 	if _buffIcon: _buffIcon.visible = is_visible
+
+func _on_settings_changed_hud():
+	_apply_lefty_joystick_layout()
+
+## Режим левши: движение справа, прицел слева (зеркально правше).
+func _apply_lefty_joystick_layout():
+	if _move_joy_c == null or _aim_joy_c == null:
+		return
+	var lefty := false
+	if SaveManager != null:
+		lefty = bool(SaveManager.get_setting("game", "lefty_mode", false))
+	if lefty:
+		_layout_joystick_bottom_right(_move_joy_c)
+		# Прицел слева: отступ от края экрана как у движения справа (~60 + зазор)
+		_layout_joystick_bottom_left(_aim_joy_c, 52.0)
+	else:
+		_layout_joystick_bottom_left(_move_joy_c, 0.0)
+		_layout_joystick_bottom_right(_aim_joy_c)
+
+## edge_inset_left — сдвиг всего блока вправо от левого края (не сжимая зону 200 px).
+func _layout_joystick_bottom_left(c: MarginContainer, edge_inset_left: float = 0.0):
+	c.set_anchors_preset(Control.PRESET_BOTTOM_LEFT)
+	c.anchor_top = 1.0
+	c.anchor_bottom = 1.0
+	c.offset_left = edge_inset_left
+	c.offset_top = -200.0
+	c.offset_right = 200.0 + edge_inset_left
+	c.offset_bottom = 0.0
+	c.grow_vertical = Control.GROW_DIRECTION_BEGIN
+	c.add_theme_constant_override("margin_left", 60)
+	c.add_theme_constant_override("margin_right", 0)
+	c.add_theme_constant_override("margin_top", 0)
+	c.add_theme_constant_override("margin_bottom", 40)
+
+func _layout_joystick_bottom_right(c: MarginContainer):
+	c.set_anchors_preset(Control.PRESET_BOTTOM_RIGHT)
+	c.anchor_left = 1.0
+	c.anchor_top = 1.0
+	c.anchor_right = 1.0
+	c.anchor_bottom = 1.0
+	c.offset_left = -260.0
+	c.offset_top = -200.0
+	c.offset_right = -60.0
+	c.offset_bottom = 0.0
+	c.grow_horizontal = Control.GROW_DIRECTION_BEGIN
+	c.grow_vertical = Control.GROW_DIRECTION_BEGIN
+	c.add_theme_constant_override("margin_left", 0)
+	c.add_theme_constant_override("margin_right", 60)
+	c.add_theme_constant_override("margin_top", 0)
+	c.add_theme_constant_override("margin_bottom", 40)
 
 func _setup_bases_label():
 	var stats_container = find_child("Stats", true)
