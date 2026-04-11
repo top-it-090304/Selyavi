@@ -24,6 +24,7 @@ var settings_data = {
 	},
 	"game": {
 		"scope_enabled": true,
+		"aim_assist": true,
 		"lefty_mode": false
 	}
 }
@@ -46,6 +47,7 @@ func load_settings():
 		settings_data["audio"]["sfx_volume"] = config.get_value("audio", "sfx_volume", 1.0)
 		settings_data["audio"]["music_volume"] = config.get_value("audio", "music_volume", 1.0)
 		settings_data["game"]["scope_enabled"] = config.get_value("game", "scope_enabled", true)
+		settings_data["game"]["aim_assist"] = config.get_value("game", "aim_assist", true)
 		settings_data["game"]["lefty_mode"] = config.get_value("game", "lefty_mode", false)
 	settings_changed.emit()
 
@@ -54,6 +56,7 @@ func save_settings():
 	config.set_value("audio", "sfx_volume", settings_data["audio"]["sfx_volume"])
 	config.set_value("audio", "music_volume", settings_data["audio"]["music_volume"])
 	config.set_value("game", "scope_enabled", settings_data["game"]["scope_enabled"])
+	config.set_value("game", "aim_assist", settings_data["game"]["aim_assist"])
 	config.set_value("game", "lefty_mode", settings_data["game"]["lefty_mode"])
 	config.save(SETTINGS_FILE)
 

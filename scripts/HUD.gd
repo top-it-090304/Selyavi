@@ -7,12 +7,25 @@ var _moneyLabel: Label
 var _basesLabel: Label
 var _levelLabel: Label
 var _basesIcon: TextureRect
+var _buffIcon: TextureRect
+var _marker_overlay: Control
+
 var _total_enemy_bases: int = 0
 var _destroyed_count: int = 0
 var _player
 var _ammo_buttons = {}
 
-# Константа для размера кнопок снарядов
+# Параметры маркеров
+var _level_time: float = 0.0
+var _show_base_markers: bool = false
+const BASE_MARKER_TIME = 10.0
+
+var _marker_icons = {
+	"boss": preload("res://assets/free-icon-skull-11429788.png"),
+	"enemy": preload("res://assets/free-icon-army-tank-8511648.png"),
+	"base": preload("res://assets/backround/PNG/Props/Platform.png")
+}
+
 const AMMO_BTN_SIZE = 120
 
 func _ready():
@@ -24,12 +37,9 @@ func _ready():
 	_moneyLabel = find_child("MoneyLabel", true)
 	_levelLabel = find_child("LevelLabel", true)
 
-	if _levelLabel:
-		_levelLabel.position.y = 0
-		if _levelLabel.label_settings:
-			_levelLabel.label_settings = _levelLabel.label_settings.duplicate()
-
 	_setup_bases_label()
+	_setup_buff_icon()
+	_setup_marker_overlay()
 	_setup_ammo_selection()
 	_update_level_display()
 
@@ -39,15 +49,41 @@ func _ready():
 
 	call_deferred("_find_player_and_connect")
 
+func _setup_marker_overlay():
+	_marker_overlay = Control.new()
+	_marker_overlay.name = "MarkerOverlay"
+	_marker_overlay.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	_marker_overlay.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_marker_overlay.draw.connect(_on_marker_overlay_draw)
+	add_child(_marker_overlay)
+
+func _setup_buff_icon():
+	var buff_margin = MarginContainer.new()
+	buff_margin.name = "BuffMarginContainer"
+	add_child(buff_margin)
+	buff_margin.set_anchors_and_offsets_preset(Control.PRESET_TOP_LEFT)
+	buff_margin.add_theme_constant_override("margin_left", 125)
+	buff_margin.add_theme_constant_override("margin_top", 15)
+
+	_buffIcon = TextureRect.new()
+	_buffIcon.texture = load("res://assets/free-icon-arrows-14035529.png")
+	_buffIcon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	_buffIcon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	_buffIcon.custom_minimum_size = Vector2(64, 64)
+	_buffIcon.modulate = Color(0.0, 1.0, 0.0, 0.8)
+	_buffIcon.visible = false
+	_buffIcon.name = "BuffIcon"
+	buff_margin.add_child(_buffIcon)
+
+func set_buff_icon_visible(is_visible: bool):
+	if _buffIcon: _buffIcon.visible = is_visible
+
 func _setup_bases_label():
 	var stats_container = find_child("Stats", true)
 	if !stats_container: return
-
 	var bases_row = HBoxContainer.new()
-	bases_row.name = "BasesRow"
 	bases_row.alignment = BoxContainer.ALIGNMENT_END
 	stats_container.add_child(bases_row)
-
 	_basesIcon = TextureRect.new()
 	_basesIcon.texture = load("res://assets/backround/PNG/Props/Platform.png")
 	_basesIcon.custom_minimum_size = Vector2(40, 40)
@@ -55,18 +91,12 @@ func _setup_bases_label():
 	_basesIcon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	_basesIcon.modulate = Color(1.0, 0.3, 0.3, 0.8)
 	bases_row.add_child(_basesIcon)
-
 	_basesLabel = Label.new()
-	_basesLabel.name = "BasesLabel"
 	_basesLabel.add_theme_font_size_override("font_size", 32)
-	_basesLabel.add_theme_color_override("font_shadow_color", Color.BLACK)
-	_basesLabel.add_theme_constant_override("shadow_outline_size", 4)
 	bases_row.add_child(_basesLabel)
-
 	call_deferred("_initialize_bases_count")
 
 func _initialize_bases_count():
-	await get_tree().process_frame
 	await get_tree().process_frame
 	_total_enemy_bases = get_tree().get_nodes_in_group("bases").filter(func(b): return b.get("type_base") == 1).size()
 	_destroyed_count = 0
@@ -77,75 +107,41 @@ func update_bases_count():
 	_update_label_text()
 
 func _update_label_text():
-	if _basesLabel:
-		_basesLabel.text = str(min(_destroyed_count, _total_enemy_bases)) + "/" + str(_total_enemy_bases)
+	if _basesLabel: _basesLabel.text = str(min(_destroyed_count, _total_enemy_bases)) + "/" + str(_total_enemy_bases)
 
 func _update_level_display():
 	if !_levelLabel: return
-
 	var lvl = 1
-	if SaveManager:
-		lvl = SaveManager.current_level
-
+	if SaveManager: lvl = SaveManager.current_level
 	_levelLabel.text = "МИССИЯ " + str(((lvl-1)/5)+1) + "." + str(((lvl-1)%5)+1)
-
-	if _levelLabel.label_settings:
-		if lvl % 5 == 0:
-			_levelLabel.label_settings.font_color = Color(1, 0, 0)
-		else:
-			_levelLabel.label_settings.font_color = Color(1, 0.9, 0.4)
 
 func _find_player_and_connect():
 	var p = get_tree().get_first_node_in_group("players")
 	if p != null:
 		_player = p
-		if not _player.health_changed.is_connected(_on_health_changed):
-			_player.health_changed.connect(_on_health_changed)
-		if not _player.lives_changed.is_connected(_on_lives_changed):
-			_player.lives_changed.connect(_on_lives_changed)
-		if not _player.money_changed.is_connected(_on_money_changed):
-			_player.money_changed.connect(_on_money_changed)
+		if not _player.health_changed.is_connected(_on_health_changed): _player.health_changed.connect(_on_health_changed)
+		if not _player.lives_changed.is_connected(_on_lives_changed): _player.lives_changed.connect(_on_lives_changed)
+		if not _player.money_changed.is_connected(_on_money_changed): _player.money_changed.connect(_on_money_changed)
 		if _player.has_signal("ammo_changed") and not _player.ammo_changed.is_connected(_on_ammo_changed):
 			_player.ammo_changed.connect(_on_ammo_changed)
 
+		# Инициализация всех значений из игрока
 		_on_health_changed(_player.get_current_health(), _player.get_max_health())
 		_on_lives_changed(_player.get_lives())
 		_on_money_changed(_player.get_money())
-		_on_ammo_changed(_player._type_bullet)
-
-		var joy = find_child("Joystick", true)
-		var aim = find_child("Aim", true)
-
-		if joy:
-			if not joy.use_move_vector.is_connected(_player.use_move_vector):
-				joy.use_move_vector.connect(_player.use_move_vector)
-
-		if aim:
-			aim.init(true)
-			if not aim.use_move_vector.is_connected(_player.use_move_vector_aim):
-				aim.use_move_vector.connect(_player.use_move_vector_aim)
-			if not aim.fire_touch.is_connected(_player.fire_touch):
-				aim.fire_touch.connect(_player.fire_touch)
+		_on_ammo_changed(_player.get("_type_bullet"))
 	else:
 		get_tree().create_timer(0.5).timeout.connect(_find_player_and_connect)
+
+func _on_health_changed(curr, m):
+	if _healthProgress:
+		_healthProgress.max_value = m
+		_healthProgress.value = curr
+		_healthLabel.text = str(max(0,curr)) + "/" + str(m)
 
 func _setup_progress_bar_style():
 	var style = StyleBoxFlat.new()
 	style.bg_color = Color(0.2, 0.8, 0.2)
-	style.set_corner_radius_all(5)
-	_healthProgress.add_theme_stylebox_override("fill", style)
-
-func _on_health_changed(curr, m):
-	if !_healthProgress: return
-	_healthProgress.max_value = m
-	_healthProgress.value = curr
-	_healthLabel.text = str(max(0,curr)) + "/" + str(m)
-	_update_health_color(curr, m)
-
-func _update_health_color(curr, m):
-	var p = float(curr)/m
-	var style = _healthProgress.get_theme_stylebox("fill").duplicate()
-	style.bg_color = Color(1,0.2,0.2) if p <= 0.3 else (Color(1,0.8,0.2) if p <= 0.6 else Color(0.2,0.8,0.2))
 	_healthProgress.add_theme_stylebox_override("fill", style)
 
 func _on_lives_changed(l): if _livesLabel: _livesLabel.text = "Жизни: " + str(l)
@@ -153,103 +149,65 @@ func _on_money_changed(m): if _moneyLabel: _moneyLabel.text = str(m)
 
 func _setup_ammo_selection():
 	if has_node("AmmoPanelContainer"): get_node("AmmoPanelContainer").queue_free()
-
-	var ammo_container = MarginContainer.new()
+	var ammo_container = CenterContainer.new()
 	ammo_container.name = "AmmoPanelContainer"
 	add_child(ammo_container)
-	ammo_container.set_anchors_and_offsets_preset(Control.PRESET_CENTER_BOTTOM)
+	ammo_container.set_anchors_preset(Control.PRESET_CENTER_BOTTOM)
 	ammo_container.grow_horizontal = Control.GROW_DIRECTION_BOTH
-	# Сдвигаем контейнер вверх на высоту кнопок + отступ (поднят на 50 пикселей)
-	ammo_container.offset_bottom = -50
-	ammo_container.offset_top = -190
+
+	# Опустили немного (было -200/-50)
+	ammo_container.offset_top = -180
+	ammo_container.offset_bottom = -30
+	ammo_container.offset_left = -500
+	ammo_container.offset_right = 500
 
 	var ammo_panel = HBoxContainer.new()
-	ammo_panel.name = "AmmoPanel"
-	ammo_panel.alignment = BoxContainer.ALIGNMENT_CENTER
-	ammo_container.add_child(ammo_panel)
-
 	ammo_panel.add_theme_constant_override("separation", 25)
-
-	var tex = [
-		"res://assets/future_tanks/PNG/Effects/Plasma.png",
-		"res://assets/future_tanks/PNG/Effects/Medium_Shell.png",
-		"res://assets/future_tanks/PNG/Effects/Light_Shell.png"
-	]
-
+	ammo_container.add_child(ammo_panel)
+	var tex = ["res://assets/future_tanks/PNG/Effects/Plasma.png","res://assets/future_tanks/PNG/Effects/Medium_Shell.png","res://assets/future_tanks/PNG/Effects/Light_Shell.png"]
 	for i in range(3):
 		var slot = Panel.new()
-		slot.name = "Slot_" + str(i)
 		slot.custom_minimum_size = Vector2(AMMO_BTN_SIZE, AMMO_BTN_SIZE)
-		# Принуждаем слоты быть снизу контейнера
-		slot.size_flags_vertical = Control.SIZE_SHRINK_END
-
 		var style = StyleBoxFlat.new()
 		style.bg_color = Color(0.1, 0.1, 0.1, 0.6)
 		style.set_corner_radius_all(15)
 		style.set_border_width_all(3)
 		style.border_color = Color(0.4, 0.4, 0.4)
 		slot.add_theme_stylebox_override("panel", style)
-
 		ammo_panel.add_child(slot)
-
 		var icon = TextureRect.new()
-		icon.texture = load(tex[i])
-		icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-		icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-		icon.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-		icon.offset_left = 18
-		icon.offset_top = 18
-		icon.offset_right = -18
-		icon.offset_bottom = -18
-		icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		icon.texture = load(tex[i]); icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE; icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		icon.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT); icon.offset_left = 18; icon.offset_top = 18; icon.offset_right = -18; icon.offset_bottom = -18
 		slot.add_child(icon)
-
 		var cooldown = Panel.new()
+		var cd_style = StyleBoxFlat.new(); cd_style.bg_color = Color(0, 0, 0, 0.7); cd_style.set_corner_radius_all(15)
+		cooldown.add_theme_stylebox_override("panel", cd_style); cooldown.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT); cooldown.visible = false
 		cooldown.name = "Cooldown"
-		var cd_style = StyleBoxFlat.new()
-		cd_style.bg_color = Color(0, 0, 0, 0.7)
-		cd_style.set_corner_radius_all(15)
-		cooldown.add_theme_stylebox_override("panel", cd_style)
-		cooldown.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-		cooldown.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		cooldown.visible = false
 		slot.add_child(cooldown)
-
 		var touch_btn = TouchScreenButton.new()
-		touch_btn.name = "TouchBtn"
-		var shape = RectangleShape2D.new()
-		shape.size = Vector2(AMMO_BTN_SIZE, AMMO_BTN_SIZE)
-		touch_btn.shape = shape
+		touch_btn.shape = RectangleShape2D.new(); touch_btn.shape.size = Vector2(AMMO_BTN_SIZE, AMMO_BTN_SIZE)
 		touch_btn.position = Vector2(AMMO_BTN_SIZE/2, AMMO_BTN_SIZE/2)
 		touch_btn.pressed.connect(func(): if _player: _player._on_ammo_selected(i))
 		slot.add_child(touch_btn)
-
 		_ammo_buttons[i] = slot
 
-func _process(_delta):
+func _process(delta):
 	_update_ammo_cooldowns()
+	_level_time += delta
+	if _level_time >= BASE_MARKER_TIME: _show_base_markers = true
+	if _marker_overlay: _marker_overlay.queue_redraw()
 
 func _update_ammo_cooldowns():
 	if _player == null or not is_instance_valid(_player): return
 	var timer = _player.get("_shoot_timer")
-
 	for i in range(3):
 		if not _ammo_buttons.has(i): continue
 		var slot = _ammo_buttons[i]
 		var cd = slot.get_node("Cooldown")
-
 		if timer and not timer.is_stopped() and i == _player.get("_type_bullet"):
-			cd.visible = true
-			var ratio = timer.time_left / timer.wait_time
-
-			cd.anchor_top = 1.0 - ratio
-			cd.anchor_bottom = 1.0
-			cd.offset_top = 0
-			cd.offset_bottom = 0
-			cd.offset_left = 0
-			cd.offset_right = 0
-		else:
-			cd.visible = false
+			cd.visible = true; var ratio = timer.time_left / timer.wait_time
+			cd.anchor_top = 1.0 - ratio; cd.anchor_bottom = 1.0; cd.offset_top = 0; cd.offset_bottom = 0
+		else: cd.visible = false
 
 func _on_ammo_changed(type):
 	for i in _ammo_buttons:
@@ -262,3 +220,51 @@ func _on_ammo_changed(type):
 			style.border_color = Color(0.4, 0.4, 0.4)
 			slot.modulate.a = 0.6
 		slot.add_theme_stylebox_override("panel", style)
+
+func _on_marker_overlay_draw():
+	if _player == null or not is_instance_valid(_player): return
+	var view_size = get_viewport().get_visible_rect().size
+	var cam_pos = _player.get_viewport().get_canvas_transform().affine_inverse().get_origin()
+	var screen_rect = Rect2(cam_pos, view_size)
+	for enemy in get_tree().get_nodes_in_group("enemies"):
+		if is_instance_valid(enemy) and enemy.get("_type_enemy") == 5:
+			_draw_marker_for(enemy.global_position, Color("#f34235"), _marker_icons.boss, screen_rect, false, 1.3)
+	if _show_base_markers:
+		for base in get_tree().get_nodes_in_group("bases"):
+			if is_instance_valid(base) and base.get("type_base") == 1:
+				_draw_marker_for(base.global_position, Color(1, 1, 0, 0.7), _marker_icons.base, screen_rect, false, 1.0)
+	var enemy_bases = get_tree().get_nodes_in_group("bases").filter(func(b): return b.get("type_base") == 1)
+	if enemy_bases.size() == 0:
+		for enemy in get_tree().get_nodes_in_group("enemies"):
+			if is_instance_valid(enemy) and enemy.get("_type_enemy") != 5:
+				_draw_marker_for(enemy.global_position, Color(0, 0.5, 1, 0.7), _marker_icons.enemy, screen_rect, false, 1.0)
+
+func _draw_marker_for(target_pos: Vector2, color: Color, icon: Texture2D, screen_rect: Rect2, pulse: bool, max_scale: float):
+	if screen_rect.has_point(target_pos): return
+	var center = screen_rect.get_center()
+	var dir = (target_pos - center).normalized()
+	var dist = center.distance_to(target_pos)
+	var marker_pos = _get_intersect_pos(center, dir, screen_rect)
+	var margin = 40.0
+	marker_pos.x = clamp(marker_pos.x, screen_rect.position.x + margin, screen_rect.end.x - margin)
+	marker_pos.y = clamp(marker_pos.y, screen_rect.position.y + margin, screen_rect.end.y - margin)
+	var draw_pos = _player.get_viewport().get_canvas_transform() * marker_pos
+	var scale_factor = clamp(remap(dist, 800, 3000, max_scale, 0.5), 0.5, max_scale)
+
+	_marker_overlay.draw_circle(draw_pos, 25 * scale_factor, Color(0, 0, 0, 0.4))
+	_marker_overlay.draw_circle(draw_pos, 22 * scale_factor, Color(color.r, color.g, color.b, 0.7))
+	if icon:
+		var icon_size = Vector2(32, 32) * scale_factor
+		_marker_overlay.draw_texture_rect(icon, Rect2(draw_pos - icon_size/2, icon_size), false, Color(1, 1, 1, 0.9))
+	var pts = PackedVector2Array([draw_pos + dir * (35 * scale_factor), draw_pos + dir.rotated(0.4) * (25 * scale_factor), draw_pos + dir.rotated(-0.4) * (25 * scale_factor)])
+	_marker_overlay.draw_colored_polygon(pts, Color(color.r, color.g, color.b, 0.7))
+
+func _get_intersect_pos(center: Vector2, dir: Vector2, rect: Rect2) -> Vector2:
+	var t_max = Vector2.ZERO
+	if dir.x > 0: t_max.x = (rect.end.x - center.x) / dir.x
+	elif dir.x < 0: t_max.x = (rect.position.x - center.x) / dir.x
+	else: t_max.x = 1e10
+	if dir.y > 0: t_max.y = (rect.end.y - center.y) / dir.y
+	elif dir.y < 0: t_max.y = (rect.position.y - center.y) / dir.y
+	else: t_max.y = 1e10
+	return center + dir * min(t_max.x, t_max.y)

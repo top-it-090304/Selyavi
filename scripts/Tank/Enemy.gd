@@ -20,7 +20,7 @@ var _shot_flash: AnimatedSprite2D
 
 @export var _type_enemy: TypeEnemy = TypeEnemy.NONE
 @export var _patrol_speed: int = 90
-@export var _chase_speed: int = 60 # Медленное приближение к игроку
+@export var _chase_speed: int = 60
 
 var _fire_rate: float = 1.0
 var _spread: float = 0.15
@@ -28,6 +28,10 @@ var _scan_angle: float = 0.0
 var _scan_dir: int = 1
 var _scan_wait_timer: float = 0.0
 var _scan_limit: float = 45.0
+
+# Дистанции поведения
+var _notice_range: float = 850.0
+var _attack_range: float = 450.0
 
 # Переменные для задержки выстрела (реакция)
 var _reaction_timer: float = 0.0
@@ -39,7 +43,7 @@ func get_enemy_type() -> int:
 
 func _ready():
 	add_to_group("enemies")
-	_init_base_tank() # Инициализация из Tank.gd
+	_init_base_tank()
 
 	_nav2d = get_node_or_null("NavigationAgent2D")
 	_ray_cast = get_node_or_null("RayCast2D")
@@ -47,7 +51,7 @@ func _ready():
 	_shot_flash = get_node_or_null("ShotAnimation")
 
 	if _ray_cast:
-		_ray_cast.collide_with_areas = false # Не сталкиваемся с триггерами
+		_ray_cast.collide_with_areas = false
 		_ray_cast.add_exception(self)
 
 	if _type_enemy == TypeEnemy.NONE: _randomize_enemy_type()
@@ -75,11 +79,9 @@ func _ready():
 	_shoot_timer.wait_time = _fire_rate
 
 func _physics_process(delta):
-	# Если цели потеряны, пробуем найти их снова
 	if not is_instance_valid(_player) or (not is_instance_valid(_base) and _base != null):
 		_find_targets()
 
-	# Если нет ни игрока, ни базы — стоим
 	var target = _get_current_target()
 	if not is_instance_valid(target):
 		_target_in_sight = false
@@ -90,7 +92,6 @@ func _physics_process(delta):
 	_aim_gun(delta)
 	_update_ray_cast()
 
-	# Обновление таймера реакции
 	_target_in_sight = _is_target_visible()
 	if _target_in_sight:
 		_reaction_timer += delta
@@ -104,12 +105,10 @@ func _physics_process(delta):
 	_handle_movement_sound(velocity)
 
 func _find_targets():
-	# Ищем игрока в группе
 	var players = get_tree().get_nodes_in_group("players")
 	if players.size() > 0:
 		_player = players[0]
 
-	# Ищем базу игрока (type_base == 0)
 	var bases = get_tree().get_nodes_in_group("bases")
 	_base = null
 	for b in bases:
@@ -117,13 +116,12 @@ func _find_targets():
 			_base = b
 			break
 
-	# Если базы нет (уровень с боссом), переходим в состояние преследования
 	if _base == null:
 		_current_state = State.CHASE
 
 func _update_target():
 	if _nav2d == null or _type_enemy == TypeEnemy.STATIONARY: return
-	
+
 	if is_instance_valid(_player) and (_current_state == State.CHASE or _base == null):
 		_nav2d.target_position = _player.global_position
 	elif is_instance_valid(_base):
@@ -148,10 +146,17 @@ func _move_enemy():
 	if _nav2d == null or _type_enemy == TypeEnemy.STATIONARY:
 		velocity = Vector2.ZERO; return
 
-	# Враг едет к цели в обоих состояниях, если навигация не закончена
+	var target = _get_current_target()
+
+	# Логика остановки при приближении к игроку (только если бот видит игрока)
+	if target == _player and is_instance_valid(_player):
+		var dist = global_position.distance_to(_player.global_position)
+		if dist <= _attack_range and _target_in_sight:
+			velocity = Vector2.ZERO
+			return
+
 	if not _nav2d.is_navigation_finished():
 		var dir = (_nav2d.get_next_path_position() - global_position).normalized()
-		# Выбираем скорость в зависимости от состояния
 		var current_speed = _chase_speed if _current_state == State.CHASE else _patrol_speed
 		velocity = dir * current_speed
 		rotation = dir.angle() + PI/2
@@ -164,7 +169,7 @@ func _update_ray_cast():
 	if target:
 		_ray_cast.target_position = _ray_cast.to_local(target.global_position)
 		_ray_cast.enabled = true
-		_ray_cast.force_raycast_update() # Принудительно обновляем, чтобы данные были актуальны в этом же кадре
+		_ray_cast.force_raycast_update()
 
 func _is_target_visible() -> bool:
 	if _ray_cast == null: return false
@@ -176,12 +181,10 @@ func _is_target_visible() -> bool:
 
 	if collider == target: return true
 
-	# Проверка для базы (у неё могут быть дочерние коллизии)
 	if target == _base:
 		if collider == _base or (collider.get_parent() != null and collider.get_parent() == _base):
 			return true
 
-	# Если на пути разрушаемая стена, считаем цель "видимой", чтобы бот начал стрелять сквозь неё
 	if collider is IngameWall:
 		if collider.destroyable():
 			return true
@@ -198,12 +201,16 @@ func _check_and_fire():
 	if target == null: return
 
 	var dist = global_position.distance_to(target.global_position)
-	# Дальность турели уменьшена до 650
-	var attack_range = 650.0 if _type_enemy == TypeEnemy.STATIONARY else 700.0
 
-	# Стреляем только при наличии прямой видимости цели
-	if dist <= attack_range and _target_in_sight:
-		# Для турелей добавляем задержку в 1 секунду
+	var can_fire = false
+	if target == _player:
+		if dist <= _attack_range and _target_in_sight:
+			can_fire = true
+	else:
+		if dist <= 700.0 and _target_in_sight:
+			can_fire = true
+
+	if can_fire:
 		if _type_enemy == TypeEnemy.STATIONARY:
 			if _reaction_timer >= 1.0:
 				_fire_at_pos(target.global_position)
@@ -214,24 +221,20 @@ func _fire_at_pos(pos: Vector2):
 	if _shoot_timer.time_left > 0: return
 
 	var base_angle = (pos - _gun.global_position).angle() + PI/2
+	var sound_type = 2 if _type_enemy == TypeEnemy.STATIONARY else (1 if _type_enemy == TypeEnemy.TRIPLE else 0)
 
-	# Определяем тип звука и играем ЕГО ОДИН РАЗ
-	var sound_type = 2 if _type_enemy == TypeEnemy.STATIONARY else 0
 	if AudioManager:
 		AudioManager.play_bullet_sound(sound_type, global_position)
 
 	if _type_enemy == TypeEnemy.TRIPLE:
-		# Стрельба веером (3 пули) - Увеличили разлет до 0.4
 		var angles = [base_angle, base_angle - 0.4, base_angle + 0.4]
 		for angle in angles:
 			var bullet = _bullet_scene.instantiate()
 			bullet.global_position = _bullet_position.global_position
 			bullet.global_rotation = angle
 			get_parent().add_child(bullet)
-			# Используем тип пули 0 (обычная)
-			bullet.init(0, false, _damage)
+			bullet.init(1, false, _damage)
 	else:
-		# Обычная стрельба
 		var bullet = _bullet_scene.instantiate()
 		var angle = base_angle + randf_range(-_spread, _spread)
 		bullet.global_position = _bullet_position.global_position
@@ -241,10 +244,6 @@ func _fire_at_pos(pos: Vector2):
 		bullet.init(b_type, false, _damage)
 
 	if _shot_flash:
-		if _type_enemy == TypeEnemy.BOSS:
-			_shot_flash.position = Vector2(0, -40)
-		else:
-			_shot_flash.position = Vector2.ZERO
 		_shot_flash.play("Fire")
 	_shoot_timer.start()
 
@@ -259,8 +258,7 @@ func _destroy():
 	if is_instance_valid(_player) and _player.has_method("add_money"):
 		_player.add_money(_get_reward())
 
-	# Шанс 20% на выпадение аптечки, для турелей - 100%
-	if _type_enemy == TypeEnemy.STATIONARY or randf() <= 0.2:
+	if _type_enemy == TypeEnemy.STATIONARY or randf() <= 0.25:
 		_spawn_heal_pickup()
 
 	super._destroy()
@@ -273,7 +271,6 @@ func _spawn_heal_pickup():
 	var pickup = Area2D.new()
 	pickup.set_script(pickup_script)
 	pickup.global_position = global_position
-	# Используем call_deferred, чтобы избежать ошибок при изменении состояния физики
 	get_parent().call_deferred("add_child", pickup)
 
 func _get_reward() -> int:
@@ -287,83 +284,38 @@ func _get_reward() -> int:
 		_: return 50
 
 func _apply_enemy_stats():
-	var hull_path: String = ""
-	var gun_path: String = ""
-	var gun_offset: float = 42.0
-
-	var lvl = 1
-	if SaveManager: lvl = SaveManager.current_level
+	var hull_path: String = ""; var gun_path: String = ""; var gun_offset: float = 42.0
+	var lvl = 1; if SaveManager: lvl = SaveManager.current_level
+	_notice_range = 800.0; _attack_range = 450.0
 
 	match _type_enemy:
 		TypeEnemy.LIGHT:
 			_hp = 50; _damage = 10; _fire_rate = 1.0; _spread = 0.25
-			hull_path = "res://assets/future_tanks/PNG/Hulls_Color_D/Hull_08.png"
-			gun_path = "res://assets/future_tanks/PNG/Weapon_Color_D/Gun_05.png"
-			gun_offset = 35.0
+			hull_path = "res://assets/future_tanks/PNG/Hulls_Color_D/Hull_08.png"; gun_path = "res://assets/future_tanks/PNG/Weapon_Color_D/Gun_05.png"; gun_offset = 35.0
+			_notice_range = 700.0; _attack_range = 500.0
 		TypeEnemy.MEDIUM:
-			_hp = 70; _damage = 25; _fire_rate = 1.2; _spread = 0.15
+			_hp = 70; _damage = 25; _fire_rate = 1.2; _spread = 0.15; _notice_range = 700.0; _attack_range = 450.0
 		TypeEnemy.HEAVY:
-			# На уровнях 1-5 здоровье снижено до 80
-			_hp = 80 if lvl <= 5 else 100
-			_damage = 35; _fire_rate = 2.5; _spread = 0.1
-			hull_path = "res://assets/future_tanks/PNG/Hulls_Color_D/Hull_06.png"
-			gun_path = "res://assets/future_tanks/PNG/Weapon_Color_D/Gun_07.png"
-			gun_offset = 40.0
+			_hp = 80 if lvl <= 5 else 100; _damage = 35; _fire_rate = 2.5; _spread = 0.1
+			hull_path = "res://assets/future_tanks/PNG/Hulls_Color_D/Hull_06.png"; gun_path = "res://assets/future_tanks/PNG/Weapon_Color_D/Gun_07.png"; gun_offset = 40.0
+			_notice_range = 600.0; _attack_range = 400.0
 		TypeEnemy.STATIONARY:
-			# На уровнях 1-5 здоровье снижено до 75
-			_hp = 75 if lvl <= 5 else 100
-			_damage = 40; _fire_rate = 1.5; _spread = 0.05
-			hull_path = "res://assets/turret/SniperTurretBase.png"
-			gun_path = "res://assets/turret/SniperTurretGun.png"
-			gun_offset = 0.0
-			scale = Vector2(2.0, 2.0)
+			_hp = 75 if lvl <= 5 else 100; _damage = 40; _fire_rate = 1.5; _spread = 0.05
+			hull_path = "res://assets/turret/SniperTurretBase.png"; gun_path = "res://assets/turret/SniperTurretGun.png"; gun_offset = 0.0; scale = Vector2(2.0, 2.0); _attack_range = 650.0
 		TypeEnemy.TRIPLE:
-			_hp = 100; _damage = 20; _fire_rate = 1.2; _spread = 0.0
-			hull_path = "res://assets/future_tanks/PNG/Hulls_Color_D/Hull_05.png"
-			gun_path = "res://assets/future_tanks/PNG/Weapon_Color_D/Gun_04.png"
-			gun_offset = 35.0
+			_hp = 100; _damage = 20; _fire_rate = 1.2; _spread = 0.05
+			hull_path = "res://assets/future_tanks/PNG/Hulls_Color_D/Hull_05.png"; gun_path = "res://assets/future_tanks/PNG/Weapon_Color_D/Gun_04.png"; gun_offset = 35.0
+			_notice_range = 600.0; _attack_range = 300.0
 		TypeEnemy.BOSS:
-			_hp = 1000; _damage = 30; _fire_rate = 0.8; _spread = 0.1
-			hull_path = "res://assets/future_tanks/PNG/Hulls_Color_D/Hull_03.png"
-			gun_path = "res://assets/future_tanks/PNG/Weapon_Color_D/Gun_08.png"
-			gun_offset = 40.0
-			scale = Vector2(2, 2)
+			_hp = 1000; _damage = 30; _fire_rate = 1.0; _spread = 0.1
+			hull_path = "res://assets/future_tanks/PNG/Hulls_Color_D/Hull_03.png"; gun_path = "res://assets/future_tanks/PNG/Weapon_Color_D/Gun_08.png"; gun_offset = 40.0; scale = Vector2(2, 2); _notice_range = 1200.0; _attack_range = 600.0
 
-	_max_hp = _hp
-	_shoot_timer.wait_time = _fire_rate
-
-	# Применяем текстуры, если они заданы
-	if _body and hull_path != "":
-		_body.texture = load(hull_path)
-	if _gun and gun_path != "":
-		_gun.texture = load(gun_path)
-		_gun.position.y = gun_offset
-		_gun.offset.y = -gun_offset
-		# Обновляем позицию спавна пули, так как пушка сместилась
-		if _bullet_position:
-			_bullet_position.position.y = -85 # Стандартное смещение для дула
-
-	# Корректируем масштаб вспышки выстрела
-	if _shot_flash:
-		# Целевой глобальный масштаб анимации 0.3.
-		# Т.к. она теперь внутри BodyTank (0.5), то формула:
-		# scale.x (врага) * 0.5 (корпуса) * flash_local_scale = 0.3
-		var needed_scale = 0.6 / scale.x
-		_shot_flash.scale = Vector2(needed_scale, needed_scale)
+	_max_hp = _hp; _shoot_timer.wait_time = _fire_rate
+	if _body and hull_path != "": _body.texture = load(hull_path)
+	if _gun and gun_path != "": _gun.texture = load(gun_path); _gun.position.y = gun_offset; _gun.offset.y = -gun_offset
+	if _shot_flash: _shot_flash.scale = Vector2(0.6/scale.x, 0.6/scale.x)
 
 func _randomize_enemy_type():
 	var available_types = [TypeEnemy.LIGHT, TypeEnemy.MEDIUM, TypeEnemy.HEAVY]
-
-	# Используем централизованную переменную из SaveManager
-	var current_lvl = 1
-	if SaveManager:
-		current_lvl = SaveManager.current_level
-
-	# Тройной выстрел разрешен только ПОСЛЕ пятого уровня (с уровня 2.1)
-	if current_lvl > 5:
-		available_types.append(TypeEnemy.TRIPLE)
-
+	if SaveManager and SaveManager.current_level > 5: available_types.append(TypeEnemy.TRIPLE)
 	_type_enemy = available_types[randi() % available_types.size()]
-
-func _setup_vision():
-	pass
