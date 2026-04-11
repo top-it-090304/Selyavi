@@ -48,11 +48,14 @@ func _init_base_tank():
 func take_damage(damage: int):
 	if _is_invulnerable: return
 
-	# Применяем сопротивление: итоговый урон = урон * (1 - (базовая броня + бонус от базы))
-	var total_armor = clamp(_armor + _base_armor_bonus, -0.9, 0.95)
-	var final_damage = int(damage * (1.0 - total_armor))
+	var final_damage = float(damage)
+	# Броня учитывается только для Игрока. Враги получают полный урон.
+	if not self is Enemy:
+		# Применяем сопротивление: итоговый урон = урон * (1 - (базовая броня + бонус от базы))
+		var total_armor = clamp(_armor + _base_armor_bonus, -0.9, 0.95)
+		final_damage = damage * (1.0 - total_armor)
 
-	_hp -= final_damage
+	_hp -= int(final_damage)
 	tank_health_changed.emit(_hp, _max_hp)
 	_update_damage_visuals()
 	if _hp <= 0:

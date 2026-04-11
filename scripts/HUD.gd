@@ -6,6 +6,7 @@ var _livesLabel: Label
 var _moneyLabel: Label
 var _basesLabel: Label
 var _levelLabel: Label
+var _warningLabel: Label
 var _basesIcon: TextureRect
 var _buffIcon: TextureRect
 var _marker_overlay: Control
@@ -18,12 +19,18 @@ var _ammo_buttons = {}
 # Параметры маркеров
 var _level_time: float = 0.0
 var _show_base_markers: bool = false
-const BASE_MARKER_TIME = 10.0
+const BASE_MARKER_TIME = 90.0
+
+# Параметры предупреждения об атаке
+var _base_under_attack: bool = false
+var _attack_warning_timer: float = 0.0
+var _player_base_pos: Vector2 = Vector2.ZERO
 
 var _marker_icons = {
 	"boss": preload("res://assets/free-icon-skull-11429788.png"),
 	"enemy": preload("res://assets/free-icon-army-tank-8511648.png"),
-	"base": preload("res://assets/backround/PNG/Props/Platform.png")
+	"base": preload("res://assets/backround/PNG/Props/Platform.png"),
+	"warning": preload("res://assets/free-icon-broken-shield-4046202.png")
 }
 
 const AMMO_BTN_SIZE = 120
@@ -40,6 +47,7 @@ func _ready():
 	_setup_bases_label()
 	_setup_buff_icon()
 	_setup_marker_overlay()
+	_setup_warning_label()
 	_setup_ammo_selection()
 	_update_level_display()
 
@@ -48,6 +56,40 @@ func _ready():
 		_healthProgress.value = 100
 
 	call_deferred("_find_player_and_connect")
+
+func _setup_warning_label():
+	var center_top = find_child("TopCenter", true)
+	if !center_top or !_levelLabel: return
+
+	# Создаем VBoxContainer для предотвращения наложения текстов
+	var vbox = VBoxContainer.new()
+	vbox.name = "HeaderVBox"
+	vbox.set_anchors_and_offsets_preset(Control.PRESET_CENTER_TOP)
+	vbox.add_theme_constant_override("separation", 10)
+	center_top.add_child(vbox)
+
+	# Перемещаем LevelLabel в новый контейнер
+	if _levelLabel.get_parent():
+		_levelLabel.get_parent().remove_child(_levelLabel)
+	vbox.add_child(_levelLabel)
+
+	_warningLabel = Label.new()
+	_warningLabel.name = "WarningLabel"
+	_warningLabel.text = "Базу атакуют!"
+	_warningLabel.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_warningLabel.add_theme_font_size_override("font_size", 32)
+	_warningLabel.add_theme_color_override("font_color", Color("#f34235"))
+	_warningLabel.add_theme_color_override("font_outline_color", Color.BLACK)
+	_warningLabel.add_theme_constant_override("outline_size", 8)
+	_warningLabel.visible = false
+
+	vbox.add_child(_warningLabel)
+
+func trigger_base_attack_warning(base_pos: Vector2):
+	_base_under_attack = true
+	_player_base_pos = base_pos
+	_attack_warning_timer = 3.0
+	if _warningLabel: _warningLabel.visible = true
 
 func _setup_marker_overlay():
 	_marker_overlay = Control.new()
@@ -124,8 +166,6 @@ func _find_player_and_connect():
 		if not _player.money_changed.is_connected(_on_money_changed): _player.money_changed.connect(_on_money_changed)
 		if _player.has_signal("ammo_changed") and not _player.ammo_changed.is_connected(_on_ammo_changed):
 			_player.ammo_changed.connect(_on_ammo_changed)
-
-		# Инициализация всех значений из игрока
 		_on_health_changed(_player.get_current_health(), _player.get_max_health())
 		_on_lives_changed(_player.get_lives())
 		_on_money_changed(_player.get_money())
@@ -154,14 +194,12 @@ func _setup_ammo_selection():
 	add_child(ammo_container)
 	ammo_container.set_anchors_preset(Control.PRESET_CENTER_BOTTOM)
 	ammo_container.grow_horizontal = Control.GROW_DIRECTION_BOTH
-
-	# Опустили немного (было -200/-50)
 	ammo_container.offset_top = -180
 	ammo_container.offset_bottom = -30
 	ammo_container.offset_left = -500
 	ammo_container.offset_right = 500
-
 	var ammo_panel = HBoxContainer.new()
+	ammo_panel.name = "AmmoPanel"
 	ammo_panel.add_theme_constant_override("separation", 25)
 	ammo_container.add_child(ammo_panel)
 	var tex = ["res://assets/future_tanks/PNG/Effects/Plasma.png","res://assets/future_tanks/PNG/Effects/Medium_Shell.png","res://assets/future_tanks/PNG/Effects/Light_Shell.png"]
@@ -169,10 +207,7 @@ func _setup_ammo_selection():
 		var slot = Panel.new()
 		slot.custom_minimum_size = Vector2(AMMO_BTN_SIZE, AMMO_BTN_SIZE)
 		var style = StyleBoxFlat.new()
-		style.bg_color = Color(0.1, 0.1, 0.1, 0.6)
-		style.set_corner_radius_all(15)
-		style.set_border_width_all(3)
-		style.border_color = Color(0.4, 0.4, 0.4)
+		style.bg_color = Color(0.1, 0.1, 0.1, 0.6); style.set_corner_radius_all(15); style.border_color = Color(0.4, 0.4, 0.4); style.set_border_width_all(3)
 		slot.add_theme_stylebox_override("panel", style)
 		ammo_panel.add_child(slot)
 		var icon = TextureRect.new()
@@ -195,6 +230,11 @@ func _process(delta):
 	_update_ammo_cooldowns()
 	_level_time += delta
 	if _level_time >= BASE_MARKER_TIME: _show_base_markers = true
+	if _base_under_attack:
+		_attack_warning_timer -= delta
+		if _attack_warning_timer <= 0:
+			_base_under_attack = false
+			if _warningLabel: _warningLabel.visible = false
 	if _marker_overlay: _marker_overlay.queue_redraw()
 
 func _update_ammo_cooldowns():
@@ -213,12 +253,8 @@ func _on_ammo_changed(type):
 	for i in _ammo_buttons:
 		var slot = _ammo_buttons[i]
 		var style = slot.get_theme_stylebox("panel").duplicate()
-		if i == type:
-			style.border_color = Color(1, 0.8, 0.2)
-			slot.modulate.a = 1.0
-		else:
-			style.border_color = Color(0.4, 0.4, 0.4)
-			slot.modulate.a = 0.6
+		if i == type: style.border_color = Color(1, 0.8, 0.2); slot.modulate.a = 1.0
+		else: style.border_color = Color(0.4, 0.4, 0.4); slot.modulate.a = 0.6
 		slot.add_theme_stylebox_override("panel", style)
 
 func _on_marker_overlay_draw():
@@ -226,30 +262,40 @@ func _on_marker_overlay_draw():
 	var view_size = get_viewport().get_visible_rect().size
 	var cam_pos = _player.get_viewport().get_canvas_transform().affine_inverse().get_origin()
 	var screen_rect = Rect2(cam_pos, view_size)
-	for enemy in get_tree().get_nodes_in_group("enemies"):
-		if is_instance_valid(enemy) and enemy.get("_type_enemy") == 5:
-			_draw_marker_for(enemy.global_position, Color("#f34235"), _marker_icons.boss, screen_rect, false, 1.3)
-	if _show_base_markers:
-		for base in get_tree().get_nodes_in_group("bases"):
-			if is_instance_valid(base) and base.get("type_base") == 1:
-				_draw_marker_for(base.global_position, Color(1, 1, 0, 0.7), _marker_icons.base, screen_rect, false, 1.0)
+
+	# ИЕРАРХИЯ ОТРИСОВКИ (от нижних к верхним):
+
+	# 1. МАРКЕР БОТОВ (Самый нижний слой)
 	var enemy_bases = get_tree().get_nodes_in_group("bases").filter(func(b): return b.get("type_base") == 1)
 	if enemy_bases.size() == 0:
 		for enemy in get_tree().get_nodes_in_group("enemies"):
 			if is_instance_valid(enemy) and enemy.get("_type_enemy") != 5:
 				_draw_marker_for(enemy.global_position, Color(0, 0.5, 1, 0.7), _marker_icons.enemy, screen_rect, false, 1.0)
 
+	# 2. МАРКЕР БАЗ ВРАГА
+	if _show_base_markers:
+		for base in get_tree().get_nodes_in_group("bases"):
+			if is_instance_valid(base) and base.get("type_base") == 1:
+				_draw_marker_for(base.global_position, Color(1, 1, 0, 0.7), _marker_icons.base, screen_rect, false, 1.0)
+
+	# 3. МАРКЕР БАЗЫ ИГРОКА (При атаке)
+	if _base_under_attack:
+		_draw_marker_for(_player_base_pos, Color.GREEN, _marker_icons.warning, screen_rect, true, 1.2)
+
+	# 4. МАРКЕР БОССА (Самый верхний слой)
+	for enemy in get_tree().get_nodes_in_group("enemies"):
+		if is_instance_valid(enemy) and enemy.get("_type_enemy") == 5:
+			_draw_marker_for(enemy.global_position, Color("#f34235"), _marker_icons.boss, screen_rect, false, 1.3)
+
 func _draw_marker_for(target_pos: Vector2, color: Color, icon: Texture2D, screen_rect: Rect2, pulse: bool, max_scale: float):
 	if screen_rect.has_point(target_pos): return
-	var center = screen_rect.get_center()
-	var dir = (target_pos - center).normalized()
-	var dist = center.distance_to(target_pos)
-	var marker_pos = _get_intersect_pos(center, dir, screen_rect)
-	var margin = 40.0
+	var center = screen_rect.get_center(); var dir = (target_pos - center).normalized(); var dist = center.distance_to(target_pos)
+	var marker_pos = _get_intersect_pos(center, dir, screen_rect); var margin = 40.0
 	marker_pos.x = clamp(marker_pos.x, screen_rect.position.x + margin, screen_rect.end.x - margin)
 	marker_pos.y = clamp(marker_pos.y, screen_rect.position.y + margin, screen_rect.end.y - margin)
 	var draw_pos = _player.get_viewport().get_canvas_transform() * marker_pos
 	var scale_factor = clamp(remap(dist, 800, 3000, max_scale, 0.5), 0.5, max_scale)
+	if pulse: scale_factor *= 1.0 + (sin(Time.get_ticks_msec() * 0.005) * 0.12)
 
 	_marker_overlay.draw_circle(draw_pos, 25 * scale_factor, Color(0, 0, 0, 0.4))
 	_marker_overlay.draw_circle(draw_pos, 22 * scale_factor, Color(color.r, color.g, color.b, 0.7))

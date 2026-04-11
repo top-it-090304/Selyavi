@@ -73,6 +73,12 @@ func _on_body_entered(body):
 		else:
 			_destroy()
 	elif body is Base:
+		# Добавляем урон базе (если это база врага для игрока или наоборот)
+		if body.has_method("take_damage"):
+			# В Base.gd уже есть проверка в _on_bullet_entered,
+			# но здесь мы просто уничтожаем пулю.
+			# Урон нанесет сама база через свой сигнал area_entered.
+			pass
 		_destroy()
 	elif body is StaticBody2D:
 		_destroy()
@@ -83,32 +89,11 @@ func _destroy():
 func init(type_bullet: int, is_player: bool, damage: int = 0):
 	_type_bullet = type_bullet
 	_is_player = is_player
-	
-	if is_player:
-		_update_type()
-	else:
-		_damage = damage
-		_update_appearance()
+	_damage = damage # Всегда используем переданный урон
 
-func _update_type():
-	match _type_bullet:
-		PLASMA:
-			_bullet_sprite.texture = load("res://assets/future_tanks/PNG/Effects/Plasma.png")
-			_bullet_speed = 7
-			_damage = 25
-			_max_range = 600.0
-		MEDIUM:
-			_bullet_sprite.texture = load("res://assets/future_tanks/PNG/Effects/Medium_Shell.png")
-			_bullet_speed = 4
-			_damage = 40
-			_max_range = 275.0
-		LIGHT:
-			_bullet_sprite.texture = load("res://assets/future_tanks/PNG/Effects/Light_Shell.png")
-			_bullet_speed = 6
-			_damage = 20
-			_max_range = 900.0
+	_update_visuals_and_speed()
 
-func _update_appearance():
+func _update_visuals_and_speed():
 	match _type_bullet:
 		PLASMA:
 			_bullet_sprite.texture = load("res://assets/future_tanks/PNG/Effects/Plasma.png")
