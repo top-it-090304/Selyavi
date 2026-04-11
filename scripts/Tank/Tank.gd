@@ -94,11 +94,6 @@ func _update_damage_visuals():
 	if _max_hp <= 0: return
 	var health_percent = float(_hp) / float(_max_hp)
 
-	var tween = create_tween()
-	if _body:
-		tween.tween_property(_body, "modulate", Color(5, 5, 5), 0.05)
-		tween.tween_property(_body, "modulate", Color(1, 1, 1), 0.05)
-
 	if health_percent <= 0.5:
 		_smoke_particles.emitting = true
 		if health_percent <= 0.25:

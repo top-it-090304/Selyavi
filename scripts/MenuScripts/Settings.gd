@@ -5,6 +5,7 @@ var _sound_slider: Slider
 var _scope_toggler: CheckButton
 var _aim_assist_toggler: CheckButton
 var _left_hand_toggler: CheckButton
+var _fov_slider: HSlider
 var _music_label: Label
 var _sound_label: Label
 var _return_button: Button
@@ -17,6 +18,7 @@ func _ready():
 	_scope_toggler = find_child("CheckButton", true)
 	_aim_assist_toggler = find_child("CheckButton_AimAssist", true)
 	_left_hand_toggler = find_child("CheckButton_LeftHand", true)
+	_fov_slider = find_child("HSlider_CameraFov", true, false)
 	_music_label = find_child("MusicLabel", true)
 	_sound_label = find_child("SfxLabel", true)
 	_return_button = find_child("Return_Button", true)
@@ -44,6 +46,10 @@ func _ready():
 	if _left_hand_toggler != null:
 		if not _left_hand_toggler.toggled.is_connected(_on_left_hand_toggled):
 			_left_hand_toggler.toggled.connect(_on_left_hand_toggled)
+
+	if _fov_slider != null:
+		if not _fov_slider.value_changed.is_connected(_on_fov_slider_changed):
+			_fov_slider.value_changed.connect(_on_fov_slider_changed)
 
 func _setup_sfx_preview():
 	_sfx_preview_timer = Timer.new()
@@ -82,6 +88,9 @@ func _load_ui_values():
 	if _left_hand_toggler != null:
 		_left_hand_toggler.button_pressed = SaveManager.get_setting("game", "lefty_mode", false)
 
+	if _fov_slider != null:
+		_fov_slider.value = float(SaveManager.get_setting("game", "camera_fov", 50.0))
+
 func _update_return_button_text():
 	if _return_button == null: return
 
@@ -115,6 +124,10 @@ func _on_aim_assist_toggled(button_pressed: bool):
 func _on_left_hand_toggled(button_pressed: bool):
 	if SaveManager != null:
 		SaveManager.set_setting("game", "lefty_mode", button_pressed)
+
+func _on_fov_slider_changed(value: float):
+	if SaveManager != null:
+		SaveManager.set_setting("game", "camera_fov", value)
 
 func _on_Return_Button_pressed():
 	if GameManager.has_meta("from_scene"):
