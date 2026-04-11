@@ -36,7 +36,7 @@ var guns = [
 var colors = [
 	{"id": 0, "name": "Коричневый", "price": 0, "hp_bonus": 0, "speed_bonus": 0, "armor_bonus": 0, "rof_bonus": 0.0, "folder": "Color_A", "color": Color("a47d6c")},
 	{"id": 1, "name": "Зеленый", "price": 4000, "hp_bonus": 30, "speed_bonus": -15, "armor_bonus": 10, "rof_bonus": 0.1, "folder": "Color_B", "color": Color("888456")},
-	{"id": 2, "name": "Лазурный", "price": 8000, "hp_bonus": 5, "speed_bonus": 20, "armor_bonus": -10, "rof_bonus": 0.05, "folder": "Color_C", "color": Color("699f9c")}
+	{"id": 2, "name": "Лазурный", "price": 8000, "hp_bonus": 5, "speed_bonus": 30, "armor_bonus": -10, "rof_bonus": 0.05, "folder": "Color_C", "color": Color("699f9c")}
 ]
 
 var current_body_idx = 0

@@ -20,6 +20,12 @@ var _smoke_particles: CPUParticles2D
 var _fade_tween: Tween
 var _normal_movement_volume: float = 0.0
 var _is_moving: bool = false
+var _is_invulnerable: bool = false
+
+# Баффы от базы
+var _base_damage_mult: float = 1.0
+var _base_armor_bonus: float = 0.0
+var _base_rof_mult: float = 1.0
 # endregion
 
 func _init_base_tank():
@@ -40,13 +46,22 @@ func _init_base_tank():
 	_setup_damage_effects()
 
 func take_damage(damage: int):
-	# Применяем сопротивление: итоговый урон = урон * (1 - броня)
-	var final_damage = int(damage * (1.0 - _armor))
+	if _is_invulnerable: return
+
+	# Применяем сопротивление: итоговый урон = урон * (1 - (базовая броня + бонус от базы))
+	var total_armor = clamp(_armor + _base_armor_bonus, -0.9, 0.95)
+	var final_damage = int(damage * (1.0 - total_armor))
+
 	_hp -= final_damage
 	tank_health_changed.emit(_hp, _max_hp)
 	_update_damage_visuals()
 	if _hp <= 0:
 		_destroy()
+
+func apply_base_buffs(damage_mult: float, armor_bonus: float, rof_mult: float):
+	_base_damage_mult = damage_mult
+	_base_armor_bonus = armor_bonus
+	_base_rof_mult = rof_mult
 
 func _setup_damage_effects():
 	_smoke_particles = CPUParticles2D.new()

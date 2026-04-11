@@ -1,4 +1,4 @@
-[gd_scene load_steps=12 format=3 uid="uid://cijo5wt2kl4cd"]
+[gd_scene load_steps=14 format=3 uid="uid://cijo5wt2kl4cd"]
 
 [ext_resource type="Script" uid="uid://3afh3r374wk0" path="res://scripts/MenuScripts/Settings.gd" id="1"]
 [ext_resource type="FontFile" uid="uid://bsnvk4l0ue5ri" path="res://assets/fonts/ofont.ru_Shonen.ttf" id="2"]
@@ -32,13 +32,25 @@ font = ExtResource("2")
 font_size = 32
 font_color = Color(0.741176, 0.819608, 0.705882, 1)
 
+[sub_resource type="Gradient" id="Gradient_grabber"]
+offsets = PackedFloat32Array(0.6, 0.61)
+colors = PackedColorArray(0.741176, 0.819608, 0.705882, 1, 0.741176, 0.819608, 0.705882, 0)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_grabber"]
+gradient = SubResource("Gradient_grabber")
+width = 44
+height = 44
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(0.5, 0)
+
 [sub_resource type="StyleBoxLine" id="StyleBoxLine_slider_bg"]
 color = Color(0.0784314, 0.0901961, 0.0784314, 1)
-thickness = 12
+thickness = 24
 
 [sub_resource type="StyleBoxLine" id="StyleBoxLine_slider_area"]
 color = Color(0.352941, 0.411765, 0.305882, 1)
-thickness = 12
+thickness = 24
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn_hover"]
 content_margin_left = 20.0
@@ -140,59 +152,73 @@ text = "НАСТРОЙКИ"
 label_settings = SubResource("LabelSettings_header")
 horizontal_alignment = 1
 
-[node name="MarginContainer" type="MarginContainer" parent="CenterContainer/MainPanel/VBoxContainer"]
+[node name="ScrollContainer" type="ScrollContainer" parent="CenterContainer/MainPanel/VBoxContainer"]
 layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+vertical_scroll_mode = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="CenterContainer/MainPanel/VBoxContainer/ScrollContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
 theme_override_constants/margin_left = 50
 theme_override_constants/margin_top = 20
 theme_override_constants/margin_right = 50
+theme_override_constants/margin_bottom = 20
 
-[node name="GridContainer" type="GridContainer" parent="CenterContainer/MainPanel/VBoxContainer/MarginContainer"]
+[node name="GridContainer" type="GridContainer" parent="CenterContainer/MainPanel/VBoxContainer/ScrollContainer/MarginContainer"]
 layout_mode = 2
 theme_override_constants/h_separation = 40
 theme_override_constants/v_separation = 25
 columns = 2
 
-[node name="MusicLabel" type="Label" parent="CenterContainer/MainPanel/VBoxContainer/MarginContainer/GridContainer"]
+[node name="MusicLabel" type="Label" parent="CenterContainer/MainPanel/VBoxContainer/ScrollContainer/MarginContainer/GridContainer"]
 layout_mode = 2
 text = "Музыка"
 label_settings = SubResource("LabelSettings_label")
 
-[node name="HSlider" type="HSlider" parent="CenterContainer/MainPanel/VBoxContainer/MarginContainer/GridContainer"]
+[node name="HSlider" type="HSlider" parent="CenterContainer/MainPanel/VBoxContainer/ScrollContainer/MarginContainer/GridContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 4
+focus_mode = 0
+theme_override_icons/grabber = SubResource("GradientTexture2D_grabber")
+theme_override_icons/grabber_highlight = SubResource("GradientTexture2D_grabber")
 theme_override_styles/slider = SubResource("StyleBoxLine_slider_bg")
 theme_override_styles/grabber_area = SubResource("StyleBoxLine_slider_area")
 max_value = 1.0
 step = 0.05
 value = 0.5
 
-[node name="SfxLabel" type="Label" parent="CenterContainer/MainPanel/VBoxContainer/MarginContainer/GridContainer"]
+[node name="SfxLabel" type="Label" parent="CenterContainer/MainPanel/VBoxContainer/ScrollContainer/MarginContainer/GridContainer"]
 layout_mode = 2
 text = "Эффекты"
 label_settings = SubResource("LabelSettings_label")
 
-[node name="HSlider2" type="HSlider" parent="CenterContainer/MainPanel/VBoxContainer/MarginContainer/GridContainer"]
+[node name="HSlider2" type="HSlider" parent="CenterContainer/MainPanel/VBoxContainer/ScrollContainer/MarginContainer/GridContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 4
+focus_mode = 0
+theme_override_icons/grabber = SubResource("GradientTexture2D_grabber")
+theme_override_icons/grabber_highlight = SubResource("GradientTexture2D_grabber")
 theme_override_styles/slider = SubResource("StyleBoxLine_slider_bg")
 theme_override_styles/grabber_area = SubResource("StyleBoxLine_slider_area")
 max_value = 1.0
 step = 0.05
 value = 0.5
 
-[node name="ScopeLabel" type="Label" parent="CenterContainer/MainPanel/VBoxContainer/MarginContainer/GridContainer"]
+[node name="ScopeLabel" type="Label" parent="CenterContainer/MainPanel/VBoxContainer/ScrollContainer/MarginContainer/GridContainer"]
 layout_mode = 2
 text = "Лазерный прицел"
 label_settings = SubResource("LabelSettings_label")
 
-[node name="CheckButtonContainer" type="Control" parent="CenterContainer/MainPanel/VBoxContainer/MarginContainer/GridContainer"]
+[node name="CheckButtonContainer" type="Control" parent="CenterContainer/MainPanel/VBoxContainer/ScrollContainer/MarginContainer/GridContainer"]
 custom_minimum_size = Vector2(110, 60)
 layout_mode = 2
 size_flags_horizontal = 0
 
-[node name="CheckButton" type="CheckButton" parent="CenterContainer/MainPanel/VBoxContainer/MarginContainer/GridContainer/CheckButtonContainer"]
+[node name="CheckButton" type="CheckButton" parent="CenterContainer/MainPanel/VBoxContainer/ScrollContainer/MarginContainer/GridContainer/CheckButtonContainer"]
 layout_mode = 0
 offset_top = 10.5
 offset_right = 44.0
@@ -200,27 +226,41 @@ offset_bottom = 34.5
 scale = Vector2(2.5, 2.5)
 pivot_offset = Vector2(0, 12)
 
-[node name="LeftHandLabel" type="Label" parent="CenterContainer/MainPanel/VBoxContainer/MarginContainer/GridContainer"]
+[node name="AimAssistLabel" type="Label" parent="CenterContainer/MainPanel/VBoxContainer/ScrollContainer/MarginContainer/GridContainer"]
+layout_mode = 2
+text = "Автоприцеливание"
+label_settings = SubResource("LabelSettings_label")
+
+[node name="CheckButtonAimAssistContainer" type="Control" parent="CenterContainer/MainPanel/VBoxContainer/ScrollContainer/MarginContainer/GridContainer"]
+custom_minimum_size = Vector2(110, 60)
+layout_mode = 2
+size_flags_horizontal = 0
+
+[node name="CheckButton_AimAssist" type="CheckButton" parent="CenterContainer/MainPanel/VBoxContainer/ScrollContainer/MarginContainer/GridContainer/CheckButtonAimAssistContainer"]
+layout_mode = 0
+offset_top = 10.5
+offset_right = 44.0
+offset_bottom = 34.5
+scale = Vector2(2.5, 2.5)
+pivot_offset = Vector2(0, 12)
+
+[node name="LeftHandLabel" type="Label" parent="CenterContainer/MainPanel/VBoxContainer/ScrollContainer/MarginContainer/GridContainer"]
 layout_mode = 2
 text = "Режим для левшей"
 label_settings = SubResource("LabelSettings_label")
 
-[node name="CheckButtonLeftHandContainer" type="Control" parent="CenterContainer/MainPanel/VBoxContainer/MarginContainer/GridContainer"]
+[node name="CheckButtonLeftHandContainer" type="Control" parent="CenterContainer/MainPanel/VBoxContainer/ScrollContainer/MarginContainer/GridContainer"]
 custom_minimum_size = Vector2(110, 60)
 layout_mode = 2
 size_flags_horizontal = 0
 
-[node name="CheckButton_LeftHand" type="CheckButton" parent="CenterContainer/MainPanel/VBoxContainer/MarginContainer/GridContainer/CheckButtonLeftHandContainer"]
+[node name="CheckButton_LeftHand" type="CheckButton" parent="CenterContainer/MainPanel/VBoxContainer/ScrollContainer/MarginContainer/GridContainer/CheckButtonLeftHandContainer"]
 layout_mode = 0
 offset_top = 10.5
 offset_right = 44.0
 offset_bottom = 34.5
 scale = Vector2(2.5, 2.5)
 pivot_offset = Vector2(0, 12)
-
-[node name="Expander" type="Control" parent="CenterContainer/MainPanel/VBoxContainer"]
-layout_mode = 2
-size_flags_vertical = 3
 
 [node name="Return_Button" type="Button" parent="CenterContainer/MainPanel/VBoxContainer"]
 custom_minimum_size = Vector2(300, 70)

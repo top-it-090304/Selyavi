@@ -18,6 +18,7 @@ var _type_bullet: int = 0
 var _type_body: int = 1
 var _type_gun: int = 1
 var _color: int = 0
+var _invul_tween: Tween
 
 const PLASMA: int = 0
 const MEDIUM: int = 1
@@ -34,6 +35,9 @@ func _ready():
 	_load_all_data()
 
 	call_deferred("_connect_hud_controls")
+
+	# Неуязвимость при старте уровня
+	_start_invulnerability(3.0)
 
 	if AudioManager != null:
 		if not AudioManager.sfx_volume_changed.is_connected(_on_sfx_volume_changed):
@@ -98,28 +102,123 @@ func fire_touch():
 	bullet.global_position = _bullet_position.global_position
 	bullet.rotation_degrees = _gun.global_rotation_degrees
 	get_parent().add_child(bullet)
-	bullet.init(_type_bullet, true, _damage)
+
+	# Учитываем бафф урона от базы
+	var final_damage = int(_damage * _base_damage_mult)
+	bullet.init(_type_bullet, true, final_damage)
 
 	var muzzle_flash = get_node_or_null("ShotAnimation")
 	if muzzle_flash:
 		muzzle_flash.global_position = _bullet_position.global_position
 		muzzle_flash.frame = 0
 		muzzle_flash.play("Fire")
-	_shoot_timer.start()
 
-func use_move_vector_aim(move_vector: Vector2):
-	_gun.global_rotation = move_vector.angle() + PI/2
+	# Запуск таймера стрельбы с учетом баффа скорости атаки
+	_shoot_timer.start(_get_reload_time() * _base_rof_mult)
 
-func _physics_process(_delta):
-	_get_input()
-	_handle_auto_shoot()
-	move_and_slide()
-	queue_redraw()
+func _get_reload_time() -> float:
+	var reload_base = 1.0
+	match _type_gun:
+		GUN_LIGHT: reload_base = 0.65
+		GUN_MEDIUM: reload_base = 1.0
+		GUN_HEAVY: reload_base = 1.8
+		GUN_LMEDIUM: reload_base = 0.9
+		GUN_MHEAVY: reload_base = 0.8
+
+	var rof_color_bonus = 0.0
+	match _color:
+		COLOR_GREEN: rof_color_bonus = 0.1
+		COLOR_AZURE: rof_color_bonus = 0.05
+
+	return max(0.1, reload_base + rof_color_bonus)
 
 func _handle_auto_shoot():
 	if _aim != null and _aim.get_is_joystick_active():
 		if _aim.move_vector.length() > 0.2:
 			fire_touch()
+
+func use_move_vector_aim(move_vector: Vector2):
+	var desired_dir = move_vector.normalized()
+	var final_angle = move_vector.angle() + PI/2
+
+	# --- Агрессивный автоприцел ---
+	var is_assist_on = true
+	if SaveManager != null:
+		is_assist_on = SaveManager.get_setting("game", "aim_assist", true)
+
+	if is_assist_on:
+		var best_enemy = null
+		var min_angle_diff = deg_to_rad(35.0) # Порог срабатывания (градусы)
+
+		for enemy in get_tree().get_nodes_in_group("enemies"):
+			if is_instance_valid(enemy):
+				# 1. Проверка видимости: автоприцел работает только на тех, кого игрок видит (не за стеной)
+				if not _is_enemy_visible_for_assist(enemy):
+					continue
+
+				# 2. Проверка нахождения на экране (визуальная видимость игроком)
+				if not _is_enemy_on_screen(enemy):
+					continue
+
+				var dir_to_enemy = (enemy.global_position - global_position).normalized()
+				var angle_diff = abs(desired_dir.angle_to(dir_to_enemy))
+
+				if angle_diff < min_angle_diff:
+					min_angle_diff = angle_diff
+					best_enemy = enemy
+
+		if best_enemy:
+			final_angle = (best_enemy.global_position - global_position).angle() + PI/2
+	# -----------------------------
+
+	_gun.global_rotation = final_angle
+
+# Функция проверки видимости врага для автоприцела
+func _is_enemy_visible_for_assist(enemy: Node) -> bool:
+	var space_state = get_world_2d().direct_space_state
+	var query = PhysicsRayQueryParameters2D.create(global_position, enemy.global_position)
+	query.exclude = [self, enemy] # Игнорируем себя и цель
+	query.collision_mask = 1 # Слой стен (предположительно 1)
+
+	var result = space_state.intersect_ray(query)
+	return result.is_empty() # Если на пути луча ничего нет, враг видим
+
+# Функция проверки нахождения врага на экране (визуально для игрока)
+func _is_enemy_on_screen(enemy: Node) -> bool:
+	var viewport_rect = get_viewport().get_visible_rect()
+	var canvas_transform = get_viewport().get_canvas_transform()
+	var screen_pos = canvas_transform * enemy.global_position
+	return viewport_rect.has_point(screen_pos)
+
+func _physics_process(delta):
+	_get_input()
+	_handle_auto_shoot()
+	_check_base_buffs()
+	move_and_slide()
+	queue_redraw()
+
+func _check_base_buffs():
+	var in_range = false
+	var base_found = null
+
+	# Проверяем все базы игрока на уровне
+	for b in get_tree().get_nodes_in_group("bases"):
+		if b.get("type_base") == 0: # PLAYER
+			var dist = global_position.distance_to(b.global_position)
+			var radius = b.get("_heal_radius")
+			if dist <= radius:
+				apply_base_buffs(b.get("_damage_bonus"), b.get("_armor_bonus"), b.get("_rof_bonus"))
+				in_range = true
+				base_found = b
+				break
+
+	if not in_range:
+		apply_base_buffs(1.0, 0.0, 1.0) # Мгновенный сброс баффов
+
+	# Обновляем состояние иконки в HUD
+	var hud = get_tree().get_first_node_in_group("hud")
+	if hud and hud.has_method("set_buff_icon_visible"):
+		hud.set_buff_icon_visible(in_range)
 
 func _get_input():
 	if _joystick == null or not _joystick.get_is_joystick_active():
@@ -140,8 +239,14 @@ func _on_ammo_selected(type: int):
 	ammo_changed.emit(_type_bullet)
 
 func take_damage(damage: int):
+	if _is_invulnerable: return
+
 	super.take_damage(damage)
 	health_changed.emit(_hp, _max_hp)
+
+	# Щит на 2 секунды после получения урона (если игрок выжил)
+	if _hp > 0:
+		_start_invulnerability(2.0)
 
 func _destroy():
 	_lives -= 1
@@ -157,6 +262,24 @@ func _revive():
 	global_position = _start_position
 	health_changed.emit(_hp, _max_hp)
 	_update_damage_visuals()
+	_start_invulnerability(3.0)
+
+func _start_invulnerability(duration: float):
+	_is_invulnerable = true
+
+	if _invul_tween:
+		_invul_tween.kill()
+
+	_invul_tween = create_tween().set_loops()
+	_invul_tween.tween_property(self, "modulate:a", 0.3, 0.2)
+	_invul_tween.tween_property(self, "modulate:a", 1.0, 0.2)
+
+	get_tree().create_timer(duration).timeout.connect(func():
+		_is_invulnerable = false
+		if _invul_tween:
+			_invul_tween.kill()
+		modulate.a = 1.0
+	)
 
 func select_type(body_type: int, gun_type: int, color_type: int):
 	_type_body = body_type; _type_gun = gun_type; _color = color_type
