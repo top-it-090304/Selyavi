@@ -158,10 +158,56 @@ func _move_enemy():
 	if not _nav2d.is_navigation_finished():
 		var dir = (_nav2d.get_next_path_position() - global_position).normalized()
 		var current_speed = _chase_speed if _current_state == State.CHASE else _patrol_speed
-		velocity = dir * current_speed
-		rotation = dir.angle() + PI/2
+		var blended = _blend_navigation_with_avoidance(dir)
+		velocity = blended * current_speed
+		rotation = blended.angle() + PI/2
 	else:
 		velocity = Vector2.ZERO
+
+## Разведение с союзными ботами: не «паровозом» в одну точку навигации.
+func _blend_navigation_with_avoidance(desired_dir: Vector2) -> Vector2:
+	if desired_dir.length_squared() < 0.0001:
+		return Vector2.ZERO
+	var nrm = desired_dir.normalized()
+	var adjust = _compute_ally_avoidance(nrm)
+	var blended = nrm + adjust * 2.35
+	if blended.length_squared() < 0.0001:
+		return nrm
+	return blended.normalized()
+
+func _compute_ally_avoidance(forward: Vector2) -> Vector2:
+	var push = Vector2.ZERO
+	var my_pos = global_position
+	var sep_radius = 118.0
+	var lateral_sum = Vector2.ZERO
+	var lateral_count: int = 0
+
+	for other in get_tree().get_nodes_in_group("enemies"):
+		if not is_instance_valid(other) or other == self or other.is_queued_for_deletion():
+			continue
+		if not (other is CharacterBody2D):
+			continue
+		var diff = my_pos - other.global_position
+		var dist = diff.length()
+		if dist < sep_radius and dist > 0.4:
+			push += diff.normalized() * ((sep_radius - dist) / sep_radius)
+
+		var rel = other.global_position - my_pos
+		var along = rel.dot(forward)
+		if along > 18.0 and along < 150.0:
+			var perp = rel - forward * along
+			if perp.length_squared() < 55.0 * 55.0:
+				var side = Vector2(-forward.y, forward.x)
+				if side.dot(rel) > 0.0:
+					side = -side
+				lateral_sum += side
+				lateral_count += 1
+
+	if lateral_count > 0:
+		var lat = lateral_sum / float(lateral_count)
+		if lat.length_squared() > 0.0001:
+			push += lat.normalized() * 0.95
+	return push
 
 func _update_ray_cast():
 	if _ray_cast == null: return

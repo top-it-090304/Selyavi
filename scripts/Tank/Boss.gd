@@ -5,6 +5,13 @@ var _enemy_scene: PackedScene
 var _hp_bar: ProgressBar
 var _spawn_attempts: int = 0
 var _max_spawn_attempts: int = 28
+var _boss_minions: Array = []
+const MAX_BOSS_MINIONS: int = 3
+
+func _prune_minion_list():
+	_boss_minions = _boss_minions.filter(func(n):
+		return is_instance_valid(n) and not n.is_queued_for_deletion()
+	)
 
 func _ready():
 	_type_enemy = TypeEnemy.BOSS
@@ -112,7 +119,11 @@ func _get_valid_spawn_position() -> Vector2:
 func _spawn_minion():
 	if not is_instance_valid(_player):
 		return
-	
+
+	_prune_minion_list()
+	if _boss_minions.size() >= MAX_BOSS_MINIONS:
+		return
+
 	var minion = _enemy_scene.instantiate()
 	
 	var allowed_types = [TypeEnemy.LIGHT, TypeEnemy.MEDIUM, TypeEnemy.HEAVY]
@@ -122,6 +133,7 @@ func _spawn_minion():
 	minion.global_position = spawn_pos
 	
 	get_parent().add_child(minion)
-	
+	_boss_minions.append(minion)
+
 	if minion.has_method("_find_targets"):
 		minion._find_targets()

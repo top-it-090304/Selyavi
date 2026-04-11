@@ -18,6 +18,7 @@ var _shoot_timer: Timer
 var _moving_sound: AudioStreamPlayer
 var _smoke_particles: CPUParticles2D
 var _fade_tween: Tween
+var _hit_flash_tween: Tween
 var _normal_movement_volume: float = 0.0
 var _is_moving: bool = false
 var _is_invulnerable: bool = false
@@ -57,9 +58,19 @@ func take_damage(damage: int):
 
 	_hp -= int(final_damage)
 	tank_health_changed.emit(_hp, _max_hp)
+	_play_body_hit_flash()
 	_update_damage_visuals()
 	if _hp <= 0:
 		_destroy()
+
+func _play_body_hit_flash():
+	if _body == null:
+		return
+	if _hit_flash_tween != null and _hit_flash_tween.is_running():
+		_hit_flash_tween.kill()
+	_hit_flash_tween = create_tween()
+	_hit_flash_tween.tween_property(_body, "modulate", Color(4.5, 4.5, 4.5, 1.0), 0.05)
+	_hit_flash_tween.tween_property(_body, "modulate", Color(1, 1, 1, 1.0), 0.07)
 
 func apply_base_buffs(damage_mult: float, armor_bonus: float, rof_mult: float):
 	_base_damage_mult = damage_mult
