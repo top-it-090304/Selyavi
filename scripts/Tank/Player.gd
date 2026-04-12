@@ -108,8 +108,15 @@ func fire_touch():
 	bullet.rotation_degrees = _gun.global_rotation_degrees
 	get_parent().add_child(bullet)
 
-	# Учитываем бафф урона от базы
-	var final_damage = int(_damage * _base_damage_mult)
+	# УРОН ПО ТИПАМ СНАРЯДОВ (фиксированный по запросу)
+	var base_bullet_damage = 25
+	match _type_bullet:
+		PLASMA: base_bullet_damage = 25
+		MEDIUM: base_bullet_damage = 40
+		LIGHT: base_bullet_damage = 20
+
+	# Учитываем бафф урона от базы, если он есть
+	var final_damage = int(base_bullet_damage * _base_damage_mult)
 	bullet.init(_type_bullet, true, final_damage)
 
 	var muzzle_flash = get_node_or_null("ShotAnimation")
