@@ -3,6 +3,9 @@ extends Control
 @onready var tank_preview_body = find_child("Body", true)
 @onready var tank_preview_gun = find_child("Gun", true)
 @onready var base_preview = find_child("BasePreview", true)
+@onready var antenna_preview = find_child("Antenna", true)
+@onready var turret_preview = find_child("Turret", true)
+@onready var artifact_preview = find_child("Artifact", true)
 @onready var money_label = find_child("MoneyLabel", true)
 
 @onready var tank_stats = find_child("TankStats", true)
@@ -158,9 +161,9 @@ func _update_tank_ui():
 		color_fill.add_theme_stylebox_override("panel", stylebox)
 	_update_selector_label("ColorSelector", color.name, null)
 
-	_update_btn(buy_gun_btn, "guns", current_gun_idx, guns[current_gun_idx].price, "gun_type")
-	_update_btn(buy_hull_btn, "bodies", current_body_idx, bodies[current_body_idx].price, "body_type")
-	_update_btn(buy_color_btn, "colors", current_color_idx, colors[current_color_idx].price, "color_type")
+	_update_btn(buy_gun_btn, "guns", current_gun_idx, guns[current_gun_idx].price, "gun_type", 1)
+	_update_btn(buy_hull_btn, "bodies", current_body_idx, bodies[current_body_idx].price, "body_type", 1)
+	_update_btn(buy_color_btn, "colors", current_color_idx, colors[current_color_idx].price, "color_type", 0)
 
 func _update_base_ui():
 	var hp_data = base_hps[current_base_hp_idx]
@@ -178,15 +181,20 @@ func _update_base_ui():
 	# Под селектором показываем описание
 	if feature_desc_label: feature_desc_label.text = feature_data.desc
 
+	# Визуализация антенны (радара), турели и артефакта (био-осмоса) на превью
+	if antenna_preview: antenna_preview.visible = (current_base_feature_idx == 1)
+	if turret_preview: turret_preview.visible = (current_base_feature_idx == 2)
+	if artifact_preview: artifact_preview.visible = (current_base_feature_idx == 3)
+
 	_update_selector_label("HPSelector", hp_data.name, null)
 	_update_selector_label("HealSelector", heal_data.name, null)
 	_update_selector_label("BonusSelector", bonus_data.name, null)
 	_update_selector_label("FeatureSelector", feature_data.name, null)
 
-	_update_btn(find_child("BuyBaseHP", true), "base_hp", current_base_hp_idx, hp_data.price, "base_hp_level")
-	_update_btn(find_child("BuyBaseHeal", true), "base_heal", current_base_heal_idx, heal_data.price, "base_heal_level")
-	_update_btn(find_child("BuyBaseBonus", true), "base_bonus", current_base_bonus_idx, bonus_data.price, "base_bonus_level")
-	_update_btn(find_child("BuyBaseFeature", true), "base_features", current_base_feature_idx, feature_data.price, "base_feature_type")
+	_update_btn(find_child("BuyBaseHP", true), "base_hp", current_base_hp_idx, hp_data.price, "base_hp_level", 0)
+	_update_btn(find_child("BuyBaseHeal", true), "base_heal", current_base_heal_idx, heal_data.price, "base_heal_level", 0)
+	_update_btn(find_child("BuyBaseBonus", true), "base_bonus", current_base_bonus_idx, bonus_data.price, "base_bonus_level", 0)
+	_update_btn(find_child("BuyBaseFeature", true), "base_features", current_base_feature_idx, feature_data.price, "base_feature_type", 0)
 
 func _update_selector_label(node_name, text, icon_tex):
 	var node = find_child(node_name, true)
@@ -196,12 +204,14 @@ func _update_selector_label(node_name, text, icon_tex):
 	var icon = node.find_child("Icon", true)
 	if icon and icon_tex: icon.texture = icon_tex
 
-func _update_btn(btn: Button, category: String, id: int, price: int, stat_name: String):
+func _update_btn(btn: Button, category: String, id: int, price: int, stat_name: String, default_id: int):
 	if !btn: return
-	var owned = SaveManager.is_purchased(category, id)
-	if price == 0: owned = true
+
+	# Проверка владения: либо куплено, либо цена 0 (базовый предмет)
+	var owned = SaveManager.is_purchased(category, id) or price == 0
+
 	if owned:
-		var equipped = SaveManager.get_player_stat(stat_name, -1) == id
+		var equipped = SaveManager.get_player_stat(stat_name, default_id) == id
 		btn.text = "ВЫБРАНО" if equipped else "ВЫБРАТЬ"
 		btn.disabled = equipped
 	else:
@@ -239,8 +249,7 @@ func _on_tank_tab_pressed(): _switch_tab("tank")
 func _on_base_tab_pressed(): _switch_tab("base")
 
 func _handle_buy(category: String, id: int, price: int, stat_name: String):
-	var owned = SaveManager.is_purchased(category, id)
-	if price == 0: owned = true
+	var owned = SaveManager.is_purchased(category, id) or price == 0
 	if owned:
 		SaveManager.set_player_stat(stat_name, id)
 	elif money >= price:

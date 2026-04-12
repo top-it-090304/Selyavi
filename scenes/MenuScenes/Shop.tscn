@@ -1,9 +1,12 @@
-[gd_scene load_steps=18 format=3 uid="uid://cdxfm038kd06l"]
+[gd_scene load_steps=21 format=3 uid="uid://cdxfm038kd06l"]
 
 [ext_resource type="Script" uid="uid://vja1k2m687in" path="res://scripts/MenuScripts/Shop.gd" id="1_shop"]
 [ext_resource type="FontFile" uid="uid://bsnvk4l0ue5ri" path="res://assets/fonts/ofont.ru_Shonen.ttf" id="2_font"]
 [ext_resource type="Texture2D" uid="uid://cbqbobkp1rlb" path="res://assets/Money.png" id="3_l6lbb"]
 [ext_resource type="Texture2D" uid="uid://ddn2x463voap0" path="res://assets/backround/PNG/Props/Platform.png" id="4_base"]
+[ext_resource type="Texture2D" uid="uid://dm6fuutw2ov1x" path="res://assets/Antenna.png" id="5_antenna"]
+[ext_resource type="Texture2D" uid="uid://bmek83gvm1fr" path="res://assets/TurretGiantSniper_Top.png" id="6_turret"]
+[ext_resource type="Texture2D" uid="uid://dllk1bhqlk17w" path="res://assets/backround/PNG/Props/Artifact.png" id="7_artifact"]
 
 [sub_resource type="LabelSettings" id="LabelSettings_title"]
 font = ExtResource("2_font")
@@ -317,6 +320,22 @@ position = Vector2(0, 35)
 visible = false
 scale = Vector2(0.75, 0.75)
 texture = ExtResource("4_base")
+
+[node name="Antenna" type="Sprite2D" parent="Content/LeftView/TankFrame/TankPreview/BasePreview"]
+visible = false
+position = Vector2(10, -40)
+scale = Vector2(0.05, 0.05)
+texture = ExtResource("5_antenna")
+
+[node name="Turret" type="Sprite2D" parent="Content/LeftView/TankFrame/TankPreview/BasePreview"]
+visible = false
+position = Vector2(35, -5)
+scale = Vector2(0.55, 0.55)
+texture = ExtResource("6_turret")
+
+[node name="Artifact" type="Sprite2D" parent="Content/LeftView/TankFrame/TankPreview/BasePreview"]
+visible = false
+texture = ExtResource("7_artifact")
 
 [node name="StatsScroll" type="ScrollContainer" parent="Content/LeftView"]
 layout_mode = 2

@@ -6,15 +6,13 @@
   <component name="ChangeListManager">
     <list default="true" id="33129e0a-8a1f-4647-8ff9-20d5e301da8a" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/scenes/MenuScenes/Menu.tscn" beforeDir="false" afterPath="$PROJECT_DIR$/scenes/MenuScenes/Menu.tscn" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/scenes/MenuScenes/Settings.tscn" beforeDir="false" afterPath="$PROJECT_DIR$/scenes/MenuScenes/Settings.tscn" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scenes/Levels/Level_1.tscn" beforeDir="false" afterPath="$PROJECT_DIR$/scenes/Levels/Level_1.tscn" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/scenes/MenuScenes/Shop.tscn" beforeDir="false" afterPath="$PROJECT_DIR$/scenes/MenuScenes/Shop.tscn" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/scripts/Base.gd" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/Base.gd" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/scripts/HUD.gd" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/HUD.gd" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/scripts/MenuScripts/LevelSelector.gd" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/MenuScripts/LevelSelector.gd" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/scripts/MenuScripts/Shop.gd" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/MenuScripts/Shop.gd" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/scripts/MenuScripts/TutorialOverlay.gd" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/MenuScripts/TutorialOverlay.gd" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/scripts/SaveManager.gd" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/SaveManager.gd" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/Tank/Bullet.gd" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/Tank/Bullet.gd" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

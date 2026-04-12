@@ -12,7 +12,7 @@ var save_data = {
 		"base_hp_level": 0,
 		"base_heal_level": 0,
 		"base_bonus_level": 0,
-		"base_feature_level": 0
+		"base_feature_type": 0
 	},
 	"purchased": {
 		"bodies": [1],
