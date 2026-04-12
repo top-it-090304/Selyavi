@@ -83,7 +83,7 @@ position = Vector2(543, 318)
 [node name="Camera2D" type="Camera2D" parent="PlayerTank"]
 limit_left = 0
 limit_top = 0
-limit_right = 3350
+limit_right = 3450
 limit_bottom = 2300
 position_smoothing_enabled = true
 position_smoothing_speed = 10.0

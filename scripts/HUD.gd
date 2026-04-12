@@ -83,7 +83,7 @@ func _setup_warning_label():
 
 	_warningLabel = Label.new()
 	_warningLabel.name = "WarningLabel"
-	_warningLabel.text = "Базу атакуют!"
+	_warningLabel.text = "Штаб атакуют!"
 	_warningLabel.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_warningLabel.add_theme_font_size_override("font_size", 32)
 	_warningLabel.add_theme_color_override("font_color", Color("#f34235"))
@@ -140,10 +140,9 @@ func _apply_lefty_joystick_layout():
 		lefty = bool(SaveManager.get_setting("game", "lefty_mode", false))
 	if lefty:
 		_layout_joystick_bottom_right(_move_joy_c)
-		# Прицел слева: отступ от края экрана как у движения справа (~60 + зазор)
-		_layout_joystick_bottom_left(_aim_joy_c, 52.0)
+		_layout_joystick_bottom_left(_aim_joy_c, 60.0)
 	else:
-		_layout_joystick_bottom_left(_move_joy_c, 0.0)
+		_layout_joystick_bottom_left(_move_joy_c, 60.0)
 		_layout_joystick_bottom_right(_aim_joy_c)
 
 ## edge_inset_left — сдвиг всего блока вправо от левого края (не сжимая зону 200 px).
