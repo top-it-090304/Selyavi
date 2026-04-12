@@ -10,6 +10,7 @@ var _damage: int = 0
 var _is_player: bool = false
 var _traveled_distance: float = 0.0
 var _max_range: float = 1000.0
+var _ignored_body_rid: RID # RID тела, которое пуля игнорирует (например, стрелявшая база)
 
 const PLASMA: int = 0
 const MEDIUM: int = 1
@@ -58,6 +59,10 @@ func _on_screen_exited():
 	_fade_sound()
 
 func _on_body_entered(body):
+	# Игнорируем тело стрелка (базу или танк), если задан RID
+	if _ignored_body_rid.is_valid() and body.get_rid() == _ignored_body_rid:
+		return
+
 	if body is Player and not _is_player:
 		body.take_damage(_damage)
 		_destroy()
@@ -73,12 +78,6 @@ func _on_body_entered(body):
 		else:
 			_destroy()
 	elif body is Base:
-		# Добавляем урон базе (если это база врага для игрока или наоборот)
-		if body.has_method("take_damage"):
-			# В Base.gd уже есть проверка в _on_bullet_entered,
-			# но здесь мы просто уничтожаем пулю.
-			# Урон нанесет сама база через свой сигнал area_entered.
-			pass
 		_destroy()
 	elif body is StaticBody2D:
 		_destroy()
@@ -86,12 +85,18 @@ func _on_body_entered(body):
 func _destroy():
 	queue_free()
 
-func init(type_bullet: int, is_player: bool, damage: int = 0):
+func init(type_bullet: int, is_player: bool, damage: int = 0, ignored_rid: RID = RID(), custom_range: float = -1.0):
 	_type_bullet = type_bullet
 	_is_player = is_player
-	_damage = damage # Всегда используем переданный урон
+	_damage = damage
+	_ignored_body_rid = ignored_rid
 
 	_update_visuals_and_speed()
+
+	# Теперь дальность устанавливается либо стандартно (в _update_visuals_and_speed),
+	# либо принудительно, если передано значение больше 0 (для штаба)
+	if custom_range > 0:
+		_max_range = custom_range
 
 func _update_visuals_and_speed():
 	match _type_bullet:

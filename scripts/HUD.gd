@@ -21,6 +21,7 @@ var _ammo_buttons = {}
 # Параметры маркеров
 var _level_time: float = 0.0
 var _show_base_markers: bool = false
+var _radar_active: bool = false
 const BASE_MARKER_TIME = 90.0
 
 # Параметры предупреждения об атаке
@@ -64,6 +65,12 @@ func _ready():
 	call_deferred("_apply_lefty_joystick_layout")
 
 	call_deferred("_find_player_and_connect")
+
+func activate_radar():
+	# Радар работает всегда, кроме туториала
+	if get_tree().has_group("tutorial"): return
+	_radar_active = true
+	_show_base_markers = true
 
 func _setup_warning_label():
 	var center_top = find_child("TopCenter", true)
@@ -296,7 +303,9 @@ func _setup_ammo_selection():
 func _process(delta):
 	_update_ammo_cooldowns()
 	_level_time += delta
-	if _level_time >= BASE_MARKER_TIME: _show_base_markers = true
+	# Если радар не активен, показываем маркеры только через 90 сек
+	if !_radar_active and _level_time >= BASE_MARKER_TIME: _show_base_markers = true
+
 	if _base_under_attack:
 		_attack_warning_timer -= delta
 		if _attack_warning_timer <= 0:
