@@ -1,4 +1,4 @@
-[gd_scene load_steps=21 format=4 uid="uid://dsgqbvu3xbmcr"]
+[gd_scene load_steps=22 format=4 uid="uid://dsgqbvu3xbmcr"]
 
 [ext_resource type="Script" uid="uid://br7yr2dcfm5dk" path="res://scripts/MenuScripts/Menu.gd" id="1"]
 [ext_resource type="FontFile" uid="uid://bsnvk4l0ue5ri" path="res://assets/fonts/ofont.ru_Shonen.ttf" id="2"]
@@ -55,6 +55,8 @@ outline_color = Color(0.0784314, 0.0901961, 0.0784314, 1)
 shadow_size = 20
 shadow_color = Color(0, 0, 0, 0.470588)
 shadow_offset = Vector2(6, 6)
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_focus"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn_hover"]
 content_margin_left = 20.0
@@ -236,9 +238,11 @@ alignment = 1
 [node name="Play_Button" type="Button" parent="UI/MainMargin/Buttons"]
 custom_minimum_size = Vector2(0, 90)
 layout_mode = 2
+focus_mode = 0
 theme_override_colors/font_hover_color = Color(0.878431, 0.941176, 0.839216, 1)
 theme_override_fonts/font = ExtResource("2")
 theme_override_font_sizes/font_size = 40
+theme_override_styles/focus = SubResource("StyleBoxEmpty_focus")
 theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
 theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
@@ -247,9 +251,11 @@ text = "Миссии"
 [node name="Shop_Button" type="Button" parent="UI/MainMargin/Buttons"]
 custom_minimum_size = Vector2(0, 90)
 layout_mode = 2
+focus_mode = 0
 theme_override_colors/font_hover_color = Color(0.878431, 0.941176, 0.839216, 1)
 theme_override_fonts/font = ExtResource("2")
 theme_override_font_sizes/font_size = 40
+theme_override_styles/focus = SubResource("StyleBoxEmpty_focus")
 theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
 theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
@@ -258,9 +264,11 @@ text = "МАГАЗИН"
 [node name="Settings_Button" type="Button" parent="UI/MainMargin/Buttons"]
 custom_minimum_size = Vector2(0, 90)
 layout_mode = 2
+focus_mode = 0
 theme_override_colors/font_hover_color = Color(0.878431, 0.941176, 0.839216, 1)
 theme_override_fonts/font = ExtResource("2")
 theme_override_font_sizes/font_size = 40
+theme_override_styles/focus = SubResource("StyleBoxEmpty_focus")
 theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
 theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
@@ -269,9 +277,11 @@ text = "НАСТРОЙКИ"
 [node name="Info_Button" type="Button" parent="UI/MainMargin/Buttons"]
 custom_minimum_size = Vector2(0, 90)
 layout_mode = 2
+focus_mode = 0
 theme_override_colors/font_hover_color = Color(0.878431, 0.941176, 0.839216, 1)
 theme_override_fonts/font = ExtResource("2")
 theme_override_font_sizes/font_size = 40
+theme_override_styles/focus = SubResource("StyleBoxEmpty_focus")
 theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
 theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
@@ -280,9 +290,11 @@ text = "ОБ ИГРЕ"
 [node name="Quit_Button" type="Button" parent="UI/MainMargin/Buttons"]
 custom_minimum_size = Vector2(0, 90)
 layout_mode = 2
+focus_mode = 0
 theme_override_colors/font_hover_color = Color(0.878431, 0.941176, 0.839216, 1)
 theme_override_fonts/font = ExtResource("2")
 theme_override_font_sizes/font_size = 40
+theme_override_styles/focus = SubResource("StyleBoxEmpty_focus")
 theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
 theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")

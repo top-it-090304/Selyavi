@@ -85,6 +85,7 @@ func _setup_grid():
 		btn.custom_minimum_size = Vector2(120, 120)
 		btn.name = "Level_" + str(i)
 		btn.mouse_filter = Control.MOUSE_FILTER_PASS
+		btn.focus_mode = Control.FOCUS_NONE
 
 		var major = ((i - 1) / 5) + 1
 		var minor = ((i - 1) % 5) + 1
@@ -101,28 +102,41 @@ func _setup_grid():
 func _apply_button_style(btn, i, is_locked):
 	var is_passed = i < _unlocked_levels
 	var is_boss = (i % 5 == 0)
-	var style = StyleBoxFlat.new()
-	style.set_corner_radius_all(15)
-	style.set_border_width_all(4)
+
+	var style_normal = StyleBoxFlat.new()
+	style_normal.set_corner_radius_all(15)
+	style_normal.set_border_width_all(4)
+	style_normal.border_width_bottom = 8 # Создаем эффект объема
 
 	if is_locked:
-		style.bg_color = Color(0.2, 0.2, 0.2, 0.8)
-		style.border_color = Color(0.1, 0.1, 0.1)
+		style_normal.bg_color = Color(0.2, 0.2, 0.2, 0.8)
+		style_normal.border_color = Color(0.1, 0.1, 0.1)
 		btn.add_theme_color_override("font_disabled_color", Color(0.5, 0.5, 0.5))
 		btn.disabled = true
 	else:
 		if is_boss:
-			style.bg_color = Color(0.35, 0.1, 0.1, 0.9) if is_passed else Color(0.7, 0.1, 0.1, 0.9)
-			style.border_color = Color(0.5, 0.2, 0.2, 0.8) if is_passed else Color(1, 0.2, 0.2, 1)
+			style_normal.bg_color = Color(0.35, 0.1, 0.1, 0.9) if is_passed else Color(0.7, 0.1, 0.1, 0.9)
+			style_normal.border_color = Color(0.5, 0.2, 0.2, 0.8) if is_passed else Color(1, 0.2, 0.2, 1)
 		else:
-			style.bg_color = Color(0.2, 0.6, 0.9, 0.9)
-			style.border_color = Color(1, 1, 1, 0.8)
+			style_normal.bg_color = Color(0.2, 0.6, 0.9, 0.9)
+			style_normal.border_color = Color(1, 1, 1, 0.8)
 			if is_passed: btn.add_theme_color_override("font_color", Color(0.2, 0.9, 0.2))
 
-	btn.add_theme_stylebox_override("normal", style)
-	btn.add_theme_stylebox_override("hover", style)
-	btn.add_theme_stylebox_override("pressed", style)
-	btn.add_theme_stylebox_override("disabled", style)
+	# Создаем стиль для наведения (чуть светлее)
+	var style_hover = style_normal.duplicate()
+	style_hover.bg_color = style_hover.bg_color.lightened(0.1)
+
+	# Создаем стиль для нажатия (эффект нажатия вниз)
+	var style_pressed = style_normal.duplicate()
+	style_pressed.bg_color = style_pressed.bg_color.darkened(0.1)
+	style_pressed.border_width_top = 8
+	style_pressed.border_width_bottom = 2
+
+	btn.add_theme_stylebox_override("normal", style_normal)
+	btn.add_theme_stylebox_override("hover", style_hover)
+	btn.add_theme_stylebox_override("pressed", style_pressed)
+	btn.add_theme_stylebox_override("disabled", style_normal)
+	btn.add_theme_stylebox_override("focus", StyleBoxEmpty.new())
 
 func _on_level_btn_gui_input(event, level_num):
 	if event is InputEventScreenTouch:

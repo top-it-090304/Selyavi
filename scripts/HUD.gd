@@ -160,6 +160,9 @@ func _layout_joystick_bottom_left(c: MarginContainer, edge_inset_left: float = 0
 	c.add_theme_constant_override("margin_top", 0)
 	c.add_theme_constant_override("margin_bottom", 40)
 
+	var is_tutorial = get_tree().has_group("tutorial")
+	c.modulate.a = 1.0 if is_tutorial else 0.3
+
 func _layout_joystick_bottom_right(c: MarginContainer):
 	c.set_anchors_preset(Control.PRESET_BOTTOM_RIGHT)
 	c.anchor_left = 1.0
@@ -176,6 +179,13 @@ func _layout_joystick_bottom_right(c: MarginContainer):
 	c.add_theme_constant_override("margin_right", 60)
 	c.add_theme_constant_override("margin_top", 0)
 	c.add_theme_constant_override("margin_bottom", 40)
+
+	var is_tutorial = get_tree().has_group("tutorial")
+	c.modulate.a = 1.0 if is_tutorial else 0.3
+
+func set_joysticks_opacity(alpha: float):
+	if _move_joy_c: _move_joy_c.modulate.a = alpha
+	if _aim_joy_c: _aim_joy_c.modulate.a = alpha
 
 func _setup_bases_label():
 	var stats_container = find_child("Stats", true)

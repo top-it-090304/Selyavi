@@ -35,6 +35,11 @@ func _ready():
 	if AudioManager:
 		AudioManager.play_tutorial()
 
+	# Принудительно делаем джойстики непрозрачными для обучения
+	var hud = get_tree().get_first_node_in_group("hud")
+	if hud and hud.has_method("set_joysticks_opacity"):
+		hud.set_joysticks_opacity(1.0)
+
 	if skip_button:
 		skip_button.text = "ПРОПУСТИТЬ"
 		skip_button.position = Vector2(230, 15)
@@ -74,13 +79,17 @@ func _start_step():
 		if node:
 			target_pos = _get_node_screen_pos(node)
 
-			# Сместил свет на джойстике стрельбы еще на 5 пикселей левее
-			# Было: Aim +10, 15 | Joystick +5, 15
-			# Стало: Aim +5, 15 | Joystick +5, 15
-			if step.node == "Aim":
-				target_pos += Vector2(5, 15)
-			elif step.node == "Joystick":
-				target_pos += Vector2(5, 15)
+			# Теперь смещения рассчитываются в процентах от размера узла (адаптивно)
+			if node is Control:
+				var node_scale = node.get_screen_transform().get_scale()
+				var actual_size = node.size * node_scale
+
+				# 5 пикселей левее/правее и 15 выше при размере ~200px — это примерно 2.5% и 7.5%
+				# Используем эти пропорции для сохранения "идеального" вида на любом экране
+				if step.node == "Aim":
+					target_pos += Vector2(actual_size.x * 0.025, actual_size.y * 0.075)
+				elif step.node == "Joystick":
+					target_pos += Vector2(actual_size.x * 0.025, actual_size.y * 0.075)
 
 			if shape == 0:
 				radius = _get_node_radius(node, step.node)
@@ -177,6 +186,11 @@ func _finish():
 	get_tree().paused = false
 	SaveManager.save_data["tutorial_completed"] = true
 	SaveManager.save_game()
+
+	# Возвращаем прозрачность джойстикам после обучения
+	var hud = get_tree().get_first_node_in_group("hud")
+	if hud and hud.has_method("set_joysticks_opacity"):
+		hud.set_joysticks_opacity(0.3)
 
 	# Останавливаем музыку обучения после завершения
 	if AudioManager:

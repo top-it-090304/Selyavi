@@ -1,4 +1,4 @@
-[gd_scene load_steps=14 format=3 uid="uid://cijo5wt2kl4cd"]
+[gd_scene load_steps=15 format=3 uid="uid://cijo5wt2kl4cd"]
 
 [ext_resource type="Script" uid="uid://3afh3r374wk0" path="res://scripts/MenuScripts/Settings.gd" id="1"]
 [ext_resource type="FontFile" uid="uid://bsnvk4l0ue5ri" path="res://assets/fonts/ofont.ru_Shonen.ttf" id="2"]
@@ -51,6 +51,8 @@ thickness = 24
 [sub_resource type="StyleBoxLine" id="StyleBoxLine_slider_area"]
 color = Color(0.352941, 0.411765, 0.305882, 1)
 thickness = 24
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_focus"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn_hover"]
 content_margin_left = 20.0
@@ -242,6 +244,7 @@ offset_right = 44.0
 offset_bottom = 34.5
 scale = Vector2(2.5, 2.5)
 pivot_offset = Vector2(0, 12)
+focus_mode = 0
 
 [node name="AimAssistLabel" type="Label" parent="CenterContainer/MainPanel/VBoxContainer/ScrollContainer/MarginContainer/GridContainer"]
 layout_mode = 2
@@ -260,6 +263,7 @@ offset_right = 44.0
 offset_bottom = 34.5
 scale = Vector2(2.5, 2.5)
 pivot_offset = Vector2(0, 12)
+focus_mode = 0
 
 [node name="LeftHandLabel" type="Label" parent="CenterContainer/MainPanel/VBoxContainer/ScrollContainer/MarginContainer/GridContainer"]
 layout_mode = 2
@@ -278,13 +282,16 @@ offset_right = 44.0
 offset_bottom = 34.5
 scale = Vector2(2.5, 2.5)
 pivot_offset = Vector2(0, 12)
+focus_mode = 0
 
 [node name="Return_Button" type="Button" parent="CenterContainer/MainPanel/VBoxContainer"]
 custom_minimum_size = Vector2(300, 70)
 layout_mode = 2
 size_flags_horizontal = 4
+focus_mode = 0
 theme_override_fonts/font = ExtResource("2")
 theme_override_font_sizes/font_size = 28
+theme_override_styles/focus = SubResource("StyleBoxEmpty_focus")
 theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
 theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")

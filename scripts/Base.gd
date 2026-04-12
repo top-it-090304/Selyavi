@@ -39,8 +39,7 @@ func _enter_tree():
 
 func _ready():
 	_sync_current_level()
-	if type_base == TypeBase.ENEMY: _max_hp = 250
-	else: _max_hp = 150
+	_apply_upgrades()
 	_hp = _max_hp
 
 	area_entered.connect(_on_bullet_entered)
@@ -57,6 +56,28 @@ func _ready():
 	_setup_base_collision()
 	_update_spawn_interval()
 	queue_redraw()
+
+func _apply_upgrades():
+	if type_base == TypeBase.ENEMY:
+		_max_hp = 250
+		return
+
+	# Для игрока подгружаем из SaveManager
+	if SaveManager:
+		# 1. HP (Защита)
+		var hp_lv = SaveManager.get_player_stat("base_hp_level", 0)
+		var hps = [150, 200, 250, 350]
+		_max_hp = hps[clampi(hp_lv, 0, hps.size()-1)]
+
+		# 2. Heal (Ремонт)
+		var heal_lv = SaveManager.get_player_stat("base_heal_level", 0)
+		var heals = [5, 7, 10]
+		_heal_amount = heals[clampi(heal_lv, 0, heals.size()-1)]
+
+		# 3. Bonus (Тактика - урон)
+		var bonus_lv = SaveManager.get_player_stat("base_bonus_level", 0)
+		var bonuses = [1.1, 1.2, 1.5]
+		_damage_bonus = bonuses[clampi(bonus_lv, 0, bonuses.size()-1)]
 
 func _setup_particles():
 	_smoke_particles = CPUParticles2D.new()
