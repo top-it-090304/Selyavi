@@ -31,25 +31,39 @@ func _ready():
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	get_tree().paused = true
 
-	# Запускаем музыку обучения
-	if AudioManager:
+	if AudioManager and AudioManager.has_method("play_tutorial"):
 		AudioManager.play_tutorial()
 
-	# Принудительно делаем джойстики непрозрачными для обучения
 	var hud = get_tree().get_first_node_in_group("hud")
 	if hud and hud.has_method("set_joysticks_opacity"):
 		hud.set_joysticks_opacity(1.0)
 
-	if skip_button:
-		skip_button.text = "ПРОПУСТИТЬ"
-		skip_button.position = Vector2(230, 15)
-		skip_button.custom_minimum_size = Vector2(250, 70)
-
+	_setup_adaptive_ui()
 	_start_step()
 
+func _setup_adaptive_ui():
+	if not skip_button: return
+	var screen_size = get_viewport().get_visible_rect().size
+
+	# Адаптивный размер кнопки (мин 240px или 15% ширины)
+	var btn_width = max(240, screen_size.x * 0.15)
+	var btn_height = max(60, screen_size.y * 0.08)
+
+	skip_button.set_anchors_preset(Control.PRESET_TOP_LEFT)
+	skip_button.anchor_left = 0.0
+	skip_button.anchor_top = 0.0
+	skip_button.anchor_right = 0.0
+	skip_button.anchor_bottom = 0.0
+
+	# Сдвигаем вправо от кнопки паузы (x=18 + ширина кнопки паузы ~120)
+	skip_button.offset_left = 140
+	skip_button.offset_top = 25
+	skip_button.custom_minimum_size = Vector2(btn_width, btn_height)
+	skip_button.size = skip_button.custom_minimum_size
+
 func _input(event):
-	if event is InputEventMouseButton and event.pressed or \
-	   event is InputEventScreenTouch and event.pressed:
+	if (event is InputEventMouseButton and event.pressed) or \
+	   (event is InputEventScreenTouch and event.pressed):
 
 		var current_time = Time.get_ticks_msec()
 		if current_time - _last_step_time < 250:
@@ -57,17 +71,16 @@ func _input(event):
 		_last_step_time = current_time
 
 		if skip_button and skip_button.get_global_rect().has_point(event.position):
+			_on_skip_pressed()
 			return
 		_next_step()
 
 func _start_step():
-	# Даем время UI обновиться, чтобы точно найти координаты и размеры узлов
 	await get_tree().process_frame
+	if _current_step >= _steps.size(): return
 
 	var step = _steps[_current_step]
 	text_label.text = step.text
-	text_label.add_theme_constant_override("line_spacing", 10)
-	text_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 
 	var target_pos = Vector2.ZERO
 	var radius = 0.0
@@ -78,66 +91,67 @@ func _start_step():
 		var node = _find_target_node(step.node)
 		if node:
 			target_pos = _get_node_screen_pos(node)
-
-			# Теперь смещения рассчитываются в процентах от размера узла (адаптивно)
 			if node is Control:
-				var node_scale = node.get_screen_transform().get_scale()
-				var actual_size = node.size * node_scale
-
-				# 5 пикселей левее/правее и 15 выше при размере ~200px — это примерно 2.5% и 7.5%
-				# Используем эти пропорции для сохранения "идеального" вида на любом экране
-				if step.node == "Aim":
-					target_pos += Vector2(actual_size.x * 0.025, actual_size.y * 0.075)
-				elif step.node == "Joystick":
-					target_pos += Vector2(actual_size.x * 0.025, actual_size.y * 0.075)
+				target_pos = node.get_global_rect().get_center()
 
 			if shape == 0:
 				radius = _get_node_radius(node, step.node)
 			else:
-				# ПРЯМОУГОЛЬНИК: Увеличиваем запас (padding), чтобы шейдер был лучше виден
-				var scale = node.get_screen_transform().get_scale()
-				size = node.size * scale + Vector2(60, 40)
+				var scale = (node as CanvasItem).get_screen_transform().get_scale()
+				if node is Control:
+					var final_size = node.size
+					if node.name == "AmmoPanelContainer":
+						var inner = node.find_child("AmmoPanel", true, false)
+						if inner: final_size = inner.size
+					size = final_size * scale + Vector2(60, 40)
+				else:
+					size = Vector2(120, 120) * scale
 
 	_adjust_dialog_position(target_pos)
 	_update_shader_params(target_pos, radius, size, shape)
 
 func _adjust_dialog_position(target_pos: Vector2):
-	var screen_height = get_viewport().get_visible_rect().size.y
+	var screen_size = get_viewport().get_visible_rect().size
 
-	dialog_panel.anchor_left = 0.5
-	dialog_panel.anchor_right = 0.5
-	dialog_panel.offset_left = -450
-	dialog_panel.offset_right = 450
+	# Ширина панели до 85% экрана, но не более 1000px
+	var panel_width = min(1000, screen_size.x * 0.85)
+	dialog_panel.custom_minimum_size.x = panel_width
+	dialog_panel.offset_left = -panel_width / 2.0
+	dialog_panel.offset_right = panel_width / 2.0
 
-	# Если цель в нижней половине экрана (как AmmoPanel), диалог уходит вверх
-	if target_pos != Vector2.ZERO and target_pos.y > screen_height * 0.5:
+	# Адаптивный отступ по вертикали (5% высоты)
+	var margin_y = screen_size.y * 0.05
+
+	if target_pos != Vector2.ZERO and target_pos.y > screen_size.y * 0.5:
+		# Цель в нижней половине -> панель наверх, но ниже кнопок управления
 		dialog_panel.anchor_top = 0.0
 		dialog_panel.anchor_bottom = 0.0
-		dialog_panel.offset_top = 150
-		dialog_panel.offset_bottom = 350
+		dialog_panel.offset_top = margin_y + 100
+		dialog_panel.offset_bottom = dialog_panel.offset_top + 220
 	else:
+		# Цель в верхней половине -> панель вниз
 		dialog_panel.anchor_top = 1.0
 		dialog_panel.anchor_bottom = 1.0
-		dialog_panel.offset_top = -250
-		dialog_panel.offset_bottom = -50
+		dialog_panel.offset_bottom = -margin_y
+		dialog_panel.offset_top = -margin_y - 220
 
 func _update_shader_params(pos, rad, sz, shp):
 	var mat = bg.material as ShaderMaterial
 	if mat:
-		var current_center = mat.get_shader_parameter("hole_center")
-		if current_center == null: current_center = Vector2.ZERO
-		var current_radius = mat.get_shader_parameter("hole_radius")
-		if current_radius == null: current_radius = 0.0
-		var current_size = mat.get_shader_parameter("hole_size")
-		if current_size == null: current_size = Vector2.ZERO
-		var current_shape = mat.get_shader_parameter("shape")
-		if current_shape == null: current_shape = 0.0
-
 		var tween = create_tween().set_pause_mode(Tween.TWEEN_PAUSE_PROCESS).set_parallel(true)
-		tween.tween_method(func(v): mat.set_shader_parameter("hole_center", v), current_center, pos, 0.4)
-		tween.tween_method(func(v): mat.set_shader_parameter("hole_radius", v), current_radius, rad, 0.4)
-		tween.tween_method(func(v): mat.set_shader_parameter("hole_size", v), current_size, sz, 0.4)
-		tween.tween_method(func(v): mat.set_shader_parameter("shape", v), current_shape, float(shp), 0.2)
+		var cur_center = mat.get_shader_parameter("hole_center")
+		if not (cur_center is Vector2): cur_center = pos
+		var cur_radius = mat.get_shader_parameter("hole_radius")
+		if not (cur_radius is float): cur_radius = 0.0
+		var cur_size = mat.get_shader_parameter("hole_size")
+		if not (cur_size is Vector2): cur_size = Vector2.ZERO
+		var cur_shape = mat.get_shader_parameter("shape")
+		if not (cur_shape is float): cur_shape = 0.0
+
+		tween.tween_method(func(v): mat.set_shader_parameter("hole_center", v), cur_center, pos, 0.4)
+		tween.tween_method(func(v): mat.set_shader_parameter("hole_radius", v), cur_radius, rad, 0.4)
+		tween.tween_method(func(v): mat.set_shader_parameter("hole_size", v), cur_size, sz, 0.4)
+		tween.tween_method(func(v): mat.set_shader_parameter("shape", v), float(cur_shape), float(shp), 0.2)
 
 func _find_target_node(node_name: String):
 	if node_name == "Base":
@@ -147,54 +161,40 @@ func _find_target_node(node_name: String):
 
 	var hud = get_tree().get_first_node_in_group("hud")
 	if hud:
-		var found = hud.find_child(node_name, true, false)
-		if found: return found
-		# Дополнительные проверки, если find_child не сработал напрямую
-		if node_name == "AmmoPanel": return hud.find_child("AmmoPanel", true)
-		if node_name == "Stats": return hud.find_child("Stats", true)
-		if node_name == "MarkerOverlay": return hud.find_child("MarkerOverlay", true)
+		if node_name == "Joystick": return hud.find_child("MoveJoystickContainer", true)
+		if node_name == "Aim": return hud.find_child("AimJoystickContainer", true)
+		if node_name == "AmmoPanel":
+			var apc = hud.find_child("AmmoPanelContainer", true, false)
+			return apc if apc else hud.find_child("AmmoPanel", true, false)
+		if node_name == "Stats": return hud.find_child("TopRight", true)
+		if node_name == "MarkerOverlay": return hud.find_child("MarkerOverlay", true, false)
 	return null
 
 func _get_node_screen_pos(node: Node) -> Vector2:
-	if node is Control: return node.get_screen_transform().get_origin() + (node.size * node.get_screen_transform().get_scale() / 2.0)
-	elif node is Node2D: return node.get_viewport_transform() * node.global_position
+	if node is Control:
+		return node.get_screen_transform().get_origin() + (node.size * node.get_screen_transform().get_scale() / 2.0)
+	if node is Node2D:
+		return node.get_global_transform_with_canvas().get_origin()
 	return Vector2.ZERO
 
 func _get_node_radius(node: Node, node_name: String) -> float:
+	if node_name == "Base": return 120.0
 	if node is Control:
-		var scale = node.get_screen_transform().get_scale().x
-		var base_radius = max(node.size.x, node.size.y) * 0.5
-
-		# Увеличиваем радиус для джойстиков
-		if node_name == "Aim": return base_radius * 1.5 * scale
-		if node_name == "Joystick": return base_radius * 1.3 * scale
-
-		# Для маркеров делаем огромный радиус, чтобы убрать темноту
-		if node_name == "MarkerOverlay": return 2000.0
-
-		return base_radius * 0.7 * scale
-	return 180.0
+		var scale = (node as CanvasItem).get_screen_transform().get_scale().x
+		return max(node.size.x, node.size.y) * scale * 0.6
+	return 100.0
 
 func _next_step():
 	_current_step += 1
-	if _current_step >= _steps.size(): _finish()
+	if _current_step >= _steps.size(): _finish_tutorial()
 	else: _start_step()
 
-func _on_skip_pressed(): _finish()
+func _on_skip_pressed(): _finish_tutorial()
 
-func _finish():
+func _finish_tutorial():
 	get_tree().paused = false
-	SaveManager.save_data["tutorial_completed"] = true
-	SaveManager.save_game()
-
-	# Возвращаем прозрачность джойстикам после обучения
-	var hud = get_tree().get_first_node_in_group("hud")
-	if hud and hud.has_method("set_joysticks_opacity"):
-		hud.set_joysticks_opacity(0.3)
-
-	# Останавливаем музыку обучения после завершения
 	if AudioManager:
-		AudioManager.stop()
-
+		if AudioManager.has_method("stop_tutorial"): AudioManager.stop_tutorial()
+		elif AudioManager.has_method("stop"): AudioManager.stop()
 	tutorial_finished.emit()
 	queue_free()
