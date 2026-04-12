@@ -8,12 +8,20 @@ var save_data = {
 	"player_stats": {
 		"body_type": 1,
 		"gun_type": 1,
-		"color_type": 0
+		"color_type": 0,
+		"base_hp_level": 0,
+		"base_heal_level": 0,
+		"base_bonus_level": 0,
+		"base_feature_level": 0
 	},
 	"purchased": {
 		"bodies": [1],
 		"guns": [1],
-		"colors": [0]
+		"colors": [0],
+		"base_hp": [0],
+		"base_heal": [0],
+		"base_bonus": [0],
+		"base_features": [0]
 	}
 }
 
@@ -126,10 +134,12 @@ func is_purchased(category: String, item_id: int) -> bool:
 	return false
 
 func add_purchased(category: String, item_id: int):
-	if save_data.purchased.has(category):
-		if not is_purchased(category, item_id):
-			save_data.purchased[category].append(item_id)
-			save_game()
+	if not save_data.purchased.has(category):
+		save_data.purchased[category] = []
+
+	if not is_purchased(category, item_id):
+		save_data.purchased[category].append(item_id)
+		save_game()
 
 func set_player_stat(stat: String, value: int):
 	if save_data.player_stats.has(stat):

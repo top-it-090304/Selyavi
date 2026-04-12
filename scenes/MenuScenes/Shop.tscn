@@ -1,27 +1,20 @@
-[gd_scene load_steps=12 format=3 uid="uid://cdxfm038kd06l"]
+[gd_scene load_steps=18 format=3 uid="uid://cdxfm038kd06l"]
 
 [ext_resource type="Script" uid="uid://vja1k2m687in" path="res://scripts/MenuScripts/Shop.gd" id="1_shop"]
 [ext_resource type="FontFile" uid="uid://bsnvk4l0ue5ri" path="res://assets/fonts/ofont.ru_Shonen.ttf" id="2_font"]
 [ext_resource type="Texture2D" uid="uid://cbqbobkp1rlb" path="res://assets/Money.png" id="3_l6lbb"]
+[ext_resource type="Texture2D" uid="uid://ddn2x463voap0" path="res://assets/backround/PNG/Props/Platform.png" id="4_base"]
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_dark_bg"]
-bg_color = Color(0.14902, 0.172549, 0.14902, 1)
-border_width_left = 8
-border_width_top = 8
-border_width_right = 8
-border_width_bottom = 8
-border_color = Color(0.290196, 0.341176, 0.25098, 1)
-corner_radius_top_left = 20
-corner_radius_top_right = 20
-corner_radius_bottom_right = 20
-corner_radius_bottom_left = 20
-shadow_color = Color(0, 0, 0, 0.392157)
-shadow_size = 15
-
-[sub_resource type="LabelSettings" id="LabelSettings_stats"]
+[sub_resource type="LabelSettings" id="LabelSettings_title"]
 font = ExtResource("2_font")
-font_size = 24
+font_size = 72
 font_color = Color(0.741176, 0.819608, 0.705882, 1)
+outline_size = 14
+outline_color = Color(0.0784314, 0.0901961, 0.0784314, 1)
+shadow_size = 15
+shadow_color = Color(0, 0, 0, 0.4)
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_focus"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn_hover"]
 content_margin_left = 20.0
@@ -73,6 +66,66 @@ corner_radius_top_right = 12
 corner_radius_bottom_right = 12
 corner_radius_bottom_left = 12
 
+[sub_resource type="LabelSettings" id="LabelSettings_stats"]
+font = ExtResource("2_font")
+font_size = 24
+font_color = Color(0.741176, 0.819608, 0.705882, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_tab_active"]
+bg_color = Color(0.290196, 0.341176, 0.25098, 1)
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_color = Color(0.439216, 0.501961, 0.380392, 1)
+corner_radius_top_left = 25
+corner_radius_top_right = 25
+expand_margin_bottom = 4.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_tab_inactive"]
+bg_color = Color(0.121569, 0.14902, 0.121569, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_color = Color(0.290196, 0.341176, 0.25098, 1)
+corner_radius_top_left = 20
+corner_radius_top_right = 20
+expand_margin_top = -10.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_dark_bg"]
+bg_color = Color(0.14902, 0.172549, 0.14902, 1)
+border_width_left = 8
+border_width_top = 8
+border_width_right = 8
+border_width_bottom = 8
+border_color = Color(0.290196, 0.341176, 0.25098, 1)
+corner_radius_top_left = 20
+corner_radius_top_right = 20
+corner_radius_bottom_right = 20
+corner_radius_bottom_left = 20
+shadow_color = Color(0, 0, 0, 0.392157)
+shadow_size = 15
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_scroll_bg"]
+content_margin_left = 15.0
+content_margin_top = 15.0
+content_margin_right = 15.0
+content_margin_bottom = 15.0
+bg_color = Color(0.0784314, 0.0901961, 0.0784314, 0.235294)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.290196, 0.341176, 0.25098, 0.470588)
+corner_radius_top_left = 15
+corner_radius_top_right = 15
+corner_radius_bottom_right = 15
+corner_radius_bottom_left = 15
+
+[sub_resource type="LabelSettings" id="LabelSettings_cat"]
+font = ExtResource("2_font")
+font_size = 20
+font_color = Color(0.439216, 0.501961, 0.380392, 1)
+
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_color_fill"]
 bg_color = Color(1, 1, 1, 1)
 corner_radius_top_left = 5
@@ -92,15 +145,6 @@ corner_radius_top_right = 8
 corner_radius_bottom_right = 8
 corner_radius_bottom_left = 8
 
-[sub_resource type="LabelSettings" id="LabelSettings_title"]
-font = ExtResource("2_font")
-font_size = 72
-font_color = Color(0.741176, 0.819608, 0.705882, 1)
-outline_size = 14
-outline_color = Color(0.0784314, 0.0901961, 0.0784314, 1)
-shadow_size = 15
-shadow_color = Color(0, 0, 0, 0.4)
-
 [node name="Shop" type="Control"]
 layout_mode = 3
 anchors_preset = 15
@@ -118,338 +162,6 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 color = Color(0.109804, 0.121569, 0.109804, 1)
-
-[node name="Content" type="HBoxContainer" parent="."]
-layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -600.0
-offset_top = -220.0
-offset_right = 600.0
-offset_bottom = 380.0
-grow_horizontal = 2
-grow_vertical = 2
-theme_override_constants/separation = 60
-alignment = 1
-
-[node name="LeftView" type="VBoxContainer" parent="Content"]
-custom_minimum_size = Vector2(320, 0)
-layout_mode = 2
-theme_override_constants/separation = 20
-
-[node name="TankFrame" type="Panel" parent="Content/LeftView"]
-custom_minimum_size = Vector2(280, 280)
-layout_mode = 2
-size_flags_horizontal = 4
-theme_override_styles/panel = SubResource("StyleBoxFlat_dark_bg")
-
-[node name="TankPreview" type="Control" parent="Content/LeftView/TankFrame"]
-layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-grow_horizontal = 2
-grow_vertical = 2
-
-[node name="Body" type="Sprite2D" parent="Content/LeftView/TankFrame/TankPreview"]
-scale = Vector2(0.85, 0.85)
-
-[node name="Gun" type="Sprite2D" parent="Content/LeftView/TankFrame/TankPreview/Body"]
-position = Vector2(0, 35)
-
-[node name="Stats" type="VBoxContainer" parent="Content/LeftView"]
-custom_minimum_size = Vector2(300, 0)
-layout_mode = 2
-theme_override_constants/separation = 6
-
-[node name="Damage" type="Label" parent="Content/LeftView/Stats"]
-custom_minimum_size = Vector2(300, 0)
-layout_mode = 2
-text = "УРОН: x1.0"
-label_settings = SubResource("LabelSettings_stats")
-autowrap_mode = 3
-
-[node name="HP" type="Label" parent="Content/LeftView/Stats"]
-custom_minimum_size = Vector2(300, 0)
-layout_mode = 2
-text = "ЗДОРОВЬЕ: 100"
-label_settings = SubResource("LabelSettings_stats")
-autowrap_mode = 3
-
-[node name="Armor" type="Label" parent="Content/LeftView/Stats"]
-custom_minimum_size = Vector2(300, 0)
-layout_mode = 2
-text = "БРОНЯ: 0%"
-label_settings = SubResource("LabelSettings_stats")
-autowrap_mode = 3
-
-[node name="Speed" type="Label" parent="Content/LeftView/Stats"]
-custom_minimum_size = Vector2(300, 0)
-layout_mode = 2
-text = "СКОРОСТЬ: 250"
-label_settings = SubResource("LabelSettings_stats")
-autowrap_mode = 3
-
-[node name="ROF" type="Label" parent="Content/LeftView/Stats"]
-custom_minimum_size = Vector2(300, 0)
-layout_mode = 2
-text = "СКОРОСТРЕЛЬНОСТЬ: 1.0s"
-label_settings = SubResource("LabelSettings_stats")
-autowrap_mode = 3
-
-[node name="Selectors" type="VBoxContainer" parent="Content"]
-custom_minimum_size = Vector2(750, 0)
-layout_mode = 2
-theme_override_constants/separation = 25
-alignment = 1
-
-[node name="GunSelector" type="HBoxContainer" parent="Content/Selectors"]
-layout_mode = 2
-theme_override_constants/separation = 20
-alignment = 1
-
-[node name="Left" type="Button" parent="Content/Selectors/GunSelector"]
-custom_minimum_size = Vector2(70, 70)
-layout_mode = 2
-size_flags_vertical = 4
-theme_override_fonts/font = ExtResource("2_font")
-theme_override_font_sizes/font_size = 40
-theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
-theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
-text = "<"
-
-[node name="Display" type="Control" parent="Content/Selectors/GunSelector"]
-custom_minimum_size = Vector2(280, 160)
-layout_mode = 2
-
-[node name="Icon" type="TextureRect" parent="Content/Selectors/GunSelector/Display"]
-custom_minimum_size = Vector2(110, 110)
-layout_mode = 1
-anchors_preset = 5
-anchor_left = 0.5
-anchor_right = 0.5
-offset_left = -55.0
-offset_right = 55.0
-offset_bottom = 110.0
-grow_horizontal = 2
-expand_mode = 1
-stretch_mode = 5
-
-[node name="Label" type="Label" parent="Content/Selectors/GunSelector/Display"]
-layout_mode = 1
-anchors_preset = 7
-anchor_left = 0.5
-anchor_top = 1.0
-anchor_right = 0.5
-anchor_bottom = 1.0
-offset_left = -135.0
-offset_top = -35.0
-offset_right = 135.0
-grow_horizontal = 2
-grow_vertical = 0
-theme_override_colors/font_color = Color(0.741176, 0.819608, 0.705882, 1)
-theme_override_fonts/font = ExtResource("2_font")
-theme_override_font_sizes/font_size = 18
-text = "ПУШКА"
-horizontal_alignment = 1
-autowrap_mode = 3
-
-[node name="Right" type="Button" parent="Content/Selectors/GunSelector"]
-custom_minimum_size = Vector2(70, 70)
-layout_mode = 2
-size_flags_vertical = 4
-theme_override_fonts/font = ExtResource("2_font")
-theme_override_font_sizes/font_size = 40
-theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
-theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
-text = ">"
-
-[node name="BuyGun" type="Button" parent="Content/Selectors/GunSelector"]
-custom_minimum_size = Vector2(180, 70)
-layout_mode = 2
-size_flags_vertical = 4
-theme_override_fonts/font = ExtResource("2_font")
-theme_override_font_sizes/font_size = 24
-theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
-theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
-text = "КУПИТЬ"
-
-[node name="HullSelector" type="HBoxContainer" parent="Content/Selectors"]
-layout_mode = 2
-theme_override_constants/separation = 20
-alignment = 1
-
-[node name="Left" type="Button" parent="Content/Selectors/HullSelector"]
-custom_minimum_size = Vector2(70, 70)
-layout_mode = 2
-size_flags_vertical = 4
-theme_override_fonts/font = ExtResource("2_font")
-theme_override_font_sizes/font_size = 40
-theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
-theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
-text = "<"
-
-[node name="Display" type="Control" parent="Content/Selectors/HullSelector"]
-custom_minimum_size = Vector2(280, 160)
-layout_mode = 2
-
-[node name="Icon" type="TextureRect" parent="Content/Selectors/HullSelector/Display"]
-custom_minimum_size = Vector2(110, 110)
-layout_mode = 1
-anchors_preset = 5
-anchor_left = 0.5
-anchor_right = 0.5
-offset_left = -55.0
-offset_right = 55.0
-offset_bottom = 110.0
-grow_horizontal = 2
-expand_mode = 1
-stretch_mode = 5
-
-[node name="Label" type="Label" parent="Content/Selectors/HullSelector/Display"]
-layout_mode = 1
-anchors_preset = 7
-anchor_left = 0.5
-anchor_top = 1.0
-anchor_right = 0.5
-anchor_bottom = 1.0
-offset_left = -135.0
-offset_top = -35.0
-offset_right = 135.0
-grow_horizontal = 2
-grow_vertical = 0
-theme_override_colors/font_color = Color(0.741176, 0.819608, 0.705882, 1)
-theme_override_fonts/font = ExtResource("2_font")
-theme_override_font_sizes/font_size = 18
-text = "КОРПУС"
-horizontal_alignment = 1
-autowrap_mode = 3
-
-[node name="Right" type="Button" parent="Content/Selectors/HullSelector"]
-custom_minimum_size = Vector2(70, 70)
-layout_mode = 2
-size_flags_vertical = 4
-theme_override_fonts/font = ExtResource("2_font")
-theme_override_font_sizes/font_size = 40
-theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
-theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
-text = ">"
-
-[node name="BuyHull" type="Button" parent="Content/Selectors/HullSelector"]
-custom_minimum_size = Vector2(180, 70)
-layout_mode = 2
-size_flags_vertical = 4
-theme_override_fonts/font = ExtResource("2_font")
-theme_override_font_sizes/font_size = 24
-theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
-theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
-text = "КУПИТЬ"
-
-[node name="ColorSelector" type="HBoxContainer" parent="Content/Selectors"]
-layout_mode = 2
-theme_override_constants/separation = 20
-alignment = 1
-
-[node name="Left" type="Button" parent="Content/Selectors/ColorSelector"]
-custom_minimum_size = Vector2(70, 70)
-layout_mode = 2
-size_flags_vertical = 4
-theme_override_fonts/font = ExtResource("2_font")
-theme_override_font_sizes/font_size = 40
-theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
-theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
-text = "<"
-
-[node name="Display" type="Control" parent="Content/Selectors/ColorSelector"]
-custom_minimum_size = Vector2(280, 160)
-layout_mode = 2
-
-[node name="ColorBox" type="Control" parent="Content/Selectors/ColorSelector/Display"]
-custom_minimum_size = Vector2(70, 70)
-layout_mode = 1
-anchors_preset = 5
-anchor_left = 0.5
-anchor_right = 0.5
-offset_left = -35.0
-offset_top = 10.0
-offset_right = 35.0
-offset_bottom = 80.0
-grow_horizontal = 2
-
-[node name="Fill" type="Panel" parent="Content/Selectors/ColorSelector/Display/ColorBox"]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = 4.0
-offset_top = 4.0
-offset_right = -4.0
-offset_bottom = -4.0
-grow_horizontal = 2
-grow_vertical = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_color_fill")
-
-[node name="Border" type="Panel" parent="Content/Selectors/ColorSelector/Display/ColorBox"]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_black_border")
-
-[node name="Label" type="Label" parent="Content/Selectors/ColorSelector/Display"]
-layout_mode = 1
-anchors_preset = 7
-anchor_left = 0.5
-anchor_top = 1.0
-anchor_right = 0.5
-anchor_bottom = 1.0
-offset_left = -135.0
-offset_top = -35.0
-offset_right = 135.0
-grow_horizontal = 2
-grow_vertical = 0
-theme_override_colors/font_color = Color(0.741176, 0.819608, 0.705882, 1)
-theme_override_fonts/font = ExtResource("2_font")
-theme_override_font_sizes/font_size = 18
-text = "ЦВЕТ"
-horizontal_alignment = 1
-autowrap_mode = 3
-
-[node name="Right" type="Button" parent="Content/Selectors/ColorSelector"]
-custom_minimum_size = Vector2(70, 70)
-layout_mode = 2
-size_flags_vertical = 4
-theme_override_fonts/font = ExtResource("2_font")
-theme_override_font_sizes/font_size = 40
-theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
-theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
-text = ">"
-
-[node name="BuyColor" type="Button" parent="Content/Selectors/ColorSelector"]
-custom_minimum_size = Vector2(180, 70)
-layout_mode = 2
-size_flags_vertical = 4
-theme_override_fonts/font = ExtResource("2_font")
-theme_override_font_sizes/font_size = 24
-theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
-theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
-text = "КУПИТЬ"
 
 [node name="Header" type="Control" parent="."]
 layout_mode = 1
@@ -480,8 +192,10 @@ offset_left = 30.0
 offset_top = 15.0
 offset_right = 230.0
 offset_bottom = 85.0
+focus_mode = 0
 theme_override_fonts/font = ExtResource("2_font")
 theme_override_font_sizes/font_size = 32
+theme_override_styles/focus = SubResource("StyleBoxEmpty_focus")
 theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
 theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
@@ -514,13 +228,870 @@ text = "0"
 label_settings = SubResource("LabelSettings_stats")
 vertical_alignment = 1
 
-[connection signal="pressed" from="Content/Selectors/GunSelector/Left" to="." method="_on_gun_left_pressed"]
-[connection signal="pressed" from="Content/Selectors/GunSelector/Right" to="." method="_on_gun_right_pressed"]
-[connection signal="pressed" from="Content/Selectors/GunSelector/BuyGun" to="." method="_on_buy_gun_pressed"]
-[connection signal="pressed" from="Content/Selectors/HullSelector/Left" to="." method="_on_hull_left_pressed"]
-[connection signal="pressed" from="Content/Selectors/HullSelector/Right" to="." method="_on_hull_right_pressed"]
-[connection signal="pressed" from="Content/Selectors/HullSelector/BuyHull" to="." method="_on_buy_hull_pressed"]
-[connection signal="pressed" from="Content/Selectors/ColorSelector/Left" to="." method="_on_color_left_pressed"]
-[connection signal="pressed" from="Content/Selectors/ColorSelector/Right" to="." method="_on_color_right_pressed"]
-[connection signal="pressed" from="Content/Selectors/ColorSelector/BuyColor" to="." method="_on_buy_color_pressed"]
+[node name="Tabs" type="HBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -300.0
+offset_top = 120.0
+offset_right = 300.0
+offset_bottom = 180.0
+grow_horizontal = 2
+theme_override_constants/separation = 10
+alignment = 1
+
+[node name="TankTab" type="Button" parent="Tabs"]
+custom_minimum_size = Vector2(250, 0)
+layout_mode = 2
+focus_mode = 0
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 28
+theme_override_styles/focus = SubResource("StyleBoxEmpty_focus")
+theme_override_styles/hover = SubResource("StyleBoxFlat_tab_active")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_tab_active")
+theme_override_styles/normal = SubResource("StyleBoxFlat_tab_active")
+text = "ТАНК"
+
+[node name="BaseTab" type="Button" parent="Tabs"]
+custom_minimum_size = Vector2(250, 0)
+layout_mode = 2
+focus_mode = 0
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 28
+theme_override_styles/focus = SubResource("StyleBoxEmpty_focus")
+theme_override_styles/hover = SubResource("StyleBoxFlat_tab_inactive")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_tab_inactive")
+theme_override_styles/normal = SubResource("StyleBoxFlat_tab_inactive")
+text = "ШТАБ"
+
+[node name="TabLine" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_top = 180.0
+offset_bottom = 184.0
+grow_horizontal = 2
+color = Color(0.290196, 0.341176, 0.25098, 1)
+
+[node name="Content" type="HBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.05
+anchor_top = 0.32
+anchor_right = 0.95
+anchor_bottom = 0.95
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 40
+alignment = 1
+
+[node name="LeftView" type="VBoxContainer" parent="Content"]
+custom_minimum_size = Vector2(380, 0)
+layout_mode = 2
+theme_override_constants/separation = 15
+
+[node name="TankFrame" type="Panel" parent="Content/LeftView"]
+custom_minimum_size = Vector2(280, 220)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_styles/panel = SubResource("StyleBoxFlat_dark_bg")
+
+[node name="TankPreview" type="Control" parent="Content/LeftView/TankFrame"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Body" type="Sprite2D" parent="Content/LeftView/TankFrame/TankPreview"]
+scale = Vector2(0.8, 0.8)
+
+[node name="Gun" type="Sprite2D" parent="Content/LeftView/TankFrame/TankPreview/Body"]
+position = Vector2(0, 35)
+
+[node name="BasePreview" type="Sprite2D" parent="Content/LeftView/TankFrame/TankPreview"]
+visible = false
+scale = Vector2(0.75, 0.75)
+texture = ExtResource("4_base")
+
+[node name="StatsScroll" type="ScrollContainer" parent="Content/LeftView"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_scroll_bg")
+horizontal_scroll_mode = 0
+
+[node name="MarginContainer" type="MarginContainer" parent="Content/LeftView/StatsScroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/margin_top = 25
+
+[node name="StatsContainer" type="VBoxContainer" parent="Content/LeftView/StatsScroll/MarginContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 10
+
+[node name="TankStats" type="VBoxContainer" parent="Content/LeftView/StatsScroll/MarginContainer/StatsContainer"]
+custom_minimum_size = Vector2(300, 0)
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="Damage" type="Label" parent="Content/LeftView/StatsScroll/MarginContainer/StatsContainer/TankStats"]
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 2
+text = "УРОН: x1.0"
+label_settings = SubResource("LabelSettings_stats")
+autowrap_mode = 3
+
+[node name="HP" type="Label" parent="Content/LeftView/StatsScroll/MarginContainer/StatsContainer/TankStats"]
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 2
+text = "ЗДОРОВЬЕ: 100"
+label_settings = SubResource("LabelSettings_stats")
+autowrap_mode = 3
+
+[node name="Armor" type="Label" parent="Content/LeftView/StatsScroll/MarginContainer/StatsContainer/TankStats"]
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 2
+text = "БРОНЯ: 0%"
+label_settings = SubResource("LabelSettings_stats")
+autowrap_mode = 3
+
+[node name="Speed" type="Label" parent="Content/LeftView/StatsScroll/MarginContainer/StatsContainer/TankStats"]
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 2
+text = "СКОРОСТЬ: 250"
+label_settings = SubResource("LabelSettings_stats")
+autowrap_mode = 3
+
+[node name="ROF" type="Label" parent="Content/LeftView/StatsScroll/MarginContainer/StatsContainer/TankStats"]
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 2
+text = "СКОРОСТРЕЛЬНОСТЬ: 1.0s"
+label_settings = SubResource("LabelSettings_stats")
+autowrap_mode = 3
+
+[node name="BaseStats" type="VBoxContainer" parent="Content/LeftView/StatsScroll/MarginContainer/StatsContainer"]
+visible = false
+custom_minimum_size = Vector2(300, 0)
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="BaseHP" type="Label" parent="Content/LeftView/StatsScroll/MarginContainer/StatsContainer/BaseStats"]
+layout_mode = 2
+text = "ПРОЧНОСТЬ: 150"
+label_settings = SubResource("LabelSettings_stats")
+
+[node name="BaseHeal" type="Label" parent="Content/LeftView/StatsScroll/MarginContainer/StatsContainer/BaseStats"]
+layout_mode = 2
+text = "РЕМОНТ: 7 HP/сек"
+label_settings = SubResource("LabelSettings_stats")
+
+[node name="BaseBonus" type="Label" parent="Content/LeftView/StatsScroll/MarginContainer/StatsContainer/BaseStats"]
+layout_mode = 2
+text = "БОНУС УРОНА: x1.3"
+label_settings = SubResource("LabelSettings_stats")
+
+[node name="BaseFeature" type="Label" parent="Content/LeftView/StatsScroll/MarginContainer/StatsContainer/BaseStats"]
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 2
+text = "ИННОВАЦИЯ: Нет"
+label_settings = SubResource("LabelSettings_stats")
+autowrap_mode = 3
+
+[node name="ScrollContainer" type="ScrollContainer" parent="Content"]
+custom_minimum_size = Vector2(780, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_scroll_bg")
+horizontal_scroll_mode = 0
+
+[node name="TopMargin" type="MarginContainer" parent="Content/ScrollContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/margin_top = 25
+
+[node name="Selectors" type="VBoxContainer" parent="Content/ScrollContainer/TopMargin"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 40
+
+[node name="TankSelectors" type="VBoxContainer" parent="Content/ScrollContainer/TopMargin/Selectors"]
+layout_mode = 2
+theme_override_constants/separation = 30
+
+[node name="GunGroup" type="VBoxContainer" parent="Content/ScrollContainer/TopMargin/Selectors/TankSelectors"]
+layout_mode = 2
+
+[node name="Cat" type="Label" parent="Content/ScrollContainer/TopMargin/Selectors/TankSelectors/GunGroup"]
+layout_mode = 2
+text = "МОДИФИКАЦИЯ ПУШКИ"
+label_settings = SubResource("LabelSettings_cat")
+horizontal_alignment = 1
+
+[node name="GunSelector" type="HBoxContainer" parent="Content/ScrollContainer/TopMargin/Selectors/TankSelectors/GunGroup"]
+layout_mode = 2
+theme_override_constants/separation = 20
+alignment = 1
+
+[node name="Left" type="Button" parent="Content/ScrollContainer/TopMargin/Selectors/TankSelectors/GunGroup/GunSelector"]
+custom_minimum_size = Vector2(70, 70)
+layout_mode = 2
+size_flags_vertical = 4
+focus_mode = 0
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 40
+theme_override_styles/focus = SubResource("StyleBoxEmpty_focus")
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
+text = "<"
+
+[node name="Display" type="Control" parent="Content/ScrollContainer/TopMargin/Selectors/TankSelectors/GunGroup/GunSelector"]
+custom_minimum_size = Vector2(280, 160)
+layout_mode = 2
+
+[node name="Icon" type="TextureRect" parent="Content/ScrollContainer/TopMargin/Selectors/TankSelectors/GunGroup/GunSelector/Display"]
+custom_minimum_size = Vector2(110, 110)
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -55.0
+offset_top = -80.0
+offset_right = 55.0
+offset_bottom = 30.0
+grow_horizontal = 2
+grow_vertical = 2
+rotation = 1.5708
+pivot_offset = Vector2(55, 55)
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Label" type="Label" parent="Content/ScrollContainer/TopMargin/Selectors/TankSelectors/GunGroup/GunSelector/Display"]
+custom_minimum_size = Vector2(270, 0)
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -135.0
+offset_top = -35.0
+offset_right = 135.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_colors/font_color = Color(0.741176, 0.819608, 0.705882, 1)
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 18
+text = "ПУШКА"
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 3
+
+[node name="Right" type="Button" parent="Content/ScrollContainer/TopMargin/Selectors/TankSelectors/GunGroup/GunSelector"]
+custom_minimum_size = Vector2(70, 70)
+layout_mode = 2
+size_flags_vertical = 4
+focus_mode = 0
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 40
+theme_override_styles/focus = SubResource("StyleBoxEmpty_focus")
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
+text = ">"
+
+[node name="BuyGun" type="Button" parent="Content/ScrollContainer/TopMargin/Selectors/TankSelectors/GunGroup/GunSelector"]
+custom_minimum_size = Vector2(180, 70)
+layout_mode = 2
+size_flags_vertical = 4
+focus_mode = 0
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 24
+theme_override_styles/focus = SubResource("StyleBoxEmpty_focus")
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
+text = "КУПИТЬ"
+
+[node name="Line" type="ColorRect" parent="Content/ScrollContainer/TopMargin/Selectors/TankSelectors"]
+custom_minimum_size = Vector2(0, 2)
+layout_mode = 2
+color = Color(0.290196, 0.341176, 0.25098, 0.313726)
+
+[node name="HullGroup" type="VBoxContainer" parent="Content/ScrollContainer/TopMargin/Selectors/TankSelectors"]
+layout_mode = 2
+
+[node name="Cat" type="Label" parent="Content/ScrollContainer/TopMargin/Selectors/TankSelectors/HullGroup"]
+layout_mode = 2
+text = "МОДИФИКАЦИЯ КОРПУСА"
+label_settings = SubResource("LabelSettings_cat")
+horizontal_alignment = 1
+
+[node name="HullSelector" type="HBoxContainer" parent="Content/ScrollContainer/TopMargin/Selectors/TankSelectors/HullGroup"]
+layout_mode = 2
+theme_override_constants/separation = 20
+alignment = 1
+
+[node name="Left" type="Button" parent="Content/ScrollContainer/TopMargin/Selectors/TankSelectors/HullGroup/HullSelector"]
+custom_minimum_size = Vector2(70, 70)
+layout_mode = 2
+size_flags_vertical = 4
+focus_mode = 0
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 40
+theme_override_styles/focus = SubResource("StyleBoxEmpty_focus")
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
+text = "<"
+
+[node name="Display" type="Control" parent="Content/ScrollContainer/TopMargin/Selectors/TankSelectors/HullGroup/HullSelector"]
+custom_minimum_size = Vector2(280, 160)
+layout_mode = 2
+
+[node name="Icon" type="TextureRect" parent="Content/ScrollContainer/TopMargin/Selectors/TankSelectors/HullGroup/HullSelector/Display"]
+custom_minimum_size = Vector2(110, 110)
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -55.0
+offset_top = -80.0
+offset_right = 55.0
+offset_bottom = 30.0
+grow_horizontal = 2
+grow_vertical = 2
+rotation = 1.5708
+pivot_offset = Vector2(55, 55)
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Label" type="Label" parent="Content/ScrollContainer/TopMargin/Selectors/TankSelectors/HullGroup/HullSelector/Display"]
+custom_minimum_size = Vector2(270, 0)
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -135.0
+offset_top = -35.0
+offset_right = 135.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_colors/font_color = Color(0.741176, 0.819608, 0.705882, 1)
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 18
+text = "КОРПУС"
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 3
+
+[node name="Right" type="Button" parent="Content/ScrollContainer/TopMargin/Selectors/TankSelectors/HullGroup/HullSelector"]
+custom_minimum_size = Vector2(70, 70)
+layout_mode = 2
+size_flags_vertical = 4
+focus_mode = 0
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 40
+theme_override_styles/focus = SubResource("StyleBoxEmpty_focus")
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
+text = ">"
+
+[node name="BuyHull" type="Button" parent="Content/ScrollContainer/TopMargin/Selectors/TankSelectors/HullGroup/HullSelector"]
+custom_minimum_size = Vector2(180, 70)
+layout_mode = 2
+size_flags_vertical = 4
+focus_mode = 0
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 24
+theme_override_styles/focus = SubResource("StyleBoxEmpty_focus")
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
+text = "КУПИТЬ"
+
+[node name="Line2" type="ColorRect" parent="Content/ScrollContainer/TopMargin/Selectors/TankSelectors"]
+custom_minimum_size = Vector2(0, 2)
+layout_mode = 2
+color = Color(0.290196, 0.341176, 0.25098, 0.313726)
+
+[node name="ColorGroup" type="VBoxContainer" parent="Content/ScrollContainer/TopMargin/Selectors/TankSelectors"]
+layout_mode = 2
+
+[node name="Cat" type="Label" parent="Content/ScrollContainer/TopMargin/Selectors/TankSelectors/ColorGroup"]
+layout_mode = 2
+text = "ВИЗУАЛЬНЫЙ ТЮНИНГ"
+label_settings = SubResource("LabelSettings_cat")
+horizontal_alignment = 1
+
+[node name="ColorSelector" type="HBoxContainer" parent="Content/ScrollContainer/TopMargin/Selectors/TankSelectors/ColorGroup"]
+layout_mode = 2
+theme_override_constants/separation = 20
+alignment = 1
+
+[node name="Left" type="Button" parent="Content/ScrollContainer/TopMargin/Selectors/TankSelectors/ColorGroup/ColorSelector"]
+custom_minimum_size = Vector2(70, 70)
+layout_mode = 2
+size_flags_vertical = 4
+focus_mode = 0
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 40
+theme_override_styles/focus = SubResource("StyleBoxEmpty_focus")
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
+text = "<"
+
+[node name="Display" type="Control" parent="Content/ScrollContainer/TopMargin/Selectors/TankSelectors/ColorGroup/ColorSelector"]
+custom_minimum_size = Vector2(280, 160)
+layout_mode = 2
+
+[node name="ColorBox" type="Control" parent="Content/ScrollContainer/TopMargin/Selectors/TankSelectors/ColorGroup/ColorSelector/Display"]
+custom_minimum_size = Vector2(70, 70)
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -35.0
+offset_top = -25.0
+offset_right = 35.0
+offset_bottom = 45.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Fill" type="Panel" parent="Content/ScrollContainer/TopMargin/Selectors/TankSelectors/ColorGroup/ColorSelector/Display/ColorBox"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 4.0
+offset_top = 4.0
+offset_right = -4.0
+offset_bottom = -4.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_color_fill")
+
+[node name="Border" type="Panel" parent="Content/ScrollContainer/TopMargin/Selectors/TankSelectors/ColorGroup/ColorSelector/Display/ColorBox"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_black_border")
+
+[node name="Label" type="Label" parent="Content/ScrollContainer/TopMargin/Selectors/TankSelectors/ColorGroup/ColorSelector/Display"]
+custom_minimum_size = Vector2(270, 0)
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -135.0
+offset_top = -35.0
+offset_right = 135.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_colors/font_color = Color(0.741176, 0.819608, 0.705882, 1)
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 18
+text = "ЦВЕТ"
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 3
+
+[node name="Right" type="Button" parent="Content/ScrollContainer/TopMargin/Selectors/TankSelectors/ColorGroup/ColorSelector"]
+custom_minimum_size = Vector2(70, 70)
+layout_mode = 2
+size_flags_vertical = 4
+focus_mode = 0
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 40
+theme_override_styles/focus = SubResource("StyleBoxEmpty_focus")
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
+text = ">"
+
+[node name="BuyColor" type="Button" parent="Content/ScrollContainer/TopMargin/Selectors/TankSelectors/ColorGroup/ColorSelector"]
+custom_minimum_size = Vector2(180, 70)
+layout_mode = 2
+size_flags_vertical = 4
+focus_mode = 0
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 24
+theme_override_styles/focus = SubResource("StyleBoxEmpty_focus")
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
+text = "КУПИТЬ"
+
+[node name="BaseSelectors" type="VBoxContainer" parent="Content/ScrollContainer/TopMargin/Selectors"]
+visible = false
+layout_mode = 2
+theme_override_constants/separation = 30
+
+[node name="HPGroup" type="VBoxContainer" parent="Content/ScrollContainer/TopMargin/Selectors/BaseSelectors"]
+layout_mode = 2
+
+[node name="Cat" type="Label" parent="Content/ScrollContainer/TopMargin/Selectors/BaseSelectors/HPGroup"]
+layout_mode = 2
+text = "Здоровье штаба"
+label_settings = SubResource("LabelSettings_cat")
+horizontal_alignment = 1
+
+[node name="HPSelector" type="HBoxContainer" parent="Content/ScrollContainer/TopMargin/Selectors/BaseSelectors/HPGroup"]
+layout_mode = 2
+theme_override_constants/separation = 20
+alignment = 1
+
+[node name="Left" type="Button" parent="Content/ScrollContainer/TopMargin/Selectors/BaseSelectors/HPGroup/HPSelector"]
+custom_minimum_size = Vector2(70, 70)
+layout_mode = 2
+size_flags_vertical = 4
+focus_mode = 0
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 40
+theme_override_styles/focus = SubResource("StyleBoxEmpty_focus")
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
+text = "<"
+
+[node name="Display" type="Control" parent="Content/ScrollContainer/TopMargin/Selectors/BaseSelectors/HPGroup/HPSelector"]
+custom_minimum_size = Vector2(280, 100)
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Content/ScrollContainer/TopMargin/Selectors/BaseSelectors/HPGroup/HPSelector/Display"]
+custom_minimum_size = Vector2(270, 0)
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(0.741176, 0.819608, 0.705882, 1)
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 24
+text = "ЗАЩИТА"
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 3
+
+[node name="Right" type="Button" parent="Content/ScrollContainer/TopMargin/Selectors/BaseSelectors/HPGroup/HPSelector"]
+custom_minimum_size = Vector2(70, 70)
+layout_mode = 2
+size_flags_vertical = 4
+focus_mode = 0
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 40
+theme_override_styles/focus = SubResource("StyleBoxEmpty_focus")
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
+text = ">"
+
+[node name="BuyBaseHP" type="Button" parent="Content/ScrollContainer/TopMargin/Selectors/BaseSelectors/HPGroup/HPSelector"]
+custom_minimum_size = Vector2(180, 70)
+layout_mode = 2
+size_flags_vertical = 4
+focus_mode = 0
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 24
+theme_override_styles/focus = SubResource("StyleBoxEmpty_focus")
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
+text = "КУПИТЬ"
+
+[node name="Line" type="ColorRect" parent="Content/ScrollContainer/TopMargin/Selectors/BaseSelectors"]
+custom_minimum_size = Vector2(0, 2)
+layout_mode = 2
+color = Color(0.290196, 0.341176, 0.25098, 0.313726)
+
+[node name="HealGroup" type="VBoxContainer" parent="Content/ScrollContainer/TopMargin/Selectors/BaseSelectors"]
+layout_mode = 2
+
+[node name="Cat" type="Label" parent="Content/ScrollContainer/TopMargin/Selectors/BaseSelectors/HealGroup"]
+layout_mode = 2
+text = "Скорость ремонта"
+label_settings = SubResource("LabelSettings_cat")
+horizontal_alignment = 1
+
+[node name="HealSelector" type="HBoxContainer" parent="Content/ScrollContainer/TopMargin/Selectors/BaseSelectors/HealGroup"]
+layout_mode = 2
+theme_override_constants/separation = 20
+alignment = 1
+
+[node name="Left" type="Button" parent="Content/ScrollContainer/TopMargin/Selectors/BaseSelectors/HealGroup/HealSelector"]
+custom_minimum_size = Vector2(70, 70)
+layout_mode = 2
+size_flags_vertical = 4
+focus_mode = 0
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 40
+theme_override_styles/focus = SubResource("StyleBoxEmpty_focus")
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
+text = "<"
+
+[node name="Display" type="Control" parent="Content/ScrollContainer/TopMargin/Selectors/BaseSelectors/HealGroup/HealSelector"]
+custom_minimum_size = Vector2(280, 100)
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Content/ScrollContainer/TopMargin/Selectors/BaseSelectors/HealGroup/HealSelector/Display"]
+custom_minimum_size = Vector2(270, 0)
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(0.741176, 0.819608, 0.705882, 1)
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 24
+text = "РЕМОНТ"
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 3
+
+[node name="Right" type="Button" parent="Content/ScrollContainer/TopMargin/Selectors/BaseSelectors/HealGroup/HealSelector"]
+custom_minimum_size = Vector2(70, 70)
+layout_mode = 2
+size_flags_vertical = 4
+focus_mode = 0
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 40
+theme_override_styles/focus = SubResource("StyleBoxEmpty_focus")
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
+text = ">"
+
+[node name="BuyBaseHeal" type="Button" parent="Content/ScrollContainer/TopMargin/Selectors/BaseSelectors/HealGroup/HealSelector"]
+custom_minimum_size = Vector2(180, 70)
+layout_mode = 2
+size_flags_vertical = 4
+focus_mode = 0
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 24
+theme_override_styles/focus = SubResource("StyleBoxEmpty_focus")
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
+text = "КУПИТЬ"
+
+[node name="Line2" type="ColorRect" parent="Content/ScrollContainer/TopMargin/Selectors/BaseSelectors"]
+custom_minimum_size = Vector2(0, 2)
+layout_mode = 2
+color = Color(0.290196, 0.341176, 0.25098, 0.313726)
+
+[node name="BonusGroup" type="VBoxContainer" parent="Content/ScrollContainer/TopMargin/Selectors/BaseSelectors"]
+layout_mode = 2
+
+[node name="Cat" type="Label" parent="Content/ScrollContainer/TopMargin/Selectors/BaseSelectors/BonusGroup"]
+layout_mode = 2
+text = "урон возле штаба"
+label_settings = SubResource("LabelSettings_cat")
+horizontal_alignment = 1
+
+[node name="BonusSelector" type="HBoxContainer" parent="Content/ScrollContainer/TopMargin/Selectors/BaseSelectors/BonusGroup"]
+layout_mode = 2
+theme_override_constants/separation = 20
+alignment = 1
+
+[node name="Left" type="Button" parent="Content/ScrollContainer/TopMargin/Selectors/BaseSelectors/BonusGroup/BonusSelector"]
+custom_minimum_size = Vector2(70, 70)
+layout_mode = 2
+size_flags_vertical = 4
+focus_mode = 0
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 40
+theme_override_styles/focus = SubResource("StyleBoxEmpty_focus")
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
+text = "<"
+
+[node name="Display" type="Control" parent="Content/ScrollContainer/TopMargin/Selectors/BaseSelectors/BonusGroup/BonusSelector"]
+custom_minimum_size = Vector2(280, 100)
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Content/ScrollContainer/TopMargin/Selectors/BaseSelectors/BonusGroup/BonusSelector/Display"]
+custom_minimum_size = Vector2(270, 0)
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(0.741176, 0.819608, 0.705882, 1)
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 24
+text = "ТАКТИКА"
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 3
+
+[node name="Right" type="Button" parent="Content/ScrollContainer/TopMargin/Selectors/BaseSelectors/BonusGroup/BonusSelector"]
+custom_minimum_size = Vector2(70, 70)
+layout_mode = 2
+size_flags_vertical = 4
+focus_mode = 0
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 40
+theme_override_styles/focus = SubResource("StyleBoxEmpty_focus")
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
+text = ">"
+
+[node name="BuyBaseBonus" type="Button" parent="Content/ScrollContainer/TopMargin/Selectors/BaseSelectors/BonusGroup/BonusSelector"]
+custom_minimum_size = Vector2(180, 70)
+layout_mode = 2
+size_flags_vertical = 4
+focus_mode = 0
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 24
+theme_override_styles/focus = SubResource("StyleBoxEmpty_focus")
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
+text = "КУПИТЬ"
+
+[node name="Line3" type="ColorRect" parent="Content/ScrollContainer/TopMargin/Selectors/BaseSelectors"]
+custom_minimum_size = Vector2(0, 2)
+layout_mode = 2
+color = Color(0.290196, 0.341176, 0.25098, 0.313726)
+
+[node name="FeatureGroup" type="VBoxContainer" parent="Content/ScrollContainer/TopMargin/Selectors/BaseSelectors"]
+layout_mode = 2
+
+[node name="Cat" type="Label" parent="Content/ScrollContainer/TopMargin/Selectors/BaseSelectors/FeatureGroup"]
+layout_mode = 2
+text = "ИННОВАЦИЯ"
+label_settings = SubResource("LabelSettings_cat")
+horizontal_alignment = 1
+
+[node name="FeatureSelector" type="HBoxContainer" parent="Content/ScrollContainer/TopMargin/Selectors/BaseSelectors/FeatureGroup"]
+layout_mode = 2
+theme_override_constants/separation = 20
+alignment = 1
+
+[node name="Left" type="Button" parent="Content/ScrollContainer/TopMargin/Selectors/BaseSelectors/FeatureGroup/FeatureSelector"]
+custom_minimum_size = Vector2(70, 70)
+layout_mode = 2
+size_flags_vertical = 4
+focus_mode = 0
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 40
+theme_override_styles/focus = SubResource("StyleBoxEmpty_focus")
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
+text = "<"
+
+[node name="Display" type="Control" parent="Content/ScrollContainer/TopMargin/Selectors/BaseSelectors/FeatureGroup/FeatureSelector"]
+custom_minimum_size = Vector2(280, 100)
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Content/ScrollContainer/TopMargin/Selectors/BaseSelectors/FeatureGroup/FeatureSelector/Display"]
+custom_minimum_size = Vector2(270, 0)
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(0.741176, 0.819608, 0.705882, 1)
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 24
+text = "ИННОВАЦИЯ"
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 3
+
+[node name="Right" type="Button" parent="Content/ScrollContainer/TopMargin/Selectors/BaseSelectors/FeatureGroup/FeatureSelector"]
+custom_minimum_size = Vector2(70, 70)
+layout_mode = 2
+size_flags_vertical = 4
+focus_mode = 0
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 40
+theme_override_styles/focus = SubResource("StyleBoxEmpty_focus")
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
+text = ">"
+
+[node name="BuyBaseFeature" type="Button" parent="Content/ScrollContainer/TopMargin/Selectors/BaseSelectors/FeatureGroup/FeatureSelector"]
+custom_minimum_size = Vector2(180, 70)
+layout_mode = 2
+size_flags_vertical = 4
+focus_mode = 0
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 24
+theme_override_styles/focus = SubResource("StyleBoxEmpty_focus")
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
+text = "КУПИТЬ"
+
+[node name="DescPanel" type="PanelContainer" parent="Content/ScrollContainer/TopMargin/Selectors/BaseSelectors/FeatureGroup"]
+custom_minimum_size = Vector2(650, 0)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_styles/panel = SubResource("StyleBoxFlat_scroll_bg")
+
+[node name="FeatureDesc" type="Label" parent="Content/ScrollContainer/TopMargin/Selectors/BaseSelectors/FeatureGroup/DescPanel"]
+custom_minimum_size = Vector2(600, 80)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.741176, 0.819608, 0.705882, 1)
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 18
+text = "Описание модуля"
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 3
+
 [connection signal="pressed" from="Header/BackButton" to="." method="_on_back_button_pressed"]
+[connection signal="pressed" from="Tabs/TankTab" to="." method="_on_tank_tab_pressed"]
+[connection signal="pressed" from="Tabs/BaseTab" to="." method="_on_base_tab_pressed"]
+[connection signal="pressed" from="Content/ScrollContainer/TopMargin/Selectors/TankSelectors/GunGroup/GunSelector/Left" to="." method="_on_gun_left_pressed"]
+[connection signal="pressed" from="Content/ScrollContainer/TopMargin/Selectors/TankSelectors/GunGroup/GunSelector/Right" to="." method="_on_gun_right_pressed"]
+[connection signal="pressed" from="Content/ScrollContainer/TopMargin/Selectors/TankSelectors/GunGroup/GunSelector/BuyGun" to="." method="_on_buy_gun_pressed"]
+[connection signal="pressed" from="Content/ScrollContainer/TopMargin/Selectors/TankSelectors/HullGroup/HullSelector/Left" to="." method="_on_hull_left_pressed"]
+[connection signal="pressed" from="Content/ScrollContainer/TopMargin/Selectors/TankSelectors/HullGroup/HullSelector/Right" to="." method="_on_hull_right_pressed"]
+[connection signal="pressed" from="Content/ScrollContainer/TopMargin/Selectors/TankSelectors/HullGroup/HullSelector/BuyHull" to="." method="_on_buy_hull_pressed"]
+[connection signal="pressed" from="Content/ScrollContainer/TopMargin/Selectors/TankSelectors/ColorGroup/ColorSelector/Left" to="." method="_on_color_left_pressed"]
+[connection signal="pressed" from="Content/ScrollContainer/TopMargin/Selectors/TankSelectors/ColorGroup/ColorSelector/Right" to="." method="_on_color_right_pressed"]
+[connection signal="pressed" from="Content/ScrollContainer/TopMargin/Selectors/TankSelectors/ColorGroup/ColorSelector/BuyColor" to="." method="_on_buy_color_pressed"]
+[connection signal="pressed" from="Content/ScrollContainer/TopMargin/Selectors/BaseSelectors/HPGroup/HPSelector/Left" to="." method="_on_base_hp_left_pressed"]
+[connection signal="pressed" from="Content/ScrollContainer/TopMargin/Selectors/BaseSelectors/HPGroup/HPSelector/Right" to="." method="_on_base_hp_right_pressed"]
+[connection signal="pressed" from="Content/ScrollContainer/TopMargin/Selectors/BaseSelectors/HPGroup/HPSelector/BuyBaseHP" to="." method="_on_buy_base_hp_pressed"]
+[connection signal="pressed" from="Content/ScrollContainer/TopMargin/Selectors/BaseSelectors/HealGroup/HealSelector/Left" to="." method="_on_base_heal_left_pressed"]
+[connection signal="pressed" from="Content/ScrollContainer/TopMargin/Selectors/BaseSelectors/HealGroup/HealSelector/Right" to="." method="_on_base_heal_right_pressed"]
+[connection signal="pressed" from="Content/ScrollContainer/TopMargin/Selectors/BaseSelectors/HealGroup/HealSelector/BuyBaseHeal" to="." method="_on_buy_base_heal_pressed"]
+[connection signal="pressed" from="Content/ScrollContainer/TopMargin/Selectors/BaseSelectors/BonusGroup/BonusSelector/Left" to="." method="_on_base_bonus_left_pressed"]
+[connection signal="pressed" from="Content/ScrollContainer/TopMargin/Selectors/BaseSelectors/BonusGroup/BonusSelector/Right" to="." method="_on_base_bonus_right_pressed"]
+[connection signal="pressed" from="Content/ScrollContainer/TopMargin/Selectors/BaseSelectors/BonusGroup/BonusSelector/BuyBaseBonus" to="." method="_on_buy_base_bonus_pressed"]
+[connection signal="pressed" from="Content/ScrollContainer/TopMargin/Selectors/BaseSelectors/FeatureGroup/FeatureSelector/Left" to="." method="_on_base_feature_left_pressed"]
+[connection signal="pressed" from="Content/ScrollContainer/TopMargin/Selectors/BaseSelectors/FeatureGroup/FeatureSelector/Right" to="." method="_on_base_feature_right_pressed"]
+[connection signal="pressed" from="Content/ScrollContainer/TopMargin/Selectors/BaseSelectors/FeatureGroup/FeatureSelector/BuyBaseFeature" to="." method="_on_buy_base_feature_pressed"]

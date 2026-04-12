@@ -12,8 +12,8 @@ var _last_step_time = 0
 var _steps = [
 	{"text": "Добро пожаловать, Командир! Рады видеть тебя в строю.", "node": null},
 	{"text": "Тебя давно не было видно. Напомню тебе, как здесь все устроено.", "node": null},
-	{"text": "Используй левый джойстик для перемещения твоего танка. Лучше его не отпускать надолго!", "node": "Joystick"},
-	{"text": "Правый джойстик отвечает за прицеливание и стрельбу. Наведи его на цель, чтобы выстрелить.", "node": "Aim"},
+	{"text": "Используй этот джойстик для перемещения твоего танка. Лучше не отпускать его надолго!", "node": "Joystick"},
+	{"text": "Синий джойстик отвечает за прицеливание и стрельбу. Наведи его на цель, чтобы выстрелить.", "node": "Aim"},
 	{"text": "Танк оснащен автодоводкой пушки. Ты можешь отключить ёе в настройках.", "node": "Aim"},
 	{"text": "Это наш штаб. Находясь рядом с ним, ты чинишь танк и наносишь больше урона.", "node": "Base"},
 	{"text": "Враги будут всеми силами пытаться его уничтожешь. Не допусти это!", "node": "Base"},
@@ -34,6 +34,11 @@ func _ready():
 	# Запускаем музыку обучения
 	if AudioManager:
 		AudioManager.play_tutorial()
+
+	# Принудительно делаем джойстики непрозрачными для обучения
+	var hud = get_tree().get_first_node_in_group("hud")
+	if hud and hud.has_method("set_joysticks_opacity"):
+		hud.set_joysticks_opacity(1.0)
 
 	if skip_button:
 		skip_button.text = "ПРОПУСТИТЬ"
@@ -74,11 +79,17 @@ func _start_step():
 		if node:
 			target_pos = _get_node_screen_pos(node)
 
-			# Оставляем текущие смещения, как просил пользователь "не менять координаты"
-			if step.node == "Aim":
-				target_pos += Vector2(60, 50)
-			elif step.node == "Joystick":
-				target_pos += Vector2(30, 50)
+			# Теперь смещения рассчитываются в процентах от размера узла (адаптивно)
+			if node is Control:
+				var node_scale = node.get_screen_transform().get_scale()
+				var actual_size = node.size * node_scale
+
+				# 5 пикселей левее/правее и 15 выше при размере ~200px — это примерно 2.5% и 7.5%
+				# Используем эти пропорции для сохранения "идеального" вида на любом экране
+				if step.node == "Aim":
+					target_pos += Vector2(actual_size.x * 0.025, actual_size.y * 0.075)
+				elif step.node == "Joystick":
+					target_pos += Vector2(actual_size.x * 0.025, actual_size.y * 0.075)
 
 			if shape == 0:
 				radius = _get_node_radius(node, step.node)
@@ -175,6 +186,11 @@ func _finish():
 	get_tree().paused = false
 	SaveManager.save_data["tutorial_completed"] = true
 	SaveManager.save_game()
+
+	# Возвращаем прозрачность джойстикам после обучения
+	var hud = get_tree().get_first_node_in_group("hud")
+	if hud and hud.has_method("set_joysticks_opacity"):
+		hud.set_joysticks_opacity(0.3)
 
 	# Останавливаем музыку обучения после завершения
 	if AudioManager:

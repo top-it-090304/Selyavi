@@ -83,7 +83,7 @@ func _setup_warning_label():
 
 	_warningLabel = Label.new()
 	_warningLabel.name = "WarningLabel"
-	_warningLabel.text = "Базу атакуют!"
+	_warningLabel.text = "Штаб атакуют!"
 	_warningLabel.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_warningLabel.add_theme_font_size_override("font_size", 32)
 	_warningLabel.add_theme_color_override("font_color", Color("#f34235"))
@@ -140,10 +140,9 @@ func _apply_lefty_joystick_layout():
 		lefty = bool(SaveManager.get_setting("game", "lefty_mode", false))
 	if lefty:
 		_layout_joystick_bottom_right(_move_joy_c)
-		# Прицел слева: отступ от края экрана как у движения справа (~60 + зазор)
-		_layout_joystick_bottom_left(_aim_joy_c, 52.0)
+		_layout_joystick_bottom_left(_aim_joy_c, 60.0)
 	else:
-		_layout_joystick_bottom_left(_move_joy_c, 0.0)
+		_layout_joystick_bottom_left(_move_joy_c, 60.0)
 		_layout_joystick_bottom_right(_aim_joy_c)
 
 ## edge_inset_left — сдвиг всего блока вправо от левого края (не сжимая зону 200 px).
@@ -161,6 +160,9 @@ func _layout_joystick_bottom_left(c: MarginContainer, edge_inset_left: float = 0
 	c.add_theme_constant_override("margin_top", 0)
 	c.add_theme_constant_override("margin_bottom", 40)
 
+	var is_tutorial = get_tree().has_group("tutorial")
+	c.modulate.a = 1.0 if is_tutorial else 0.3
+
 func _layout_joystick_bottom_right(c: MarginContainer):
 	c.set_anchors_preset(Control.PRESET_BOTTOM_RIGHT)
 	c.anchor_left = 1.0
@@ -177,6 +179,13 @@ func _layout_joystick_bottom_right(c: MarginContainer):
 	c.add_theme_constant_override("margin_right", 60)
 	c.add_theme_constant_override("margin_top", 0)
 	c.add_theme_constant_override("margin_bottom", 40)
+
+	var is_tutorial = get_tree().has_group("tutorial")
+	c.modulate.a = 1.0 if is_tutorial else 0.3
+
+func set_joysticks_opacity(alpha: float):
+	if _move_joy_c: _move_joy_c.modulate.a = alpha
+	if _aim_joy_c: _aim_joy_c.modulate.a = alpha
 
 func _setup_bases_label():
 	var stats_container = find_child("Stats", true)
