@@ -38,6 +38,7 @@ var _marker_icons = {
 }
 
 const AMMO_BTN_SIZE = 120
+const AMMO_DEFAULT_LOADOUT = [2, 0, 1]
 
 func _ready():
 	add_to_group("hud")
@@ -215,10 +216,11 @@ func _find_player_and_connect():
 		if not _player.money_changed.is_connected(_on_money_changed): _player.money_changed.connect(_on_money_changed)
 		if _player.has_signal("ammo_changed") and not _player.ammo_changed.is_connected(_on_ammo_changed):
 			_player.ammo_changed.connect(_on_ammo_changed)
+		_setup_ammo_selection()
 		_on_health_changed(_player.get_current_health(), _player.get_max_health())
 		_on_lives_changed(_player.get_lives())
 		_on_money_changed(_player.get_money())
-		_on_ammo_changed(_player.get("_type_bullet"))
+		_on_ammo_changed(_player.get("_current_ammo_slot"))
 	else:
 		get_tree().create_timer(0.5).timeout.connect(_find_player_and_connect)
 
@@ -251,12 +253,19 @@ func _setup_ammo_selection():
 	ammo_panel.name = "AmmoPanel"
 	ammo_panel.add_theme_constant_override("separation", 25)
 	ammo_container.add_child(ammo_panel)
-	var tex = ["res://assets/future_tanks/PNG/Effects/Plasma.png","res://assets/future_tanks/PNG/Effects/Medium_Shell.png","res://assets/future_tanks/PNG/Effects/Light_Shell.png"]
+	var loadout = AMMO_DEFAULT_LOADOUT
+	if _player != null and is_instance_valid(_player) and _player.has_method("get_ammo_loadout"):
+		loadout = _player.get_ammo_loadout()
 	for i in range(3):
-		var slot = Panel.new(); slot.custom_minimum_size = Vector2(AMMO_BTN_SIZE, AMMO_BTN_SIZE)
-		var style = StyleBoxFlat.new(); style.bg_color = Color(0.1, 0.1, 0.1, 0.6); style.set_corner_radius_all(15); style.border_color = Color(0.4, 0.4, 0.4); style.set_border_width_all(3)
-		slot.add_theme_stylebox_override("panel", style); ammo_panel.add_child(slot)
-		var icon = TextureRect.new(); icon.texture = load(tex[i]); icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE; icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		var slot = Panel.new()
+		slot.custom_minimum_size = Vector2(AMMO_BTN_SIZE, AMMO_BTN_SIZE)
+		var style = StyleBoxFlat.new()
+		style.bg_color = Color(0.1, 0.1, 0.1, 0.6); style.set_corner_radius_all(15); style.border_color = Color(0.4, 0.4, 0.4); style.set_border_width_all(3)
+		slot.add_theme_stylebox_override("panel", style)
+		ammo_panel.add_child(slot)
+		var icon = TextureRect.new()
+		var ammo_id = loadout[i] if i < loadout.size() else AMMO_DEFAULT_LOADOUT[i]
+		icon.texture = load(_ammo_icon_path(ammo_id)); icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE; icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 		icon.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT); icon.offset_left = 18; icon.offset_top = 18; icon.offset_right = -18; icon.offset_bottom = -18
 		slot.add_child(icon)
 		var cooldown = Panel.new(); var cd_style = StyleBoxFlat.new(); cd_style.bg_color = Color(0, 0, 0, 0.7); cd_style.set_corner_radius_all(15)
@@ -266,6 +275,15 @@ func _setup_ammo_selection():
 		touch_btn.position = Vector2(AMMO_BTN_SIZE/2, AMMO_BTN_SIZE/2)
 		touch_btn.pressed.connect(func(): if _player: _player._on_ammo_selected(i))
 		slot.add_child(touch_btn); _ammo_buttons[i] = slot
+
+func _ammo_icon_path(ammo_id: int) -> String:
+	match ammo_id:
+		0: return "res://assets/future_tanks/PNG/Effects/Plasma.png"
+		1: return "res://assets/future_tanks/PNG/Effects/Medium_Shell.png"
+		2: return "res://assets/future_tanks/PNG/Effects/Light_Shell.png"
+		3: return "res://assets/future_tanks/PNG/Effects/Granade_Shell.png"
+		4: return "res://assets/future_tanks/PNG/Effects/Heavy_Shell.png"
+		_: return "res://assets/future_tanks/PNG/Effects/Plasma.png"
 
 func _process(delta):
 	_update_ammo_cooldowns()
@@ -285,7 +303,7 @@ func _update_ammo_cooldowns():
 		if not _ammo_buttons.has(i): continue
 		var slot = _ammo_buttons[i]
 		var cd = slot.get_node("Cooldown")
-		if timer and not timer.is_stopped() and i == _player.get("_type_bullet"):
+		if timer and not timer.is_stopped() and i == _player.get("_current_ammo_slot"):
 			cd.visible = true; var ratio = timer.time_left / timer.wait_time
 			cd.anchor_top = 1.0 - ratio; cd.anchor_bottom = 1.0; cd.offset_top = 0; cd.offset_bottom = 0
 		else: cd.visible = false

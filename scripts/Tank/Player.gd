@@ -4,7 +4,7 @@ extends Tank
 signal health_changed(current_health, max_health)
 signal lives_changed(current_lives)
 signal money_changed(current_money)
-signal ammo_changed(type)
+signal ammo_changed(slot_idx)
 
 var _lives: int = 3
 var _money: int = 0
@@ -15,6 +15,8 @@ var is_scope_on: bool = true
 var _joystick: Node
 var _aim: Node
 var _type_bullet: int = 0
+var _ammo_loadout: Array[int] = [2, 0, 1]
+var _current_ammo_slot: int = 0
 var _type_body: int = 1
 var _type_gun: int = 1
 var _color: int = 0
@@ -23,6 +25,8 @@ var _invul_tween: Tween
 const PLASMA: int = 0
 const MEDIUM: int = 1
 const LIGHT: int = 2
+const HE: int = 3
+const BOPS: int = 4
 
 const BODY_LIGHT = 0; const BODY_MEDIUM = 1; const BODY_HEAVY = 2; const BODY_LMEDIUM = 3; const BODY_MHEAVY = 4
 const GUN_LIGHT = 0; const GUN_MEDIUM = 1; const GUN_HEAVY = 2; const GUN_LMEDIUM = 3; const GUN_MHEAVY = 4
@@ -68,8 +72,17 @@ func _load_all_data():
 		_type_body = SaveManager.get_player_stat("body_type", 1)
 		_type_gun = SaveManager.get_player_stat("gun_type", 1)
 		_color = SaveManager.get_player_stat("color_type", 0)
+		_ammo_loadout = [
+			SaveManager.get_player_stat("ammo_slot_0", LIGHT),
+			SaveManager.get_player_stat("ammo_slot_1", PLASMA),
+			SaveManager.get_player_stat("ammo_slot_2", MEDIUM)
+		]
+		_current_ammo_slot = clampi(SaveManager.get_player_stat("ammo_type", 0), 0, 2)
+		_type_bullet = _ammo_loadout[_current_ammo_slot]
+
 		select_type(_type_body, _type_gun, _color)
 		money_changed.emit(_money)
+		ammo_changed.emit(_current_ammo_slot)
 
 func get_current_health() -> int: return _hp
 func get_max_health() -> int: return _max_hp
@@ -85,7 +98,12 @@ func fire_touch():
 	if _shoot_timer.time_left > 0: return
 
 	if AudioManager != null:
-		AudioManager.play_bullet_sound(_type_bullet, global_position)
+		var sound_type = _type_bullet
+		if _type_bullet == HE:
+			sound_type = MEDIUM
+		elif _type_bullet == BOPS:
+			sound_type = LIGHT
+		AudioManager.play_bullet_sound(sound_type, global_position)
 
 	var bullet = _bullet_scene.instantiate()
 	bullet.global_position = _bullet_position.global_position
@@ -98,6 +116,8 @@ func fire_touch():
 		PLASMA: base_bullet_damage = 25
 		MEDIUM: base_bullet_damage = 40
 		LIGHT: base_bullet_damage = 20
+		HE: base_bullet_damage = 26
+		BOPS: base_bullet_damage = 20
 
 	# Итоговый урон = Урон пули * Бафф от базы
 	var final_damage = int(base_bullet_damage * _base_damage_mult)
@@ -161,26 +181,37 @@ func _physics_process(_delta):
 			velocity = Vector2.ZERO
 			_handle_movement_sound(Vector2.ZERO)
 
-	if _aim != null and _aim.get_is_joystick_active() and _aim.move_vector.length() > 0.2:
+if _aim != null and _aim.get_is_dynamic() and _aim.get_output().length() > 0.2:
 		fire_touch()
 
-	_check_base_buffs()
+	_check_base_buffs() # Твоя фича из balance
 	move_and_slide()
 	queue_redraw()
+
+# --- Далее идут сами функции (размещай их в блоке функций) ---
 
 func _check_base_buffs():
 	var in_range = false
 	for b in get_tree().get_nodes_in_group("bases"):
 		if b.get("type_base") == 0 and global_position.distance_to(b.global_position) <= b.get("_heal_radius"):
 			apply_base_buffs(b.get("_damage_bonus"), b.get("_armor_bonus"), b.get("_rof_bonus"))
-			in_range = true; break
+			in_range = true
+			break
 	if not in_range: apply_base_buffs(1.0, 0.0, 1.0)
 	var hud = get_tree().get_first_node_in_group("hud")
 	if hud: hud.set_buff_icon_visible(in_range)
 
-func _on_ammo_selected(type: int):
-	_type_bullet = type
-	ammo_changed.emit(_type_bullet)
+func _on_ammo_selected(slot_idx: int):
+	if slot_idx < 0 or slot_idx >= _ammo_loadout.size():
+		return
+	_current_ammo_slot = slot_idx
+	_type_bullet = _ammo_loadout[_current_ammo_slot]
+	if SaveManager != null:
+		SaveManager.set_player_stat("ammo_type", _current_ammo_slot)
+	ammo_changed.emit(_current_ammo_slot)
+
+func get_ammo_loadout() -> Array:
+	return _ammo_loadout.duplicate()
 
 func take_damage(damage: int):
 	if _is_invulnerable: return
@@ -261,11 +292,26 @@ func _apply_camera_fov():
 
 func _draw():
 	if is_scope_on and _aim != null and _aim.get_is_joystick_active():
-		var range_len = 600.0 if _type_bullet == PLASMA else 275.0 if _type_bullet == MEDIUM else 900.0
-		draw_line(to_local(_bullet_position.global_position), to_local(_bullet_position.global_position + Vector2(0, -1).rotated(_gun.global_rotation) * range_len), Color(1, 0, 0, 0.5), 2.0)
+var direction = Vector2(0, -1).rotated(_gun.global_rotation)
+	var range_len = 600.0
+	
+	# Используем match из main, так как он поддерживает HE и BOPS
+	match _type_bullet:
+		0: range_len = 600.0 # PLASMA/По умолчанию
+		1: range_len = 275.0 # MEDIUM
+		2: range_len = 900.0 # LIGHT
+		3: range_len = 520.0 # HE (Фугас)
+		4: range_len = 1000.0 # BOPS (Подкалиберный)
+	
+	draw_line(to_local(_bullet_position.global_position), to_local(_bullet_position.global_position + direction * range_len), Color(1, 0, 0, 0.5), 2.0)
+
+# --- Функции настроек из balance (не удаляй их!) ---
 
 func _on_sfx_volume_changed(value: float):
 	_normal_movement_volume = linear_to_db(value)
-	if _moving_sound and _moving_sound.playing: _moving_sound.volume_db = _normal_movement_volume
+	if _moving_sound and _moving_sound.playing:
+		_moving_sound.volume_db = _normal_movement_volume
 
-func _toggle_scope(checkbox_value: bool): is_scope_on = checkbox_value; queue_redraw()
+func _toggle_scope(checkbox_value: bool):
+	is_scope_on = checkbox_value
+	queue_redraw()
