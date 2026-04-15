@@ -1,4 +1,4 @@
-[gd_scene load_steps=15 format=4 uid="uid://dhi7h2hkywvuo"]
+[gd_scene load_steps=16 format=4 uid="uid://dhi7h2hkywvuo"]
 
 [ext_resource type="PackedScene" uid="uid://mfxaskty4hrm" path="res://scenes/Tank/Player.tscn" id="2"]
 [ext_resource type="Texture2D" uid="uid://d0bnoilig7yxs" path="res://assets/ground_shaker_asset/Terrains/terrain.png" id="2_mssve"]
@@ -9,6 +9,7 @@
 [ext_resource type="Script" uid="uid://3wsw25sk74o6" path="res://scripts/Field.gd" id="8"]
 [ext_resource type="Texture2D" uid="uid://dsiq4t7qegc5x" path="res://assets/ButtonSprites/pause_594725.png" id="9"]
 [ext_resource type="PackedScene" uid="uid://dfpgy8w1vxtx0" path="res://scenes/Tank/Enemy.tscn" id="11_fn4ql"]
+[ext_resource type="Resource" uid="uid://d17w5hoo3u0qm" path="res://resources/enemies/enemy_stationary.tres" id="12_ht2ea"]
 [ext_resource type="PackedScene" uid="uid://bjw4bj0fr4c7q" path="res://scenes/Base.tscn" id="15"]
 [ext_resource type="PackedScene" uid="uid://336qfi6ddylt" path="res://scenes/Tank/HUD.tscn" id="21"]
 
@@ -303,14 +304,17 @@ position = Vector2(2785, -344)
 
 [node name="Enemy" parent="." instance=ExtResource("11_fn4ql")]
 position = Vector2(1908, 164)
+enemy_data = ExtResource("12_ht2ea")
 _type_enemy = 3
 
 [node name="Enemy2" parent="." instance=ExtResource("11_fn4ql")]
 position = Vector2(1494, 308)
+enemy_data = ExtResource("12_ht2ea")
 _type_enemy = 3
 
 [node name="Enemy3" parent="." instance=ExtResource("11_fn4ql")]
 position = Vector2(1479, -315)
+enemy_data = ExtResource("12_ht2ea")
 _type_enemy = 3
 
 [node name="Area2D" parent="." instance=ExtResource("15")]

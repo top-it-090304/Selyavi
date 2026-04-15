@@ -1,0 +1,24 @@
+[gd_scene load_steps=7 format=3]
+
+[ext_resource type="Texture2D" uid="uid://dflh11hetycup" path="res://assets/backround/PNG/Blocks/Block_A_02.png" id="1"]
+[ext_resource type="Texture2D" uid="uid://0o1k3bwfch45" path="res://assets/backround/PNG/Blocks/Block_C_02.png" id="2"]
+[ext_resource type="Script" path="res://scripts/WallTileMap.gd" id="3"]
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_1"]
+texture = ExtResource("1")
+texture_region_size = Vector2i(128, 128)
+0:0/0 = 0
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_2"]
+texture = ExtResource("2")
+texture_region_size = Vector2i(128, 128)
+0:0/0 = 0
+
+[sub_resource type="TileSet" id="TileSet_1"]
+tile_size = Vector2i(128, 128)
+sources/1 = SubResource("TileSetAtlasSource_1")
+sources/2 = SubResource("TileSetAtlasSource_2")
+
+[node name="WallLayer" type="TileMapLayer"]
+tile_set = SubResource("TileSet_1")
+script = ExtResource("3")

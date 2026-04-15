@@ -1,14 +1,17 @@
 class_name Tank
 extends CharacterBody2D
 
-# Общие сигналы (могут использоваться или переопределяться)
+# Общие сигналы
 signal tank_health_changed(current, max_hp)
 
+# Временное поле для отладки (будет видно в инспекторе)
+@export var last_damage_received: int = 0
+
 # region Общие поля
-var _hp: int
-var _max_hp: int
+var _hp: int = 100 # Дефолтное значение для безопасности
+var _max_hp: int = 100
 var _damage: int = 30
-var _armor: float = 0.0 # Сопротивление урону (0.0 - 1.0)
+var _armor: float = 0.0
 var _bullet_scene: PackedScene
 
 var _body: Sprite2D
@@ -49,10 +52,10 @@ func _init_base_tank():
 func take_damage(damage: int):
 	if _is_invulnerable: return
 
+	last_damage_received = damage # Сохраняем для инспектора
 	var final_damage = float(damage)
-	# Броня учитывается только для Игрока. Враги получают полный урон.
+
 	if not self is Enemy:
-		# Применяем сопротивление: итоговый урон = урон * (1 - (базовая броня + бонус от базы))
 		var total_armor = clamp(_armor + _base_armor_bonus, -0.9, 0.95)
 		final_damage = damage * (1.0 - total_armor)
 
@@ -64,8 +67,7 @@ func take_damage(damage: int):
 		_destroy()
 
 func _play_body_hit_flash():
-	if _body == null:
-		return
+	if _body == null: return
 	if _hit_flash_tween != null and _hit_flash_tween.is_running():
 		_hit_flash_tween.kill()
 	_hit_flash_tween = create_tween()
@@ -120,22 +122,18 @@ func _handle_movement_sound(movement_velocity: Vector2):
 	var is_moving_now = movement_velocity.length() > 0.1
 	if is_moving_now:
 		if not _is_moving:
-			if _fade_tween != null and _fade_tween.is_running():
-				_fade_tween.kill()
+			if _fade_tween != null and _fade_tween.is_running(): _fade_tween.kill()
 			if _moving_sound:
 				_moving_sound.volume_db = _normal_movement_volume
-				if not _moving_sound.playing:
-					_moving_sound.play()
+				if not _moving_sound.playing: _moving_sound.play()
 			_is_moving = true
 	else:
 		if _is_moving:
 			_is_moving = false
-			if _moving_sound and _moving_sound.playing:
-				_fade_sound()
+			if _moving_sound and _moving_sound.playing: _fade_sound()
 
 func _fade_sound():
-	if _fade_tween != null and _fade_tween.is_running():
-		_fade_tween.kill()
+	if _fade_tween != null and _fade_tween.is_running(): _fade_tween.kill()
 	if _moving_sound:
 		_fade_tween = create_tween()
 		_fade_tween.tween_property(_moving_sound, "volume_db", -80.0, 0.3)

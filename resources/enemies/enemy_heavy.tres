@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=4 format=3 uid="uid://d0l0x5sgfpn8o"]
+
+[ext_resource type="Script" uid="uid://dipqcqff40858" path="res://scripts/Resources/EnemyData.gd" id="1"]
+[ext_resource type="Texture2D" uid="uid://b8xh1au3hip6d" path="res://assets/future_tanks/PNG/Weapon_Color_D/Gun_07.png" id="1_t1vom"]
+[ext_resource type="Texture2D" uid="uid://cidhn7l3rioly" path="res://assets/future_tanks/PNG/Hulls_Color_D/Hull_06.png" id="2_q6nlp"]
+
+[resource]
+script = ExtResource("1")
+hp = 100
+hp_early_levels = 75
+damage = 35
+fire_rate = 2.5
+spread = 0.1
+reward_money = 100
+is_special = false
+is_boss = false
+can_be_spawned_by_base = true
+enemy_type = -1
+patrol_speed = 50
+chase_speed = 40
+notice_range = 600.0
+attack_range = 400.0
+hull_texture = ExtResource("2_q6nlp")
+gun_texture = ExtResource("1_t1vom")
+gun_offset = 40.0
+scale = Vector2(1, 1)

@@ -1,4 +1,4 @@
-[gd_scene load_steps=22 format=4 uid="uid://bq0we0oligvfp"]
+[gd_scene load_steps=26 format=4 uid="uid://bq0we0oligvfp"]
 
 [ext_resource type="PackedScene" uid="uid://mfxaskty4hrm" path="res://scenes/Tank/Player.tscn" id="2"]
 [ext_resource type="Texture2D" uid="uid://d0bnoilig7yxs" path="res://assets/ground_shaker_asset/Terrains/terrain.png" id="2_mssve"]
@@ -16,8 +16,12 @@
 [ext_resource type="Texture2D" uid="uid://61lkq4axcjsi" path="res://assets/backround/PNG/Props/Cactus_02.png" id="14_wcsub"]
 [ext_resource type="PackedScene" uid="uid://bjw4bj0fr4c7q" path="res://scenes/Base.tscn" id="15"]
 [ext_resource type="Texture2D" uid="uid://b2hkxhipx0ba" path="res://assets/backround/PNG/Props/Cactus_03.png" id="15_sxqcy"]
+[ext_resource type="Resource" uid="uid://d17w5hoo3u0qm" path="res://resources/enemies/enemy_stationary.tres" id="19_hbvp2"]
+[ext_resource type="Resource" uid="uid://d0l0x5sgfpn8o" path="res://resources/enemies/enemy_heavy.tres" id="20_y2hwn"]
 [ext_resource type="PackedScene" uid="uid://336qfi6ddylt" path="res://scenes/Tank/HUD.tscn" id="21"]
+[ext_resource type="Resource" uid="uid://qsjfx3w3rsll" path="res://resources/enemies/enemy_light.tres" id="21_efu85"]
 [ext_resource type="PackedScene" uid="uid://dfpgy8w1vxtx0" path="res://scenes/Tank/Enemy.tscn" id="22_n0sxv"]
+[ext_resource type="Resource" uid="uid://dsh37cwiuha28" path="res://resources/enemies/enemy_medium.tres" id="22_ns4on"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_2i15a"]
 texture = ExtResource("2_mssve")
@@ -432,34 +436,42 @@ position = Vector2(3297, 2151)
 
 [node name="Enemy" parent="." instance=ExtResource("22_n0sxv")]
 position = Vector2(84, 1902)
+enemy_data = ExtResource("19_hbvp2")
 _type_enemy = 3
 
 [node name="Enemy2" parent="." instance=ExtResource("22_n0sxv")]
 position = Vector2(1503, 2220)
+enemy_data = ExtResource("19_hbvp2")
 _type_enemy = 3
 
 [node name="Enemy3" parent="." instance=ExtResource("22_n0sxv")]
 position = Vector2(2874, 470)
+enemy_data = ExtResource("20_y2hwn")
 _type_enemy = 2
 
 [node name="Enemy4" parent="." instance=ExtResource("22_n0sxv")]
 position = Vector2(1947, 1276)
+enemy_data = ExtResource("20_y2hwn")
 _type_enemy = 2
 
 [node name="Enemy5" parent="." instance=ExtResource("22_n0sxv")]
 position = Vector2(522, 1146)
+enemy_data = ExtResource("21_efu85")
 _type_enemy = 0
 
 [node name="Enemy6" parent="." instance=ExtResource("22_n0sxv")]
 position = Vector2(3229, 1531)
+enemy_data = ExtResource("22_ns4on")
 _type_enemy = 1
 
 [node name="Enemy7" parent="." instance=ExtResource("22_n0sxv")]
 position = Vector2(2161, 2081)
+enemy_data = ExtResource("22_ns4on")
 _type_enemy = 1
 
 [node name="Enemy8" parent="." instance=ExtResource("22_n0sxv")]
 position = Vector2(1877, 1985)
+enemy_data = ExtResource("22_ns4on")
 _type_enemy = 1
 
 [connection signal="pressed" from="PlayerTank/PauseButton/PauseButton" to="." method="_on_TouchScreenButton_pressed"]

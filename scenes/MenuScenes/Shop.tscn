@@ -444,6 +444,7 @@ theme_override_constants/separation = 30
 
 [node name="GunGroup" type="VBoxContainer" parent="Content/ScrollContainer/TopMargin/Selectors/TankSelectors"]
 layout_mode = 2
+theme_override_constants/separation = 15
 
 [node name="Cat" type="Label" parent="Content/ScrollContainer/TopMargin/Selectors/TankSelectors/GunGroup"]
 layout_mode = 2
@@ -469,11 +470,17 @@ theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
 theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
 text = "<"
 
-[node name="Display" type="Control" parent="Content/ScrollContainer/TopMargin/Selectors/TankSelectors/GunGroup/GunSelector"]
-custom_minimum_size = Vector2(280, 160)
+[node name="DisplayArea" type="VBoxContainer" parent="Content/ScrollContainer/TopMargin/Selectors/TankSelectors/GunGroup/GunSelector"]
+custom_minimum_size = Vector2(280, 180)
+layout_mode = 2
+theme_override_constants/separation = 10
+alignment = 1
+
+[node name="IconContainer" type="Control" parent="Content/ScrollContainer/TopMargin/Selectors/TankSelectors/GunGroup/GunSelector/DisplayArea"]
+custom_minimum_size = Vector2(0, 110)
 layout_mode = 2
 
-[node name="Icon" type="TextureRect" parent="Content/ScrollContainer/TopMargin/Selectors/TankSelectors/GunGroup/GunSelector/Display"]
+[node name="Icon" type="TextureRect" parent="Content/ScrollContainer/TopMargin/Selectors/TankSelectors/GunGroup/GunSelector/DisplayArea/IconContainer"]
 custom_minimum_size = Vector2(110, 110)
 layout_mode = 1
 anchors_preset = 8
@@ -482,9 +489,9 @@ anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
 offset_left = -55.0
-offset_top = -80.0
+offset_top = -55.0
 offset_right = 55.0
-offset_bottom = 30.0
+offset_bottom = 55.0
 grow_horizontal = 2
 grow_vertical = 2
 rotation = 1.5708
@@ -492,19 +499,9 @@ pivot_offset = Vector2(55, 55)
 expand_mode = 1
 stretch_mode = 5
 
-[node name="Label" type="Label" parent="Content/ScrollContainer/TopMargin/Selectors/TankSelectors/GunGroup/GunSelector/Display"]
-custom_minimum_size = Vector2(270, 0)
-layout_mode = 1
-anchors_preset = 7
-anchor_left = 0.5
-anchor_top = 1.0
-anchor_right = 0.5
-anchor_bottom = 1.0
-offset_left = -135.0
-offset_top = -35.0
-offset_right = 135.0
-grow_horizontal = 2
-grow_vertical = 0
+[node name="Label" type="Label" parent="Content/ScrollContainer/TopMargin/Selectors/TankSelectors/GunGroup/GunSelector/DisplayArea"]
+custom_minimum_size = Vector2(270, 40)
+layout_mode = 2
 theme_override_colors/font_color = Color(0.741176, 0.819608, 0.705882, 1)
 theme_override_fonts/font = ExtResource("2_font")
 theme_override_font_sizes/font_size = 18
@@ -512,6 +509,19 @@ text = "ПУШКА"
 horizontal_alignment = 1
 vertical_alignment = 1
 autowrap_mode = 3
+
+[node name="BuyGun" type="Button" parent="Content/ScrollContainer/TopMargin/Selectors/TankSelectors/GunGroup/GunSelector/DisplayArea"]
+custom_minimum_size = Vector2(180, 70)
+layout_mode = 2
+size_flags_horizontal = 4
+focus_mode = 0
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 24
+theme_override_styles/focus = SubResource("StyleBoxEmpty_focus")
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
+text = "КУПИТЬ"
 
 [node name="Right" type="Button" parent="Content/ScrollContainer/TopMargin/Selectors/TankSelectors/GunGroup/GunSelector"]
 custom_minimum_size = Vector2(70, 70)
@@ -526,19 +536,6 @@ theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
 theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
 text = ">"
 
-[node name="BuyGun" type="Button" parent="Content/ScrollContainer/TopMargin/Selectors/TankSelectors/GunGroup/GunSelector"]
-custom_minimum_size = Vector2(180, 70)
-layout_mode = 2
-size_flags_vertical = 4
-focus_mode = 0
-theme_override_fonts/font = ExtResource("2_font")
-theme_override_font_sizes/font_size = 24
-theme_override_styles/focus = SubResource("StyleBoxEmpty_focus")
-theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
-theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
-text = "КУПИТЬ"
-
 [node name="Line" type="ColorRect" parent="Content/ScrollContainer/TopMargin/Selectors/TankSelectors"]
 custom_minimum_size = Vector2(0, 2)
 layout_mode = 2
@@ -546,6 +543,7 @@ color = Color(0.290196, 0.341176, 0.25098, 0.313726)
 
 [node name="HullGroup" type="VBoxContainer" parent="Content/ScrollContainer/TopMargin/Selectors/TankSelectors"]
 layout_mode = 2
+theme_override_constants/separation = 15
 
 [node name="Cat" type="Label" parent="Content/ScrollContainer/TopMargin/Selectors/TankSelectors/HullGroup"]
 layout_mode = 2
@@ -571,11 +569,17 @@ theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
 theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
 text = "<"
 
-[node name="Display" type="Control" parent="Content/ScrollContainer/TopMargin/Selectors/TankSelectors/HullGroup/HullSelector"]
-custom_minimum_size = Vector2(280, 160)
+[node name="DisplayArea" type="VBoxContainer" parent="Content/ScrollContainer/TopMargin/Selectors/TankSelectors/HullGroup/HullSelector"]
+custom_minimum_size = Vector2(280, 180)
+layout_mode = 2
+theme_override_constants/separation = 10
+alignment = 1
+
+[node name="IconContainer" type="Control" parent="Content/ScrollContainer/TopMargin/Selectors/TankSelectors/HullGroup/HullSelector/DisplayArea"]
+custom_minimum_size = Vector2(0, 110)
 layout_mode = 2
 
-[node name="Icon" type="TextureRect" parent="Content/ScrollContainer/TopMargin/Selectors/TankSelectors/HullGroup/HullSelector/Display"]
+[node name="Icon" type="TextureRect" parent="Content/ScrollContainer/TopMargin/Selectors/TankSelectors/HullGroup/HullSelector/DisplayArea/IconContainer"]
 custom_minimum_size = Vector2(110, 110)
 layout_mode = 1
 anchors_preset = 8
@@ -584,9 +588,9 @@ anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
 offset_left = -55.0
-offset_top = -80.0
+offset_top = -55.0
 offset_right = 55.0
-offset_bottom = 30.0
+offset_bottom = 55.0
 grow_horizontal = 2
 grow_vertical = 2
 rotation = 1.5708
@@ -594,19 +598,9 @@ pivot_offset = Vector2(55, 55)
 expand_mode = 1
 stretch_mode = 5
 
-[node name="Label" type="Label" parent="Content/ScrollContainer/TopMargin/Selectors/TankSelectors/HullGroup/HullSelector/Display"]
-custom_minimum_size = Vector2(270, 0)
-layout_mode = 1
-anchors_preset = 7
-anchor_left = 0.5
-anchor_top = 1.0
-anchor_right = 0.5
-anchor_bottom = 1.0
-offset_left = -135.0
-offset_top = -35.0
-offset_right = 135.0
-grow_horizontal = 2
-grow_vertical = 0
+[node name="Label" type="Label" parent="Content/ScrollContainer/TopMargin/Selectors/TankSelectors/HullGroup/HullSelector/DisplayArea"]
+custom_minimum_size = Vector2(270, 40)
+layout_mode = 2
 theme_override_colors/font_color = Color(0.741176, 0.819608, 0.705882, 1)
 theme_override_fonts/font = ExtResource("2_font")
 theme_override_font_sizes/font_size = 18
@@ -614,6 +608,19 @@ text = "КОРПУС"
 horizontal_alignment = 1
 vertical_alignment = 1
 autowrap_mode = 3
+
+[node name="BuyHull" type="Button" parent="Content/ScrollContainer/TopMargin/Selectors/TankSelectors/HullGroup/HullSelector/DisplayArea"]
+custom_minimum_size = Vector2(180, 70)
+layout_mode = 2
+size_flags_horizontal = 4
+focus_mode = 0
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 24
+theme_override_styles/focus = SubResource("StyleBoxEmpty_focus")
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
+text = "КУПИТЬ"
 
 [node name="Right" type="Button" parent="Content/ScrollContainer/TopMargin/Selectors/TankSelectors/HullGroup/HullSelector"]
 custom_minimum_size = Vector2(70, 70)
@@ -628,19 +635,6 @@ theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
 theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
 text = ">"
 
-[node name="BuyHull" type="Button" parent="Content/ScrollContainer/TopMargin/Selectors/TankSelectors/HullGroup/HullSelector"]
-custom_minimum_size = Vector2(180, 70)
-layout_mode = 2
-size_flags_vertical = 4
-focus_mode = 0
-theme_override_fonts/font = ExtResource("2_font")
-theme_override_font_sizes/font_size = 24
-theme_override_styles/focus = SubResource("StyleBoxEmpty_focus")
-theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
-theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
-text = "КУПИТЬ"
-
 [node name="Line2" type="ColorRect" parent="Content/ScrollContainer/TopMargin/Selectors/TankSelectors"]
 custom_minimum_size = Vector2(0, 2)
 layout_mode = 2
@@ -648,6 +642,7 @@ color = Color(0.290196, 0.341176, 0.25098, 0.313726)
 
 [node name="ColorGroup" type="VBoxContainer" parent="Content/ScrollContainer/TopMargin/Selectors/TankSelectors"]
 layout_mode = 2
+theme_override_constants/separation = 15
 
 [node name="Cat" type="Label" parent="Content/ScrollContainer/TopMargin/Selectors/TankSelectors/ColorGroup"]
 layout_mode = 2
@@ -673,11 +668,17 @@ theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
 theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
 text = "<"
 
-[node name="Display" type="Control" parent="Content/ScrollContainer/TopMargin/Selectors/TankSelectors/ColorGroup/ColorSelector"]
-custom_minimum_size = Vector2(280, 160)
+[node name="DisplayArea" type="VBoxContainer" parent="Content/ScrollContainer/TopMargin/Selectors/TankSelectors/ColorGroup/ColorSelector"]
+custom_minimum_size = Vector2(280, 180)
+layout_mode = 2
+theme_override_constants/separation = 20
+alignment = 1
+
+[node name="ColorBoxContainer" type="Control" parent="Content/ScrollContainer/TopMargin/Selectors/TankSelectors/ColorGroup/ColorSelector/DisplayArea"]
+custom_minimum_size = Vector2(0, 110)
 layout_mode = 2
 
-[node name="ColorBox" type="Control" parent="Content/ScrollContainer/TopMargin/Selectors/TankSelectors/ColorGroup/ColorSelector/Display"]
+[node name="ColorBox" type="Control" parent="Content/ScrollContainer/TopMargin/Selectors/TankSelectors/ColorGroup/ColorSelector/DisplayArea/ColorBoxContainer"]
 custom_minimum_size = Vector2(70, 70)
 layout_mode = 1
 anchors_preset = 8
@@ -686,13 +687,13 @@ anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
 offset_left = -35.0
-offset_top = -25.0
+offset_top = -35.0
 offset_right = 35.0
-offset_bottom = 45.0
+offset_bottom = 35.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="Fill" type="Panel" parent="Content/ScrollContainer/TopMargin/Selectors/TankSelectors/ColorGroup/ColorSelector/Display/ColorBox"]
+[node name="Fill" type="Panel" parent="Content/ScrollContainer/TopMargin/Selectors/TankSelectors/ColorGroup/ColorSelector/DisplayArea/ColorBoxContainer/ColorBox"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -705,7 +706,7 @@ grow_horizontal = 2
 grow_vertical = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_color_fill")
 
-[node name="Border" type="Panel" parent="Content/ScrollContainer/TopMargin/Selectors/TankSelectors/ColorGroup/ColorSelector/Display/ColorBox"]
+[node name="Border" type="Panel" parent="Content/ScrollContainer/TopMargin/Selectors/TankSelectors/ColorGroup/ColorSelector/DisplayArea/ColorBoxContainer/ColorBox"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -714,19 +715,9 @@ grow_horizontal = 2
 grow_vertical = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_black_border")
 
-[node name="Label" type="Label" parent="Content/ScrollContainer/TopMargin/Selectors/TankSelectors/ColorGroup/ColorSelector/Display"]
-custom_minimum_size = Vector2(270, 0)
-layout_mode = 1
-anchors_preset = 7
-anchor_left = 0.5
-anchor_top = 1.0
-anchor_right = 0.5
-anchor_bottom = 1.0
-offset_left = -135.0
-offset_top = -35.0
-offset_right = 135.0
-grow_horizontal = 2
-grow_vertical = 0
+[node name="Label" type="Label" parent="Content/ScrollContainer/TopMargin/Selectors/TankSelectors/ColorGroup/ColorSelector/DisplayArea"]
+custom_minimum_size = Vector2(270, 40)
+layout_mode = 2
 theme_override_colors/font_color = Color(0.741176, 0.819608, 0.705882, 1)
 theme_override_fonts/font = ExtResource("2_font")
 theme_override_font_sizes/font_size = 18
@@ -734,6 +725,19 @@ text = "ЦВЕТ"
 horizontal_alignment = 1
 vertical_alignment = 1
 autowrap_mode = 3
+
+[node name="BuyColor" type="Button" parent="Content/ScrollContainer/TopMargin/Selectors/TankSelectors/ColorGroup/ColorSelector/DisplayArea"]
+custom_minimum_size = Vector2(180, 70)
+layout_mode = 2
+size_flags_horizontal = 4
+focus_mode = 0
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 24
+theme_override_styles/focus = SubResource("StyleBoxEmpty_focus")
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
+text = "КУПИТЬ"
 
 [node name="Right" type="Button" parent="Content/ScrollContainer/TopMargin/Selectors/TankSelectors/ColorGroup/ColorSelector"]
 custom_minimum_size = Vector2(70, 70)
@@ -748,19 +752,6 @@ theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
 theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
 text = ">"
 
-[node name="BuyColor" type="Button" parent="Content/ScrollContainer/TopMargin/Selectors/TankSelectors/ColorGroup/ColorSelector"]
-custom_minimum_size = Vector2(180, 70)
-layout_mode = 2
-size_flags_vertical = 4
-focus_mode = 0
-theme_override_fonts/font = ExtResource("2_font")
-theme_override_font_sizes/font_size = 24
-theme_override_styles/focus = SubResource("StyleBoxEmpty_focus")
-theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
-theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
-text = "КУПИТЬ"
-
 [node name="BaseSelectors" type="VBoxContainer" parent="Content/ScrollContainer/TopMargin/Selectors"]
 visible = false
 layout_mode = 2
@@ -768,6 +759,7 @@ theme_override_constants/separation = 30
 
 [node name="HPGroup" type="VBoxContainer" parent="Content/ScrollContainer/TopMargin/Selectors/BaseSelectors"]
 layout_mode = 2
+theme_override_constants/separation = 15
 
 [node name="Cat" type="Label" parent="Content/ScrollContainer/TopMargin/Selectors/BaseSelectors/HPGroup"]
 layout_mode = 2
@@ -793,25 +785,36 @@ theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
 theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
 text = "<"
 
-[node name="Display" type="Control" parent="Content/ScrollContainer/TopMargin/Selectors/BaseSelectors/HPGroup/HPSelector"]
-custom_minimum_size = Vector2(280, 100)
+[node name="DisplayArea" type="VBoxContainer" parent="Content/ScrollContainer/TopMargin/Selectors/BaseSelectors/HPGroup/HPSelector"]
+custom_minimum_size = Vector2(280, 180)
 layout_mode = 2
+theme_override_constants/separation = 20
+alignment = 1
 
-[node name="Label" type="Label" parent="Content/ScrollContainer/TopMargin/Selectors/BaseSelectors/HPGroup/HPSelector/Display"]
-custom_minimum_size = Vector2(270, 0)
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
+[node name="Label" type="Label" parent="Content/ScrollContainer/TopMargin/Selectors/BaseSelectors/HPGroup/HPSelector/DisplayArea"]
+custom_minimum_size = Vector2(270, 80)
+layout_mode = 2
 theme_override_colors/font_color = Color(0.741176, 0.819608, 0.705882, 1)
 theme_override_fonts/font = ExtResource("2_font")
 theme_override_font_sizes/font_size = 24
+theme_override_constants/line_spacing = 10
 text = "ЗАЩИТА"
 horizontal_alignment = 1
 vertical_alignment = 1
 autowrap_mode = 3
+
+[node name="BuyBaseHP" type="Button" parent="Content/ScrollContainer/TopMargin/Selectors/BaseSelectors/HPGroup/HPSelector/DisplayArea"]
+custom_minimum_size = Vector2(180, 70)
+layout_mode = 2
+size_flags_horizontal = 4
+focus_mode = 0
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 24
+theme_override_styles/focus = SubResource("StyleBoxEmpty_focus")
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
+text = "КУПИТЬ"
 
 [node name="Right" type="Button" parent="Content/ScrollContainer/TopMargin/Selectors/BaseSelectors/HPGroup/HPSelector"]
 custom_minimum_size = Vector2(70, 70)
@@ -826,19 +829,6 @@ theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
 theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
 text = ">"
 
-[node name="BuyBaseHP" type="Button" parent="Content/ScrollContainer/TopMargin/Selectors/BaseSelectors/HPGroup/HPSelector"]
-custom_minimum_size = Vector2(180, 70)
-layout_mode = 2
-size_flags_vertical = 4
-focus_mode = 0
-theme_override_fonts/font = ExtResource("2_font")
-theme_override_font_sizes/font_size = 24
-theme_override_styles/focus = SubResource("StyleBoxEmpty_focus")
-theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
-theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
-text = "КУПИТЬ"
-
 [node name="Line" type="ColorRect" parent="Content/ScrollContainer/TopMargin/Selectors/BaseSelectors"]
 custom_minimum_size = Vector2(0, 2)
 layout_mode = 2
@@ -846,6 +836,7 @@ color = Color(0.290196, 0.341176, 0.25098, 0.313726)
 
 [node name="HealGroup" type="VBoxContainer" parent="Content/ScrollContainer/TopMargin/Selectors/BaseSelectors"]
 layout_mode = 2
+theme_override_constants/separation = 15
 
 [node name="Cat" type="Label" parent="Content/ScrollContainer/TopMargin/Selectors/BaseSelectors/HealGroup"]
 layout_mode = 2
@@ -871,25 +862,36 @@ theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
 theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
 text = "<"
 
-[node name="Display" type="Control" parent="Content/ScrollContainer/TopMargin/Selectors/BaseSelectors/HealGroup/HealSelector"]
-custom_minimum_size = Vector2(280, 100)
+[node name="DisplayArea" type="VBoxContainer" parent="Content/ScrollContainer/TopMargin/Selectors/BaseSelectors/HealGroup/HealSelector"]
+custom_minimum_size = Vector2(280, 180)
 layout_mode = 2
+theme_override_constants/separation = 20
+alignment = 1
 
-[node name="Label" type="Label" parent="Content/ScrollContainer/TopMargin/Selectors/BaseSelectors/HealGroup/HealSelector/Display"]
-custom_minimum_size = Vector2(270, 0)
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
+[node name="Label" type="Label" parent="Content/ScrollContainer/TopMargin/Selectors/BaseSelectors/HealGroup/HealSelector/DisplayArea"]
+custom_minimum_size = Vector2(270, 80)
+layout_mode = 2
 theme_override_colors/font_color = Color(0.741176, 0.819608, 0.705882, 1)
 theme_override_fonts/font = ExtResource("2_font")
 theme_override_font_sizes/font_size = 24
+theme_override_constants/line_spacing = 10
 text = "РЕМОНТ"
 horizontal_alignment = 1
 vertical_alignment = 1
 autowrap_mode = 3
+
+[node name="BuyBaseHeal" type="Button" parent="Content/ScrollContainer/TopMargin/Selectors/BaseSelectors/HealGroup/HealSelector/DisplayArea"]
+custom_minimum_size = Vector2(180, 70)
+layout_mode = 2
+size_flags_horizontal = 4
+focus_mode = 0
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 24
+theme_override_styles/focus = SubResource("StyleBoxEmpty_focus")
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
+text = "КУПИТЬ"
 
 [node name="Right" type="Button" parent="Content/ScrollContainer/TopMargin/Selectors/BaseSelectors/HealGroup/HealSelector"]
 custom_minimum_size = Vector2(70, 70)
@@ -904,19 +906,6 @@ theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
 theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
 text = ">"
 
-[node name="BuyBaseHeal" type="Button" parent="Content/ScrollContainer/TopMargin/Selectors/BaseSelectors/HealGroup/HealSelector"]
-custom_minimum_size = Vector2(180, 70)
-layout_mode = 2
-size_flags_vertical = 4
-focus_mode = 0
-theme_override_fonts/font = ExtResource("2_font")
-theme_override_font_sizes/font_size = 24
-theme_override_styles/focus = SubResource("StyleBoxEmpty_focus")
-theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
-theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
-text = "КУПИТЬ"
-
 [node name="Line2" type="ColorRect" parent="Content/ScrollContainer/TopMargin/Selectors/BaseSelectors"]
 custom_minimum_size = Vector2(0, 2)
 layout_mode = 2
@@ -924,6 +913,7 @@ color = Color(0.290196, 0.341176, 0.25098, 0.313726)
 
 [node name="BonusGroup" type="VBoxContainer" parent="Content/ScrollContainer/TopMargin/Selectors/BaseSelectors"]
 layout_mode = 2
+theme_override_constants/separation = 15
 
 [node name="Cat" type="Label" parent="Content/ScrollContainer/TopMargin/Selectors/BaseSelectors/BonusGroup"]
 layout_mode = 2
@@ -949,25 +939,36 @@ theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
 theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
 text = "<"
 
-[node name="Display" type="Control" parent="Content/ScrollContainer/TopMargin/Selectors/BaseSelectors/BonusGroup/BonusSelector"]
-custom_minimum_size = Vector2(280, 100)
+[node name="DisplayArea" type="VBoxContainer" parent="Content/ScrollContainer/TopMargin/Selectors/BaseSelectors/BonusGroup/BonusSelector"]
+custom_minimum_size = Vector2(280, 180)
 layout_mode = 2
+theme_override_constants/separation = 20
+alignment = 1
 
-[node name="Label" type="Label" parent="Content/ScrollContainer/TopMargin/Selectors/BaseSelectors/BonusGroup/BonusSelector/Display"]
-custom_minimum_size = Vector2(270, 0)
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
+[node name="Label" type="Label" parent="Content/ScrollContainer/TopMargin/Selectors/BaseSelectors/BonusGroup/BonusSelector/DisplayArea"]
+custom_minimum_size = Vector2(270, 80)
+layout_mode = 2
 theme_override_colors/font_color = Color(0.741176, 0.819608, 0.705882, 1)
 theme_override_fonts/font = ExtResource("2_font")
 theme_override_font_sizes/font_size = 24
+theme_override_constants/line_spacing = 10
 text = "ТАКТИКА"
 horizontal_alignment = 1
 vertical_alignment = 1
 autowrap_mode = 3
+
+[node name="BuyBaseBonus" type="Button" parent="Content/ScrollContainer/TopMargin/Selectors/BaseSelectors/BonusGroup/BonusSelector/DisplayArea"]
+custom_minimum_size = Vector2(180, 70)
+layout_mode = 2
+size_flags_horizontal = 4
+focus_mode = 0
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 24
+theme_override_styles/focus = SubResource("StyleBoxEmpty_focus")
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
+text = "КУПИТЬ"
 
 [node name="Right" type="Button" parent="Content/ScrollContainer/TopMargin/Selectors/BaseSelectors/BonusGroup/BonusSelector"]
 custom_minimum_size = Vector2(70, 70)
@@ -982,19 +983,6 @@ theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
 theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
 text = ">"
 
-[node name="BuyBaseBonus" type="Button" parent="Content/ScrollContainer/TopMargin/Selectors/BaseSelectors/BonusGroup/BonusSelector"]
-custom_minimum_size = Vector2(180, 70)
-layout_mode = 2
-size_flags_vertical = 4
-focus_mode = 0
-theme_override_fonts/font = ExtResource("2_font")
-theme_override_font_sizes/font_size = 24
-theme_override_styles/focus = SubResource("StyleBoxEmpty_focus")
-theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
-theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
-text = "КУПИТЬ"
-
 [node name="Line3" type="ColorRect" parent="Content/ScrollContainer/TopMargin/Selectors/BaseSelectors"]
 custom_minimum_size = Vector2(0, 2)
 layout_mode = 2
@@ -1002,6 +990,7 @@ color = Color(0.290196, 0.341176, 0.25098, 0.313726)
 
 [node name="FeatureGroup" type="VBoxContainer" parent="Content/ScrollContainer/TopMargin/Selectors/BaseSelectors"]
 layout_mode = 2
+theme_override_constants/separation = 15
 
 [node name="Cat" type="Label" parent="Content/ScrollContainer/TopMargin/Selectors/BaseSelectors/FeatureGroup"]
 layout_mode = 2
@@ -1027,25 +1016,36 @@ theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
 theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
 text = "<"
 
-[node name="Display" type="Control" parent="Content/ScrollContainer/TopMargin/Selectors/BaseSelectors/FeatureGroup/FeatureSelector"]
-custom_minimum_size = Vector2(280, 100)
+[node name="DisplayArea" type="VBoxContainer" parent="Content/ScrollContainer/TopMargin/Selectors/BaseSelectors/FeatureGroup/FeatureSelector"]
+custom_minimum_size = Vector2(280, 180)
 layout_mode = 2
+theme_override_constants/separation = 20
+alignment = 1
 
-[node name="Label" type="Label" parent="Content/ScrollContainer/TopMargin/Selectors/BaseSelectors/FeatureGroup/FeatureSelector/Display"]
-custom_minimum_size = Vector2(270, 0)
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
+[node name="Label" type="Label" parent="Content/ScrollContainer/TopMargin/Selectors/BaseSelectors/FeatureGroup/FeatureSelector/DisplayArea"]
+custom_minimum_size = Vector2(270, 80)
+layout_mode = 2
 theme_override_colors/font_color = Color(0.741176, 0.819608, 0.705882, 1)
 theme_override_fonts/font = ExtResource("2_font")
 theme_override_font_sizes/font_size = 24
+theme_override_constants/line_spacing = 10
 text = "ИННОВАЦИЯ"
 horizontal_alignment = 1
 vertical_alignment = 1
 autowrap_mode = 3
+
+[node name="BuyBaseFeature" type="Button" parent="Content/ScrollContainer/TopMargin/Selectors/BaseSelectors/FeatureGroup/FeatureSelector/DisplayArea"]
+custom_minimum_size = Vector2(180, 70)
+layout_mode = 2
+size_flags_horizontal = 4
+focus_mode = 0
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 24
+theme_override_styles/focus = SubResource("StyleBoxEmpty_focus")
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
+text = "КУПИТЬ"
 
 [node name="Right" type="Button" parent="Content/ScrollContainer/TopMargin/Selectors/BaseSelectors/FeatureGroup/FeatureSelector"]
 custom_minimum_size = Vector2(70, 70)
@@ -1059,19 +1059,6 @@ theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
 theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
 text = ">"
-
-[node name="BuyBaseFeature" type="Button" parent="Content/ScrollContainer/TopMargin/Selectors/BaseSelectors/FeatureGroup/FeatureSelector"]
-custom_minimum_size = Vector2(180, 70)
-layout_mode = 2
-size_flags_vertical = 4
-focus_mode = 0
-theme_override_fonts/font = ExtResource("2_font")
-theme_override_font_sizes/font_size = 24
-theme_override_styles/focus = SubResource("StyleBoxEmpty_focus")
-theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
-theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
-text = "КУПИТЬ"
 
 [node name="DescPanel" type="PanelContainer" parent="Content/ScrollContainer/TopMargin/Selectors/BaseSelectors/FeatureGroup"]
 custom_minimum_size = Vector2(650, 0)
@@ -1095,22 +1082,22 @@ autowrap_mode = 3
 [connection signal="pressed" from="Tabs/BaseTab" to="." method="_on_base_tab_pressed"]
 [connection signal="pressed" from="Content/ScrollContainer/TopMargin/Selectors/TankSelectors/GunGroup/GunSelector/Left" to="." method="_on_gun_left_pressed"]
 [connection signal="pressed" from="Content/ScrollContainer/TopMargin/Selectors/TankSelectors/GunGroup/GunSelector/Right" to="." method="_on_gun_right_pressed"]
-[connection signal="pressed" from="Content/ScrollContainer/TopMargin/Selectors/TankSelectors/GunGroup/GunSelector/BuyGun" to="." method="_on_buy_gun_pressed"]
+[connection signal="pressed" from="Content/ScrollContainer/TopMargin/Selectors/TankSelectors/GunGroup/GunSelector/DisplayArea/BuyGun" to="." method="_on_buy_gun_pressed"]
 [connection signal="pressed" from="Content/ScrollContainer/TopMargin/Selectors/TankSelectors/HullGroup/HullSelector/Left" to="." method="_on_hull_left_pressed"]
 [connection signal="pressed" from="Content/ScrollContainer/TopMargin/Selectors/TankSelectors/HullGroup/HullSelector/Right" to="." method="_on_hull_right_pressed"]
-[connection signal="pressed" from="Content/ScrollContainer/TopMargin/Selectors/TankSelectors/HullGroup/HullSelector/BuyHull" to="." method="_on_buy_hull_pressed"]
+[connection signal="pressed" from="Content/ScrollContainer/TopMargin/Selectors/TankSelectors/HullGroup/HullSelector/DisplayArea/BuyHull" to="." method="_on_buy_hull_pressed"]
 [connection signal="pressed" from="Content/ScrollContainer/TopMargin/Selectors/TankSelectors/ColorGroup/ColorSelector/Left" to="." method="_on_color_left_pressed"]
 [connection signal="pressed" from="Content/ScrollContainer/TopMargin/Selectors/TankSelectors/ColorGroup/ColorSelector/Right" to="." method="_on_color_right_pressed"]
-[connection signal="pressed" from="Content/ScrollContainer/TopMargin/Selectors/TankSelectors/ColorGroup/ColorSelector/BuyColor" to="." method="_on_buy_color_pressed"]
+[connection signal="pressed" from="Content/ScrollContainer/TopMargin/Selectors/TankSelectors/ColorGroup/ColorSelector/DisplayArea/BuyColor" to="." method="_on_buy_color_pressed"]
 [connection signal="pressed" from="Content/ScrollContainer/TopMargin/Selectors/BaseSelectors/HPGroup/HPSelector/Left" to="." method="_on_base_hp_left_pressed"]
 [connection signal="pressed" from="Content/ScrollContainer/TopMargin/Selectors/BaseSelectors/HPGroup/HPSelector/Right" to="." method="_on_base_hp_right_pressed"]
-[connection signal="pressed" from="Content/ScrollContainer/TopMargin/Selectors/BaseSelectors/HPGroup/HPSelector/BuyBaseHP" to="." method="_on_buy_base_hp_pressed"]
+[connection signal="pressed" from="Content/ScrollContainer/TopMargin/Selectors/BaseSelectors/HPGroup/HPSelector/DisplayArea/BuyBaseHP" to="." method="_on_buy_base_hp_pressed"]
 [connection signal="pressed" from="Content/ScrollContainer/TopMargin/Selectors/BaseSelectors/HealGroup/HealSelector/Left" to="." method="_on_base_heal_left_pressed"]
 [connection signal="pressed" from="Content/ScrollContainer/TopMargin/Selectors/BaseSelectors/HealGroup/HealSelector/Right" to="." method="_on_base_heal_right_pressed"]
-[connection signal="pressed" from="Content/ScrollContainer/TopMargin/Selectors/BaseSelectors/HealGroup/HealSelector/BuyBaseHeal" to="." method="_on_buy_base_heal_pressed"]
+[connection signal="pressed" from="Content/ScrollContainer/TopMargin/Selectors/BaseSelectors/HealGroup/HealSelector/DisplayArea/BuyBaseHeal" to="." method="_on_buy_base_heal_pressed"]
 [connection signal="pressed" from="Content/ScrollContainer/TopMargin/Selectors/BaseSelectors/BonusGroup/BonusSelector/Left" to="." method="_on_base_bonus_left_pressed"]
 [connection signal="pressed" from="Content/ScrollContainer/TopMargin/Selectors/BaseSelectors/BonusGroup/BonusSelector/Right" to="." method="_on_base_bonus_right_pressed"]
-[connection signal="pressed" from="Content/ScrollContainer/TopMargin/Selectors/BaseSelectors/BonusGroup/BonusSelector/BuyBaseBonus" to="." method="_on_buy_base_bonus_pressed"]
+[connection signal="pressed" from="Content/ScrollContainer/TopMargin/Selectors/BaseSelectors/BonusGroup/BonusSelector/DisplayArea/BuyBaseBonus" to="." method="_on_buy_base_bonus_pressed"]
 [connection signal="pressed" from="Content/ScrollContainer/TopMargin/Selectors/BaseSelectors/FeatureGroup/FeatureSelector/Left" to="." method="_on_base_feature_left_pressed"]
 [connection signal="pressed" from="Content/ScrollContainer/TopMargin/Selectors/BaseSelectors/FeatureGroup/FeatureSelector/Right" to="." method="_on_base_feature_right_pressed"]
-[connection signal="pressed" from="Content/ScrollContainer/TopMargin/Selectors/BaseSelectors/FeatureGroup/FeatureSelector/BuyBaseFeature" to="." method="_on_buy_base_feature_pressed"]
+[connection signal="pressed" from="Content/ScrollContainer/TopMargin/Selectors/BaseSelectors/FeatureGroup/FeatureSelector/DisplayArea/BuyBaseFeature" to="." method="_on_buy_base_feature_pressed"]

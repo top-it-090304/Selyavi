@@ -5,9 +5,42 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="33129e0a-8a1f-4647-8ff9-20d5e301da8a" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/resources/enemies/enemy_artillery.tres" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/resources/enemies/enemy_boss.tres" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/resources/enemies/enemy_heavy.tres" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/resources/enemies/enemy_light.tres" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/resources/enemies/enemy_medium.tres" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/resources/enemies/enemy_scout.tres" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/resources/enemies/enemy_stationary.tres" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/resources/enemies/enemy_triple.tres" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/scenes/BackgroundLayer.tscn" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/scenes/Levels/Sandbox.tscn" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/scenes/Tank/ArtilleryTarget.tscn" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/scenes/WallLayer.tscn" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/scripts/Resources/EnemyData.gd" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/scripts/SandboxField.gd" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/scripts/Tank/ArtilleryIndicator.gd" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/scripts/WallTileMap.gd" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/caches/deviceStreaming.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/caches/deviceStreaming.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scenes/Field.tscn" beforeDir="false" afterPath="$PROJECT_DIR$/scenes/Field.tscn" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scenes/Levels/Level_1.tscn" beforeDir="false" afterPath="$PROJECT_DIR$/scenes/Levels/Level_1.tscn" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scenes/Levels/Level_2.tscn" beforeDir="false" afterPath="$PROJECT_DIR$/scenes/Levels/Level_2.tscn" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scenes/Levels/Level_3.tscn" beforeDir="false" afterPath="$PROJECT_DIR$/scenes/Levels/Level_3.tscn" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scenes/Levels/Level_4.tscn" beforeDir="false" afterPath="$PROJECT_DIR$/scenes/Levels/Level_4.tscn" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scenes/Levels/Level_6.tscn" beforeDir="false" afterPath="$PROJECT_DIR$/scenes/Levels/Level_6.tscn" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scenes/MenuScenes/Settings.tscn" beforeDir="false" afterPath="$PROJECT_DIR$/scenes/MenuScenes/Settings.tscn" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scenes/MenuScenes/Shop.tscn" beforeDir="false" afterPath="$PROJECT_DIR$/scenes/MenuScenes/Shop.tscn" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/Base.gd" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/Base.gd" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/HUD.gd" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/HUD.gd" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/MenuScripts/Settings.gd" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/MenuScripts/Settings.gd" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/scripts/MenuScripts/TutorialOverlay.gd" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/MenuScripts/TutorialOverlay.gd" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/SaveManager.gd" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/SaveManager.gd" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/Tank/Bullet.gd" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/Tank/Bullet.gd" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/Tank/Enemy.gd" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/Tank/Enemy.gd" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/scripts/Tank/Player.gd" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/Tank/Player.gd" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/Tank/Tank.gd" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/Tank/Tank.gd" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/Tank/TankCustomize/tankEnums.gd" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/Tank/TankCustomize/tankEnums.gd" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
