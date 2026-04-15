@@ -1,0 +1,14 @@
+[gd_scene load_steps=4 format=3 uid="uid://b5ewq03v7qkiv"]
+
+[ext_resource type="PackedScene" path="res://scenes/IngameWall.tscn" id="1"]
+[ext_resource type="Texture2D" uid="uid://0o1k3bwfch45" path="res://assets/backround/PNG/Blocks/Block_C_02.png" id="2"]
+[ext_resource type="Script" uid="uid://bnsy3xwpox5su" path="res://scripts/IndestructibleWall.gd" id="3"]
+
+[node name="IndestructibleWall" instance=ExtResource("1")]
+script = ExtResource("3")
+
+[node name="CollisionShape2D" parent="." index="0"]
+position = Vector2(0, 0)
+
+[node name="BlockC02" type="Sprite2D" parent="." index="1"]
+texture = ExtResource("2")

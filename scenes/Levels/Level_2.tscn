@@ -3,8 +3,8 @@
 [ext_resource type="PackedScene" uid="uid://mfxaskty4hrm" path="res://scenes/Tank/Player.tscn" id="2"]
 [ext_resource type="Texture2D" uid="uid://d0bnoilig7yxs" path="res://assets/ground_shaker_asset/Terrains/terrain.png" id="2_mssve"]
 [ext_resource type="PackedScene" path="res://scenes/obtacles/wall.tscn" id="3"]
-[ext_resource type="PackedScene" path="res://scenes/IndestructibleWall.tscn" id="4"]
-[ext_resource type="PackedScene" path="res://scenes/DestructibleWall.tscn" id="5"]
+[ext_resource type="PackedScene" uid="uid://b5ewq03v7qkiv" path="res://scenes/Walls/IndestructibleWall.tscn" id="4"]
+[ext_resource type="PackedScene" uid="uid://dwrghveyttq4p" path="res://scenes/Walls/DestructibleWall.tscn" id="5"]
 [ext_resource type="AudioStream" uid="uid://bxl5wv7crhm5" path="res://assets/Music/68. Sad Eyes.mp3" id="6"]
 [ext_resource type="Script" uid="uid://3wsw25sk74o6" path="res://scripts/Field.gd" id="8"]
 [ext_resource type="Texture2D" uid="uid://dsiq4t7qegc5x" path="res://assets/ButtonSprites/pause_594725.png" id="9"]
@@ -104,103 +104,103 @@ bus = &"Music"
 [node name="IngameWalls" type="Node" parent="."]
 
 [node name="IndestructibleWall" parent="IngameWalls" instance=ExtResource("4")]
-position = Vector2(10, 145)
+position = Vector2(69, 93)
 
 [node name="IndestructibleWall2" parent="IngameWalls" instance=ExtResource("4")]
-position = Vector2(137, 145)
+position = Vector2(196, 93)
 
 [node name="IndestructibleWall3" parent="IngameWalls" instance=ExtResource("4")]
-position = Vector2(269, 144)
+position = Vector2(328, 92)
 
 [node name="IndestructibleWall4" parent="IngameWalls" instance=ExtResource("4")]
-position = Vector2(14, 600)
+position = Vector2(73, 548)
 
 [node name="IndestructibleWall5" parent="IngameWalls" instance=ExtResource("4")]
-position = Vector2(148, 600)
+position = Vector2(207, 548)
 
 [node name="IndestructibleWall6" parent="IngameWalls" instance=ExtResource("4")]
-position = Vector2(275, 600)
+position = Vector2(334, 548)
 
 [node name="DestructibleWall" parent="IngameWalls" instance=ExtResource("5")]
-position = Vector2(354, 281)
+position = Vector2(413, 229)
 
 [node name="DestructibleWall2" parent="IngameWalls" instance=ExtResource("5")]
-position = Vector2(351, 410)
+position = Vector2(410, 358)
 
 [node name="DestructibleWall7" parent="IngameWalls" instance=ExtResource("5")]
-position = Vector2(1419, 500)
+position = Vector2(1478, 448)
 
 [node name="DestructibleWall8" parent="IngameWalls" instance=ExtResource("5")]
-position = Vector2(1580, -88)
+position = Vector2(1639, -140)
 
 [node name="DestructibleWall9" parent="IngameWalls" instance=ExtResource("5")]
-position = Vector2(1889, 576)
+position = Vector2(1948, 524)
 
 [node name="DestructibleWall10" parent="IngameWalls" instance=ExtResource("5")]
-position = Vector2(1181, 1144)
+position = Vector2(1240, 1092)
 
 [node name="DestructibleWall11" parent="IngameWalls" instance=ExtResource("5")]
-position = Vector2(1315, 1138)
+position = Vector2(1374, 1086)
 
 [node name="DestructibleWall12" parent="IngameWalls" instance=ExtResource("5")]
-position = Vector2(1444, 1141)
+position = Vector2(1503, 1089)
 
 [node name="IndestructibleWall7" parent="IngameWalls" instance=ExtResource("4")]
-position = Vector2(2063, 174)
+position = Vector2(2122, 122)
 
 [node name="IndestructibleWall8" parent="IngameWalls" instance=ExtResource("4")]
-position = Vector2(1998, 303)
+position = Vector2(2057, 251)
 
 [node name="IndestructibleWall9" parent="IngameWalls" instance=ExtResource("4")]
-position = Vector2(1995, 435)
+position = Vector2(2054, 383)
 
 [node name="IndestructibleWall10" parent="IngameWalls" instance=ExtResource("4")]
-position = Vector2(2076, 572)
+position = Vector2(2135, 520)
 
 [node name="IndestructibleWall11" parent="IngameWalls" instance=ExtResource("4")]
-position = Vector2(2665, 925)
+position = Vector2(2724, 873)
 
 [node name="IndestructibleWall12" parent="IngameWalls" instance=ExtResource("4")]
-position = Vector2(2809, 925)
+position = Vector2(2868, 873)
 
 [node name="DestructibleWall15" parent="IngameWalls" instance=ExtResource("5")]
-position = Vector2(1572, -375)
+position = Vector2(1631, -427)
 
 [node name="DestructibleWall16" parent="IngameWalls" instance=ExtResource("5")]
-position = Vector2(1575, -231)
+position = Vector2(1634, -283)
 
 [node name="IndestructibleWall15" parent="IngameWalls" instance=ExtResource("4")]
-position = Vector2(2810, 1140)
+position = Vector2(2869, 1088)
 
 [node name="DestructibleWall17" parent="IngameWalls" instance=ExtResource("5")]
-position = Vector2(539, -379)
+position = Vector2(598, -431)
 
 [node name="DestructibleWall18" parent="IngameWalls" instance=ExtResource("5")]
-position = Vector2(911, 1007)
+position = Vector2(970, 955)
 
 [node name="IndestructibleWall13" parent="IngameWalls" instance=ExtResource("4")]
-position = Vector2(2828, -149)
+position = Vector2(2887, -201)
 
 [node name="IndestructibleWall14" parent="IngameWalls" instance=ExtResource("4")]
-position = Vector2(2699, -149)
+position = Vector2(2758, -201)
 
 [node name="DestructibleWall13" parent="IngameWalls" instance=ExtResource("5")]
-position = Vector2(2437, 928)
+position = Vector2(2496, 876)
 
 [node name="DestructibleWall14" parent="IngameWalls" instance=ExtResource("5")]
-position = Vector2(2430, -223)
+position = Vector2(2489, -275)
 
 [node name="DestructibleWall3" parent="IngameWalls" instance=ExtResource("5")]
-position = Vector2(414, 546)
+position = Vector2(473, 494)
 
 [node name="DestructibleWall4" parent="IngameWalls" instance=ExtResource("5")]
-position = Vector2(553, 119)
+position = Vector2(612, 67)
 
 [node name="DestructibleWall5" parent="IngameWalls" instance=ExtResource("5")]
-position = Vector2(907, 507)
+position = Vector2(966, 455)
 
 [node name="DestructibleWall6" parent="IngameWalls" instance=ExtResource("5")]
-position = Vector2(893, 221)
+position = Vector2(952, 169)
 
 [node name="BorderWalls" type="Node" parent="."]
 
