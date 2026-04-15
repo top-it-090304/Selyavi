@@ -67,9 +67,9 @@ func _ready():
 	_shot_flash = get_node_or_null("ShotAnimation")
 
 	if _ray_cast:
-		_ray_cast.collide_with_areas = false # ВАЖНО: Игнорируем триггерные зоны, ищем только тела
+		_ray_cast.collide_with_areas = false # Игнорируем триггерные зоны
 		_ray_cast.add_exception(self)
-		_ray_cast.collision_mask = 1 # Слой тел (обычно 1)
+		_ray_cast.collision_mask = 1 # Только физические тела
 
 	# Сброс статических данных засвета при старте уровня
 	if scout_target != null and (not is_instance_valid(scout_target) or scout_target.get_tree() != get_tree()):
@@ -388,8 +388,8 @@ func _is_target_visible() -> bool:
 			return true
 
 		# 3. Сохраняем "слепой" радиус (НУЖЕН LoS)
-		if dist <= _blind_fire_range:
-			return _is_target_visible_at(_player)
+		if dist <= _blind_fire_range and _is_target_visible_at(_player):
+			return true
 
 		return false
 
@@ -498,12 +498,8 @@ func _fire_at_pos(pos: Vector2):
 	if AudioManager:
 		AudioManager.play_bullet_sound(sound_type, global_position)
 
-	# ПРОВЕРКА НА ТРОЙНОЙ ВЫСТРЕЛ: И по типу, и по ресурсу (enemy_type == 4)
-	var is_triple = (_type_enemy == TypeEnemy.TRIPLE)
-	if enemy_data and enemy_data.enemy_type == 4:
-		is_triple = true
-
-	if is_triple:
+	# ПРОВЕРКА НА ТРОЙНОЙ ВЫСТРЕЛ: строго по типу
+	if _type_enemy == TypeEnemy.TRIPLE:
 		var angles = [base_angle, base_angle - 0.4, base_angle + 0.4]
 		for angle in angles:
 			var bullet = _bullet_scene.instantiate()
@@ -531,6 +527,11 @@ func _on_detection_area_exited(body):
 	if body == _player: _current_state = State.PATROL
 
 func _destroy():
+	# Если умирает скаут, немедленно сбрасываем глобальный засвет для арты
+	if _type_enemy == TypeEnemy.SCOUT:
+		Enemy.scout_target = null
+		Enemy.last_spotted_time = -100.0
+
 	enemy_died.emit(_type_enemy)
 	if is_instance_valid(_player) and _player.has_method("add_money"):
 		var reward = enemy_data.reward_money if enemy_data else _get_reward()
@@ -568,6 +569,4 @@ func _apply_enemy_stats():
 
 func _randomize_enemy_type():
 	var available_types = [TypeEnemy.LIGHT, TypeEnemy.MEDIUM, TypeEnemy.HEAVY]
-	var lvl = SaveManager.current_level if SaveManager else 1
-	# ВАЖНО: Убрал TRIPLE из пула рандома для обычных ботов
 	_type_enemy = available_types[randi() % available_types.size()]
