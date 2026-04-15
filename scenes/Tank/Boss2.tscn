@@ -1,0 +1,96 @@
+[gd_scene load_steps=15 format=3]
+
+[ext_resource type="Script" path="res://scripts/Tank/Boss2.gd" id="1"]
+[ext_resource type="Texture2D" path="res://assets/future_tanks/PNG/Weapon_Color_D/Gun_08.png" id="2"]
+[ext_resource type="Texture2D" path="res://assets/future_tanks/PNG/Hulls_Color_D/Hull_07.png" id="3"]
+[ext_resource type="Texture2D" path="res://assets/future_tanks/PNG/Effects/Explosion_C.png" id="4"]
+[ext_resource type="Texture2D" path="res://assets/future_tanks/PNG/Effects/Explosion_B.png" id="5"]
+[ext_resource type="Texture2D" path="res://assets/future_tanks/PNG/Effects/Explosion_H.png" id="6"]
+[ext_resource type="Texture2D" path="res://assets/future_tanks/PNG/Effects/Explosion_G.png" id="7"]
+[ext_resource type="Texture2D" path="res://assets/future_tanks/PNG/Effects/Explosion_D.png" id="8"]
+[ext_resource type="Texture2D" path="res://assets/future_tanks/PNG/Effects/Explosion_E.png" id="9"]
+[ext_resource type="Texture2D" path="res://assets/future_tanks/PNG/Effects/Explosion_F.png" id="10"]
+[ext_resource type="AudioStream" path="res://assets/sounds/tracks_rattle_slow_01.mp3" id="11"]
+
+[sub_resource type="CircleShape2D" id="1"]
+radius = 800.0
+
+[sub_resource type="CapsuleShape2D" id="2"]
+radius = 50.0
+height = 130.0
+
+[sub_resource type="SpriteFrames" id="3"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": null
+}, {
+"duration": 1.0,
+"texture": ExtResource("5")
+}, {
+"duration": 1.0,
+"texture": ExtResource("4")
+}, {
+"duration": 1.0,
+"texture": ExtResource("8")
+}, {
+"duration": 1.0,
+"texture": ExtResource("9")
+}, {
+"duration": 1.0,
+"texture": ExtResource("10")
+}, {
+"duration": 1.0,
+"texture": ExtResource("7")
+}, {
+"duration": 1.0,
+"texture": ExtResource("6")
+}, {
+"duration": 1.0,
+"texture": null
+}],
+"loop": false,
+"name": &"Fire",
+"speed": 25.0
+}]
+
+[node name="Boss2" type="CharacterBody2D"]
+floor_max_angle = 0.0
+script = ExtResource("1")
+_type_enemy = 5
+
+[node name="DetectionArea" type="Area2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="DetectionArea"]
+shape = SubResource("1")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("2")
+
+[node name="BodyTank" type="Sprite2D" parent="."]
+scale = Vector2(0.5, 0.5)
+texture = ExtResource("3")
+
+[node name="Gun" type="Sprite2D" parent="BodyTank"]
+position = Vector2(0, 40)
+texture = ExtResource("2")
+offset = Vector2(0, -40)
+
+[node name="BulletPosition" type="Marker2D" parent="BodyTank/Gun"]
+position = Vector2(0, -85)
+
+[node name="NavigationAgent2D" type="NavigationAgent2D" parent="."]
+target_desired_distance = 22.23
+path_max_distance = 13.0
+
+[node name="RayCast2D" type="RayCast2D" parent="."]
+target_position = Vector2(0, 200)
+
+[node name="ShotAnimation" type="AnimatedSprite2D" parent="."]
+scale = Vector2(0.3, 0.3)
+sprite_frames = SubResource("3")
+animation = &"Fire"
+
+[node name="MovingSound" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("11")
+volume_db = -20.0
