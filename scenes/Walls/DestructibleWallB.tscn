@@ -1,0 +1,19 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://scripts/DestructibleWall.gd" id="1"]
+[ext_resource type="Texture2D" uid="uid://cs88v720n2m2f" path="res://assets/backround/PNG/Blocks/Block_B_02.png" id="2"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_1"]
+size = Vector2(128, 128)
+
+[node name="DestructibleWallB" type="StaticBody2D"]
+z_index = 10
+collision_layer = 1
+script = ExtResource("1")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("RectangleShape2D_1")
+
+[node name="BlockA02" type="Sprite2D" parent="."]
+texture = ExtResource("2")
+centered = true

@@ -1,4 +1,4 @@
-[gd_scene load_steps=15 format=3 uid="uid://cijo5wt2kl4cd"]
+[gd_scene load_steps=22 format=3 uid="uid://cijo5wt2kl4cd"]
 
 [ext_resource type="Script" uid="uid://3afh3r374wk0" path="res://scripts/MenuScripts/Settings.gd" id="1"]
 [ext_resource type="FontFile" uid="uid://bsnvk4l0ue5ri" path="res://assets/fonts/ofont.ru_Shonen.ttf" id="2"]
@@ -27,9 +27,27 @@ font_color = Color(0.741176, 0.819608, 0.705882, 1)
 outline_size = 14
 outline_color = Color(0.0784314, 0.0901961, 0.0784314, 1)
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_tab_normal"]
+bg_color = Color(0.121569, 0.14902, 0.121569, 1)
+border_width_bottom = 4
+border_color = Color(0.0784314, 0.0901961, 0.0784314, 1)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_tab_selected"]
+bg_color = Color(0.25098, 0.301961, 0.25098, 1)
+border_width_bottom = 4
+border_color = Color(0.439216, 0.501961, 0.380392, 1)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+
 [sub_resource type="LabelSettings" id="LabelSettings_label"]
 font = ExtResource("2")
-font_size = 32
+font_size = 28
 font_color = Color(0.741176, 0.819608, 0.705882, 1)
 
 [sub_resource type="Gradient" id="Gradient_grabber"]
@@ -104,6 +122,76 @@ corner_radius_top_right = 12
 corner_radius_bottom_right = 12
 corner_radius_bottom_left = 12
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_red_hover"]
+content_margin_left = 20.0
+content_margin_top = 10.0
+content_margin_right = 20.0
+content_margin_bottom = 10.0
+bg_color = Color(0.701961, 0.121569, 0.121569, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 6
+border_color = Color(0.901961, 0.235294, 0.235294, 1)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+shadow_color = Color(0.8, 0.2, 0.2, 0.235294)
+shadow_size = 10
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_red_pressed"]
+content_margin_left = 20.0
+content_margin_top = 14.0
+content_margin_right = 20.0
+content_margin_bottom = 6.0
+bg_color = Color(0.4, 0.0784314, 0.0784314, 1)
+border_width_left = 2
+border_width_top = 4
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.301961, 0.0588235, 0.0588235, 1)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_red_normal"]
+content_margin_left = 20.0
+content_margin_top = 10.0
+content_margin_right = 20.0
+content_margin_bottom = 10.0
+bg_color = Color(0.54902, 0.109804, 0.109804, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 6
+border_color = Color(0.701961, 0.121569, 0.121569, 1)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_dialog"]
+content_margin_left = 20.0
+content_margin_top = 20.0
+content_margin_right = 20.0
+content_margin_bottom = 20.0
+bg_color = Color(0.14902, 0.172549, 0.14902, 1)
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 4
+border_color = Color(0.290196, 0.341176, 0.25098, 1)
+corner_radius_top_left = 20
+corner_radius_top_right = 20
+corner_radius_bottom_right = 20
+corner_radius_bottom_left = 20
+shadow_color = Color(0, 0, 0, 0.470588)
+shadow_size = 20
+
+[sub_resource type="ButtonGroup" id="ButtonGroup_tabs"]
+
 [node name="Settings" type="Control"]
 layout_mode = 3
 anchors_preset = 15
@@ -122,100 +210,104 @@ grow_horizontal = 2
 grow_vertical = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_bg")
 
-[node name="CenterContainer" type="CenterContainer" parent="."]
+[node name="VBoxMain" type="VBoxContainer" parent="."]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+theme_override_constants/separation = 20
 
-[node name="MainPanel" type="Panel" parent="CenterContainer"]
-custom_minimum_size = Vector2(850, 600)
-layout_mode = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
-
-[node name="VBoxContainer" type="VBoxContainer" parent="CenterContainer/MainPanel"]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-theme_override_constants/separation = 15
-
-[node name="TopSpacer" type="Control" parent="CenterContainer/MainPanel/VBoxContainer"]
-custom_minimum_size = Vector2(0, 15)
+[node name="HeaderSpacer" type="Control" parent="VBoxMain"]
+custom_minimum_size = Vector2(0, 20)
 layout_mode = 2
 
-[node name="Header" type="Label" parent="CenterContainer/MainPanel/VBoxContainer"]
+[node name="Header" type="Label" parent="VBoxMain"]
 layout_mode = 2
 text = "НАСТРОЙКИ"
 label_settings = SubResource("LabelSettings_header")
 horizontal_alignment = 1
 
-[node name="ScrollContainer" type="ScrollContainer" parent="CenterContainer/MainPanel/VBoxContainer"]
+[node name="ContentContainer" type="HBoxContainer" parent="VBoxMain"]
 layout_mode = 2
 size_flags_vertical = 3
-horizontal_scroll_mode = 0
-vertical_scroll_mode = 2
+theme_override_constants/separation = 30
 
-[node name="MarginContainer" type="MarginContainer" parent="CenterContainer/MainPanel/VBoxContainer/ScrollContainer"]
+[node name="SideMarginLeft" type="Control" parent="VBoxMain/ContentContainer"]
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+
+[node name="SideMenu" type="VBoxContainer" parent="VBoxMain/ContentContainer"]
+custom_minimum_size = Vector2(250, 0)
+layout_mode = 2
+theme_override_constants/separation = 15
+
+[node name="GameTab" type="Button" parent="VBoxMain/ContentContainer/SideMenu"]
+custom_minimum_size = Vector2(0, 80)
+layout_mode = 2
+focus_mode = 0
+theme_override_fonts/font = ExtResource("2")
+theme_override_font_sizes/font_size = 28
+theme_override_styles/hover = SubResource("StyleBoxFlat_tab_selected")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_tab_selected")
+theme_override_styles/normal = SubResource("StyleBoxFlat_tab_normal")
+toggle_mode = true
+button_pressed = true
+button_group = SubResource("ButtonGroup_tabs")
+text = "ИГРА"
+
+[node name="AudioTab" type="Button" parent="VBoxMain/ContentContainer/SideMenu"]
+custom_minimum_size = Vector2(0, 80)
+layout_mode = 2
+focus_mode = 0
+theme_override_fonts/font = ExtResource("2")
+theme_override_font_sizes/font_size = 28
+theme_override_styles/hover = SubResource("StyleBoxFlat_tab_selected")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_tab_selected")
+theme_override_styles/normal = SubResource("StyleBoxFlat_tab_normal")
+toggle_mode = true
+button_group = SubResource("ButtonGroup_tabs")
+text = "ЗВУК"
+
+[node name="SettingsPanel" type="Panel" parent="VBoxMain/ContentContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_constants/margin_left = 50
-theme_override_constants/margin_top = 20
-theme_override_constants/margin_right = 50
-theme_override_constants/margin_bottom = 20
+theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
 
-[node name="GridContainer" type="GridContainer" parent="CenterContainer/MainPanel/VBoxContainer/ScrollContainer/MarginContainer"]
+[node name="GameSettings" type="ScrollContainer" parent="VBoxMain/ContentContainer/SettingsPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+horizontal_scroll_mode = 0
+
+[node name="Margin" type="MarginContainer" parent="VBoxMain/ContentContainer/SettingsPanel/GameSettings"]
 layout_mode = 2
-theme_override_constants/h_separation = 40
+size_flags_horizontal = 3
+theme_override_constants/margin_left = 40
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 40
+theme_override_constants/margin_bottom = 40
+
+[node name="VBox" type="VBoxContainer" parent="VBoxMain/ContentContainer/SettingsPanel/GameSettings/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 40
+
+[node name="Grid" type="GridContainer" parent="VBoxMain/ContentContainer/SettingsPanel/GameSettings/Margin/VBox"]
+layout_mode = 2
+theme_override_constants/h_separation = 30
 theme_override_constants/v_separation = 25
 columns = 2
 
-[node name="MusicLabel" type="Label" parent="CenterContainer/MainPanel/VBoxContainer/ScrollContainer/MarginContainer/GridContainer"]
+[node name="FovLabel" type="Label" parent="VBoxMain/ContentContainer/SettingsPanel/GameSettings/Margin/VBox/Grid"]
 layout_mode = 2
-text = "Музыка"
+text = "Поле зрения"
 label_settings = SubResource("LabelSettings_label")
 
-[node name="HSlider" type="HSlider" parent="CenterContainer/MainPanel/VBoxContainer/ScrollContainer/MarginContainer/GridContainer"]
-layout_mode = 2
-size_flags_horizontal = 3
-size_flags_vertical = 4
-focus_mode = 0
-theme_override_icons/grabber = SubResource("GradientTexture2D_grabber")
-theme_override_icons/grabber_highlight = SubResource("GradientTexture2D_grabber")
-theme_override_styles/slider = SubResource("StyleBoxLine_slider_bg")
-theme_override_styles/grabber_area = SubResource("StyleBoxLine_slider_area")
-max_value = 1.0
-step = 0.05
-value = 0.5
-
-[node name="SfxLabel" type="Label" parent="CenterContainer/MainPanel/VBoxContainer/ScrollContainer/MarginContainer/GridContainer"]
-layout_mode = 2
-text = "Эффекты"
-label_settings = SubResource("LabelSettings_label")
-
-[node name="HSlider2" type="HSlider" parent="CenterContainer/MainPanel/VBoxContainer/ScrollContainer/MarginContainer/GridContainer"]
-layout_mode = 2
-size_flags_horizontal = 3
-size_flags_vertical = 4
-focus_mode = 0
-theme_override_icons/grabber = SubResource("GradientTexture2D_grabber")
-theme_override_icons/grabber_highlight = SubResource("GradientTexture2D_grabber")
-theme_override_styles/slider = SubResource("StyleBoxLine_slider_bg")
-theme_override_styles/grabber_area = SubResource("StyleBoxLine_slider_area")
-max_value = 1.0
-step = 0.05
-value = 0.5
-
-[node name="FovLabel" type="Label" parent="CenterContainer/MainPanel/VBoxContainer/ScrollContainer/MarginContainer/GridContainer"]
-layout_mode = 2
-text = "Поле зрения (FOV)"
-label_settings = SubResource("LabelSettings_label")
-
-[node name="HSlider_CameraFov" type="HSlider" parent="CenterContainer/MainPanel/VBoxContainer/ScrollContainer/MarginContainer/GridContainer"]
+[node name="HSlider_CameraFov" type="HSlider" parent="VBoxMain/ContentContainer/SettingsPanel/GameSettings/Margin/VBox/Grid"]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 4
@@ -227,65 +319,173 @@ theme_override_styles/grabber_area = SubResource("StyleBoxLine_slider_area")
 step = 5.0
 value = 50.0
 
-[node name="ScopeLabel" type="Label" parent="CenterContainer/MainPanel/VBoxContainer/ScrollContainer/MarginContainer/GridContainer"]
+[node name="MarkerScaleLabel" type="Label" parent="VBoxMain/ContentContainer/SettingsPanel/GameSettings/Margin/VBox/Grid"]
+layout_mode = 2
+text = "Размер маркеров"
+label_settings = SubResource("LabelSettings_label")
+
+[node name="HSlider_MarkerScale" type="HSlider" parent="VBoxMain/ContentContainer/SettingsPanel/GameSettings/Margin/VBox/Grid"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+focus_mode = 0
+theme_override_icons/grabber = SubResource("GradientTexture2D_grabber")
+theme_override_icons/grabber_highlight = SubResource("GradientTexture2D_grabber")
+theme_override_styles/slider = SubResource("StyleBoxLine_slider_bg")
+theme_override_styles/grabber_area = SubResource("StyleBoxLine_slider_area")
+min_value = 0.5
+max_value = 2.0
+step = 0.1
+value = 1.0
+
+[node name="ScopeLabel" type="Label" parent="VBoxMain/ContentContainer/SettingsPanel/GameSettings/Margin/VBox/Grid"]
 layout_mode = 2
 text = "Лазерный прицел"
 label_settings = SubResource("LabelSettings_label")
 
-[node name="CheckButtonContainer" type="Control" parent="CenterContainer/MainPanel/VBoxContainer/ScrollContainer/MarginContainer/GridContainer"]
-custom_minimum_size = Vector2(110, 60)
+[node name="CheckButtonContainer" type="Control" parent="VBoxMain/ContentContainer/SettingsPanel/GameSettings/Margin/VBox/Grid"]
+custom_minimum_size = Vector2(100, 50)
 layout_mode = 2
-size_flags_horizontal = 0
 
-[node name="CheckButton" type="CheckButton" parent="CenterContainer/MainPanel/VBoxContainer/ScrollContainer/MarginContainer/GridContainer/CheckButtonContainer"]
-layout_mode = 0
-offset_top = 10.5
+[node name="CheckButton" type="CheckButton" parent="VBoxMain/ContentContainer/SettingsPanel/GameSettings/Margin/VBox/Grid/CheckButtonContainer"]
+layout_mode = 1
+anchors_preset = 4
+anchor_top = 0.5
+anchor_bottom = 0.5
+offset_top = -12.0
 offset_right = 44.0
-offset_bottom = 34.5
-scale = Vector2(2.5, 2.5)
+offset_bottom = 12.0
+grow_vertical = 2
+scale = Vector2(2, 2)
 pivot_offset = Vector2(0, 12)
 focus_mode = 0
 
-[node name="AimAssistLabel" type="Label" parent="CenterContainer/MainPanel/VBoxContainer/ScrollContainer/MarginContainer/GridContainer"]
+[node name="AimAssistLabel" type="Label" parent="VBoxMain/ContentContainer/SettingsPanel/GameSettings/Margin/VBox/Grid"]
 layout_mode = 2
-text = "Автоприцеливание"
+text = "Автоприцел"
 label_settings = SubResource("LabelSettings_label")
 
-[node name="CheckButtonAimAssistContainer" type="Control" parent="CenterContainer/MainPanel/VBoxContainer/ScrollContainer/MarginContainer/GridContainer"]
-custom_minimum_size = Vector2(110, 60)
+[node name="CheckButtonAimAssistContainer" type="Control" parent="VBoxMain/ContentContainer/SettingsPanel/GameSettings/Margin/VBox/Grid"]
+custom_minimum_size = Vector2(100, 50)
 layout_mode = 2
-size_flags_horizontal = 0
 
-[node name="CheckButton_AimAssist" type="CheckButton" parent="CenterContainer/MainPanel/VBoxContainer/ScrollContainer/MarginContainer/GridContainer/CheckButtonAimAssistContainer"]
-layout_mode = 0
-offset_top = 10.5
+[node name="CheckButton_AimAssist" type="CheckButton" parent="VBoxMain/ContentContainer/SettingsPanel/GameSettings/Margin/VBox/Grid/CheckButtonAimAssistContainer"]
+layout_mode = 1
+anchors_preset = 4
+anchor_top = 0.5
+anchor_bottom = 0.5
+offset_top = -12.0
 offset_right = 44.0
-offset_bottom = 34.5
-scale = Vector2(2.5, 2.5)
+offset_bottom = 12.0
+grow_vertical = 2
+scale = Vector2(2, 2)
 pivot_offset = Vector2(0, 12)
 focus_mode = 0
 
-[node name="LeftHandLabel" type="Label" parent="CenterContainer/MainPanel/VBoxContainer/ScrollContainer/MarginContainer/GridContainer"]
+[node name="LeftHandLabel" type="Label" parent="VBoxMain/ContentContainer/SettingsPanel/GameSettings/Margin/VBox/Grid"]
 layout_mode = 2
-text = "Режим для левшей"
+text = "Режим левши"
 label_settings = SubResource("LabelSettings_label")
 
-[node name="CheckButtonLeftHandContainer" type="Control" parent="CenterContainer/MainPanel/VBoxContainer/ScrollContainer/MarginContainer/GridContainer"]
-custom_minimum_size = Vector2(110, 60)
+[node name="CheckButtonLeftHandContainer" type="Control" parent="VBoxMain/ContentContainer/SettingsPanel/GameSettings/Margin/VBox/Grid"]
+custom_minimum_size = Vector2(100, 50)
 layout_mode = 2
-size_flags_horizontal = 0
 
-[node name="CheckButton_LeftHand" type="CheckButton" parent="CenterContainer/MainPanel/VBoxContainer/ScrollContainer/MarginContainer/GridContainer/CheckButtonLeftHandContainer"]
-layout_mode = 0
-offset_top = 10.5
+[node name="CheckButton_LeftHand" type="CheckButton" parent="VBoxMain/ContentContainer/SettingsPanel/GameSettings/Margin/VBox/Grid/CheckButtonLeftHandContainer"]
+layout_mode = 1
+anchors_preset = 4
+anchor_top = 0.5
+anchor_bottom = 0.5
+offset_top = -12.0
 offset_right = 44.0
-offset_bottom = 34.5
-scale = Vector2(2.5, 2.5)
+offset_bottom = 12.0
+grow_vertical = 2
+scale = Vector2(2, 2)
 pivot_offset = Vector2(0, 12)
 focus_mode = 0
 
-[node name="Return_Button" type="Button" parent="CenterContainer/MainPanel/VBoxContainer"]
-custom_minimum_size = Vector2(300, 70)
+[node name="ResetProgressBtn" type="Button" parent="VBoxMain/ContentContainer/SettingsPanel/GameSettings/Margin/VBox"]
+custom_minimum_size = Vector2(350, 70)
+layout_mode = 2
+size_flags_horizontal = 4
+focus_mode = 0
+theme_override_fonts/font = ExtResource("2")
+theme_override_font_sizes/font_size = 24
+theme_override_styles/hover = SubResource("StyleBoxFlat_red_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_red_pressed")
+theme_override_styles/normal = SubResource("StyleBoxFlat_red_normal")
+text = "СБРОСИТЬ ПРОГРЕСС"
+
+[node name="Spacer" type="Control" parent="VBoxMain/ContentContainer/SettingsPanel/GameSettings/Margin/VBox"]
+custom_minimum_size = Vector2(0, 40)
+layout_mode = 2
+
+[node name="AudioSettings" type="ScrollContainer" parent="VBoxMain/ContentContainer/SettingsPanel"]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+horizontal_scroll_mode = 0
+
+[node name="Margin" type="MarginContainer" parent="VBoxMain/ContentContainer/SettingsPanel/AudioSettings"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/margin_left = 40
+theme_override_constants/margin_top = 30
+theme_override_constants/margin_right = 40
+theme_override_constants/margin_bottom = 30
+
+[node name="Grid" type="GridContainer" parent="VBoxMain/ContentContainer/SettingsPanel/AudioSettings/Margin"]
+layout_mode = 2
+theme_override_constants/h_separation = 30
+theme_override_constants/v_separation = 30
+columns = 2
+
+[node name="MusicLabel" type="Label" parent="VBoxMain/ContentContainer/SettingsPanel/AudioSettings/Margin/Grid"]
+layout_mode = 2
+text = "Музыка"
+label_settings = SubResource("LabelSettings_label")
+
+[node name="HSlider" type="HSlider" parent="VBoxMain/ContentContainer/SettingsPanel/AudioSettings/Margin/Grid"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+focus_mode = 0
+theme_override_icons/grabber = SubResource("GradientTexture2D_grabber")
+theme_override_icons/grabber_highlight = SubResource("GradientTexture2D_grabber")
+theme_override_styles/slider = SubResource("StyleBoxLine_slider_bg")
+theme_override_styles/grabber_area = SubResource("StyleBoxLine_slider_area")
+max_value = 1.0
+step = 0.05
+value = 0.5
+
+[node name="SfxLabel" type="Label" parent="VBoxMain/ContentContainer/SettingsPanel/AudioSettings/Margin/Grid"]
+layout_mode = 2
+text = "Эффекты"
+label_settings = SubResource("LabelSettings_label")
+
+[node name="HSlider2" type="HSlider" parent="VBoxMain/ContentContainer/SettingsPanel/AudioSettings/Margin/Grid"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+focus_mode = 0
+theme_override_icons/grabber = SubResource("GradientTexture2D_grabber")
+theme_override_icons/grabber_highlight = SubResource("GradientTexture2D_grabber")
+theme_override_styles/slider = SubResource("StyleBoxLine_slider_bg")
+theme_override_styles/grabber_area = SubResource("StyleBoxLine_slider_area")
+max_value = 1.0
+step = 0.05
+value = 0.5
+
+[node name="SideMarginRight" type="Control" parent="VBoxMain/ContentContainer"]
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+
+[node name="Return_Button" type="Button" parent="VBoxMain"]
+custom_minimum_size = Vector2(300, 80)
 layout_mode = 2
 size_flags_horizontal = 4
 focus_mode = 0
@@ -297,8 +497,24 @@ theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
 theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
 text = "НАЗАД"
 
-[node name="BottomSpacer" type="Control" parent="CenterContainer/MainPanel/VBoxContainer"]
-custom_minimum_size = Vector2(0, 15)
+[node name="FooterSpacer" type="Control" parent="VBoxMain"]
+custom_minimum_size = Vector2(0, 20)
 layout_mode = 2
 
-[connection signal="pressed" from="CenterContainer/MainPanel/VBoxContainer/Return_Button" to="." method="_on_Return_Button_pressed"]
+[node name="ResetConfirmation" type="ConfirmationDialog" parent="."]
+title = "ПОДТВЕРЖДЕНИЕ"
+initial_position = 2
+size = Vector2i(800, 500)
+unresizable = true
+borderless = true
+always_on_top = true
+theme_override_styles/panel = SubResource("StyleBoxFlat_dialog")
+ok_button_text = "ДА, СБРОСИТЬ"
+dialog_text = "Вы уверены, что хотите сбросить весь прогресс? Это действие необратимо."
+cancel_button_text = "ОТМЕНА"
+
+[connection signal="pressed" from="VBoxMain/ContentContainer/SideMenu/GameTab" to="." method="_on_tab_pressed" binds= ["game"]]
+[connection signal="pressed" from="VBoxMain/ContentContainer/SideMenu/AudioTab" to="." method="_on_tab_pressed" binds= ["audio"]]
+[connection signal="pressed" from="VBoxMain/ContentContainer/SettingsPanel/GameSettings/Margin/VBox/ResetProgressBtn" to="." method="_on_reset_btn_pressed"]
+[connection signal="pressed" from="VBoxMain/Return_Button" to="." method="_on_Return_Button_pressed"]
+[connection signal="confirmed" from="ResetConfirmation" to="." method="_on_reset_progress_confirmed"]

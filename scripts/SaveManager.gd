@@ -39,7 +39,8 @@ var settings_data = {
 		"scope_enabled": true,
 		"aim_assist": true,
 		"lefty_mode": false,
-		"camera_fov": 50.0
+		"camera_fov": 50.0,
+		"marker_scale": 1.0
 	}
 }
 
@@ -64,6 +65,7 @@ func load_settings():
 		settings_data["game"]["aim_assist"] = config.get_value("game", "aim_assist", true)
 		settings_data["game"]["lefty_mode"] = config.get_value("game", "lefty_mode", false)
 		settings_data["game"]["camera_fov"] = config.get_value("game", "camera_fov", 50.0)
+		settings_data["game"]["marker_scale"] = config.get_value("game", "marker_scale", 1.0)
 	settings_changed.emit()
 
 func save_settings():
@@ -74,6 +76,7 @@ func save_settings():
 	config.set_value("game", "aim_assist", settings_data["game"]["aim_assist"])
 	config.set_value("game", "lefty_mode", settings_data["game"]["lefty_mode"])
 	config.set_value("game", "camera_fov", settings_data["game"]["camera_fov"])
+	config.set_value("game", "marker_scale", settings_data["game"]["marker_scale"])
 	config.save(SETTINGS_FILE)
 
 func get_setting(section: String, key: String, default):
@@ -158,6 +161,33 @@ func get_player_stat(stat: String, default: int) -> int:
 	return int(save_data.player_stats.get(stat, default))
 
 func unlock_level(level_num: int):
+	# Только увеличиваем уровень, не позволяем сбрасывать назад через UI
 	if level_num > save_data.get("unlocked_levels", 1):
 		save_data["unlocked_levels"] = level_num
 		save_game()
+
+func reset_progress():
+	save_data = {
+		"money": 0,
+		"unlocked_levels": 1,
+		"player_stats": {
+			"body_type": 1,
+			"gun_type": 1,
+			"color_type": 0,
+			"base_hp_level": 0,
+			"base_heal_level": 0,
+			"base_bonus_level": 0,
+			"base_feature_type": 0
+		},
+		"purchased": {
+			"bodies": [1],
+			"guns": [1],
+			"colors": [0],
+			"base_hp": [0],
+			"base_heal": [0],
+			"base_bonus": [0],
+			"base_features": [0]
+		}
+	}
+	save_game()
+	money_loaded.emit(0)

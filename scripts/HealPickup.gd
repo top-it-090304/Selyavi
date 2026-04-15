@@ -21,7 +21,7 @@ func _setup_pickup():
 
 	# Основной спрайт ящика
 	_sprite = Sprite2D.new()
-	var box_tex = load("res://assets/free-icon-tool-box-479353.png")
+	var box_tex = load("res://assets/IngameAssets/EnemyDrop/free-icon-tool-box-479353.png")
 	if box_tex:
 		_sprite.texture = box_tex
 	_sprite.scale = Vector2(0.1, 0.1)

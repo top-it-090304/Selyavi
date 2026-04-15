@@ -161,6 +161,7 @@ func _find_target_node(node_name: String):
 
 	var hud = get_tree().get_first_node_in_group("hud")
 	if hud:
+		# Ищем джойстики в контейнерах, так как сами джойстики могут иметь нулевой размер
 		if node_name == "Joystick": return hud.find_child("MoveJoystickContainer", true)
 		if node_name == "Aim": return hud.find_child("AimJoystickContainer", true)
 		if node_name == "AmmoPanel":
@@ -193,6 +194,12 @@ func _on_skip_pressed(): _finish_tutorial()
 
 func _finish_tutorial():
 	get_tree().paused = false
+
+	# Возвращаем прозрачность джойстикам (0.3 - стандартное значение)
+	var hud = get_tree().get_first_node_in_group("hud")
+	if hud and hud.has_method("set_joysticks_opacity"):
+		hud.set_joysticks_opacity(0.3)
+
 	if AudioManager:
 		if AudioManager.has_method("stop_tutorial"): AudioManager.stop_tutorial()
 		elif AudioManager.has_method("stop"): AudioManager.stop()

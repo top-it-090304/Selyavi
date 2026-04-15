@@ -5,9 +5,21 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="33129e0a-8a1f-4647-8ff9-20d5e301da8a" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/assets/shaders/seasonal_tint.gdshader" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/scripts/MenuScripts/TutorialOverlay.gd" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/MenuScripts/TutorialOverlay.gd" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/scripts/Tank/Player.gd" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/Tank/Player.gd" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/enemies/enemy_scout.tres" beforeDir="false" afterPath="$PROJECT_DIR$/resources/enemies/enemy_scout.tres" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scenes/DestructibleWall.tscn" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/scenes/Field.tscn" beforeDir="false" afterPath="$PROJECT_DIR$/scenes/Field.tscn" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scenes/IndestructibleWall.tscn" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/scenes/Levels/Level_1.tscn" beforeDir="false" afterPath="$PROJECT_DIR$/scenes/Levels/Level_1.tscn" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scenes/Levels/Level_2.tscn" beforeDir="false" afterPath="$PROJECT_DIR$/scenes/Levels/Level_2.tscn" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scenes/Levels/Level_3.tscn" beforeDir="false" afterPath="$PROJECT_DIR$/scenes/Levels/Level_3.tscn" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scenes/Levels/Level_4.tscn" beforeDir="false" afterPath="$PROJECT_DIR$/scenes/Levels/Level_4.tscn" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scenes/Levels/Level_5.tscn" beforeDir="false" afterPath="$PROJECT_DIR$/scenes/Levels/Level_5.tscn" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scenes/Levels/Level_6.tscn" beforeDir="false" afterPath="$PROJECT_DIR$/scenes/Levels/Level_6.tscn" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scenes/Levels/Sandbox.tscn" beforeDir="false" afterPath="$PROJECT_DIR$/scenes/Levels/Sandbox.tscn" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scenes/WallLayer.tscn" beforeDir="false" afterPath="$PROJECT_DIR$/scenes/WallLayer.tscn" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/WallTileMap.gd" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/WallTileMap.gd" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

@@ -21,16 +21,6 @@ const LIGHT: int = 2
 const HE: int = 3
 const BOPS: int = 4
 
-func get_bullet_speed() -> int:
-	return _bullet_speed
-
-func set_bullet_speed(value: int):
-	if value > 0 and value <= 30:
-		_bullet_speed = value
-
-func is_player() -> bool:
-	return _is_player
-
 func _ready():
 	_bullet_sprite = $BulletSprite
 	_bullet_sound = $PlasmaGunSound
@@ -38,40 +28,31 @@ func _ready():
 	_visibility_bullet = $VisibleOnScreenNotifier2D
 	
 	body_entered.connect(_on_body_entered)
-	if not _visibility_bullet.is_connected("screen_exited", _on_screen_exited):
-		_visibility_bullet.screen_exited.connect(_on_screen_exited)
+	area_entered.connect(_on_area_entered)
+	_visibility_bullet.screen_exited.connect(_on_screen_exited)
 
-func _move():
+func _process(delta):
 	var move_step = _velocity * _bullet_speed
 	position += move_step
 	_traveled_distance += move_step.length()
-
-	if _traveled_distance >= _max_range:
-		_destroy()
-
-func _fade_sound():
-	var tween = create_tween()
-	tween.tween_property(_bullet_sound, "volume_db", -80, 1.0)
-	tween.finished.connect(_on_fade_complete)
-
-func _on_fade_complete():
-	if _bullet_sound != null:
-		_bullet_sound.stop()
-		_bullet_sound.volume_db = 0
-	queue_free()
-
-func _on_screen_exited():
-	_fade_sound()
+	if _traveled_distance >= _max_range: _destroy()
 
 func _on_body_entered(body):
-	# Игнорируем тело стрелка (базу или танк), если задан RID
-	if _ignored_body_rid.is_valid() and body.get_rid() == _ignored_body_rid:
+	if _has_dealt_damage: return
+	if _ignored_body_rid.is_valid() and body.get_rid() == _ignored_body_rid: return
+
+	# Проверка на физическое тело базы
+	var parent = body.get_parent()
+	if parent is Base:
+		_handle_base_hit(parent)
 		return
 
 	if body is Player and not _is_player:
+		_has_dealt_damage = true
 		body.take_damage(_damage)
 		_post_hit_destroy(body)
 	elif body is Enemy and _is_player:
+		_has_dealt_damage = true
 		body.take_damage(_damage)
 		if _type_bullet == BOPS and _pierce_left > 0:
 			_pierce_left -= 1
@@ -103,24 +84,17 @@ func init(type_bullet: int, is_player: bool, damage: int = 0, ignored_rid: RID =
 	_is_player = is_player
 	_damage = damage
 	_ignored_body_rid = ignored_rid
-
 	_update_visuals_and_speed()
-
-	# Теперь дальность устанавливается либо стандартно (в _update_visuals_and_speed),
-	# либо принудительно, если передано значение больше 0 (для штаба)
-	if custom_range > 0:
-		_max_range = custom_range
+	if custom_range > 0: _max_range = custom_range
 
 func _update_visuals_and_speed():
 	match _type_bullet:
 		PLASMA:
 			_bullet_sprite.texture = load("res://assets/future_tanks/PNG/Effects/Plasma.png")
-			_bullet_speed = 7
-			_max_range = 600.0
+			_bullet_speed = 7; _max_range = 600.0
 		MEDIUM:
 			_bullet_sprite.texture = load("res://assets/future_tanks/PNG/Effects/Medium_Shell.png")
-			_bullet_speed = 4
-			_max_range = 275.0
+			_bullet_speed = 4; _max_range = 275.0
 		LIGHT:
 			_bullet_sprite.texture = load("res://assets/future_tanks/PNG/Effects/Light_Shell.png")
 			_bullet_speed = 6
@@ -159,5 +133,7 @@ func _apply_aoe_damage(hit_body: Node):
 		elif c is Player and not _is_player:
 			c.take_damage(splash_damage)
 
-func _process(delta):
-	_move()
+func _on_screen_exited():
+	var tween = create_tween()
+	tween.tween_property(_bullet_sound, "volume_db", -80, 1.0)
+	tween.finished.connect(queue_free)

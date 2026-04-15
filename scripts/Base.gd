@@ -15,7 +15,10 @@ var _enemy_position: Marker2D
 var _enemy_scene: PackedScene
 var _base_body: StaticBody2D
 
-@export var _max_enemies: int = 3
+@export var _max_enemies: int = 3 # Лимит обычных ботов
+@export var _special_enemy_resource: EnemyData # Гарантированный особый бот из инспектора
+var _special_pool: Array[EnemyData] = [] # Пул всех особых ботов из ресурсов
+
 @export var _heal_amount: int = 7
 @export var _heal_interval: float = 1.0
 @export var _heal_radius: float = 300.0
@@ -65,6 +68,7 @@ func _ready():
 	_setup_base_appearance()
 	_setup_particles()
 	_setup_feature_sprites()
+	_load_special_enemies() # Загружаем всех доступных особых ботов
 
 	_spawn_timer = Timer.new(); _spawn_timer.wait_time = 0.1; _spawn_timer.one_shot = true; add_child(_spawn_timer); _spawn_timer.start()
 	_heal_timer = Timer.new(); _heal_timer.wait_time = _heal_interval; _heal_timer.one_shot = false; add_child(_heal_timer)
@@ -80,12 +84,26 @@ func _ready():
 
 	queue_redraw()
 
+func _load_special_enemies():
+	_special_pool.clear()
+	var path = "res://resources/enemies/"
+	var dir = DirAccess.open(path)
+	if dir:
+		dir.list_dir_begin()
+		var file_name = dir.get_next()
+		while file_name != "":
+			if file_name.ends_with(".tres"):
+				var res = load(path + file_name)
+				if res is EnemyData and res.is_special and res.can_be_spawned_by_base:
+					_special_pool.append(res)
+			file_name = dir.get_next()
+
 func _setup_feature_sprites():
 	if type_base != TypeBase.PLAYER: return
 
 	if _has_radar:
 		_antenna_sprite = Sprite2D.new()
-		_antenna_sprite.texture = load("res://assets/Antenna.png")
+		_antenna_sprite.texture = load("res://assets/BaseAssets/Antenna.png")
 		_antenna_sprite.position = Vector2(10, -40)
 		_antenna_sprite.scale = Vector2(0.05, 0.05)
 		_antenna_sprite.z_index = 1
@@ -93,7 +111,7 @@ func _setup_feature_sprites():
 
 	if _has_turret:
 		_turret_sprite = Sprite2D.new()
-		_turret_sprite.texture = load("res://assets/TurretGiantSniper_Top.png")
+		_turret_sprite.texture = load("res://assets/BaseAssets/TurretGiantSniper_Top.png")
 		_turret_sprite.position = Vector2.ZERO
 		_turret_sprite.scale = Vector2(0.55, 0.55)
 		_turret_sprite.z_index = 2
@@ -196,9 +214,6 @@ func _draw():
 		draw_circle(Vector2.ZERO, _heal_radius, Color(0.0, 1.0, 0.0, 0.1))
 		draw_arc(Vector2.ZERO, _heal_radius, 0, TAU, 64, Color(0.0, 1.0, 0.0, 0.3), 3.0, true)
 
-		if _has_turret:
-			draw_arc(Vector2.ZERO, _turret_range, 0, TAU, 64, Color(1.0, 0.3, 0.3, 0.1), 2.0)
-
 func _sync_current_level():
 	if SaveManager == null: return
 	var scene_name = get_tree().current_scene.name
@@ -285,14 +300,79 @@ func _spawn_enemy():
 	if get_tree().has_group("tutorial"): return
 
 	_my_spawned_enemies = _my_spawned_enemies.filter(func(enemy): return is_instance_valid(enemy) and not enemy.is_queued_for_deletion())
-	if _my_spawned_enemies.size() >= _max_enemies: return
+
+	var regulars = _my_spawned_enemies.filter(func(e): return not (e.get("enemy_data") and e.enemy_data.is_special))
+	var special_on_map = _my_spawned_enemies.filter(func(e): return e.get("enemy_data") and e.enemy_data.is_special)
+
+	var lvl = SaveManager.current_level if SaveManager else 1
+
+	# 1. ПРИОРИТЕТ: Особый бот (с 6 уровня)
+	if special_on_map.size() == 0 and lvl >= 6:
+		var special_to_spawn = null
+
+		# Сначала пробуем назначенный ресурс
+		if _special_enemy_resource and _special_enemy_resource.can_be_spawned_by_base and _check_special_condition(_special_enemy_resource):
+			special_to_spawn = _special_enemy_resource
+		else:
+			# Если назначенный не подошел, ищем в пуле
+			var possible_specials = _special_pool.filter(func(res): return _check_special_condition(res))
+			if possible_specials.size() > 0:
+				special_to_spawn = possible_specials[randi() % possible_specials.size()]
+
+		if special_to_spawn:
+			if _do_spawn(special_to_spawn):
+				_time_since_last_check = 0
+				return
+			else:
+				_time_since_last_check = _spawn_interval - 1.0 # Ретрай через сек если мешает стена
+				return
+
+	# 2. Обычные боты (лимит 3)
+	if regulars.size() < _max_enemies:
+		if _do_spawn(null):
+			_time_since_last_check = 0
+		else:
+			_time_since_last_check = _spawn_interval - 1.0
+
+func _check_special_condition(res: EnemyData) -> bool:
+	if res.enemy_type == 7: # SCOUT
+		var all_enemies = get_tree().get_nodes_in_group("enemies")
+		for e in all_enemies:
+			if is_instance_valid(e) and e.has_method("get_enemy_type") and e.get_enemy_type() == 6: # ARTILLERY
+				return true
+		return false
+	return true
+
+func _do_spawn(data: EnemyData) -> bool:
 	var spawn_pos = _get_safe_spawn_pos()
-	if spawn_pos != Vector2.ZERO:
-		var enemy = _enemy_scene.instantiate()
-		if enemy.get("type_enemy") == 5: enemy.set("type_enemy", randi() % 3)
-		enemy.global_position = spawn_pos
-		get_parent().add_child(enemy)
-		_my_spawned_enemies.append(enemy)
+	if spawn_pos == Vector2.ZERO: return false
+
+	var enemy = _enemy_scene.instantiate()
+	if data:
+		enemy.enemy_data = data
+	else:
+		_assign_random_enemy_data(enemy)
+
+	enemy.global_position = spawn_pos
+	get_parent().add_child(enemy)
+	_my_spawned_enemies.append(enemy)
+	return true
+
+func _assign_random_enemy_data(enemy: Node):
+	var available_resources = []
+	var path = "res://resources/enemies/"
+	var types = ["enemy_light.tres", "enemy_medium.tres", "enemy_heavy.tres"]
+
+	var lvl = SaveManager.current_level if SaveManager else 1
+	if lvl > 5: types.append("enemy_triple.tres")
+
+	for t in types:
+		var res = load(path + t)
+		if res and res.get("can_be_spawned_by_base") and not res.get("is_special"):
+			available_resources.append(res)
+
+	if available_resources.size() > 0:
+		enemy.enemy_data = available_resources[randi() % available_resources.size()]
 
 func _get_safe_spawn_pos() -> Vector2:
 	var player = get_tree().get_first_node_in_group("players")
@@ -301,11 +381,25 @@ func _get_safe_spawn_pos() -> Vector2:
 		if b.type_base == TypeBase.PLAYER: player_base = b; break
 	var target_pos = player_base.global_position if is_instance_valid(player_base) else (player.global_position if is_instance_valid(player) else Vector2.ZERO)
 	var base_angle = (target_pos - global_position).angle() if target_pos != Vector2.ZERO else 0.0
-	for attempts in range(30):
-		var angle = base_angle + randf_range(-PI/4, PI/4) if target_pos != Vector2.ZERO else randf_range(0, 2*PI)
-		var spawn_pos = global_position + Vector2(cos(angle), sin(angle)) * randf_range(250, 400)
-		if _is_pos_safe(spawn_pos): return spawn_pos
+
+	for attempts in range(50):
+		var angle = base_angle + randf_range(-PI/2, PI/2) if target_pos != Vector2.ZERO else randf_range(0, 2*PI)
+		var spawn_pos = global_position + Vector2(cos(angle), sin(angle)) * randf_range(250, 500)
+
+		if _is_pos_safe(spawn_pos) and _is_spawn_line_clear(spawn_pos):
+			return spawn_pos
 	return Vector2.ZERO
+
+func _is_spawn_line_clear(pos: Vector2) -> bool:
+	var space_state = get_world_2d().direct_space_state
+	var query = PhysicsRayQueryParameters2D.create(global_position, pos)
+	query.exclude = [get_rid()]
+	if is_instance_valid(_base_body): query.exclude.append(_base_body.get_rid())
+
+	var result = space_state.intersect_ray(query)
+	if result.is_empty(): return true
+	if result.collider is TileMap or result.collider is StaticBody2D: return false
+	return true
 
 func _is_pos_safe(pos: Vector2) -> bool:
 	var space_state = get_world_2d().direct_space_state
@@ -324,12 +418,14 @@ func _process(delta):
 	if type_base == TypeBase.ENEMY:
 		_time_since_last_check += delta
 		if _time_since_last_check >= _spawn_interval:
-			_spawn_enemy(); _time_since_last_check = 0
+			_spawn_enemy()
+			if _time_since_last_check >= _spawn_interval:
+				_time_since_last_check = 0
 	else:
 		if _has_osmosis:
 			_osmosis_timer += delta
 			if _osmosis_timer >= 5.0:
-				if _hp < _max_hp: # Условие: лечим и показываем эффекты только если база задамажена
+				if _hp < _max_hp:
 					take_heal(10)
 					_spawn_heal_plus_effects()
 				_osmosis_timer = 0.0
@@ -342,11 +438,9 @@ func _process(delta):
 func _spawn_heal_plus_effects():
 	for i in range(3):
 		var plus = Sprite2D.new()
-		plus.texture = load("res://assets/plus.png")
-		# Еще сильнее уменьшил плюсы (масштаб 0.04)
+		plus.texture = load("res://assets/BaseAssets/plus.png")
 		plus.scale = Vector2(0.04, 0.04)
 		plus.modulate = Color(0.2, 1.0, 0.2, 0.8)
-		# Плюсы будут поверх спрайта осмоса (z_index 5)
 		plus.z_index = 5
 		var offset = Vector2(randf_range(-60, 60), randf_range(-60, 60))
 		plus.global_position = global_position + offset
@@ -409,7 +503,8 @@ func _fire_turret():
 
 		if bullet.has_method("init"):
 			var ignored_rid = _base_body.get_rid() if is_instance_valid(_base_body) else get_rid()
-			bullet.init(1, true, _turret_damage, ignored_rid)
+			# Передаем _turret_range как custom_range для пули
+			bullet.init(1, true, _turret_damage, ignored_rid, _turret_range)
 			var sprite = bullet.get_node_or_null("BulletSprite")
 			if sprite: sprite.texture = load("res://assets/future_tanks/PNG/Effects/Heavy_Shell.png")
 
