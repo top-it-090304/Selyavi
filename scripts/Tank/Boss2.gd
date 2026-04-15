@@ -17,23 +17,20 @@ var _phase2_active: bool = false
 func _ready():
 	_type_enemy = TypeEnemy.BOSS
 	super._ready()
+	_patrol_speed = 150
+	_chase_speed = 130
 
 	if _body:
-		_body.texture = load("res://assets/future_tanks/PNG/Hulls_Color_D/Hull_07.png")
+		_body.texture = load("res://assets/future_tanks/PNG/Hulls_Color_D/Hull_08.png")
 		_body.modulate = Color(0.8, 0.25, 1.0)
 	if _gun:
+		_gun.texture = load("res://assets/future_tanks/PNG/Weapon_Color_D/Gun_02.png")
 		_gun.modulate = Color(0.9, 0.4, 1.0)
 
 	_setup_hp_bar()
 
 	_enemy_scene = load("res://scenes/Tank/Enemy.tscn")
 	_ricochet_scene = load("res://scenes/Tank/RicochetBullet.tscn")
-
-	_spawn_timer = Timer.new()
-	_spawn_timer.wait_time = 9.0
-	_spawn_timer.autostart = true
-	_spawn_timer.timeout.connect(_spawn_minion)
-	add_child(_spawn_timer)
 
 func _setup_hp_bar():
 	var canvas = CanvasLayer.new()

@@ -1,8 +1,8 @@
 [gd_scene load_steps=15 format=3]
 
 [ext_resource type="Script" path="res://scripts/Tank/Boss2.gd" id="1"]
-[ext_resource type="Texture2D" path="res://assets/future_tanks/PNG/Weapon_Color_D/Gun_08.png" id="2"]
-[ext_resource type="Texture2D" path="res://assets/future_tanks/PNG/Hulls_Color_D/Hull_07.png" id="3"]
+[ext_resource type="Texture2D" path="res://assets/future_tanks/PNG/Weapon_Color_D/Gun_02.png" id="2"]
+[ext_resource type="Texture2D" path="res://assets/future_tanks/PNG/Hulls_Color_D/Hull_08.png" id="3"]
 [ext_resource type="Texture2D" path="res://assets/future_tanks/PNG/Effects/Explosion_C.png" id="4"]
 [ext_resource type="Texture2D" path="res://assets/future_tanks/PNG/Effects/Explosion_B.png" id="5"]
 [ext_resource type="Texture2D" path="res://assets/future_tanks/PNG/Effects/Explosion_H.png" id="6"]
@@ -77,7 +77,7 @@ texture = ExtResource("2")
 offset = Vector2(0, -40)
 
 [node name="BulletPosition" type="Marker2D" parent="BodyTank/Gun"]
-position = Vector2(0, -85)
+position = Vector2(0, -130)
 
 [node name="NavigationAgent2D" type="NavigationAgent2D" parent="."]
 target_desired_distance = 22.23
