@@ -1,7 +1,7 @@
 [gd_resource type="Resource" script_class="EnemyData" load_steps=4 format=3 uid="uid://dg8w0uox8v2p4"]
 
 [ext_resource type="Script" uid="uid://dipqcqff40858" path="res://scripts/Resources/EnemyData.gd" id="1"]
-[ext_resource type="Texture2D" uid="uid://c4keshkoohyri" path="res://assets/future_tanks/PNG/Weapon_Color_D/Gun_06.png" id="1_scout_gun"]
+[ext_resource type="Texture2D" uid="uid://bw6dsh2phgp22" path="res://assets/future_tanks/PNG/Weapon_Color_D/Gun_01.png" id="1_jado3"]
 [ext_resource type="Texture2D" uid="uid://dj34y0nijm3g" path="res://assets/future_tanks/PNG/Hulls_Color_D/Hull_05.png" id="2_scout_hull"]
 
 [resource]
@@ -9,18 +9,18 @@ script = ExtResource("1")
 hp = 40
 hp_early_levels = 40
 damage = 5
-fire_rate = 1.0
-spread = 0.15
-reward_money = 40
+fire_rate = 7.0
+spread = 0.2
+reward_money = 30
 is_special = true
 is_boss = false
 can_be_spawned_by_base = true
 enemy_type = 7
-patrol_speed = 120
-chase_speed = 120
-notice_range = 1000.0
-attack_range = 800.0
+patrol_speed = 100
+chase_speed = 110
+notice_range = 800.0
+attack_range = 500.0
 hull_texture = ExtResource("2_scout_hull")
-gun_texture = ExtResource("1_scout_gun")
+gun_texture = ExtResource("1_jado3")
 gun_offset = 30.0
 scale = Vector2(0.9, 0.9)

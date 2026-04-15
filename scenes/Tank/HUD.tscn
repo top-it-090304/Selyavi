@@ -1,9 +1,9 @@
 [gd_scene load_steps=8 format=3 uid="uid://336qfi6ddylt"]
 
 [ext_resource type="FontFile" uid="uid://bsnvk4l0ue5ri" path="res://assets/fonts/ofont.ru_Shonen.ttf" id="1"]
-[ext_resource type="Texture2D" uid="uid://gkllwxuihlub" path="res://assets/HP.png" id="2"]
+[ext_resource type="Texture2D" uid="uid://gkllwxuihlub" path="res://assets/IngameAssets/HUD/HP.png" id="2"]
 [ext_resource type="Script" uid="uid://ojrswod2mfck" path="res://scripts/HUD.gd" id="4"]
-[ext_resource type="Texture2D" uid="uid://cbqbobkp1rlb" path="res://assets/Money.png" id="4_mxnk6"]
+[ext_resource type="Texture2D" uid="uid://cbqbobkp1rlb" path="res://assets/IngameAssets/HUD/Money.png" id="4_mxnk6"]
 [ext_resource type="PackedScene" path="res://scenes/Tank/MobileJoystick.tscn" id="5"]
 
 [sub_resource type="FontFile" id="1"]

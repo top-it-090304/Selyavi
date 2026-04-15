@@ -31,10 +31,10 @@ var _attack_warning_timer: float = 0.0
 var _player_base_pos: Vector2 = Vector2.ZERO
 
 var _marker_icons = {
-	"boss": preload("res://assets/free-icon-skull-11429788.png"),
-	"enemy": preload("res://assets/free-icon-army-tank-8511648.png"),
+	"boss": preload("res://assets/IngameAssets/Markers/free-icon-skull-11429788.png"),
+	"enemy": preload("res://assets/IngameAssets/Markers/free-icon-army-tank-8511648.png"),
 	"base": preload("res://assets/backround/PNG/Props/Platform.png"),
-	"warning": preload("res://assets/free-icon-broken-shield-4046202.png")
+	"warning": preload("res://assets/IngameAssets/Markers/free-icon-broken-shield-4046202.png")
 }
 
 const AMMO_BTN_SIZE = 120
@@ -127,7 +127,7 @@ func _setup_buff_icon():
 	buff_margin.add_theme_constant_override("margin_left", 125)
 	buff_margin.add_theme_constant_override("margin_top", 15)
 	_buffIcon = TextureRect.new()
-	_buffIcon.texture = load("res://assets/free-icon-arrows-14035529.png")
+	_buffIcon.texture = load("res://assets/IngameAssets/HUD/free-icon-arrows-14035529.png")
 	_buffIcon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	_buffIcon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	_buffIcon.custom_minimum_size = Vector2(64, 64)
@@ -331,7 +331,7 @@ func _on_marker_overlay_draw():
 func _draw_marker_for(target_pos: Vector2, color: Color, icon: Texture2D, screen_rect: Rect2, pulse: bool, max_scale: float):
 	if screen_rect.has_point(target_pos): return
 	var center = screen_rect.get_center(); var dir = (target_pos - center).normalized(); var dist = center.distance_to(target_pos)
-	var marker_pos = _get_intersect_pos(center, dir, screen_rect); var margin = 40.0
+	var marker_pos = _get_intersect_pos(center, dir, screen_rect); var margin = 80.0
 	marker_pos.x = clamp(marker_pos.x, screen_rect.position.x + margin, screen_rect.end.x - margin)
 	marker_pos.y = clamp(marker_pos.y, screen_rect.position.y + margin, screen_rect.end.y - margin)
 	var draw_pos = _player.get_viewport().get_canvas_transform() * marker_pos
@@ -347,7 +347,7 @@ func _draw_marker_for(target_pos: Vector2, color: Color, icon: Texture2D, screen
 	if icon:
 		var icon_size = Vector2(32, 32) * scale_factor
 		_marker_overlay.draw_texture_rect(icon, Rect2(draw_pos - icon_size/2, icon_size), false, Color(1, 1, 1, 0.9))
-	var pts = PackedVector2Array([draw_pos + dir * (35 * scale_factor), draw_pos + dir.rotated(0.4) * (25 * scale_factor), draw_pos + dir.rotated(-0.4) * (25 * scale_factor)])
+	var pts = PackedVector2Array([draw_pos + dir * (35 * scale_factor), draw_pos + dir.rotated(0.4) * (20 * scale_factor), draw_pos + dir.rotated(-0.4) * (20 * scale_factor)])
 	_marker_overlay.draw_colored_polygon(pts, Color(color.r, color.g, color.b, 0.7))
 
 func _get_intersect_pos(center: Vector2, dir: Vector2, rect: Rect2) -> Vector2:

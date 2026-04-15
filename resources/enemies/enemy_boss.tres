@@ -15,6 +15,7 @@ reward_money = 500
 is_special = false
 is_boss = true
 can_be_spawned_by_base = false
+enemy_type = -1
 patrol_speed = 60
 chase_speed = 40
 notice_range = 1200.0

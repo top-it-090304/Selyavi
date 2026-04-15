@@ -55,7 +55,7 @@ func take_damage(damage: int):
 	last_damage_received = damage # Сохраняем для инспектора
 	var final_damage = float(damage)
 
-	if not self is Enemy:
+	if not is_in_group("enemies"):
 		var total_armor = clamp(_armor + _base_armor_bonus, -0.9, 0.95)
 		final_damage = damage * (1.0 - total_armor)
 

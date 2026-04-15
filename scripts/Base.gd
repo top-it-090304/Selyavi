@@ -103,7 +103,7 @@ func _setup_feature_sprites():
 
 	if _has_radar:
 		_antenna_sprite = Sprite2D.new()
-		_antenna_sprite.texture = load("res://assets/Antenna.png")
+		_antenna_sprite.texture = load("res://assets/BaseAssets/Antenna.png")
 		_antenna_sprite.position = Vector2(10, -40)
 		_antenna_sprite.scale = Vector2(0.05, 0.05)
 		_antenna_sprite.z_index = 1
@@ -111,7 +111,7 @@ func _setup_feature_sprites():
 
 	if _has_turret:
 		_turret_sprite = Sprite2D.new()
-		_turret_sprite.texture = load("res://assets/TurretGiantSniper_Top.png")
+		_turret_sprite.texture = load("res://assets/BaseAssets/TurretGiantSniper_Top.png")
 		_turret_sprite.position = Vector2.ZERO
 		_turret_sprite.scale = Vector2(0.55, 0.55)
 		_turret_sprite.z_index = 2
@@ -438,7 +438,7 @@ func _process(delta):
 func _spawn_heal_plus_effects():
 	for i in range(3):
 		var plus = Sprite2D.new()
-		plus.texture = load("res://assets/plus.png")
+		plus.texture = load("res://assets/BaseAssets/plus.png")
 		plus.scale = Vector2(0.04, 0.04)
 		plus.modulate = Color(0.2, 1.0, 0.2, 0.8)
 		plus.z_index = 5
@@ -503,7 +503,8 @@ func _fire_turret():
 
 		if bullet.has_method("init"):
 			var ignored_rid = _base_body.get_rid() if is_instance_valid(_base_body) else get_rid()
-			bullet.init(1, true, _turret_damage, ignored_rid)
+			# Передаем _turret_range как custom_range для пули
+			bullet.init(1, true, _turret_damage, ignored_rid, _turret_range)
 			var sprite = bullet.get_node_or_null("BulletSprite")
 			if sprite: sprite.texture = load("res://assets/future_tanks/PNG/Effects/Heavy_Shell.png")
 

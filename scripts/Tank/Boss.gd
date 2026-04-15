@@ -1,4 +1,4 @@
-extends Enemy
+extends "res://scripts/Tank/Enemy.gd"
 
 var _spawn_timer: Timer
 var _enemy_scene: PackedScene
