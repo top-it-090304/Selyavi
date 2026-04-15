@@ -2,5 +2,7 @@
 enum TypeBullet {
 	PLASMA,
 	MEDIUM,
-	LIGHT
+	LIGHT,
+	HE,
+	BOPS
 }

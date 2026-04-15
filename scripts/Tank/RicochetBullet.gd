@@ -15,6 +15,7 @@ var _bounces_left: int = DEFAULT_BOUNCES
 var _traveled_distance: float = 0.0
 var _ignored_body_rid: RID
 var _destroyed: bool = false
+var _has_ricocheted: bool = false
 
 var _bullet_sprite: Sprite2D
 
@@ -76,10 +77,19 @@ func _move():
 			return
 		# ????? / ??????????? ? ???????
 		elif _is_wall(collider):
+			# After first ricochet, a hit on a destructible wall breaks it.
+			if _has_ricocheted and collider.has_method("destroyable") and collider.destroyable():
+				if collider.has_method("destroy"):
+					collider.destroy()
+				global_position = hit.position
+				_explode()
+				return
+
 			if _bounces_left > 0:
 				_velocity = _velocity.bounce(hit.normal)
 				rotation = _velocity.angle() + PI * 0.5
 				_bounces_left -= 1
+				_has_ricocheted = true
 				# ?????????? ???? ?? ?????, ????? ?? ????????
 				global_position = hit.position + hit.normal * 5.0
 				_play_ricochet_fx()

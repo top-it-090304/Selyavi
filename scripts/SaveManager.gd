@@ -9,6 +9,10 @@ var save_data = {
 		"body_type": 1,
 		"gun_type": 1,
 		"color_type": 0,
+		"ammo_type": 0,
+		"ammo_slot_0": 2,
+		"ammo_slot_1": 0,
+		"ammo_slot_2": 1,
 		"base_hp_level": 0,
 		"base_heal_level": 0,
 		"base_bonus_level": 0,
@@ -18,6 +22,7 @@ var save_data = {
 		"bodies": [1],
 		"guns": [1],
 		"colors": [0],
+		"ammo_types": [0, 1, 2],
 		"base_hp": [0],
 		"base_heal": [0],
 		"base_bonus": [0],
@@ -107,6 +112,9 @@ func load_game():
 		var data = JSON.parse_string(json_string)
 		if data is Dictionary:
 			_merge_dict(save_data, data)
+			for base_ammo in [0, 1, 2]:
+				if not is_purchased("ammo_types", base_ammo):
+					save_data.purchased["ammo_types"].append(base_ammo)
 			money_loaded.emit(int(save_data.get("money", 0)))
 
 func _merge_dict(target: Dictionary, source: Dictionary):
