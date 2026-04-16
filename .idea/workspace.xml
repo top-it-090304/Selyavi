@@ -5,12 +5,18 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="33129e0a-8a1f-4647-8ff9-20d5e301da8a" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/assets/shaders/seasonal_tint.gdshader" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/resources/enemies/enemy_dummy.tres" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/scripts/ExplosionEffect.gd" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/icons/108.png.import" beforeDir="false" afterPath="$PROJECT_DIR$/icons/108.png.import" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/icons/86.png.import" beforeDir="false" afterPath="$PROJECT_DIR$/icons/86.png.import" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/project.godot" beforeDir="false" afterPath="$PROJECT_DIR$/project.godot" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/enemies/enemy_artillery.tres" beforeDir="false" afterPath="$PROJECT_DIR$/resources/enemies/enemy_artillery.tres" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/enemies/enemy_heavy.tres" beforeDir="false" afterPath="$PROJECT_DIR$/resources/enemies/enemy_heavy.tres" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/enemies/enemy_light.tres" beforeDir="false" afterPath="$PROJECT_DIR$/resources/enemies/enemy_light.tres" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/enemies/enemy_medium.tres" beforeDir="false" afterPath="$PROJECT_DIR$/resources/enemies/enemy_medium.tres" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/resources/enemies/enemy_scout.tres" beforeDir="false" afterPath="$PROJECT_DIR$/resources/enemies/enemy_scout.tres" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/scenes/DestructibleWall.tscn" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/scenes/Field.tscn" beforeDir="false" afterPath="$PROJECT_DIR$/scenes/Field.tscn" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/scenes/IndestructibleWall.tscn" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/enemies/enemy_stationary.tres" beforeDir="false" afterPath="$PROJECT_DIR$/resources/enemies/enemy_stationary.tres" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/scenes/Levels/Level_1.tscn" beforeDir="false" afterPath="$PROJECT_DIR$/scenes/Levels/Level_1.tscn" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/scenes/Levels/Level_2.tscn" beforeDir="false" afterPath="$PROJECT_DIR$/scenes/Levels/Level_2.tscn" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/scenes/Levels/Level_3.tscn" beforeDir="false" afterPath="$PROJECT_DIR$/scenes/Levels/Level_3.tscn" afterDir="false" />
@@ -18,8 +24,10 @@
       <change beforePath="$PROJECT_DIR$/scenes/Levels/Level_5.tscn" beforeDir="false" afterPath="$PROJECT_DIR$/scenes/Levels/Level_5.tscn" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/scenes/Levels/Level_6.tscn" beforeDir="false" afterPath="$PROJECT_DIR$/scenes/Levels/Level_6.tscn" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/scenes/Levels/Sandbox.tscn" beforeDir="false" afterPath="$PROJECT_DIR$/scenes/Levels/Sandbox.tscn" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/scenes/WallLayer.tscn" beforeDir="false" afterPath="$PROJECT_DIR$/scenes/WallLayer.tscn" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/scripts/WallTileMap.gd" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/WallTileMap.gd" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scenes/Tank/Boss.tscn" beforeDir="false" afterPath="$PROJECT_DIR$/scenes/Tank/Boss.tscn" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scenes/Tank/Enemy.tscn" beforeDir="false" afterPath="$PROJECT_DIR$/scenes/Tank/Enemy.tscn" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/Tank/Bullet.gd" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/Tank/Bullet.gd" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/Tank/Player.gd" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/Tank/Player.gd" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -63,7 +71,7 @@
     &quot;cf.first.check.clang-format&quot;: &quot;false&quot;,
     &quot;cidr.known.project.marker&quot;: &quot;true&quot;,
     &quot;dart.analysis.tool.window.visible&quot;: &quot;false&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;balance&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
     &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
     &quot;settings.editor.selected.configurable&quot;: &quot;com.google.gct.login2.settings.GoogleLoginApplicationSettingsConfigurableProvider&quot;,
     &quot;show.migrate.to.gradle.popup&quot;: &quot;false&quot;

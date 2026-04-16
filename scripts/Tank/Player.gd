@@ -110,16 +110,15 @@ func fire_touch():
 	bullet.rotation_degrees = _gun.global_rotation_degrees
 	get_parent().add_child(bullet)
 
-	# --- УРОН, ЗАВИСЯЩИЙ ОТ ПУЛИ ---
+	# --- ФИНАЛЬНЫЙ БАЛАНС УРОНА ---
 	var base_bullet_damage = 25
 	match _type_bullet:
 		PLASMA: base_bullet_damage = 25
 		MEDIUM: base_bullet_damage = 40
-		LIGHT: base_bullet_damage = 20
-		HE: base_bullet_damage = 26
-		BOPS: base_bullet_damage = 20
+		LIGHT: base_bullet_damage = 15
+		HE: base_bullet_damage = 30
+		BOPS: base_bullet_damage = 26
 
-	# Итоговый урон = Урон пули * Бафф от базы
 	var final_damage = int(base_bullet_damage * _base_damage_mult)
 	bullet.init(_type_bullet, true, final_damage)
 	# --------------------------------
@@ -181,14 +180,12 @@ func _physics_process(_delta):
 			velocity = Vector2.ZERO
 			_handle_movement_sound(Vector2.ZERO)
 
-if _aim != null and _aim.get_is_dynamic() and _aim.get_output().length() > 0.2:
+	if _aim != null and _aim.get_is_joystick_active() and _aim.move_vector.length() > 0.2:
 		fire_touch()
 
-	_check_base_buffs() # Твоя фича из balance
+	_check_base_buffs()
 	move_and_slide()
 	queue_redraw()
-
-# --- Далее идут сами функции (размещай их в блоке функций) ---
 
 func _check_base_buffs():
 	var in_range = false
@@ -210,7 +207,7 @@ func _on_ammo_selected(slot_idx: int):
 		SaveManager.set_player_stat("ammo_type", _current_ammo_slot)
 	ammo_changed.emit(_current_ammo_slot)
 
-func get_ammo_loadout() -> Array:
+func get_ammo_loadout() -> Array[int]:
 	return _ammo_loadout.duplicate()
 
 func take_damage(damage: int):
@@ -292,20 +289,17 @@ func _apply_camera_fov():
 
 func _draw():
 	if is_scope_on and _aim != null and _aim.get_is_joystick_active():
-var direction = Vector2(0, -1).rotated(_gun.global_rotation)
-	var range_len = 600.0
-	
-	# Используем match из main, так как он поддерживает HE и BOPS
-	match _type_bullet:
-		0: range_len = 600.0 # PLASMA/По умолчанию
-		1: range_len = 275.0 # MEDIUM
-		2: range_len = 900.0 # LIGHT
-		3: range_len = 520.0 # HE (Фугас)
-		4: range_len = 1000.0 # BOPS (Подкалиберный)
-	
-	draw_line(to_local(_bullet_position.global_position), to_local(_bullet_position.global_position + direction * range_len), Color(1, 0, 0, 0.5), 2.0)
+		var direction = Vector2(0, -1).rotated(_gun.global_rotation)
+		var range_len = 650.0 # PLASMA default
 
-# --- Функции настроек из balance (не удаляй их!) ---
+		match _type_bullet:
+			PLASMA: range_len = 650.0
+			MEDIUM: range_len = 300.0
+			LIGHT: range_len = 1000.0
+			HE: range_len = 550.0
+			BOPS: range_len = 1100.0
+
+		draw_line(to_local(_bullet_position.global_position), to_local(_bullet_position.global_position + direction * range_len), Color(1, 0, 0, 0.5), 2.0)
 
 func _on_sfx_volume_changed(value: float):
 	_normal_movement_volume = linear_to_db(value)

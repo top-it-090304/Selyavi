@@ -14,6 +14,7 @@ var _ignored_body_rid: RID # RID тела, которое пуля игнори�
 var _pierce_left: int = 0
 var _aoe_radius: float = 0.0
 var _aoe_damage_multiplier: float = 0.0
+var _hit_targets: Array = [] # Список уже пораженных целей для пробития
 
 const PLASMA: int = 0
 const MEDIUM: int = 1
@@ -37,27 +38,34 @@ func _process(delta):
 	_traveled_distance += move_step.length()
 	if _traveled_distance >= _max_range: _destroy()
 
+func _on_area_entered(_area):
+	pass
+
 func _on_body_entered(body):
-	if _has_dealt_damage: return
+	if body in _hit_targets: return # Не бьем одну и ту же цель дважды
 	if _ignored_body_rid.is_valid() and body.get_rid() == _ignored_body_rid: return
 
 	# Проверка на физическое тело базы
 	var parent = body.get_parent()
-	if parent is Base:
-		_handle_base_hit(parent)
+	if parent is Base or body.is_in_group("bases"):
+		var base_node = parent if parent is Base else body
+		_handle_base_hit(base_node)
 		return
 
 	if body is Player and not _is_player:
-		_has_dealt_damage = true
+		_hit_targets.append(body)
 		body.take_damage(_damage)
 		_post_hit_destroy(body)
 	elif body is Enemy and _is_player:
-		_has_dealt_damage = true
+		_hit_targets.append(body)
 		body.take_damage(_damage)
+
+		# ЛОГИКА ПРОБИТИЯ (BOPS)
 		if _type_bullet == BOPS and _pierce_left > 0:
 			_pierce_left -= 1
 		else:
 			_post_hit_destroy(body)
+
 	elif body.has_method("can_bullet_pass"):
 		if body.can_bullet_pass():
 			return
@@ -66,15 +74,42 @@ func _on_body_entered(body):
 			_post_hit_destroy(body)
 		else:
 			_post_hit_destroy(body)
-	elif body is Base:
-		_post_hit_destroy(body)
 	elif body is StaticBody2D:
 		_post_hit_destroy(body)
 
+func _handle_base_hit(base_node: Node):
+	if base_node in _hit_targets: return
+
+	var is_enemy_base = base_node.get("type_base") == 1
+
+	if (_is_player and is_enemy_base) or (not _is_player and not is_enemy_base):
+		_hit_targets.append(base_node)
+		if base_node.has_method("take_damage"):
+			base_node.take_damage(_damage)
+
+		# БОПС должен прошивать и базу тоже
+		if _type_bullet == BOPS and _pierce_left > 0:
+			_pierce_left -= 1
+		else:
+			_post_hit_destroy(base_node)
+	else:
+		_post_hit_destroy(base_node)
+
 func _post_hit_destroy(hit_body: Node):
-	if _is_player and _type_bullet == HE and _aoe_radius > 0.0:
-		_apply_aoe_damage(hit_body)
+	if _type_bullet == HE:
+		_play_shockwave_effect()
+		# Фугас всегда наносит сплэш урон при попадании во что угодно (враг, стена, база)
+		if _aoe_radius > 0.0:
+			_apply_aoe_damage(hit_body)
 	_destroy()
+
+func _play_shockwave_effect():
+	var effect = Node2D.new()
+	effect.set_script(load("res://scripts/ExplosionEffect.gd"))
+	get_parent().add_child(effect)
+	effect.global_position = global_position
+	if effect.has_method("init"):
+		effect.init(_aoe_radius, Color(1, 0.6, 0.2, 0.8))
 
 func _destroy():
 	queue_free()
@@ -91,25 +126,22 @@ func _update_visuals_and_speed():
 	match _type_bullet:
 		PLASMA:
 			_bullet_sprite.texture = load("res://assets/future_tanks/PNG/Effects/Plasma.png")
-			_bullet_speed = 7; _max_range = 600.0
+			_bullet_speed = 9; _max_range = 650.0
 		MEDIUM:
 			_bullet_sprite.texture = load("res://assets/future_tanks/PNG/Effects/Medium_Shell.png")
-			_bullet_speed = 4; _max_range = 275.0
+			_bullet_speed = 4; _max_range = 300.0
 		LIGHT:
 			_bullet_sprite.texture = load("res://assets/future_tanks/PNG/Effects/Light_Shell.png")
-			_bullet_speed = 6
-			_max_range = 900.0
+			_bullet_speed = 7; _max_range = 1000.0
 		HE:
 			_bullet_sprite.texture = load("res://assets/future_tanks/PNG/Effects/Granade_Shell.png")
-			_bullet_speed = 5
-			_max_range = 520.0
+			_bullet_speed = 5; _max_range = 550.0
 			_aoe_radius = 105.0
 			_aoe_damage_multiplier = 0.65
 		BOPS:
 			_bullet_sprite.texture = load("res://assets/future_tanks/PNG/Effects/Heavy_Shell.png")
-			_bullet_speed = 9
-			_max_range = 1000.0
-			_pierce_left = 2
+			_bullet_speed = 8; _max_range = 1100.0
+			_pierce_left = 1
 
 func _apply_aoe_damage(hit_body: Node):
 	var space_state = get_world_2d().direct_space_state
@@ -128,10 +160,18 @@ func _apply_aoe_damage(hit_body: Node):
 		var c = result.collider
 		if c == hit_body:
 			continue
-		if c is Enemy and _is_player:
-			c.take_damage(splash_damage)
-		elif c is Player and not _is_player:
-			c.take_damage(splash_damage)
+
+		# Если стреляет игрок, дамажим врагов. Если враг - игрока.
+		if _is_player:
+			if c is Enemy:
+				c.take_damage(splash_damage)
+			elif c is Base and c.get("type_base") == 1:
+				c.take_damage(splash_damage)
+		else:
+			if c is Player:
+				c.take_damage(splash_damage)
+			elif c is Base and c.get("type_base") == 0:
+				c.take_damage(splash_damage)
 
 func _on_screen_exited():
 	var tween = create_tween()
