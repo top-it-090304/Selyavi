@@ -23,6 +23,7 @@
 [ext_resource type="PackedScene" uid="uid://dfpgy8w1vxtx0" path="res://scenes/Tank/Enemy.tscn" id="22_n0sxv"]
 [ext_resource type="Resource" uid="uid://dsh37cwiuha28" path="res://resources/enemies/enemy_medium.tres" id="22_ns4on"]
 
+
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_2i15a"]
 texture = ExtResource("2_mssve")
 texture_region_size = Vector2i(128, 128)

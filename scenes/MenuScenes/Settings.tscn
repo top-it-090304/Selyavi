@@ -317,7 +317,7 @@ theme_override_icons/grabber_highlight = SubResource("GradientTexture2D_grabber"
 theme_override_styles/slider = SubResource("StyleBoxLine_slider_bg")
 theme_override_styles/grabber_area = SubResource("StyleBoxLine_slider_area")
 step = 5.0
-value = 50.0
+value = 80.0
 
 [node name="MarkerScaleLabel" type="Label" parent="VBoxMain/ContentContainer/SettingsPanel/GameSettings/Margin/VBox/Grid"]
 layout_mode = 2
