@@ -13,7 +13,7 @@
 [ext_resource type="PackedScene" uid="uid://bjw4bj0fr4c7q" path="res://scenes/Base.tscn" id="15"]
 [ext_resource type="PackedScene" uid="uid://336qfi6ddylt" path="res://scenes/Tank/HUD.tscn" id="21"]
 
-[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_2i15a"]
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_e1qoi"]
 texture = ExtResource("2_mssve")
 texture_region_size = Vector2i(128, 128)
 0:0/0 = 0
@@ -54,7 +54,7 @@ texture_region_size = Vector2i(128, 128)
 
 [sub_resource type="TileSet" id="TileSet_4osdq"]
 tile_size = Vector2i(128, 128)
-sources/0 = SubResource("TileSetAtlasSource_2i15a")
+sources/0 = SubResource("TileSetAtlasSource_e1qoi")
 
 [sub_resource type="NavigationPolygon" id="NavigationPolygon_0g6pg"]
 vertices = PackedVector2Array(1060.69, 73.9531, 1584.59, 344.844, 1379, 348.156, 1078.24, 336.75, 1047.32, 256.594, 2676.45, -104, 2914.89, -104, 2905.1, 760.188, 2398.86, 770.203, 2302.84, 678.063, 2213.2, 321.578, 2270.86, -21.2266, 1843.1, 404.438, 1820.12, 675.953, 1592.42, 533.844, 417.961, -494.023, 1940.01, -14.8516, 850.156, 363.07, 825.906, 266.508, 2697.44, -498.969, 847.031, 54.1328, 413.031, 860.922, 846.82, 546.813, 1064.64, 855.93, 1073.79, 551.188, 1379, 537.156, 2403.85, 1114, 1601, 1114, 1601, 998.094, 1069.64, 993.078)

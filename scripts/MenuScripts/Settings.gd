@@ -14,6 +14,7 @@ var _left_hand_toggler: CheckButton
 var _fov_slider: HSlider
 var _marker_slider: HSlider
 var _return_button: Button
+var _reset_progress_btn: Button
 
 var _sfx_preview_timer: Timer
 
@@ -26,6 +27,7 @@ func _ready():
 	_left_hand_toggler = game_settings.find_child("CheckButton_LeftHand", true)
 	_fov_slider = game_settings.find_child("HSlider_CameraFov", true)
 	_marker_slider = game_settings.find_child("HSlider_MarkerScale", true)
+	_reset_progress_btn = game_settings.find_child("ResetProgressBtn", true)
 
 	_return_button = find_child("Return_Button", true)
 
@@ -34,6 +36,7 @@ func _ready():
 	_setup_sfx_preview()
 	_apply_tab_styles()
 	_setup_reset_dialog_style()
+	_check_reset_button_visibility()
 
 	# Коннекты
 	if _sound_slider:
@@ -47,6 +50,20 @@ func _ready():
 	if _left_hand_toggler: _left_hand_toggler.toggled.connect(_on_left_hand_toggled)
 	if _fov_slider: _fov_slider.value_changed.connect(_on_fov_slider_changed)
 	if _marker_slider: _marker_slider.value_changed.connect(_on_marker_scale_changed)
+
+func _check_reset_button_visibility():
+	if _reset_progress_btn == null: return
+
+	var game_mgr = get_node_or_null("/root/GameManager")
+	var is_from_menu = true # По умолчанию считаем, что мы в меню
+
+	if game_mgr and game_mgr.has_meta("from_scene"):
+		var last_scene = game_mgr.get_meta("from_scene")
+		# Если мы пришли из миссии (не из меню), скрываем кнопку
+		if not last_scene.contains("Menu.tscn"):
+			is_from_menu = false
+
+	_reset_progress_btn.visible = is_from_menu
 
 func _setup_reset_dialog_style():
 	if not reset_dialog: return
@@ -69,7 +86,7 @@ func _setup_reset_dialog_style():
 	if ok_btn:
 		ok_btn.add_theme_font_override("font", main_font)
 		ok_btn.add_theme_font_size_override("font_size", 32)
-		ok_btn.custom_minimum_size = Vector2(380, 130) # Существенно увеличил высоту
+		ok_btn.custom_minimum_size = Vector2(380, 130)
 
 		var red_normal = StyleBoxFlat.new()
 		red_normal.bg_color = Color(0.55, 0.11, 0.11)
@@ -101,7 +118,7 @@ func _setup_reset_dialog_style():
 	if cancel_btn:
 		cancel_btn.add_theme_font_override("font", main_font)
 		cancel_btn.add_theme_font_size_override("font_size", 32)
-		cancel_btn.custom_minimum_size = Vector2(300, 130) # Существенно увеличил высоту
+		cancel_btn.custom_minimum_size = Vector2(300, 130)
 
 		var grey_style = StyleBoxFlat.new()
 		grey_style.bg_color = Color(0.18, 0.22, 0.18)
