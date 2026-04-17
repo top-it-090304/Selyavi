@@ -1,14 +1,17 @@
-[gd_scene load_steps=6 format=3]
+[gd_scene load_steps=7 format=3 uid="uid://ci31nodw6s6ty"]
 
-[ext_resource type="Script" path="res://scripts/MenuScripts/TutorialOverlay.gd" id="1"]
-[ext_resource type="Shader" path="res://assets/shaders/spotlight.gdshader" id="2"]
+[ext_resource type="Script" uid="uid://x448iws3h3ux" path="res://scripts/MenuScripts/TutorialOverlay.gd" id="1"]
+[ext_resource type="Shader" uid="uid://cdlwbi2tvnot0" path="res://assets/shaders/spotlight.gdshader" id="2"]
 [ext_resource type="FontFile" uid="uid://bsnvk4l0ue5ri" path="res://assets/fonts/ofont.ru_Shonen.ttf" id="3"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_1"]
 shader = ExtResource("2")
 shader_parameter/hole_center = Vector2(0, 0)
+shader_parameter/hole_size = Vector2(0, 0)
 shader_parameter/hole_radius = 0.0
+shader_parameter/shape = 0.0
 shader_parameter/blur = 0.2
+shader_parameter/alpha_val = 0.7
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_panel"]
 bg_color = Color(0.14902, 0.172549, 0.14902, 0.9)

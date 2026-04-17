@@ -1,7 +1,7 @@
-[gd_scene load_steps=5 format=3]
+[gd_scene load_steps=4 format=3 uid="uid://pqx7bh4bo1sa"]
 
-[ext_resource type="Script" path="res://scripts/DestructibleWall.gd" id="1"]
-[ext_resource type="Texture2D" uid="uid://cs88v720n2m2f" path="res://assets/backround/PNG/Blocks/Block_B_02.png" id="2"]
+[ext_resource type="Script" uid="uid://lh2wrcty2ntq" path="res://scripts/DestructibleWall.gd" id="1"]
+[ext_resource type="Texture2D" uid="uid://bjbf8owd5q6xl" path="res://assets/backround/PNG/Blocks/Block_B_02.png" id="2"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_1"]
 size = Vector2(128, 128)

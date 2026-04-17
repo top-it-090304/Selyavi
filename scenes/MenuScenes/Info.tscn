@@ -1,4 +1,4 @@
-[gd_scene load_steps=12 format=3 uid="uid://dwdei3ebmswf5"]
+[gd_scene load_steps=9 format=3 uid="uid://dwdei3ebmswf5"]
 
 [ext_resource type="Script" uid="uid://ctaqxuigqjc0u" path="res://scripts/MenuScripts/Info.gd" id="1"]
 [ext_resource type="FontFile" uid="uid://bsnvk4l0ue5ri" path="res://assets/fonts/ofont.ru_Shonen.ttf" id="2"]

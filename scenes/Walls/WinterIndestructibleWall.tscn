@@ -1,8 +1,8 @@
-[gd_scene load_steps=6 format=3]
+[gd_scene load_steps=6 format=3 uid="uid://dme4gp7xm3ggc"]
 
-[ext_resource type="Script" path="res://scripts/IndestructibleWall.gd" id="1"]
+[ext_resource type="Script" uid="uid://bnsy3xwpox5su" path="res://scripts/IndestructibleWall.gd" id="1"]
 [ext_resource type="Texture2D" uid="uid://0o1k3bwfch45" path="res://assets/backround/PNG/Blocks/Block_C_02.png" id="2"]
-[ext_resource type="Shader" path="res://assets/shaders/seasonal_tint.gdshader" id="3"]
+[ext_resource type="Shader" uid="uid://3rnm3yf05t0y" path="res://assets/shaders/seasonal_tint.gdshader" id="3"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_1"]
 size = Vector2(128, 128)

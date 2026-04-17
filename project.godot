@@ -11,9 +11,8 @@ config_version=5
 [application]
 
 config/name="Tanks 2026"
-run/main_scene="uid://dsgqbvu3xbmcr"
+run/main_scene="res://scenes/MenuScenes/Menu.tscn"
 config/features=PackedStringArray("4.4")
-boot_splash/image="uid://dqn3kxp3syx7t"
 config/icon="res://icon.png"
 
 [autoload]
@@ -94,10 +93,6 @@ go_to_settings={
 
 pointing/emulate_touch_from_mouse=true
 
-[mono]
-
-project/assembly_name="Tanks 2026"
-
 [physics]
 
 common/enable_pause_aware_picking=true
@@ -107,6 +102,4 @@ common/enable_pause_aware_picking=true
 renderer/rendering_method="gl_compatibility"
 renderer/rendering_method.mobile="gl_compatibility"
 textures/vram_compression/import_etc2_astc=true
-environment/defaults/default_environment="res://default_env.tres"
-quality/driver/driver_name="GLES2"
 vram_compression/import_etc=true

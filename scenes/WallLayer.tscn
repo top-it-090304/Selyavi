@@ -3,11 +3,11 @@
 [ext_resource type="Texture2D" uid="uid://dflh11hetycup" path="res://assets/backround/PNG/Blocks/Block_A_02.png" id="1"]
 [ext_resource type="Texture2D" uid="uid://0o1k3bwfch45" path="res://assets/backround/PNG/Blocks/Block_C_02.png" id="2"]
 [ext_resource type="Script" uid="uid://lxo4dtnvkpka" path="res://scripts/WallTileMap.gd" id="3"]
-[ext_resource type="PackedScene" path="res://scenes/Walls/WinterDestructibleWall.tscn" id="4"]
-[ext_resource type="PackedScene" path="res://scenes/Walls/WinterIndestructibleWall.tscn" id="5"]
-[ext_resource type="PackedScene" path="res://scenes/Walls/SpringDestructibleWall.tscn" id="6"]
-[ext_resource type="PackedScene" path="res://scenes/Walls/SpringIndestructibleWall.tscn" id="7"]
-[ext_resource type="PackedScene" path="res://scenes/Walls/DestructibleWallB.tscn" id="8"]
+[ext_resource type="PackedScene" uid="uid://dm0ptyhuy2r1s" path="res://scenes/Walls/WinterDestructibleWall.tscn" id="4"]
+[ext_resource type="PackedScene" uid="uid://dme4gp7xm3ggc" path="res://scenes/Walls/WinterIndestructibleWall.tscn" id="5"]
+[ext_resource type="PackedScene" uid="uid://dk7cbu0eibuxa" path="res://scenes/Walls/SpringDestructibleWall.tscn" id="6"]
+[ext_resource type="PackedScene" uid="uid://c7s727c0gk5n7" path="res://scenes/Walls/SpringIndestructibleWall.tscn" id="7"]
+[ext_resource type="PackedScene" uid="uid://pqx7bh4bo1sa" path="res://scenes/Walls/DestructibleWallB.tscn" id="8"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_1"]
 texture = ExtResource("1")

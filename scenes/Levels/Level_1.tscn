@@ -2,7 +2,7 @@
 
 [ext_resource type="PackedScene" uid="uid://mfxaskty4hrm" path="res://scenes/Tank/Player.tscn" id="2"]
 [ext_resource type="Texture2D" uid="uid://d0bnoilig7yxs" path="res://assets/ground_shaker_asset/Terrains/terrain.png" id="2_mssve"]
-[ext_resource type="PackedScene" path="res://scenes/obtacles/wall.tscn" id="3"]
+[ext_resource type="PackedScene" uid="uid://crbjyol17koge" path="res://scenes/obtacles/wall.tscn" id="3"]
 [ext_resource type="PackedScene" uid="uid://b5ewq03v7qkiv" path="res://scenes/Walls/IndestructibleWall.tscn" id="4"]
 [ext_resource type="PackedScene" uid="uid://dwrghveyttq4p" path="res://scenes/Walls/DestructibleWall.tscn" id="5"]
 [ext_resource type="AudioStream" uid="uid://bxl5wv7crhm5" path="res://assets/Music/68. Sad Eyes.mp3" id="6"]
@@ -222,6 +222,9 @@ position = Vector2(739, 363)
 [node name="IndestructibleWall16" parent="IngameWalls" instance=ExtResource("4")]
 position = Vector2(981, 213)
 
+[node name="DestructibleWall8" parent="IngameWalls" instance=ExtResource("5")]
+position = Vector2(522, 84)
+
 [node name="IndestructibleWall#IndestructibleWall12" parent="." instance=ExtResource("4")]
 position = Vector2(1488, 78)
 
@@ -281,8 +284,5 @@ navigation_polygon = SubResource("2")
 
 [node name="EnemyBase" parent="." instance=ExtResource("15")]
 position = Vector2(1628, 1339)
-
-[node name="DestructibleWall" parent="." instance=ExtResource("5")]
-position = Vector2(522, 84)
 
 [connection signal="pressed" from="PlayerTank/PauseButton/PauseButton" to="." method="_on_TouchScreenButton_pressed"]

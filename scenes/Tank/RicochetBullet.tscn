@@ -1,7 +1,7 @@
-[gd_scene load_steps=4 format=3]
+[gd_scene load_steps=4 format=3 uid="uid://cyvtbrjck6alf"]
 
-[ext_resource type="Script" path="res://scripts/Tank/RicochetBullet.gd" id="1"]
-[ext_resource type="Texture2D" path="res://assets/future_tanks/PNG/Effects/Granade_Shell.png" id="2"]
+[ext_resource type="Script" uid="uid://c36suvediag26" path="res://scripts/Tank/RicochetBullet.gd" id="1"]
+[ext_resource type="Texture2D" uid="uid://rpvllhbb34i6" path="res://assets/future_tanks/PNG/Effects/Granade_Shell.png" id="2"]
 
 [sub_resource type="CapsuleShape2D" id="1"]
 radius = 11.0
@@ -17,4 +17,4 @@ texture = ExtResource("2")
 shape = SubResource("1")
 
 [node name="VisibleOnScreenNotifier2D" type="VisibleOnScreenNotifier2D" parent="."]
-scale = Vector2(1.0, 4.2)
+scale = Vector2(1, 4.2)

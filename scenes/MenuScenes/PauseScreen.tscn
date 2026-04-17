@@ -12,6 +12,8 @@ corner_radius_bottom_right = 25
 shadow_color = Color(0, 0, 0, 0.588235)
 shadow_size = 20
 
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_scroll"]
+
 [sub_resource type="LabelSettings" id="LabelSettings_pause"]
 font = ExtResource("1")
 font_size = 48
@@ -75,8 +77,6 @@ corner_radius_top_left = 12
 corner_radius_top_right = 12
 corner_radius_bottom_right = 12
 corner_radius_bottom_left = 12
-
-[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_scroll"]
 
 [node name="PauseScreen" type="CanvasLayer"]
 process_mode = 3

@@ -1,25 +1,25 @@
-[gd_scene load_steps=5 format=2]
+[gd_scene load_steps=5 format=3 uid="uid://d7lhh8m7hkd7"]
 
-[ext_resource path="res://assets/future_tanks/PNG/Effects/Plasma.png" type="Texture2D" id=1]
-[ext_resource path="res://scripts/Tank/Bullet.gd" type="Script" id=2]
-[ext_resource path="res://assets/sounds/plasma_gun_06.mp3" type="AudioStream" id=3]
+[ext_resource type="Texture2D" uid="uid://dyk8ocdauyfc5" path="res://assets/future_tanks/PNG/Effects/Plasma.png" id="1"]
+[ext_resource type="Script" uid="uid://cr04wfgtqgv8k" path="res://scripts/Tank/Bullet.gd" id="2"]
+[ext_resource type="AudioStream" uid="uid://bs4kd3hkr7j7b" path="res://assets/sounds/plasma_gun_06.mp3" id="3"]
 
-[sub_resource type="CapsuleShape2D" id=1]
+[sub_resource type="CapsuleShape2D" id="1"]
 radius = 9.0
 height = 56.0
 
 [node name="Bullet" type="Area2D"]
-script = ExtResource( 2 )
+script = ExtResource("2")
 
 [node name="BulletSprite" type="Sprite2D" parent="."]
-texture = ExtResource( 1 )
+texture = ExtResource("1")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-shape = SubResource( 1 )
+shape = SubResource("1")
 
 [node name="PlasmaGunSound" type="AudioStreamPlayer" parent="."]
-stream = ExtResource( 3 )
+stream = ExtResource("3")
 
 [node name="VisibleOnScreenNotifier2D" type="VisibleOnScreenNotifier2D" parent="."]
-position = Vector2( 0, -3.09944e-06 )
-scale = Vector2( 1, 3.8 )
+position = Vector2(0, -3.09944e-06)
+scale = Vector2(1, 3.8)
