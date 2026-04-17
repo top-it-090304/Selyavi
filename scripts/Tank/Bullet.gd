@@ -32,6 +32,12 @@ func _ready():
 	area_entered.connect(_on_area_entered)
 	_visibility_bullet.screen_exited.connect(_on_screen_exited)
 
+func is_player() -> bool:
+	return _is_player
+
+func get_damage() -> int:
+	return _damage
+
 func _process(delta):
 	var move_step = _velocity * _bullet_speed
 	position += move_step
@@ -39,6 +45,9 @@ func _process(delta):
 	if _traveled_distance >= _max_range: _destroy()
 
 func _on_area_entered(_area):
+	# Если мы попали в другую область (например, триггер базы),
+	# обработка урона обычно идет на стороне той области,
+	# но нам важно не блокировать логику взрыва.
 	pass
 
 func _on_body_entered(body):
@@ -52,21 +61,25 @@ func _on_body_entered(body):
 		_handle_base_hit(base_node)
 		return
 
-	if body is Player and not _is_player:
-		_hit_targets.append(body)
-		body.take_damage(_damage)
-		_post_hit_destroy(body)
-	elif body is Enemy and _is_player:
-		_hit_targets.append(body)
-		body.take_damage(_damage)
-
-		# ЛОГИКА ПРОБИТИЯ (BOPS)
-		if _type_bullet == BOPS and _pierce_left > 0:
-			_pierce_left -= 1
-		else:
+	if body is Player:
+		if not _is_player:
+			_hit_targets.append(body)
+			body.take_damage(_damage)
 			_post_hit_destroy(body)
+		return
 
-	elif body.has_method("can_bullet_pass"):
+	if body is Enemy:
+		if _is_player:
+			_hit_targets.append(body)
+			body.take_damage(_damage)
+			# ЛОГИКА ПРОБИТИЯ (BOPS)
+			if _type_bullet == BOPS and _pierce_left > 0:
+				_pierce_left -= 1
+			else:
+				_post_hit_destroy(body)
+		return
+
+	if body.has_method("can_bullet_pass"):
 		if body.can_bullet_pass():
 			return
 		elif body.has_method("destroyable") and body.destroyable():
@@ -96,22 +109,27 @@ func _handle_base_hit(base_node: Node):
 		_post_hit_destroy(base_node)
 
 func _post_hit_destroy(hit_body: Node):
-	if _type_bullet == HE:
-		_play_shockwave_effect()
-		# Фугас всегда наносит сплэш урон при попадании во что угодно (враг, стена, база)
-		if _aoe_radius > 0.0:
-			_apply_aoe_damage(hit_body)
-	_destroy()
+	# При попадании мы вызываем взрыв, исключая прямого виновника из сплэш-урона,
+	# чтобы он не получил урон дважды (прямой + сплэш).
+	_destroy(hit_body)
 
 func _play_shockwave_effect():
+	var effect_scene = load("res://scripts/ExplosionEffect.gd")
+	if not effect_scene: return
+
 	var effect = Node2D.new()
-	effect.set_script(load("res://scripts/ExplosionEffect.gd"))
+	effect.set_script(effect_scene)
 	get_parent().add_child(effect)
 	effect.global_position = global_position
 	if effect.has_method("init"):
 		effect.init(_aoe_radius, Color(1, 0.6, 0.2, 0.8))
 
-func _destroy():
+func _destroy(exclude_body: Node = null):
+	if _type_bullet == HE:
+		_play_shockwave_effect()
+		if _aoe_radius > 0.0:
+			_apply_aoe_damage(exclude_body)
+
 	queue_free()
 
 func init(type_bullet: int, is_player: bool, damage: int = 0, ignored_rid: RID = RID(), custom_range: float = -1.0):

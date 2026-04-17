@@ -366,8 +366,9 @@ func _compute_ally_avoidance(forward: Vector2) -> Vector2:
 		if not (other is CharacterBody2D):
 			continue
 
-		# Игнорируем стационарные турели в логике объезда, чтобы не застревать в узких проходах
-		if other.get("_type_enemy") == TypeEnemy.STATIONARY:
+		# Игнорируем стационарные турели и артиллерию в логике объезда, чтобы не застревать в узких проходах
+		var other_type = other.get("_type_enemy")
+		if other_type == TypeEnemy.STATIONARY or other_type == TypeEnemy.ARTILLERY:
 			continue
 
 		var diff = my_pos - other.global_position
@@ -491,17 +492,19 @@ func _update_ray_cast():
 
 func _is_target_visible() -> bool:
 	if _type_enemy == TypeEnemy.ARTILLERY:
-		# 1. Проверяем \"засвет\" от разведчика.
+		# СТРОГАЯ ПРОВЕРКА ДЛЯ АРТИЛЛЕРИИ:
+		# 1. Проверяем засвет от скаута (приоритет)
 		var time_since_spotted = (Time.get_ticks_msec() / 1000.0) - Enemy.last_spotted_time
-		if time_since_spotted <= 2.0 and is_instance_valid(Enemy.scout_target):
-			# Арта стреляет по цели (игроку или базе), если её подсветил скаут
+		if time_since_spotted <= 2.5 and is_instance_valid(Enemy.scout_target):
+			# Для арты по засвету скаута убираем все проверки препятствий у ствола.
+			# Это навесной огонь, стены рядом не должны мешать.
 			return true
 
-		# 2. Самостоятельное обнаружение только игрока (базу арта сама не видит без скаута)
+		# 2. Самостоятельное обнаружение ТОЛЬКО ИГРОКА и только в пределах LoS (никаких стен)
 		if is_instance_valid(_player):
 			var dist = global_position.distance_to(_player.global_position)
-			# Проверяем LoS до игрока (обычный радиус или \"слепая\" зона вблизи)
-			if (dist <= _notice_range or dist <= _blind_fire_range) and _is_target_visible_at(_player):
+			# Уменьшаем радиус "самостоятельной" стрельбы арты без скаута до 500
+			if dist <= 500.0 and _is_target_visible_at(_player):
 				return true
 
 		return false
@@ -514,7 +517,9 @@ func _is_target_visible() -> bool:
 		return false
 
 	# Дополнительная проверка боковых лучей (защита от стрельбы в стену полкорпусом)
-	var side_offset = 35.0 * max(scale.x, scale.y) # Увеличено для лучшего Peeking-а
+	var is_base = target is Base
+	# Для баз используем меньший офсет, чтобы боты не тупили перед стенами, но видели препятствие
+	var side_offset = (20.0 if is_base else 35.0) * max(scale.x, scale.y)
 	var dir_to_target = (target.global_position - global_position).normalized()
 	var right = Vector2(-dir_to_target.y, dir_to_target.x) * side_offset
 
@@ -524,61 +529,71 @@ func _is_target_visible() -> bool:
 
 	return true
 
-func _is_line_clear_to_target(from: Vector2, target: Node) -> bool:
+func _is_line_clear_to_target(from: Vector2, target_node_or_pos) -> bool:
+	var target_pos = target_node_or_pos.global_position if target_node_or_pos is Node2D else target_node_or_pos
 	var space_state = get_world_2d().direct_space_state
-	var query = PhysicsRayQueryParameters2D.create(from, target.global_position)
-	query.exclude = [self]
-	query.collision_mask = 1 # Стены и другие танки
-	var result = space_state.intersect_ray(query)
 
-	if result.is_empty():
-		return true
+	# Список исключений для луча (те, сквозь кого мы "смотрим")
+	var exclude_list: Array[RID] = [get_rid()]
 
-	var collider = result.collider
-	if collider == target:
-		return true
+	# Мы делаем несколько проходов (цикл), чтобы проверить, нет ли неразрушимых препятствий за разрушимыми
+	# 10 итераций должно хватить для самых сложных нагромождений коробок
+	for i in range(10):
+		var query = PhysicsRayQueryParameters2D.create(from, target_pos)
+		query.exclude = exclude_list
+		query.collision_mask = 3 # Стены (1) и Танки/Базы (2)
+		var result = space_state.intersect_ray(query)
 
-	# Игнорируем других врагов, так как пули пролетают сквозь них
-	if collider is Enemy:
-		return true
-
-	# Особая проверка для базы
-	if target == _base:
-		if collider == _base or (collider.get_parent() != null and collider.get_parent() == _base):
+		# Если луч ни во что не врезался - путь чист
+		if result.is_empty():
 			return true
 
-	# Если это разрушаемая стена, бот должен стрелять
-	if collider is IngameWall and collider.destroyable():
-		return true
+		var collider = result.collider
+
+		# 1. Если попали прямо в цель (или её физическое тело в случае базы)
+		if target_node_or_pos is Node:
+			if collider == target_node_or_pos or (collider is Node and collider.get_parent() == target_node_or_pos):
+				return true
+
+		# 2. Если попали в другого врага - игнорируем его (мы разрешили стрельбу сквозь своих)
+		if collider is Enemy:
+			exclude_list.append(collider.get_rid())
+			continue
+
+		# 3. Проверка на разрушаемость
+		var is_destructible = false
+		if collider.has_method("destroyable") and collider.destroyable():
+			is_destructible = true
+		elif collider.is_in_group("walls") and collider.has_method("destroyable") and collider.destroyable():
+			is_destructible = true
+
+		if is_destructible:
+			# Если объект разрушаем, мы добавляем его в исключения и "смотрим" дальше.
+			# Таким образом, если ЗА этой коробкой стоит бетонная стена, луч в итоге упрётся в неё
+			# и вернёт false, и бот не будет тратить снаряды впустую.
+			exclude_list.append(collider.get_rid())
+			continue
+
+		# 4. Если мы дошли до этой точки, значит попали во что-то твердое (неразрушимая стена)
+		return false
 
 	return false
 
 func _is_target_visible_at(target) -> bool:
-	if not is_instance_valid(target) or _ray_cast == null: return false
+	if not is_instance_valid(target): return false
 
-	_ray_cast.target_position = _ray_cast.to_local(target.global_position)
-	_ray_cast.force_raycast_update()
+	# Для арты делаем "честный" старт луча чуть впереди, чтобы не застревать в своей коллизии
+	var from = global_position
+	if _type_enemy == TypeEnemy.ARTILLERY:
+		var dir = (target.global_position - global_position).normalized()
+		from = global_position + dir * 110.0
 
-	if not _ray_cast.is_colliding():
-		return true
-
-	var collider = _ray_cast.get_collider()
-	if collider == target: return true
-
-	if target == _base:
-		if collider == _base or (collider.get_parent() != null and collider.get_parent() == _base):
-			return true
-
-	if collider is IngameWall:
-		if collider.destroyable():
-			return true
-
-	return false
+	return _is_line_clear_to_target(from, target)
 
 func _get_current_target():
 	if _type_enemy == TypeEnemy.ARTILLERY:
 		var time_since_spotted = (Time.get_ticks_msec() / 1000.0) - Enemy.last_spotted_time
-		if time_since_spotted <= 2.0 and is_instance_valid(Enemy.scout_target):
+		if time_since_spotted <= 2.5 and is_instance_valid(Enemy.scout_target):
 			return Enemy.scout_target
 		return _player
 
@@ -597,8 +612,8 @@ func _check_and_fire():
 
 	var can_fire = false
 	if _type_enemy == TypeEnemy.ARTILLERY:
-		# Арта использует результат _is_target_visible() и ждет секунду
-		can_fire = _target_in_sight and _reaction_timer >= 1.0
+		# Арта стреляет только если цель в прямой видимости (или по наводке)
+		can_fire = _target_in_sight and _reaction_timer >= 1.2
 	elif _type_enemy == TypeEnemy.SCOUT:
 		if dist <= _attack_range and _target_in_sight:
 			can_fire = true
@@ -606,6 +621,7 @@ func _check_and_fire():
 		if dist <= _attack_range and _target_in_sight:
 			can_fire = true
 	else:
+		# Стрельба по базе или другим целям
 		if dist <= 700.0 and _target_in_sight:
 			can_fire = true
 
@@ -663,7 +679,7 @@ func _fire_at_pos(pos: Vector2):
 			bullet.global_position = _bullet_position.global_position
 			bullet.global_rotation = angle
 			get_parent().add_child(bullet)
-			bullet.init(1, false, _damage)
+			bullet.init(1, false, _damage, get_rid())
 	else:
 		var bullet = _bullet_scene.instantiate()
 		var angle = base_angle + randf_range(-_spread, _spread)
@@ -671,7 +687,7 @@ func _fire_at_pos(pos: Vector2):
 		bullet.global_rotation = angle
 		get_parent().add_child(bullet)
 		var b_type = 2 if _type_enemy == TypeEnemy.STATIONARY else 0
-		bullet.init(b_type, false, _damage)
+		bullet.init(b_type, false, _damage, get_rid())
 
 	if _shot_flash:
 		_shot_flash.play("Fire")

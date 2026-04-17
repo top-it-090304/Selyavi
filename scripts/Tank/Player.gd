@@ -214,7 +214,9 @@ func take_damage(damage: int):
 	if _is_invulnerable: return
 	super.take_damage(damage)
 	health_changed.emit(_hp, _max_hp)
-	if _hp > 0: _start_invulnerability(1.0)
+	# Даем инвул только если урон существенный (> 10)
+	if _hp > 0 and damage > 10:
+		_start_invulnerability(1.0)
 
 func _destroy():
 	_lives -= 1

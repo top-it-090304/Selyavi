@@ -39,7 +39,7 @@ var settings_data = {
 		"scope_enabled": true,
 		"aim_assist": true,
 		"lefty_mode": false,
-		"camera_fov": 50.0,
+		"camera_fov": 80.0,
 		"marker_scale": 1.0
 	}
 }
@@ -64,7 +64,7 @@ func load_settings():
 		settings_data["game"]["scope_enabled"] = config.get_value("game", "scope_enabled", true)
 		settings_data["game"]["aim_assist"] = config.get_value("game", "aim_assist", true)
 		settings_data["game"]["lefty_mode"] = config.get_value("game", "lefty_mode", false)
-		settings_data["game"]["camera_fov"] = config.get_value("game", "camera_fov", 50.0)
+		settings_data["game"]["camera_fov"] = config.get_value("game", "camera_fov", 80.0)
 		settings_data["game"]["marker_scale"] = config.get_value("game", "marker_scale", 1.0)
 	settings_changed.emit()
 

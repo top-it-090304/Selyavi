@@ -17,7 +17,7 @@ var _base_body: StaticBody2D
 
 @export var _max_enemies: int = 3 # Лимит обычных ботов
 @export var _special_enemy_resource: EnemyData # Гарантированный особый бот из инспектора
-var _special_pool: Array[EnemyData] = [] # Пул всех особых ботов из ресурсов
+var _special_pool: Array[EnemyData] = [] # Пул всех особых ботов
 
 @export var _heal_amount: int = 7
 @export var _heal_interval: float = 1.0
@@ -86,17 +86,16 @@ func _ready():
 
 func _load_special_enemies():
 	_special_pool.clear()
-	var path = "res://resources/enemies/"
-	var dir = DirAccess.open(path)
-	if dir:
-		dir.list_dir_begin()
-		var file_name = dir.get_next()
-		while file_name != "":
-			if file_name.ends_with(".tres"):
-				var res = load(path + file_name)
-				if res is EnemyData and res.is_special and res.can_be_spawned_by_base:
-					_special_pool.append(res)
-			file_name = dir.get_next()
+	# ПРЯМАЯ ЗАГРУЗКА БЕЗ АРТИЛЛЕРИИ
+	var paths = [
+		"res://resources/enemies/enemy_scout.tres",
+		]
+
+	for p in paths:
+		if ResourceLoader.exists(p):
+			var res = load(p)
+			if res is EnemyData:
+				_special_pool.append(res)
 
 func _setup_feature_sprites():
 	if type_base != TypeBase.PLAYER: return
@@ -227,11 +226,20 @@ func _update_spawn_interval():
 	_spawn_interval = 10.0 if lvl <= 5 else (8.0 if lvl <= 10 else 6.0)
 
 func _setup_base_collision():
-	_base_body = StaticBody2D.new(); _base_body.name = "BaseStaticBody"; add_child(_base_body)
-	var cs = CollisionShape2D.new(); var circle = CircleShape2D.new()
+	_base_body = StaticBody2D.new()
+	_base_body.name = "BaseStaticBody"
+	# Устанавливаем слои 1 и 2, чтобы в базу врезались и игроки, и танки
+	_base_body.collision_layer = 1 | 2
+	_base_body.collision_mask = 0
+	add_child(_base_body)
+
+	var cs = CollisionShape2D.new()
+	var circle = CircleShape2D.new()
 	var area_shape = get_node_or_null("CollisionShape2D")
-	circle.radius = area_shape.shape.radius if area_shape and area_shape.shape is CircleShape2D else 60.0
-	cs.shape = circle; _base_body.add_child(cs)
+	# Делаем коллизию чуть меньше спрайта для честности
+	circle.radius = (area_shape.shape.radius if area_shape and area_shape.shape is CircleShape2D else 60.0) * 0.95
+	cs.shape = circle
+	_base_body.add_child(cs)
 
 func _on_bullet_entered(area):
 	if area.has_method("is_player"):
@@ -312,8 +320,11 @@ func _spawn_enemy():
 
 		# Сначала пробуем назначенный ресурс
 		if _special_enemy_resource and _special_enemy_resource.can_be_spawned_by_base and _check_special_condition(_special_enemy_resource):
-			special_to_spawn = _special_enemy_resource
-		else:
+			# ГАРАНТИРУЕМ ЧТО ЭТО НЕ АРТИЛЛЕРИЯ
+			if _special_enemy_resource.enemy_type != 6:
+				special_to_spawn = _special_enemy_resource
+
+		if not special_to_spawn:
 			# Если назначенный не подошел, ищем в пуле
 			var possible_specials = _special_pool.filter(func(res): return _check_special_condition(res))
 			if possible_specials.size() > 0:
@@ -383,12 +394,20 @@ func _get_safe_spawn_pos() -> Vector2:
 	var base_angle = (target_pos - global_position).angle() if target_pos != Vector2.ZERO else 0.0
 
 	for attempts in range(50):
-		var angle = base_angle + randf_range(-PI/2, PI/2) if target_pos != Vector2.ZERO else randf_range(0, 2*PI)
-		var spawn_pos = global_position + Vector2(cos(angle), sin(angle)) * randf_range(250, 500)
+		# Ограничиваем угол спавна вперед к цели (PI/2 вместо PI)
+		var angle = base_angle + randf_range(-PI/3, PI/3) if target_pos != Vector2.ZERO else randf_range(0, 2*PI)
+		var spawn_pos = global_position + Vector2(cos(angle), sin(angle)) * randf_range(200, 400)
 
-		if _is_pos_safe(spawn_pos) and _is_spawn_line_clear(spawn_pos):
+		# ПРОВЕРКА: находится ли точка на навигационной сетке (внутри уровня)
+		if _is_pos_on_nav_mesh(spawn_pos) and _is_pos_safe(spawn_pos) and _is_spawn_line_clear(spawn_pos):
 			return spawn_pos
 	return Vector2.ZERO
+
+func _is_pos_on_nav_mesh(pos: Vector2) -> bool:
+	var map = get_world_2d().get_navigation_map()
+	var closest_pos = NavigationServer2D.map_get_closest_point(map, pos)
+	# Если ближайшая точка на сетке слишком далеко от желаемой, значит мы за границей уровня
+	return pos.distance_to(closest_pos) < 50.0
 
 func _is_spawn_line_clear(pos: Vector2) -> bool:
 	var space_state = get_world_2d().direct_space_state
