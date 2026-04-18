@@ -231,14 +231,19 @@ func _show_game_over_screen(is_victory: bool, reason: String = ""):
 					am.stop()
 
 			var next_path = "res://scenes/Levels/Level_" + str(next_lvl_num) + ".tscn"
+			var final_path = "res://scenes/MenuScenes/LevelSelector.tscn"
+
 			if ResourceLoader.exists(next_path):
-				get_tree().change_scene_to_file(next_path)
+				final_path = next_path
 			else:
 				var alt_path = next_path.replace(".tscn", ".scn")
 				if ResourceLoader.exists(alt_path):
-					get_tree().change_scene_to_file(alt_path)
-				else:
-					get_tree().change_scene_to_file("res://scenes/MenuScenes/LevelSelector.tscn")
+					final_path = alt_path
+
+			if has_node("/root/LoadingManager"):
+				get_node("/root/LoadingManager").load_level(final_path)
+			else:
+				get_tree().change_scene_to_file(final_path)
 		)
 
 	var btn_retry = Button.new()

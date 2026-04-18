@@ -1,0 +1,124 @@
+[gd_scene load_steps=9 format=3 uid="uid://cm3j8p3d5k2j6"]
+
+[ext_resource type="Script" path="res://scripts/MenuScripts/LoadingScreen.gd" id="1"]
+[ext_resource type="FontFile" uid="uid://bsnvk4l0ue5ri" path="res://assets/fonts/ofont.ru_Shonen.ttf" id="2"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bg"]
+bg_color = Color(0.0784314, 0.0901961, 0.0784314, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_progress"]
+bg_color = Color(0.352941, 0.411765, 0.305882, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.741176, 0.819608, 0.705882, 1)
+corner_radius_top_left = 5
+corner_radius_top_right = 5
+corner_radius_bottom_right = 5
+corner_radius_bottom_left = 5
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn_normal"]
+bg_color = Color(0.180392, 0.219608, 0.180392, 1)
+border_width_bottom = 8
+border_color = Color(0.290196, 0.341176, 0.25098, 1)
+corner_radius_top_left = 15
+corner_radius_top_right = 15
+corner_radius_bottom_right = 15
+corner_radius_bottom_left = 15
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn_hover"]
+bg_color = Color(0.25098, 0.301961, 0.25098, 1)
+border_width_bottom = 8
+border_color = Color(0.439216, 0.501961, 0.380392, 1)
+corner_radius_top_left = 15
+corner_radius_top_right = 15
+corner_radius_bottom_right = 15
+corner_radius_bottom_left = 15
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn_pressed"]
+bg_color = Color(0.121569, 0.14902, 0.121569, 1)
+border_width_top = 8
+border_width_bottom = 2
+border_color = Color(0.0784314, 0.0901961, 0.0784314, 1)
+corner_radius_top_left = 15
+corner_radius_top_right = 15
+corner_radius_bottom_right = 15
+corner_radius_bottom_left = 15
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_focus"]
+
+[node name="LoadingScreen" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1")
+
+[node name="Background" type="Panel" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_bg")
+
+[node name="CenterContainer" type="CenterContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Content" type="MarginContainer" parent="CenterContainer"]
+custom_minimum_size = Vector2(800, 0)
+layout_mode = 2
+theme_override_constants/margin_left = 50
+theme_override_constants/margin_right = 50
+
+[node name="VBox" type="VBoxContainer" parent="CenterContainer/Content"]
+layout_mode = 2
+theme_override_constants/separation = 40
+
+[node name="StatusLabel" type="Label" parent="CenterContainer/Content/VBox"]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("2")
+theme_override_font_sizes/font_size = 48
+text = "ПОДГОТОВКА..."
+horizontal_alignment = 1
+
+[node name="ProgressBar" type="ProgressBar" parent="CenterContainer/Content/VBox"]
+custom_minimum_size = Vector2(0, 45)
+layout_mode = 2
+theme_override_styles/fill = SubResource("StyleBoxFlat_progress")
+step = 1.0
+
+[node name="TipLabel" type="Label" parent="CenterContainer/Content/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.65, 0.65, 0.65, 1)
+theme_override_fonts/font = ExtResource("2")
+theme_override_font_sizes/font_size = 28
+text = "СОВЕТ: Танк оснащен системой автодоводки..."
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="Control" type="Control" parent="CenterContainer/Content/VBox"]
+custom_minimum_size = Vector2(0, 40)
+layout_mode = 2
+
+[node name="StartButton" type="Button" parent="CenterContainer/Content/VBox"]
+visible = false
+custom_minimum_size = Vector2(450, 100)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_fonts/font = ExtResource("2")
+theme_override_font_sizes/font_size = 42
+theme_override_styles/focus = SubResource("StyleBoxEmpty_focus")
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
+text = "НАЧАТЬ МИССИЮ"

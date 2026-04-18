@@ -26,13 +26,17 @@ func _on_ReturnToGameButton_pressed():
 	queue_free()
 
 func _on_RestartButton_pressed():
-	_show_confirm_dialog("ПЕРЕЗАГРУЗИТЬ УРОВЕНЬ?", "Весь текущий прогресс будет потерян.", func():
+	_show_confirm_dialog("ПЕРЕЗАГРУЗИТЬ УРОВЕНЬ?", "Весь текущий прогресс будет утерян!", func():
 		get_tree().paused = false
-		get_tree().reload_current_scene()
+		var current_scene_path = get_tree().current_scene.scene_file_path
+		if has_node("/root/LoadingManager"):
+			get_node("/root/LoadingManager").load_level(current_scene_path)
+		else:
+			get_tree().reload_current_scene()
 	)
 
 func _on_ReturnToSettingsButton_pressed():
-	_show_confirm_dialog("ВЫЙТИ В НАСТРОЙКИ?", "Прогресс миссии не сохранится.", func():
+	_show_confirm_dialog("ВЫЙТИ В НАСТРОЙКИ?", "Прогресс миссии будет утерян!", func():
 		if GameManager != null:
 			GameManager.set_meta("from_scene", get_tree().current_scene.scene_file_path)
 		get_tree().paused = false
@@ -46,16 +50,16 @@ func _on_LevelSelectorButton_pressed():
 	)
 
 func _on_ReturnToMenuButton_pressed():
-	_show_confirm_dialog("В ГЛАВНОЕ МЕНЮ?", "Прогресс миссии будет утерян.", func():
+	_show_confirm_dialog("В ГЛАВНОЕ МЕНЮ?", "Прогресс миссии будет утерян!", func():
 		get_tree().paused = false
 		get_tree().change_scene_to_file("res://scenes/MenuScenes/Menu.tscn")
 	)
 
 func _show_confirm_dialog(title_text: String, desc_text: String, on_confirm: Callable):
-	# Создаем оверлей для блокировки нажатий на паузу
+	# Создаем оверлей
 	var dialog_overlay = ColorRect.new()
 	dialog_overlay.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	dialog_overlay.color = Color(0, 0, 0, 0.4)
+	dialog_overlay.color = Color(0, 0, 0, 0.6)
 	add_child(dialog_overlay)
 
 	var center = CenterContainer.new()
@@ -63,48 +67,60 @@ func _show_confirm_dialog(title_text: String, desc_text: String, on_confirm: Cal
 	dialog_overlay.add_child(center)
 
 	var panel = PanelContainer.new()
-	panel.custom_minimum_size = Vector2(400, 250)
+	panel.custom_minimum_size = Vector2(750, 450) # Значительно увеличено окно
 	center.add_child(panel)
 
 	var style = StyleBoxFlat.new()
-	style.bg_color = Color(0.15, 0.16, 0.15, 0.95)
-	style.border_width_left = 4; style.border_width_top = 4; style.border_width_right = 4; style.border_width_bottom = 4
-	style.border_color = Color(0.9, 0.3, 0.3) # Красная рамка для предупреждения
-	style.corner_radius_top_left = 15; style.corner_radius_top_right = 15; style.corner_radius_bottom_left = 15; style.corner_radius_bottom_right = 15
+	style.bg_color = Color(0.12, 0.13, 0.12, 0.98)
+	style.border_width_left = 6; style.border_width_top = 6; style.border_width_right = 6; style.border_width_bottom = 6
+	style.border_color = Color(0.8, 0.2, 0.2) # Акцент на предупреждении
+	style.set_corner_radius_all(25)
+	style.shadow_size = 40
 	panel.add_theme_stylebox_override("panel", style)
 
+	var margin = MarginContainer.new()
+	margin.add_theme_constant_override("margin_left", 40); margin.add_theme_constant_override("margin_right", 40)
+	margin.add_theme_constant_override("margin_top", 40); margin.add_theme_constant_override("margin_bottom", 40)
+	panel.add_child(margin)
+
 	var vbox = VBoxContainer.new()
-	vbox.add_theme_constant_override("separation", 20)
+	vbox.add_theme_constant_override("separation", 40)
 	vbox.alignment = BoxContainer.ALIGNMENT_CENTER
-	panel.add_child(vbox)
+	margin.add_child(vbox)
 
 	var title = Label.new()
 	title.text = title_text
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	title.add_theme_font_size_override("font_size", 32)
-	title.add_theme_color_override("font_color", Color(1, 0.8, 0.2))
+	title.add_theme_font_size_override("font_size", 52)
+	title.add_theme_color_override("font_color", Color(1, 0.9, 0.2))
 	vbox.add_child(title)
 
 	var desc = Label.new()
 	desc.text = desc_text
 	desc.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	desc.add_theme_font_size_override("font_size", 20)
+	desc.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	desc.custom_minimum_size = Vector2(650, 0)
+	desc.add_theme_font_size_override("font_size", 36)
 	vbox.add_child(desc)
 
 	var hbox = HBoxContainer.new()
-	hbox.add_theme_constant_override("separation", 30)
+	hbox.add_theme_constant_override("separation", 60)
 	hbox.alignment = BoxContainer.ALIGNMENT_CENTER
 	vbox.add_child(hbox)
 
 	var btn_style = func(btn: Button, is_danger: bool):
-		btn.custom_minimum_size = Vector2(140, 50)
+		btn.custom_minimum_size = Vector2(260, 100)
+		btn.add_theme_font_size_override("font_size", 38)
 		var b_style = StyleBoxFlat.new()
-		b_style.bg_color = Color(0.3, 0.1, 0.1) if is_danger else Color(0.2, 0.2, 0.2)
-		b_style.corner_radius_top_left = 8; b_style.corner_radius_top_right = 8
-		b_style.corner_radius_bottom_left = 8; b_style.corner_radius_bottom_right = 8
+		b_style.bg_color = Color(0.4, 0.1, 0.1) if is_danger else Color(0.25, 0.25, 0.25)
+		b_style.set_corner_radius_all(15)
+		b_style.border_width_bottom = 10
+		b_style.border_color = Color(0.2, 0.05, 0.05) if is_danger else Color(0.15, 0.15, 0.15)
 		btn.add_theme_stylebox_override("normal", b_style)
-		btn.add_theme_stylebox_override("hover", b_style)
-		btn.add_theme_stylebox_override("pressed", b_style)
+
+		var h_style = b_style.duplicate()
+		h_style.bg_color = h_style.bg_color.lightened(0.1)
+		btn.add_theme_stylebox_override("hover", h_style)
 
 	var btn_yes = Button.new()
 	btn_yes.text = "ДА"
