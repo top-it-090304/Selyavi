@@ -106,7 +106,7 @@ func _apply_button_style(btn, i, is_locked):
 	var style_normal = StyleBoxFlat.new()
 	style_normal.set_corner_radius_all(15)
 	style_normal.set_border_width_all(4)
-	style_normal.border_width_bottom = 8 # Создаем эффект объема
+	style_normal.border_width_bottom = 8
 
 	if is_locked:
 		style_normal.bg_color = Color(0.2, 0.2, 0.2, 0.8)
@@ -122,11 +122,9 @@ func _apply_button_style(btn, i, is_locked):
 			style_normal.border_color = Color(1, 1, 1, 0.8)
 			if is_passed: btn.add_theme_color_override("font_color", Color(0.2, 0.9, 0.2))
 
-	# Создаем стиль для наведения (чуть светлее)
 	var style_hover = style_normal.duplicate()
 	style_hover.bg_color = style_hover.bg_color.lightened(0.1)
 
-	# Создаем стиль для нажатия (эффект нажатия вниз)
 	var style_pressed = style_normal.duplicate()
 	style_pressed.bg_color = style_pressed.bg_color.darkened(0.1)
 	style_pressed.border_width_top = 8
@@ -169,23 +167,30 @@ func _on_level_pressed(level_num: int):
 	if SaveManager:
 		SaveManager.current_level = level_num
 
-	# Управление музыкой: останавливаем все лишнее перед переходом
+	# Управление музыкой перед переходом
 	if has_node("/root/AudioManager"):
 		var am = get_node("/root/AudioManager")
-		if level_num % 5 == 0:
-			am.play_boss()
-		else:
+		# Если уровень босса, можно заранее сменить музыку, либо LoadingScreen сам всё сделает
+		if level_num % 5 != 0:
 			am.stop()
 
 	var path = "res://scenes/Levels/Level_" + str(level_num) + ".tscn"
+	var final_path = ""
+
 	if ResourceLoader.exists(path):
-		get_tree().change_scene_to_file(path)
+		final_path = path
 	else:
 		var alt_path = path.replace(".tscn", ".scn")
 		if ResourceLoader.exists(alt_path):
-			get_tree().change_scene_to_file(alt_path)
+			final_path = alt_path
 		else:
-			get_tree().change_scene_to_file("res://scenes/Field.tscn")
+			final_path = "res://scenes/Field.tscn"
 
-func _on_Return_Button_pressed():
+	# ИСПОЛЬЗУЕМ АСИНХРОННУЮ ЗАГРУЗКУ
+	if has_node("/root/LoadingManager"):
+		get_node("/root/LoadingManager").load_level(final_path)
+	else:
+		get_tree().change_scene_to_file(final_path)
+
+func _on_return_button_pressed():
 	get_tree().change_scene_to_file("res://scenes/MenuScenes/Menu.tscn")
