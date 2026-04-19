@@ -12,7 +12,7 @@ func _ready():
 	if SaveManager:
 		current_level = SaveManager.current_level
 
-	# Подстраховка по имени сцены (например, если запустить сцену отдельно через F6)
+	# Подстраховка по имени сцены
 	if name.contains("_"):
 		var extracted = name.get_slice("_", 1).to_int()
 		if extracted > 0:
@@ -43,7 +43,7 @@ func _ready():
 	for node in get_tree().get_nodes_in_group("enemies"):
 		_connect_enemy(node)
 
-	# 4. Таймер подстраховки (проверяет победу раз в секунду)
+	# 4. Таймер подстраховки
 	_victory_timer = Timer.new()
 	_victory_timer.wait_time = 1.0
 	_victory_timer.autostart = true
@@ -251,7 +251,13 @@ func _show_game_over_screen(is_victory: bool, reason: String = ""):
 	style_btn.call(btn_retry)
 	btn_container.add_child(btn_retry)
 	btn_retry.pressed.connect(func():
-		_cleanup_global_objects(); get_tree().paused = false; get_tree().reload_current_scene()
+		_cleanup_global_objects()
+		get_tree().paused = false
+		var current_path = get_tree().current_scene.scene_file_path
+		if has_node("/root/LoadingManager"):
+			get_node("/root/LoadingManager").load_level(current_path)
+		else:
+			get_tree().reload_current_scene()
 	)
 
 	var btn_levels = Button.new()

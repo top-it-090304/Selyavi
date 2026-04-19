@@ -121,10 +121,11 @@ func _process(_delta):
 				var boss_name = "ПРИЗЫВАТЕЛЬ" if lvl == 5 else "РИКОШЕТИР"
 				status_label.text = boss_name + " ЖДЕТ ТЕБЯ..."
 				status_label.add_theme_color_override("font_color", Color(1, 0.3, 0.3))
+				_show_start_button()
 			else:
 				status_label.text = "ГОТОВО К БОЮ!"
-
-			_show_start_button()
+				# На обычных уровнях переходим автоматически
+				_on_start_pressed()
 
 		2: # FAILED
 			status_label.text = "ОШИБКА ЗАГРУЗКИ"
