@@ -98,6 +98,12 @@ func _ready():
 	if not enemy_data:
 		_apply_enemy_stats()
 
+	# Уменьшение хитбокса для турели
+	if _type_enemy == TypeEnemy.STATIONARY:
+		var collision = get_node_or_null("CollisionShape2D")
+		if collision and collision.shape is CircleShape2D:
+			collision.shape.radius *= 0.8
+
 	match _type_enemy:
 		TypeEnemy.ARTILLERY:
 			_patrol_speed = 0
