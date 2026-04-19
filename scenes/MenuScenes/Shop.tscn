@@ -280,7 +280,7 @@ color = Color(0.290196, 0.341176, 0.25098, 1)
 [node name="Content" type="HBoxContainer" parent="."]
 layout_mode = 1
 anchors_preset = -1
-anchor_left = 0.05
+anchor_left = 0.07
 anchor_top = 0.32
 anchor_right = 0.95
 anchor_bottom = 0.95
@@ -346,6 +346,8 @@ horizontal_scroll_mode = 0
 [node name="MarginContainer" type="MarginContainer" parent="Content/LeftView/StatsScroll"]
 layout_mode = 2
 size_flags_horizontal = 3
+theme_override_constants/margin_left = 14
+theme_override_constants/margin_right = 10
 theme_override_constants/margin_top = 25
 
 [node name="StatsContainer" type="VBoxContainer" parent="Content/LeftView/StatsScroll/MarginContainer"]

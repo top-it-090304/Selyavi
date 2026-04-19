@@ -44,6 +44,11 @@ var _slot_equip_btns: Array = []
 @onready var tank_tab_btn = find_child("TankTab", true)
 @onready var base_tab_btn = find_child("BaseTab", true)
 @onready var ammo_tab_btn = find_child("AmmoTab", true)
+@onready var tank_frame = find_child("TankFrame", true)
+
+## Слоты снарядов слева (вместо превью танка на вкладке «Снаряды»)
+var _ammo_left_slots_root: VBoxContainer = null
+var _ammo_left_margin: MarginContainer = null
 
 @onready var color_fill = find_child("Fill", true)
 
@@ -187,6 +192,24 @@ func _setup_ammo_tab():
 
 	var selectors_root = find_child("Selectors", true) as VBoxContainer
 	if selectors_root and ammo_selectors == null:
+		var left_view = find_child("LeftView", true) as VBoxContainer
+		if left_view and _ammo_left_slots_root == null:
+			_ammo_left_margin = MarginContainer.new()
+			_ammo_left_margin.name = "AmmoLoadoutMargin"
+			_ammo_left_margin.visible = false
+			_ammo_left_margin.add_theme_constant_override("margin_left", 18)
+			_ammo_left_margin.add_theme_constant_override("margin_right", 12)
+			_ammo_left_margin.add_theme_constant_override("margin_top", 4)
+			_ammo_left_margin.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+			left_view.add_child(_ammo_left_margin)
+			left_view.move_child(_ammo_left_margin, 0)
+
+			_ammo_left_slots_root = VBoxContainer.new()
+			_ammo_left_slots_root.name = "AmmoLoadoutPanel"
+			_ammo_left_slots_root.add_theme_constant_override("separation", 12)
+			_ammo_left_slots_root.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+			_ammo_left_margin.add_child(_ammo_left_slots_root)
+
 		var ammo_group = VBoxContainer.new()
 		ammo_group.name = "AmmoSelectors"
 		ammo_group.visible = false
@@ -269,30 +292,36 @@ func _setup_ammo_tab():
 		_ammo_desc_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		desc_panel.add_child(_ammo_desc_label)
 
-		# ── Три слота ─────────────────────────────────────────────────────
+		# ── Три слота: слева в LeftView (вместо картинки танка на вкладке «Снаряды») ──
 		var slots_cat = Label.new()
 		slots_cat.text = "СНАРЯЖЕНИЕ В БОЮ"
 		slots_cat.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		slots_cat.label_settings = load("res://scenes/MenuScenes/Shop.tscn::LabelSettings_cat")
-		ammo_group.add_child(slots_cat)
+		if _ammo_left_slots_root != null:
+			_ammo_left_slots_root.add_child(slots_cat)
+		else:
+			ammo_group.add_child(slots_cat)
 
 		var slots_row = HBoxContainer.new()
 		slots_row.alignment = BoxContainer.ALIGNMENT_CENTER
-		slots_row.add_theme_constant_override("separation", 24)
-		ammo_group.add_child(slots_row)
+		slots_row.add_theme_constant_override("separation", 8)
+		if _ammo_left_slots_root != null:
+			_ammo_left_slots_root.add_child(slots_row)
+		else:
+			ammo_group.add_child(slots_row)
 
 		_slot_panels.clear(); _slot_icons.clear()
 		_slot_names.clear();  _slot_equip_btns.clear()
 
 		for si in range(3):
 			var slot_vbox = VBoxContainer.new()
-			slot_vbox.custom_minimum_size = Vector2(160, 0)
-			slot_vbox.add_theme_constant_override("separation", 6)
+			slot_vbox.custom_minimum_size = Vector2(108, 0)
+			slot_vbox.add_theme_constant_override("separation", 4)
 			slots_row.add_child(slot_vbox)
 
-			# Рамка + иконка
+			# Рамка + иконка (уже по ширине влезает в LeftView с отступами)
 			var slot_panel = Panel.new()
-			slot_panel.custom_minimum_size = Vector2(110, 110)
+			slot_panel.custom_minimum_size = Vector2(96, 96)
 			slot_panel.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 			var sst = StyleBoxFlat.new()
 			sst.bg_color = Color(0.07, 0.09, 0.07, 0.9)
@@ -317,7 +346,7 @@ func _setup_ammo_tab():
 			slot_num.text = "СЛОТ " + str(si + 1)
 			slot_num.add_theme_color_override("font_color", Color(0.44, 0.50, 0.38, 1))
 			slot_num.add_theme_font_override("font", load(SHOP_FONT_PATH))
-			slot_num.add_theme_font_size_override("font_size", 15)
+			slot_num.add_theme_font_size_override("font_size", 13)
 			slot_num.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 			slot_vbox.add_child(slot_num)
 
@@ -325,7 +354,7 @@ func _setup_ammo_tab():
 			var slot_name_lbl = Label.new()
 			slot_name_lbl.add_theme_color_override("font_color", Color(0.85, 0.92, 0.78, 1))
 			slot_name_lbl.add_theme_font_override("font", load(SHOP_FONT_PATH))
-			slot_name_lbl.add_theme_font_size_override("font_size", 18)
+			slot_name_lbl.add_theme_font_size_override("font_size", 15)
 			slot_name_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 			slot_name_lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 			slot_vbox.add_child(slot_name_lbl)
@@ -334,7 +363,7 @@ func _setup_ammo_tab():
 			# Кнопка назначить
 			var equip_slot_btn = _create_buy_button()
 			equip_slot_btn.text = "В СЛОТ"
-			equip_slot_btn.custom_minimum_size = Vector2(140, 55)
+			equip_slot_btn.custom_minimum_size = Vector2(104, 48)
 			var _si = si
 			equip_slot_btn.pressed.connect(func(): _on_equip_to_slot(_si))
 			slot_vbox.add_child(equip_slot_btn)
@@ -526,6 +555,8 @@ func _switch_tab(tab_name: String):
 		tank_tab_btn.add_theme_stylebox_override("normal", active_style)
 		base_tab_btn.add_theme_stylebox_override("normal", inactive_style)
 		if ammo_tab_btn: ammo_tab_btn.add_theme_stylebox_override("normal", inactive_style)
+		if tank_frame: tank_frame.visible = true
+		if _ammo_left_margin: _ammo_left_margin.visible = false
 		tank_preview_body.visible = true
 		tank_preview_gun.visible = true
 		base_preview.visible = false
@@ -538,9 +569,8 @@ func _switch_tab(tab_name: String):
 		tank_tab_btn.add_theme_stylebox_override("normal", inactive_style)
 		base_tab_btn.add_theme_stylebox_override("normal", inactive_style)
 		if ammo_tab_btn: ammo_tab_btn.add_theme_stylebox_override("normal", active_style)
-		tank_preview_body.visible = true
-		tank_preview_gun.visible = true
-		base_preview.visible = false
+		if tank_frame: tank_frame.visible = false
+		if _ammo_left_margin: _ammo_left_margin.visible = true
 		tank_stats.visible = true
 		base_stats.visible = false
 		tank_selectors.visible = false
@@ -550,6 +580,8 @@ func _switch_tab(tab_name: String):
 		tank_tab_btn.add_theme_stylebox_override("normal", inactive_style)
 		base_tab_btn.add_theme_stylebox_override("normal", active_style)
 		if ammo_tab_btn: ammo_tab_btn.add_theme_stylebox_override("normal", inactive_style)
+		if tank_frame: tank_frame.visible = true
+		if _ammo_left_margin: _ammo_left_margin.visible = false
 		tank_preview_body.visible = false
 		tank_preview_gun.visible = false
 		base_preview.visible = true
