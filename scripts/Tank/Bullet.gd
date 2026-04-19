@@ -46,13 +46,14 @@ func _process(delta):
 	if _traveled_distance >= _max_range: _destroy()
 
 func _on_area_entered(_area):
+	# При контакте с Area2D (например, штабом) вызываем детонацию через _destroy
+	# Сама база нанесет себе урон через свой сигнал area_entered
 	pass
 
 func _on_body_entered(body):
-	if body in _hit_targets: return # Не бьем одну и ту же цель дважды
+	if body in _hit_targets: return
 	if _ignored_body_rid.is_valid() and body.get_rid() == _ignored_body_rid: return
 
-	# Проверка на физическое тело базы
 	var parent = body.get_parent()
 	if parent is Base or body.is_in_group("bases"):
 		var base_node = parent if parent is Base else body
@@ -70,7 +71,6 @@ func _on_body_entered(body):
 		if _is_player:
 			_hit_targets.append(body)
 			body.take_damage(_damage)
-			# ЛОГИКА ПРОБИТИЯ (BOPS)
 			if _type_bullet == BOPS and _pierce_left > 0:
 				_pierce_left -= 1
 			else:
@@ -90,15 +90,11 @@ func _on_body_entered(body):
 
 func _handle_base_hit(base_node: Node):
 	if base_node in _hit_targets: return
-
 	var is_enemy_base = base_node.get("type_base") == 1
-
 	if (_is_player and is_enemy_base) or (not _is_player and not is_enemy_base):
 		_hit_targets.append(base_node)
 		if base_node.has_method("take_damage"):
 			base_node.take_damage(_damage)
-
-		# БОПС должен прошивать и базу тоже
 		if _type_bullet == BOPS and _pierce_left > 0:
 			_pierce_left -= 1
 		else:
@@ -106,19 +102,13 @@ func _handle_base_hit(base_node: Node):
 	else:
 		_explode(base_node)
 
-# Логика взрыва: вызывается только при попадании
 func _explode(exclude_body: Node = null):
-	if _type_bullet == HE:
-		_play_shockwave_effect()
-		if _aoe_radius > 0.0:
-			_apply_aoe_damage(exclude_body)
-
-	_destroy()
+	# Метод оставлен для совместимости с логикой попадания в тела
+	_destroy(exclude_body)
 
 func _play_shockwave_effect():
 	var effect_scene = load("res://scripts/ExplosionEffect.gd")
 	if not effect_scene: return
-
 	var effect = Node2D.new()
 	effect.set_script(effect_scene)
 	get_parent().add_child(effect)
@@ -126,8 +116,15 @@ func _play_shockwave_effect():
 	if effect.has_method("init"):
 		effect.init(_aoe_radius, Color(1, 0.6, 0.2, 0.8))
 
-# Базовое удаление пули
-func _destroy():
+# Глобальный метод уничтожения
+func _destroy(exclude_body: Node = null):
+	# Если это фугас и мы во что-то попали (не по дистанции), запускаем взрыв
+	# (Проверка дистанции в _process вызывает _destroy без аргументов)
+	if _type_bullet == HE and exclude_body != null:
+		_play_shockwave_effect()
+		if _aoe_radius > 0.0:
+			_apply_aoe_damage(exclude_body)
+
 	queue_free()
 
 func init(type_bullet: int, is_player: bool, damage: int = 0, ignored_rid: RID = RID(), custom_range: float = -1.0):
@@ -174,20 +171,13 @@ func _apply_aoe_damage(hit_body: Node):
 	var results = space_state.intersect_shape(query, 24)
 	for result in results:
 		var c = result.collider
-		if c == hit_body:
-			continue
-
-		# Если стреляет игрок, дамажим врагов. Если враг - игрока.
+		if c == hit_body: continue
 		if _is_player:
-			if c is Enemy:
-				c.take_damage(splash_damage)
-			elif c is Base and c.get("type_base") == 1:
-				c.take_damage(splash_damage)
+			if c is Enemy: c.take_damage(splash_damage)
+			elif c is Base and c.get("type_base") == 1: c.take_damage(splash_damage)
 		else:
-			if c is Player:
-				c.take_damage(splash_damage)
-			elif c is Base and c.get("type_base") == 0:
-				c.take_damage(splash_damage)
+			if c is Player: c.take_damage(splash_damage)
+			elif c is Base and c.get("type_base") == 0: c.take_damage(splash_damage)
 
 func _on_screen_exited():
 	var tween = create_tween()
