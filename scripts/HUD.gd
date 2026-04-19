@@ -13,6 +13,8 @@ var _marker_overlay: Control
 var _move_joy_c: MarginContainer
 var _aim_joy_c: MarginContainer
 
+var _top_right: Control
+
 var _total_enemy_bases: int = 0
 var _destroyed_count: int = 0
 var _player
@@ -48,6 +50,7 @@ func _ready():
 	_livesLabel = find_child("LivesLabel", true)
 	_moneyLabel = find_child("MoneyLabel", true)
 	_levelLabel = find_child("LevelLabel", true)
+	_top_right = find_child("TopRight", true)
 
 	_setup_bases_label()
 	_setup_buff_icon()
@@ -58,8 +61,12 @@ func _ready():
 	_load_marker_settings()
 
 	if _healthProgress:
-		_setup_progress_bar_style()
 		_healthProgress.value = 100
+		_healthProgress.modulate.a = 0.5
+		if _healthLabel: _healthLabel.modulate.a = 0.5
+
+	if _top_right:
+		_top_right.modulate.a = 0.5 # Деньги, жизни и базы полупрозрачные
 
 	_move_joy_c = find_child("MoveJoystickContainer", true, false) as MarginContainer
 	_aim_joy_c = find_child("AimJoystickContainer", true, false) as MarginContainer
@@ -70,6 +77,28 @@ func _ready():
 
 	call_deferred("_apply_lefty_joystick_layout")
 	call_deferred("_find_player_and_connect")
+	_start_level_label_fade()
+
+func _start_level_label_fade():
+	if _levelLabel:
+		get_tree().create_timer(6.0).timeout.connect(func():
+			var tween = create_tween()
+			tween.tween_property(_levelLabel, "modulate:a", 0.0, 1.5)
+			tween.finished.connect(func(): _levelLabel.visible = false)
+		)
+
+func highlight_health():
+	if _healthProgress:
+		# Восстанавливаем непрозрачность ТОЛЬКО для полоски здоровья
+		var tween = create_tween().set_parallel(true)
+		tween.tween_property(_healthProgress, "modulate:a", 1.0, 0.2)
+		if _healthLabel: tween.tween_property(_healthLabel, "modulate:a", 1.0, 0.2)
+
+		get_tree().create_timer(2.0).timeout.connect(func():
+			var fade = create_tween().set_parallel(true)
+			fade.tween_property(_healthProgress, "modulate:a", 0.5, 1.0)
+			if _healthLabel: fade.tween_property(_healthLabel, "modulate:a", 0.5, 1.0)
+		)
 
 func _load_marker_settings():
 	if SaveManager:
@@ -203,9 +232,9 @@ func _update_level_display():
 
 	if _levelLabel.label_settings:
 		if lvl % 5 == 0:
-			_levelLabel.label_settings.font_color = Color("#f34235") # Красный для босса
+			_levelLabel.label_settings.font_color = Color("#f34235")
 		else:
-			_levelLabel.label_settings.font_color = Color(1, 0.9, 0.4) # Желтый для обычных
+			_levelLabel.label_settings.font_color = Color(1, 0.9, 0.4)
 
 func _find_player_and_connect():
 	var p = get_tree().get_first_node_in_group("players")
@@ -229,10 +258,22 @@ func _on_health_changed(curr, m):
 		_healthProgress.max_value = m
 		_healthProgress.value = curr
 		_healthLabel.text = str(max(0,curr)) + "/" + str(m)
+		_update_health_bar_color(curr, m)
+		# Подсвечиваем ТОЛЬКО HP при получении урона
+		highlight_health()
 
-func _setup_progress_bar_style():
+func _update_health_bar_color(curr, m):
+	var ratio = float(curr) / float(m)
 	var style = StyleBoxFlat.new()
-	style.bg_color = Color(0.2, 0.8, 0.2)
+	style.set_corner_radius_all(5)
+
+	if ratio > 0.6:
+		style.bg_color = Color(0.2, 0.8, 0.2) # Зеленый
+	elif ratio > 0.3:
+		style.bg_color = Color(0.9, 0.8, 0.1) # Желтый
+	else:
+		style.bg_color = Color(0.8, 0.1, 0.1) # Красный
+
 	_healthProgress.add_theme_stylebox_override("fill", style)
 
 func _on_lives_changed(l): if _livesLabel: _livesLabel.text = "Жизни: " + str(l)
@@ -245,7 +286,6 @@ func _setup_ammo_selection():
 	add_child(ammo_container)
 	ammo_container.set_anchors_preset(Control.PRESET_CENTER_BOTTOM)
 	ammo_container.offset_top = -180; ammo_container.offset_bottom = -30
-	# Центрируем контейнер по X
 	ammo_container.anchor_left = 0.5; ammo_container.anchor_right = 0.5
 	ammo_container.offset_left = -500; ammo_container.offset_right = 500
 
@@ -354,7 +394,6 @@ func _draw_marker_for(target_pos: Vector2, color: Color, icon: Texture2D, screen
 	marker_pos.y = clamp(marker_pos.y, screen_rect.position.y + margin, screen_rect.end.y - margin)
 	var draw_pos = _player.get_viewport().get_canvas_transform() * marker_pos
 
-	# Применяем настройку marker_scale
 	var base_scale = clamp(remap(dist, 800, 3000, max_scale, 0.5), 0.5, max_scale)
 	var scale_factor = base_scale * _marker_setting_scale
 

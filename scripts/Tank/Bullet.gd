@@ -42,12 +42,10 @@ func _process(delta):
 	var move_step = _velocity * _bullet_speed
 	position += move_step
 	_traveled_distance += move_step.length()
+	# Если пролетели всю дистанцию, просто удаляем пулю без взрыва
 	if _traveled_distance >= _max_range: _destroy()
 
 func _on_area_entered(_area):
-	# Если мы попали в другую область (например, триггер базы),
-	# обработка урона обычно идет на стороне той области,
-	# но нам важно не блокировать логику взрыва.
 	pass
 
 func _on_body_entered(body):
@@ -65,7 +63,7 @@ func _on_body_entered(body):
 		if not _is_player:
 			_hit_targets.append(body)
 			body.take_damage(_damage)
-			_post_hit_destroy(body)
+			_explode(body)
 		return
 
 	if body is Enemy:
@@ -76,7 +74,7 @@ func _on_body_entered(body):
 			if _type_bullet == BOPS and _pierce_left > 0:
 				_pierce_left -= 1
 			else:
-				_post_hit_destroy(body)
+				_explode(body)
 		return
 
 	if body.has_method("can_bullet_pass"):
@@ -84,11 +82,11 @@ func _on_body_entered(body):
 			return
 		elif body.has_method("destroyable") and body.destroyable():
 			body.destroy()
-			_post_hit_destroy(body)
+			_explode(body)
 		else:
-			_post_hit_destroy(body)
+			_explode(body)
 	elif body is StaticBody2D:
-		_post_hit_destroy(body)
+		_explode(body)
 
 func _handle_base_hit(base_node: Node):
 	if base_node in _hit_targets: return
@@ -104,14 +102,18 @@ func _handle_base_hit(base_node: Node):
 		if _type_bullet == BOPS and _pierce_left > 0:
 			_pierce_left -= 1
 		else:
-			_post_hit_destroy(base_node)
+			_explode(base_node)
 	else:
-		_post_hit_destroy(base_node)
+		_explode(base_node)
 
-func _post_hit_destroy(hit_body: Node):
-	# При попадании мы вызываем взрыв, исключая прямого виновника из сплэш-урона,
-	# чтобы он не получил урон дважды (прямой + сплэш).
-	_destroy(hit_body)
+# Логика взрыва: вызывается только при попадании
+func _explode(exclude_body: Node = null):
+	if _type_bullet == HE:
+		_play_shockwave_effect()
+		if _aoe_radius > 0.0:
+			_apply_aoe_damage(exclude_body)
+
+	_destroy()
 
 func _play_shockwave_effect():
 	var effect_scene = load("res://scripts/ExplosionEffect.gd")
@@ -124,12 +126,8 @@ func _play_shockwave_effect():
 	if effect.has_method("init"):
 		effect.init(_aoe_radius, Color(1, 0.6, 0.2, 0.8))
 
-func _destroy(exclude_body: Node = null):
-	if _type_bullet == HE:
-		_play_shockwave_effect()
-		if _aoe_radius > 0.0:
-			_apply_aoe_damage(exclude_body)
-
+# Базовое удаление пули
+func _destroy():
 	queue_free()
 
 func init(type_bullet: int, is_player: bool, damage: int = 0, ignored_rid: RID = RID(), custom_range: float = -1.0):
