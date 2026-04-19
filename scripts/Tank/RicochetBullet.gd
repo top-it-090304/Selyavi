@@ -146,11 +146,20 @@ func _move():
 			_explode()
 			return
 		elif _is_wall(collider):
+			if _has_ricocheted and collider.has_method("destroyable") and collider.destroyable():
+				if collider.has_method("destroy"):
+					collider.destroy()
+				global_position = hit.position
+				_explode()
+				return
 			if _bounces_left > 0:
 				_velocity = _velocity.bounce(hit.normal)
 				rotation = _velocity.angle() + PI * 0.5
 				_bounces_left -= 1
 				_has_ricocheted = true
+				if _is_player:
+					_damage = int(ceil(_damage * 1.26))
+					_splash_damage = int(ceil(max(1, _splash_damage) * 1.12))
 				global_position = hit.position + hit.normal * 5.0
 				_play_ricochet_fx()
 			else:

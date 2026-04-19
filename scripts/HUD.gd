@@ -323,6 +323,7 @@ func _ammo_icon_path(ammo_id: int) -> String:
 		2: return "res://assets/future_tanks/PNG/Effects/Light_Shell.png"
 		3: return "res://assets/future_tanks/PNG/Effects/Granade_Shell.png"
 		4: return "res://assets/future_tanks/PNG/Effects/Heavy_Shell.png"
+		5: return "res://assets/future_tanks/PNG/Effects/Laser.png"
 		_: return "res://assets/future_tanks/PNG/Effects/Plasma.png"
 
 func _process(delta):

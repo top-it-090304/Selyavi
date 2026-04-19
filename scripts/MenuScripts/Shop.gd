@@ -77,7 +77,8 @@ var ammo_types = [
 	{"id": 1, "name": "Средний", "price": 0, "desc": "Тяжелее и мощнее: выше урон, но короче дистанция.", "icon": "res://assets/future_tanks/PNG/Effects/Medium_Shell.png"},
 	{"id": 2, "name": "Легкий", "price": 0, "desc": "Быстрый и дальнобойный снаряд с меньшим уроном.", "icon": "res://assets/future_tanks/PNG/Effects/Light_Shell.png"},
 	{"id": 3, "name": "Фугас", "price": 6000, "desc": "Взрывной снаряд: наносит урон по площади вокруг точки попадания.", "icon": "res://assets/future_tanks/PNG/Effects/Granade_Shell.png"},
-	{"id": 4, "name": "БОПС", "price": 9000, "desc": "Бронебойный оперенный снаряд: пробивает 2+ цели по траектории.", "icon": "res://assets/future_tanks/PNG/Effects/Heavy_Shell.png"}
+	{"id": 4, "name": "БОПС", "price": 9000, "desc": "Бронебойный оперенный снаряд: пробивает не более двух танков по одной линии.", "icon": "res://assets/future_tanks/PNG/Effects/Heavy_Shell.png"},
+	{"id": 5, "name": "Рикошет", "price": 7500, "desc": "Снаряд отскакивает от стен; после каждого рикошета прямой урон и взрыв становятся сильнее.", "icon": "res://assets/future_tanks/PNG/Effects/Laser.png"}
 ]
 
 # Item Data - Base
@@ -390,7 +391,8 @@ func _update_ammo_ui():
 		1: effect_text = "ВЫСОКИЙ УРОН"
 		2: effect_text = "ВЫСОКАЯ ДАЛЬНОСТЬ"
 		3: effect_text = "УРОН ПО ОБЛАСТИ"
-		4: effect_text = "ПРОБИТИЕ ЦЕЛЕЙ"
+		4: effect_text = "ПРОБИТИЕ (2 ТАНКА)"
+		5: effect_text = "РИКОШЕТ + УРОН"
 	if hp_label:    hp_label.text    = "ЭФФЕКТ: " + effect_text
 	if speed_label: speed_label.text = "ПРИМЕНЕНИЕ: В БОЮ"
 	if rof_label:   rof_label.text   = ""

@@ -27,6 +27,9 @@ const MEDIUM: int = 1
 const LIGHT: int = 2
 const HE: int = 3
 const BOPS: int = 4
+const RICOCHET: int = 5
+
+var _ricochet_bullet_scene: PackedScene
 
 const BODY_LIGHT = 0; const BODY_MEDIUM = 1; const BODY_HEAVY = 2; const BODY_LMEDIUM = 3; const BODY_MHEAVY = 4
 const GUN_LIGHT = 0; const GUN_MEDIUM = 1; const GUN_HEAVY = 2; const GUN_LMEDIUM = 3; const GUN_MHEAVY = 4
@@ -35,6 +38,7 @@ const COLOR_BROWN = 0; const COLOR_GREEN = 1; const COLOR_AZURE = 2
 func _ready():
 	add_to_group("players")
 	_init_base_tank()
+	_ricochet_bullet_scene = load("res://scenes/Tank/RicochetBullet.tscn")
 	_start_position = global_position
 	_load_all_data()
 
@@ -73,9 +77,9 @@ func _load_all_data():
 		_type_gun = SaveManager.get_player_stat("gun_type", 1)
 		_color = SaveManager.get_player_stat("color_type", 0)
 		_ammo_loadout = [
-			SaveManager.get_player_stat("ammo_slot_0", LIGHT),
-			SaveManager.get_player_stat("ammo_slot_1", PLASMA),
-			SaveManager.get_player_stat("ammo_slot_2", MEDIUM)
+			clampi(SaveManager.get_player_stat("ammo_slot_0", LIGHT), 0, RICOCHET),
+			clampi(SaveManager.get_player_stat("ammo_slot_1", PLASMA), 0, RICOCHET),
+			clampi(SaveManager.get_player_stat("ammo_slot_2", MEDIUM), 0, RICOCHET)
 		]
 		_current_ammo_slot = clampi(SaveManager.get_player_stat("ammo_type", 0), 0, 2)
 		_type_bullet = _ammo_loadout[_current_ammo_slot]
@@ -103,25 +107,38 @@ func fire_touch():
 			sound_type = MEDIUM
 		elif _type_bullet == BOPS:
 			sound_type = LIGHT
+		elif _type_bullet == RICOCHET:
+			sound_type = PLASMA
 		AudioManager.play_bullet_sound(sound_type, global_position)
 
-	var bullet = _bullet_scene.instantiate()
-	bullet.global_position = _bullet_position.global_position
-	bullet.rotation_degrees = _gun.global_rotation_degrees
-	get_parent().add_child(bullet)
+	if _type_bullet == RICOCHET:
+		if _ricochet_bullet_scene == null:
+			return
+		var rb = _ricochet_bullet_scene.instantiate()
+		rb.global_position = _bullet_position.global_position
+		rb.rotation_degrees = _gun.global_rotation_degrees
+		get_parent().add_child(rb)
+		var base_bullet_damage = 22
+		var splash_base = 14
+		var final_damage = int(base_bullet_damage * _base_damage_mult)
+		var final_splash = int(splash_base * _base_damage_mult)
+		rb.init(true, final_damage, final_splash, get_rid(), 3, false)
+	else:
+		var bullet = _bullet_scene.instantiate()
+		bullet.global_position = _bullet_position.global_position
+		bullet.rotation_degrees = _gun.global_rotation_degrees
+		get_parent().add_child(bullet)
 
-	# --- ФИНАЛЬНЫЙ БАЛАНС УРОНА ---
-	var base_bullet_damage = 25
-	match _type_bullet:
-		PLASMA: base_bullet_damage = 25
-		MEDIUM: base_bullet_damage = 40
-		LIGHT: base_bullet_damage = 15
-		HE: base_bullet_damage = 30
-		BOPS: base_bullet_damage = 26
+		var base_bullet_damage = 25
+		match _type_bullet:
+			PLASMA: base_bullet_damage = 25
+			MEDIUM: base_bullet_damage = 40
+			LIGHT: base_bullet_damage = 15
+			HE: base_bullet_damage = 30
+			BOPS: base_bullet_damage = 26
 
-	var final_damage = int(base_bullet_damage * _base_damage_mult)
-	bullet.init(_type_bullet, true, final_damage)
-	# --------------------------------
+		var final_damage = int(base_bullet_damage * _base_damage_mult)
+		bullet.init(_type_bullet, true, final_damage)
 
 	if has_node("ShotAnimation"):
 		$ShotAnimation.global_position = _bullet_position.global_position
@@ -300,6 +317,7 @@ func _draw():
 			LIGHT: range_len = 1000.0
 			HE: range_len = 550.0
 			BOPS: range_len = 1100.0
+			RICOCHET: range_len = 2200.0
 
 		draw_line(to_local(_bullet_position.global_position), to_local(_bullet_position.global_position + direction * range_len), Color(1, 0, 0, 0.5), 2.0)
 

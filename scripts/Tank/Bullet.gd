@@ -95,10 +95,8 @@ func _handle_base_hit(base_node: Node):
 		_hit_targets.append(base_node)
 		if base_node.has_method("take_damage"):
 			base_node.take_damage(_damage)
-		if _type_bullet == BOPS and _pierce_left > 0:
-			_pierce_left -= 1
-		else:
-			_explode(base_node)
+		# БОПС: пробитие только по танкам; база всегда останавливает снаряд.
+		_explode(base_node)
 	else:
 		_explode(base_node)
 
@@ -154,6 +152,7 @@ func _update_visuals_and_speed():
 		BOPS:
 			_bullet_sprite.texture = load("res://assets/future_tanks/PNG/Effects/Heavy_Shell.png")
 			_bullet_speed = 8; _max_range = 1100.0
+			# 1 = после первого танка снаряд летит дальше; второй танк — последний (всего 2 танка).
 			_pierce_left = 1
 
 func _apply_aoe_damage(hit_body: Node):
