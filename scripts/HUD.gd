@@ -165,8 +165,9 @@ func _setup_buff_icon():
 	_buffIcon.visible = false
 	buff_margin.add_child(_buffIcon)
 
-func set_buff_icon_visible(is_visible: bool):
-	if _buffIcon: _buffIcon.visible = is_visible
+func set_buff_icon_visible(show_buff: bool):
+	if _buffIcon:
+		_buffIcon.visible = show_buff
 
 func _apply_lefty_joystick_layout():
 	if _move_joy_c == null or _aim_joy_c == null: return

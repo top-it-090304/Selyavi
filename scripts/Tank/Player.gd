@@ -122,7 +122,7 @@ func fire_touch():
 		var splash_base = 14
 		var final_damage = int(base_bullet_damage * _base_damage_mult)
 		var final_splash = int(splash_base * _base_damage_mult)
-		rb.init(true, final_damage, final_splash, get_rid(), 3, false)
+		rb.init(true, final_damage, final_splash, get_rid(), 2, false)
 	else:
 		var bullet = _bullet_scene.instantiate()
 		bullet.global_position = _bullet_position.global_position
@@ -309,17 +309,97 @@ func _apply_camera_fov():
 func _draw():
 	if is_scope_on and _aim != null and _aim.get_is_joystick_active():
 		var direction = Vector2(0, -1).rotated(_gun.global_rotation)
-		var range_len = 650.0 # PLASMA default
+		if _type_bullet == RICOCHET:
+			_draw_ricochet_scope_preview(direction.normalized())
+			return
 
+		var range_len = 650.0 # PLASMA default
 		match _type_bullet:
 			PLASMA: range_len = 650.0
 			MEDIUM: range_len = 300.0
 			LIGHT: range_len = 1000.0
 			HE: range_len = 550.0
 			BOPS: range_len = 1100.0
-			RICOCHET: range_len = 2200.0
 
 		draw_line(to_local(_bullet_position.global_position), to_local(_bullet_position.global_position + direction * range_len), Color(1, 0, 0, 0.5), 2.0)
+
+
+func _is_wall_ricochet_preview(c: Object) -> bool:
+	if c == null:
+		return false
+	if c is Player or c is Enemy:
+		return false
+	if c is StaticBody2D:
+		return true
+	if c.has_method("can_bullet_pass"):
+		return not c.can_bullet_pass()
+	var cls := c.get_class()
+	return cls == "TileMap" or cls == "TileMapLayer"
+
+
+## Предпросмотр пути рикошета (как у RicochetBullet): до 2 отскоков, дальность как MAX_RANGE снаряда.
+func _draw_ricochet_scope_preview(dir: Vector2):
+	const PREVIEW_MAX_RANGE := 2200.0
+	const PLAYER_RICOCHET_BOUNCES := 2
+	const RAY_CAP := 6000.0
+
+	var pos_g := _bullet_position.global_position
+	var remaining := PREVIEW_MAX_RANGE
+	var bounces_left := PLAYER_RICOCHET_BOUNCES
+	var last_local := to_local(pos_g)
+	var col_main := Color(1.0, 0.25, 0.25, 0.62)
+	var col_bounce := Color(0.35, 0.92, 1.0, 0.72)
+
+	var space := get_world_2d().direct_space_state
+	var safety := 0
+	while safety < 12:
+		safety += 1
+		var reach := minf(remaining, RAY_CAP)
+		var ray := PhysicsRayQueryParameters2D.create(pos_g, pos_g + dir * reach)
+		ray.exclude = [get_rid()]
+		var hit := space.intersect_ray(ray)
+
+		if hit.is_empty():
+			var end_g := pos_g + dir * reach
+			draw_line(last_local, to_local(end_g), col_main if bounces_left == PLAYER_RICOCHET_BOUNCES else col_bounce, 2.0)
+			return
+
+		var hit_pos: Vector2 = hit.position
+		var dist := pos_g.distance_to(hit_pos)
+		if dist > remaining:
+			var clip_g := pos_g + dir * remaining
+			draw_line(last_local, to_local(clip_g), col_main if bounces_left == PLAYER_RICOCHET_BOUNCES else col_bounce, 2.0)
+			return
+
+		var collider: Object = hit.collider
+		var hit_local := to_local(hit_pos)
+
+		if collider is Enemy:
+			draw_line(last_local, hit_local, col_main if bounces_left == PLAYER_RICOCHET_BOUNCES else col_bounce, 2.0)
+			return
+
+		if _is_wall_ricochet_preview(collider):
+			draw_line(last_local, hit_local, col_main if bounces_left == PLAYER_RICOCHET_BOUNCES else col_bounce, 2.0)
+			remaining = maxf(0.0, remaining - dist)
+			if bounces_left <= 0:
+				return
+			bounces_left -= 1
+			var n: Vector2 = hit.get("normal", Vector2.ZERO)
+			if not (n is Vector2):
+				n = Vector2.ZERO
+			if n.length_squared() < 1e-10:
+				return
+			n = n.normalized()
+			dir = dir.bounce(n)
+			if dir.length_squared() < 1e-10:
+				return
+			dir = dir.normalized()
+			pos_g = hit_pos + n * 5.0
+			last_local = to_local(pos_g)
+			continue
+
+		draw_line(last_local, hit_local, col_main, 2.0)
+		return
 
 func _on_sfx_volume_changed(value: float):
 	_normal_movement_volume = linear_to_db(value)
