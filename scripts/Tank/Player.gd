@@ -27,6 +27,9 @@ const MEDIUM: int = 1
 const LIGHT: int = 2
 const HE: int = 3
 const BOPS: int = 4
+const RICOCHET: int = 5
+
+var _ricochet_bullet_scene: PackedScene
 
 const BODY_LIGHT = 0; const BODY_MEDIUM = 1; const BODY_HEAVY = 2; const BODY_LMEDIUM = 3; const BODY_MHEAVY = 4
 const GUN_LIGHT = 0; const GUN_MEDIUM = 1; const GUN_HEAVY = 2; const GUN_LMEDIUM = 3; const GUN_MHEAVY = 4
@@ -35,6 +38,7 @@ const COLOR_BROWN = 0; const COLOR_GREEN = 1; const COLOR_AZURE = 2
 func _ready():
 	add_to_group("players")
 	_init_base_tank()
+	_ricochet_bullet_scene = load("res://scenes/Tank/RicochetBullet.tscn")
 	_start_position = global_position
 	_load_all_data()
 
@@ -73,9 +77,9 @@ func _load_all_data():
 		_type_gun = SaveManager.get_player_stat("gun_type", 1)
 		_color = SaveManager.get_player_stat("color_type", 0)
 		_ammo_loadout = [
-			SaveManager.get_player_stat("ammo_slot_0", LIGHT),
-			SaveManager.get_player_stat("ammo_slot_1", PLASMA),
-			SaveManager.get_player_stat("ammo_slot_2", MEDIUM)
+			clampi(SaveManager.get_player_stat("ammo_slot_0", LIGHT), 0, RICOCHET),
+			clampi(SaveManager.get_player_stat("ammo_slot_1", PLASMA), 0, RICOCHET),
+			clampi(SaveManager.get_player_stat("ammo_slot_2", MEDIUM), 0, RICOCHET)
 		]
 		_current_ammo_slot = clampi(SaveManager.get_player_stat("ammo_type", 0), 0, 2)
 		_type_bullet = _ammo_loadout[_current_ammo_slot]
@@ -103,25 +107,38 @@ func fire_touch():
 			sound_type = MEDIUM
 		elif _type_bullet == BOPS:
 			sound_type = LIGHT
+		elif _type_bullet == RICOCHET:
+			sound_type = PLASMA
 		AudioManager.play_bullet_sound(sound_type, global_position)
 
-	var bullet = _bullet_scene.instantiate()
-	bullet.global_position = _bullet_position.global_position
-	bullet.rotation_degrees = _gun.global_rotation_degrees
-	get_parent().add_child(bullet)
+	if _type_bullet == RICOCHET:
+		if _ricochet_bullet_scene == null:
+			return
+		var rb = _ricochet_bullet_scene.instantiate()
+		rb.global_position = _bullet_position.global_position
+		rb.rotation_degrees = _gun.global_rotation_degrees
+		get_parent().add_child(rb)
+		var base_bullet_damage = 22
+		var splash_base = 14
+		var final_damage = int(base_bullet_damage * _base_damage_mult)
+		var final_splash = int(splash_base * _base_damage_mult)
+		rb.init(true, final_damage, final_splash, get_rid(), 2, false)
+	else:
+		var bullet = _bullet_scene.instantiate()
+		bullet.global_position = _bullet_position.global_position
+		bullet.rotation_degrees = _gun.global_rotation_degrees
+		get_parent().add_child(bullet)
 
-	# --- ФИНАЛЬНЫЙ БАЛАНС УРОНА ---
-	var base_bullet_damage = 25
-	match _type_bullet:
-		PLASMA: base_bullet_damage = 25
-		MEDIUM: base_bullet_damage = 40
-		LIGHT: base_bullet_damage = 15
-		HE: base_bullet_damage = 30
-		BOPS: base_bullet_damage = 26
+		var base_bullet_damage = 25
+		match _type_bullet:
+			PLASMA: base_bullet_damage = 25
+			MEDIUM: base_bullet_damage = 40
+			LIGHT: base_bullet_damage = 15
+			HE: base_bullet_damage = 30
+			BOPS: base_bullet_damage = 26
 
-	var final_damage = int(base_bullet_damage * _base_damage_mult)
-	bullet.init(_type_bullet, true, final_damage)
-	# --------------------------------
+		var final_damage = int(base_bullet_damage * _base_damage_mult)
+		bullet.init(_type_bullet, true, final_damage)
 
 	if has_node("ShotAnimation"):
 		$ShotAnimation.global_position = _bullet_position.global_position
@@ -292,8 +309,11 @@ func _apply_camera_fov():
 func _draw():
 	if is_scope_on and _aim != null and _aim.get_is_joystick_active():
 		var direction = Vector2(0, -1).rotated(_gun.global_rotation)
-		var range_len = 650.0 # PLASMA default
+		if _type_bullet == RICOCHET:
+			_draw_ricochet_scope_preview(direction.normalized())
+			return
 
+		var range_len = 650.0 # PLASMA default
 		match _type_bullet:
 			PLASMA: range_len = 650.0
 			MEDIUM: range_len = 300.0
@@ -302,6 +322,84 @@ func _draw():
 			BOPS: range_len = 1100.0
 
 		draw_line(to_local(_bullet_position.global_position), to_local(_bullet_position.global_position + direction * range_len), Color(1, 0, 0, 0.5), 2.0)
+
+
+func _is_wall_ricochet_preview(c: Object) -> bool:
+	if c == null:
+		return false
+	if c is Player or c is Enemy:
+		return false
+	if c is StaticBody2D:
+		return true
+	if c.has_method("can_bullet_pass"):
+		return not c.can_bullet_pass()
+	var cls := c.get_class()
+	return cls == "TileMap" or cls == "TileMapLayer"
+
+
+## Предпросмотр пути рикошета (как у RicochetBullet): до 2 отскоков, дальность как MAX_RANGE снаряда.
+func _draw_ricochet_scope_preview(dir: Vector2):
+	const PREVIEW_MAX_RANGE := 2200.0
+	const PLAYER_RICOCHET_BOUNCES := 2
+	const RAY_CAP := 6000.0
+
+	var pos_g := _bullet_position.global_position
+	var remaining := PREVIEW_MAX_RANGE
+	var bounces_left := PLAYER_RICOCHET_BOUNCES
+	var last_local := to_local(pos_g)
+	var col_main := Color(1.0, 0.25, 0.25, 0.62)
+	var col_bounce := Color(0.35, 0.92, 1.0, 0.72)
+
+	var space := get_world_2d().direct_space_state
+	var safety := 0
+	while safety < 12:
+		safety += 1
+		var reach := minf(remaining, RAY_CAP)
+		var ray := PhysicsRayQueryParameters2D.create(pos_g, pos_g + dir * reach)
+		ray.exclude = [get_rid()]
+		var hit := space.intersect_ray(ray)
+
+		if hit.is_empty():
+			var end_g := pos_g + dir * reach
+			draw_line(last_local, to_local(end_g), col_main if bounces_left == PLAYER_RICOCHET_BOUNCES else col_bounce, 2.0)
+			return
+
+		var hit_pos: Vector2 = hit.position
+		var dist := pos_g.distance_to(hit_pos)
+		if dist > remaining:
+			var clip_g := pos_g + dir * remaining
+			draw_line(last_local, to_local(clip_g), col_main if bounces_left == PLAYER_RICOCHET_BOUNCES else col_bounce, 2.0)
+			return
+
+		var collider: Object = hit.collider
+		var hit_local := to_local(hit_pos)
+
+		if collider is Enemy:
+			draw_line(last_local, hit_local, col_main if bounces_left == PLAYER_RICOCHET_BOUNCES else col_bounce, 2.0)
+			return
+
+		if _is_wall_ricochet_preview(collider):
+			draw_line(last_local, hit_local, col_main if bounces_left == PLAYER_RICOCHET_BOUNCES else col_bounce, 2.0)
+			remaining = maxf(0.0, remaining - dist)
+			if bounces_left <= 0:
+				return
+			bounces_left -= 1
+			var n: Vector2 = hit.get("normal", Vector2.ZERO)
+			if not (n is Vector2):
+				n = Vector2.ZERO
+			if n.length_squared() < 1e-10:
+				return
+			n = n.normalized()
+			dir = dir.bounce(n)
+			if dir.length_squared() < 1e-10:
+				return
+			dir = dir.normalized()
+			pos_g = hit_pos + n * 5.0
+			last_local = to_local(pos_g)
+			continue
+
+		draw_line(last_local, hit_local, col_main, 2.0)
+		return
 
 func _on_sfx_volume_changed(value: float):
 	_normal_movement_volume = linear_to_db(value)

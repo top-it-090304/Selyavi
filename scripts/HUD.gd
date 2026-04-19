@@ -165,8 +165,9 @@ func _setup_buff_icon():
 	_buffIcon.visible = false
 	buff_margin.add_child(_buffIcon)
 
-func set_buff_icon_visible(is_visible: bool):
-	if _buffIcon: _buffIcon.visible = is_visible
+func set_buff_icon_visible(show_buff: bool):
+	if _buffIcon:
+		_buffIcon.visible = show_buff
 
 func _apply_lefty_joystick_layout():
 	if _move_joy_c == null or _aim_joy_c == null: return
@@ -323,6 +324,7 @@ func _ammo_icon_path(ammo_id: int) -> String:
 		2: return "res://assets/future_tanks/PNG/Effects/Light_Shell.png"
 		3: return "res://assets/future_tanks/PNG/Effects/Granade_Shell.png"
 		4: return "res://assets/future_tanks/PNG/Effects/Heavy_Shell.png"
+		5: return "res://assets/future_tanks/PNG/Effects/Laser.png"
 		_: return "res://assets/future_tanks/PNG/Effects/Plasma.png"
 
 func _process(delta):

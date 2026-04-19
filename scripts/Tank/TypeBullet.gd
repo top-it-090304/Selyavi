@@ -4,5 +4,6 @@ enum TypeBullet {
 	MEDIUM,
 	LIGHT,
 	HE,
-	BOPS
+	BOPS,
+	RICOCHET
 }
