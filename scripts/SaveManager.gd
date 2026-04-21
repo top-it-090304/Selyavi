@@ -100,24 +100,23 @@ func set_setting(section: String, key: String, value):
 
 func _apply_graphics_quality(quality: String):
 	var viewport = get_viewport()
-	var window = get_window()
 
-	if viewport == null or window == null:
+	if viewport == null:
 		return
 
 	match quality:
 		"low":
-			window.content_scale_factor = 0.75
 			viewport.msaa_2d = Viewport.MSAA_DISABLED
 			viewport.screen_space_aa = Viewport.SCREEN_SPACE_AA_DISABLED
+			viewport.canvas_item_default_texture_filter = Viewport.DEFAULT_CANVAS_ITEM_TEXTURE_FILTER_NEAREST
 		"medium":
-			window.content_scale_factor = 0.9
 			viewport.msaa_2d = Viewport.MSAA_2X
 			viewport.screen_space_aa = Viewport.SCREEN_SPACE_AA_FXAA
+			viewport.canvas_item_default_texture_filter = Viewport.DEFAULT_CANVAS_ITEM_TEXTURE_FILTER_LINEAR
 		_:
-			window.content_scale_factor = 1.0
 			viewport.msaa_2d = Viewport.MSAA_4X
 			viewport.screen_space_aa = Viewport.SCREEN_SPACE_AA_FXAA
+			viewport.canvas_item_default_texture_filter = Viewport.DEFAULT_CANVAS_ITEM_TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
 
 func save_game():
 	var player_money = _get_money_from_active_player()

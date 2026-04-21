@@ -192,5 +192,5 @@ func _on_level_pressed(level_num: int):
 	else:
 		get_tree().change_scene_to_file(final_path)
 
-func _on_return_button_pressed():
+func _on_Return_Button_pressed():
 	get_tree().change_scene_to_file("res://scenes/MenuScenes/Menu.tscn")
