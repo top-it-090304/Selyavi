@@ -13,6 +13,7 @@ var _aim_assist_toggler: CheckButton
 var _left_hand_toggler: CheckButton
 var _fov_slider: HSlider
 var _marker_slider: HSlider
+var _graphics_quality_selector: OptionButton
 var _return_button: Button
 var _reset_progress_btn: Button
 
@@ -27,10 +28,12 @@ func _ready():
 	_left_hand_toggler = game_settings.find_child("CheckButton_LeftHand", true)
 	_fov_slider = game_settings.find_child("HSlider_CameraFov", true)
 	_marker_slider = game_settings.find_child("HSlider_MarkerScale", true)
+	_graphics_quality_selector = game_settings.find_child("OptionButton_GraphicsQuality", true)
 	_reset_progress_btn = game_settings.find_child("ResetProgressBtn", true)
 
 	_return_button = find_child("Return_Button", true)
 
+	_setup_graphics_selector()
 	_load_ui_values()
 	_update_return_button_text()
 	_setup_sfx_preview()
@@ -50,6 +53,16 @@ func _ready():
 	if _left_hand_toggler: _left_hand_toggler.toggled.connect(_on_left_hand_toggled)
 	if _fov_slider: _fov_slider.value_changed.connect(_on_fov_slider_changed)
 	if _marker_slider: _marker_slider.value_changed.connect(_on_marker_scale_changed)
+	if _graphics_quality_selector: _graphics_quality_selector.item_selected.connect(_on_graphics_quality_selected)
+
+func _setup_graphics_selector():
+	if _graphics_quality_selector == null:
+		return
+
+	_graphics_quality_selector.clear()
+	_graphics_quality_selector.add_item("Максимальные")
+	_graphics_quality_selector.add_item("Средние")
+	_graphics_quality_selector.add_item("Минимальные")
 
 func _check_reset_button_visibility():
 	if _reset_progress_btn == null: return
@@ -167,6 +180,9 @@ func _load_ui_values():
 		if _left_hand_toggler: _left_hand_toggler.button_pressed = save_mgr.get_setting("game", "lefty_mode", false)
 		if _fov_slider: _fov_slider.value = float(save_mgr.get_setting("game", "camera_fov", 50.0))
 		if _marker_slider: _marker_slider.value = float(save_mgr.get_setting("game", "marker_scale", 1.0))
+		if _graphics_quality_selector:
+			var quality = str(save_mgr.get_setting("game", "graphics_quality", "high"))
+			_graphics_quality_selector.select(_quality_to_index(quality))
 
 	if game_mgr and _scope_toggler:
 		_scope_toggler.button_pressed = game_mgr.is_scope_currently_enabled()
@@ -178,6 +194,29 @@ func _on_marker_scale_changed(value: float):
 func _on_fov_slider_changed(value: float):
 	var save_mgr = get_node_or_null("/root/SaveManager")
 	if save_mgr: save_mgr.set_setting("game", "camera_fov", value)
+
+func _on_graphics_quality_selected(index: int):
+	var save_mgr = get_node_or_null("/root/SaveManager")
+	if save_mgr:
+		save_mgr.set_setting("game", "graphics_quality", _index_to_quality(index))
+
+func _quality_to_index(quality: String) -> int:
+	match quality:
+		"low":
+			return 2
+		"medium":
+			return 1
+		_:
+			return 0
+
+func _index_to_quality(index: int) -> String:
+	match index:
+		2:
+			return "low"
+		1:
+			return "medium"
+		_:
+			return "high"
 
 func _on_music_slider_changed(value: float):
 	var save_mgr = get_node_or_null("/root/SaveManager")

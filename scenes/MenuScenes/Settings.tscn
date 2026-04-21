@@ -338,6 +338,21 @@ max_value = 2.0
 step = 0.1
 value = 1.0
 
+[node name="GraphicsQualityLabel" type="Label" parent="VBoxMain/ContentContainer/SettingsPanel/GameSettings/Margin/VBox/Grid"]
+layout_mode = 2
+text = "Качество графики"
+label_settings = SubResource("LabelSettings_label")
+
+[node name="OptionButton_GraphicsQuality" type="OptionButton" parent="VBoxMain/ContentContainer/SettingsPanel/GameSettings/Margin/VBox/Grid"]
+layout_mode = 2
+size_flags_horizontal = 3
+focus_mode = 0
+theme_override_fonts/font = ExtResource("2")
+theme_override_font_sizes/font_size = 24
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
+
 [node name="ScopeLabel" type="Label" parent="VBoxMain/ContentContainer/SettingsPanel/GameSettings/Margin/VBox/Grid"]
 layout_mode = 2
 text = "Лазерный прицел"
