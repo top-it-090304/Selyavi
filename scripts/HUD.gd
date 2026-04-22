@@ -39,7 +39,8 @@ var _marker_icons = {
 	"warning": preload("res://assets/IngameAssets/Markers/free-icon-broken-shield-4046202.png")
 }
 
-const AMMO_BTN_SIZE = 120
+const AMMO_BTN_SIZE = 80
+const AMMO_HITBOX_SIZE = 140
 const AMMO_DEFAULT_LOADOUT = [2, 0, 1]
 
 func _ready():
@@ -57,6 +58,7 @@ func _ready():
 	_setup_marker_overlay()
 	_setup_warning_label()
 	_setup_ammo_selection()
+	_setup_pause_button()
 	_update_level_display()
 	_load_marker_settings()
 
@@ -66,7 +68,7 @@ func _ready():
 		if _healthLabel: _healthLabel.modulate.a = 0.5
 
 	if _top_right:
-		_top_right.modulate.a = 0.5 # Деньги, жизни и базы полупрозрачные
+		_top_right.modulate.a = 0.5
 
 	_move_joy_c = find_child("MoveJoystickContainer", true, false) as MarginContainer
 	_aim_joy_c = find_child("AimJoystickContainer", true, false) as MarginContainer
@@ -79,6 +81,25 @@ func _ready():
 	call_deferred("_find_player_and_connect")
 	_start_level_label_fade()
 
+func _setup_pause_button():
+	if has_node("PauseMargin"): get_node("PauseMargin").queue_free()
+	var pause_container = MarginContainer.new()
+	pause_container.name = "PauseMargin"
+	add_child(pause_container)
+	# Пауза в левом верхнем углу
+	pause_container.set_anchors_preset(Control.PRESET_TOP_LEFT)
+	pause_container.add_theme_constant_override("margin_left", 60)
+	pause_container.add_theme_constant_override("margin_top", 60)
+
+	var btn = TextureButton.new()
+	btn.texture_normal = load("res://assets/ButtonSprites/pause_594725.png")
+	btn.custom_minimum_size = Vector2(80, 80)
+	btn.ignore_texture_size = true
+	btn.stretch_mode = TextureButton.STRETCH_KEEP_ASPECT_CENTERED
+	btn.modulate.a = 0.5
+	btn.pressed.connect(func(): if get_tree().has_group("pause_menu"): get_tree().call_group("pause_menu", "open"))
+	pause_container.add_child(btn)
+
 func _start_level_label_fade():
 	if _levelLabel:
 		get_tree().create_timer(6.0).timeout.connect(func():
@@ -89,7 +110,6 @@ func _start_level_label_fade():
 
 func highlight_health():
 	if _healthProgress:
-		# Восстанавливаем непрозрачность ТОЛЬКО для полоски здоровья
 		var tween = create_tween().set_parallel(true)
 		tween.tween_property(_healthProgress, "modulate:a", 1.0, 0.2)
 		if _healthLabel: tween.tween_property(_healthLabel, "modulate:a", 1.0, 0.2)
@@ -181,15 +201,17 @@ func _apply_lefty_joystick_layout():
 
 func _layout_joystick_bottom_left(c: MarginContainer, edge_inset_left: float = 0.0):
 	c.set_anchors_preset(Control.PRESET_BOTTOM_LEFT)
-	c.offset_left = edge_inset_left; c.offset_top = -200.0; c.offset_right = 200.0 + edge_inset_left; c.offset_bottom = 0.0
-	c.add_theme_constant_override("margin_left", 60); c.add_theme_constant_override("margin_bottom", 40)
-	c.modulate.a = 1.0 if get_tree().has_group("tutorial") else 0.3
+	# Возвращаем ниже (было -300/100, ставим -220/60)
+	c.offset_left = edge_inset_left; c.offset_top = -220.0; c.offset_right = 200.0 + edge_inset_left; c.offset_bottom = -20.0
+	c.add_theme_constant_override("margin_left", 60); c.add_theme_constant_override("margin_bottom", 60)
+	c.modulate.a = 0.4
 
 func _layout_joystick_bottom_right(c: MarginContainer):
 	c.set_anchors_preset(Control.PRESET_BOTTOM_RIGHT)
-	c.offset_left = -260.0; c.offset_top = -200.0; c.offset_right = -60.0; c.offset_bottom = 0.0
-	c.add_theme_constant_override("margin_right", 60); c.add_theme_constant_override("margin_bottom", 40)
-	c.modulate.a = 1.0 if get_tree().has_group("tutorial") else 0.3
+	# Возвращаем ниже
+	c.offset_left = -260.0; c.offset_top = -220.0; c.offset_right = -60.0; c.offset_bottom = -20.0
+	c.add_theme_constant_override("margin_right", 60); c.add_theme_constant_override("margin_bottom", 60)
+	c.modulate.a = 0.4
 
 func set_joysticks_opacity(alpha: float):
 	if _move_joy_c: _move_joy_c.modulate.a = alpha
@@ -260,7 +282,6 @@ func _on_health_changed(curr, m):
 		_healthProgress.value = curr
 		_healthLabel.text = str(max(0,curr)) + "/" + str(m)
 		_update_health_bar_color(curr, m)
-		# Подсвечиваем ТОЛЬКО HP при получении урона
 		highlight_health()
 
 func _update_health_bar_color(curr, m):
@@ -269,11 +290,11 @@ func _update_health_bar_color(curr, m):
 	style.set_corner_radius_all(5)
 
 	if ratio > 0.6:
-		style.bg_color = Color(0.2, 0.8, 0.2) # Зеленый
+		style.bg_color = Color(0.2, 0.8, 0.2)
 	elif ratio > 0.3:
-		style.bg_color = Color(0.9, 0.8, 0.1) # Желтый
+		style.bg_color = Color(0.9, 0.8, 0.1)
 	else:
-		style.bg_color = Color(0.8, 0.1, 0.1) # Красный
+		style.bg_color = Color(0.8, 0.1, 0.1)
 
 	_healthProgress.add_theme_stylebox_override("fill", style)
 
@@ -282,40 +303,68 @@ func _on_money_changed(m): if _moneyLabel: _moneyLabel.text = str(m)
 
 func _setup_ammo_selection():
 	if has_node("AmmoPanelContainer"): get_node("AmmoPanelContainer").queue_free()
-	var ammo_container = CenterContainer.new()
-	ammo_container.name = "AmmoPanelContainer"
-	add_child(ammo_container)
-	ammo_container.set_anchors_preset(Control.PRESET_CENTER_BOTTOM)
-	ammo_container.offset_top = -180; ammo_container.offset_bottom = -30
-	ammo_container.anchor_left = 0.5; ammo_container.anchor_right = 0.5
-	ammo_container.offset_left = -500; ammo_container.offset_right = 500
 
-	var ammo_panel = HBoxContainer.new()
-	ammo_panel.name = "AmmoPanel"
-	ammo_panel.add_theme_constant_override("separation", 25)
-	ammo_container.add_child(ammo_panel)
+	var ammo_arc = Control.new()
+	ammo_arc.name = "AmmoPanelContainer"
+	add_child(ammo_arc)
+	ammo_arc.set_anchors_preset(Control.PRESET_BOTTOM_RIGHT)
+
 	var loadout = AMMO_DEFAULT_LOADOUT
 	if _player != null and is_instance_valid(_player) and _player.has_method("get_ammo_loadout"):
 		loadout = _player.get_ammo_loadout()
+
+	var angles = [-1.8, -1.35, -0.9]
+	var radius = 220.0
+
 	for i in range(3):
+		var touch_area = Control.new()
+		touch_area.custom_minimum_size = Vector2(AMMO_HITBOX_SIZE, AMMO_HITBOX_SIZE)
+		var offset = Vector2(cos(angles[i]), sin(angles[i])) * radius
+		# Сдвигаем точку отсчета дуги чуть выше и левее правого джойстика
+		touch_area.position = Vector2(-220, -220) + offset
+		ammo_arc.add_child(touch_area)
+
 		var slot = Panel.new()
+		slot.name = "Slot_" + str(i)
 		slot.custom_minimum_size = Vector2(AMMO_BTN_SIZE, AMMO_BTN_SIZE)
+		slot.set_anchors_preset(Control.PRESET_CENTER)
+		slot.position = Vector2((AMMO_HITBOX_SIZE - AMMO_BTN_SIZE)/2, (AMMO_HITBOX_SIZE - AMMO_BTN_SIZE)/2)
+
 		var style = StyleBoxFlat.new()
-		style.bg_color = Color(0.1, 0.1, 0.1, 0.6); style.set_corner_radius_all(15); style.border_color = Color(0.4, 0.4, 0.4); style.set_border_width_all(3)
+		style.bg_color = Color(0, 0, 0, 0.4); style.set_corner_radius_all(40); style.border_color = Color(0.6, 0.6, 0.6); style.set_border_width_all(2)
 		slot.add_theme_stylebox_override("panel", style)
-		ammo_panel.add_child(slot)
+		touch_area.add_child(slot)
+
 		var icon = TextureRect.new()
 		var ammo_id = loadout[i] if i < loadout.size() else AMMO_DEFAULT_LOADOUT[i]
-		icon.texture = load(_ammo_icon_path(ammo_id)); icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE; icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-		icon.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT); icon.offset_left = 18; icon.offset_top = 18; icon.offset_right = -18; icon.offset_bottom = -18
+		icon.texture = load(_ammo_icon_path(ammo_id))
+		icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE; icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		icon.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT); icon.offset_left = 12; icon.offset_top = 12; icon.offset_right = -12; icon.offset_bottom = -12
 		slot.add_child(icon)
-		var cooldown = Panel.new(); var cd_style = StyleBoxFlat.new(); cd_style.bg_color = Color(0, 0, 0, 0.7); cd_style.set_corner_radius_all(15)
-		cooldown.add_theme_stylebox_override("panel", cd_style); cooldown.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT); cooldown.visible = false
-		cooldown.name = "Cooldown"; slot.add_child(cooldown)
-		var touch_btn = TouchScreenButton.new(); touch_btn.shape = RectangleShape2D.new(); touch_btn.shape.size = Vector2(AMMO_BTN_SIZE, AMMO_BTN_SIZE)
-		touch_btn.position = Vector2(AMMO_BTN_SIZE/2, AMMO_BTN_SIZE/2)
+
+		var cooldown = TextureProgressBar.new()
+		cooldown.name = "Cooldown"
+		cooldown.fill_mode = TextureProgressBar.FILL_CLOCKWISE
+		cooldown.step = 0.01
+		cooldown.value = 0
+		cooldown.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+
+		var img = Image.create(128, 128, false, Image.FORMAT_RGBA8)
+		for y in range(128):
+			for x in range(128):
+				if Vector2(x-64, y-64).length() < 64: img.set_pixel(x, y, Color.WHITE)
+		cooldown.texture_progress = ImageTexture.create_from_image(img)
+		cooldown.tint_progress = Color(0, 0, 0, 0.7)
+		cooldown.visible = false
+		slot.add_child(cooldown)
+
+		var touch_btn = TouchScreenButton.new()
+		touch_btn.shape = CircleShape2D.new(); touch_btn.shape.radius = AMMO_HITBOX_SIZE/2
+		touch_btn.position = Vector2(AMMO_HITBOX_SIZE/2, AMMO_HITBOX_SIZE/2)
 		touch_btn.pressed.connect(func(): if _player: _player._on_ammo_selected(i))
-		slot.add_child(touch_btn); _ammo_buttons[i] = slot
+		touch_area.add_child(touch_btn)
+
+		_ammo_buttons[i] = slot
 
 func _ammo_icon_path(ammo_id: int) -> String:
 	match ammo_id:
@@ -344,18 +393,27 @@ func _update_ammo_cooldowns():
 	for i in range(3):
 		if not _ammo_buttons.has(i): continue
 		var slot = _ammo_buttons[i]
-		var cd = slot.get_node("Cooldown")
+		var cd = slot.get_node("Cooldown") as TextureProgressBar
 		if timer and not timer.is_stopped() and i == _player.get("_current_ammo_slot"):
-			cd.visible = true; var ratio = timer.time_left / timer.wait_time
-			cd.anchor_top = 1.0 - ratio; cd.anchor_bottom = 1.0; cd.offset_top = 0; cd.offset_bottom = 0
-		else: cd.visible = false
+			cd.visible = true
+			cd.value = (timer.time_left / timer.wait_time) * 100
+		else:
+			cd.visible = false
 
 func _on_ammo_changed(type):
 	for i in _ammo_buttons:
 		var slot = _ammo_buttons[i]
 		var style = slot.get_theme_stylebox("panel").duplicate()
-		if i == type: style.border_color = Color(1, 0.8, 0.2); slot.modulate.a = 1.0
-		else: style.border_color = Color(0.4, 0.4, 0.4); slot.modulate.a = 0.6
+		if i == type:
+			style.border_color = Color(1, 0.8, 0.2)
+			style.set_border_width_all(4)
+			slot.modulate.a = 1.0
+			slot.scale = Vector2(1.1, 1.1)
+		else:
+			style.border_color = Color(0.4, 0.4, 0.4)
+			style.set_border_width_all(2)
+			slot.modulate.a = 0.5
+			slot.scale = Vector2(1.0, 1.0)
 		slot.add_theme_stylebox_override("panel", style)
 
 func _on_marker_overlay_draw():
@@ -366,24 +424,20 @@ func _on_marker_overlay_draw():
 	var view_size = get_viewport().get_visible_rect().size / cam_scale
 	var screen_rect = Rect2(cam_pos, view_size)
 
-	# 1. МАРКЕР БОТОВ
 	var enemy_bases = get_tree().get_nodes_in_group("bases").filter(func(b): return b.get("type_base") == 1)
 	if enemy_bases.size() == 0:
 		for enemy in get_tree().get_nodes_in_group("enemies"):
 			if is_instance_valid(enemy) and enemy.get("_type_enemy") != 5:
 				_draw_marker_for(enemy.global_position, Color(0, 0.5, 1, 0.7), _marker_icons.enemy, screen_rect, false, 1.0)
 
-	# 2. МАРКЕР БАЗ ВРАГА
 	if _show_base_markers:
 		for base in get_tree().get_nodes_in_group("bases"):
 			if is_instance_valid(base) and base.get("type_base") == 1:
 				_draw_marker_for(base.global_position, Color(1, 1, 0, 0.7), _marker_icons.base, screen_rect, false, 1.0)
 
-	# 3. МАРКЕР БАЗЫ ИГРОКА (При атаке)
 	if _base_under_attack:
 		_draw_marker_for(_player_base_pos, Color.GREEN, _marker_icons.warning, screen_rect, true, 1.2)
 
-	# 4. МАРКЕР БОССА
 	for enemy in get_tree().get_nodes_in_group("enemies"):
 		if is_instance_valid(enemy) and enemy.get("_type_enemy") == 5:
 			_draw_marker_for(enemy.global_position, Color("#f34235"), _marker_icons.boss, screen_rect, false, 1.3)
