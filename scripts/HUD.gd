@@ -68,6 +68,8 @@ func _ready():
 	_setup_warning_label()
 
 	var pause_btn = get_node_or_null("PauseButton")
+	if not pause_btn: pause_btn = find_child("PauseButton", true)
+
 	if pause_btn:
 		pause_btn.pressed.connect(_on_pause_pressed)
 		pause_btn.modulate.a = 0.5
@@ -94,20 +96,24 @@ func _on_pause_pressed():
 		scene._on_TouchScreenButton_pressed()
 
 func _setup_ammo_selection():
-	if !_ammo_anchor: return
+	if !_ammo_anchor or !_aim_joy_c: return
 	for c in _ammo_anchor.get_children(): c.queue_free()
 
 	var loadout = AMMO_DEFAULT_LOADOUT
 	if _player != null and is_instance_valid(_player) and _player.has_method("get_ammo_loadout"):
 		loadout = _player.get_ammo_loadout()
 
-	var angles = [-2.1, -1.57, -1.05]
-	var radius = 180.0
+	var joy_center = _aim_joy_c.global_position + _aim_joy_c.size / 2
+	var anchor_pos = _ammo_anchor.global_position
+	var relative_joy = joy_center - anchor_pos
+
+	var angles = [-2.2, -1.57, -0.94]
+	var radius = 210.0
 
 	for i in range(3):
 		var touch_btn = TouchScreenButton.new()
 		var offset = Vector2(cos(angles[i]), sin(angles[i])) * radius
-		touch_btn.position = offset - Vector2(AMMO_HITBOX_SIZE/2, AMMO_HITBOX_SIZE/2)
+		touch_btn.position = relative_joy + offset - Vector2(AMMO_HITBOX_SIZE/2, AMMO_HITBOX_SIZE/2)
 
 		var slot = Panel.new()
 		slot.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -165,7 +171,7 @@ func _update_ammo_cooldowns():
 	for i in range(3):
 		if not _ammo_buttons.has(i): continue
 		var slot = _ammo_buttons[i]
-		var cd = slot.get_node("Cooldown")
+		var cd = slot.get_node("Cooldown") as TextureProgressBar
 		if timer and not timer.is_stopped() and i == _player.get("_current_ammo_slot"):
 			cd.visible = true
 			cd.value = (timer.time_left / timer.wait_time) * 100
@@ -180,6 +186,7 @@ func _on_ammo_changed(type):
 		slot.add_theme_stylebox_override("panel", style)
 
 func _setup_buff_icon():
+	if has_node("BuffMarginContainer"): return
 	var buff_margin = MarginContainer.new()
 	buff_margin.name = "BuffMarginContainer"
 	add_child(buff_margin)
@@ -195,10 +202,39 @@ func set_buff_icon_visible(show_buff: bool):
 	if _buffIcon: _buffIcon.visible = show_buff
 
 func _setup_warning_label():
-	_warningLabel = find_child("WarningLabel", true)
+	# ИСПРАВЛЕНИЕ: Центрированный VBoxContainer для всех надписей сверху
+	var top_center = find_child("TopCenter", true)
+	if !top_center: return
+
+	# Убеждаемся, что TopCenter - это CenterContainer или имеет правильные якоря
+	top_center.set_anchors_and_offsets_preset(Control.PRESET_CENTER_TOP)
+
+	var vbox = VBoxContainer.new()
+	vbox.name = "CenterLabelsVBox"
+	# Заставляем VBox растягиваться по ширине для центрирования текста
+	vbox.custom_minimum_size = Vector2(800, 0)
+	top_center.add_child(vbox)
+
+	# Перемещаем LevelLabel (номер миссии) в этот VBox
+	if _levelLabel and _levelLabel.get_parent():
+		_levelLabel.get_parent().remove_child(_levelLabel)
+		vbox.add_child(_levelLabel)
+		_levelLabel.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+
+	_warningLabel = Label.new()
+	_warningLabel.name = "WarningLabel"
+	_warningLabel.text = "ШТАБ АТАКУЮТ!"
+	_warningLabel.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_warningLabel.add_theme_font_size_override("font_size", 42)
+	_warningLabel.add_theme_color_override("font_color", Color(1, 0.2, 0.2))
+	_warningLabel.add_theme_color_override("font_outline_color", Color.BLACK)
+	_warningLabel.add_theme_constant_override("outline_size", 12)
+
+	vbox.add_child(_warningLabel)
+	_warningLabel.visible = false
 
 func trigger_base_attack_warning(base_pos: Vector2):
-	_base_under_attack = true; _player_base_pos = base_pos; _attack_warning_timer = 3.0
+	_base_under_attack = true; _player_base_pos = base_pos; _attack_warning_timer = 4.0
 	if _warningLabel: _warningLabel.visible = true
 
 func _setup_marker_overlay():
@@ -264,17 +300,22 @@ func _on_money_changed(m): if _moneyLabel: _moneyLabel.text = str(m)
 func highlight_health():
 	if _healthProgress:
 		var tween = create_tween().set_parallel(true)
-		tween.tween_property(_healthProgress, "modulate:a", 1.0, 0.2)
-		if _healthLabel: tween.tween_property(_healthLabel, "modulate:a", 1.0, 0.2)
-		get_tree().create_timer(2.0).timeout.connect(func():
+		tween.tween_property(_healthProgress, "modulate:a", 1.0, 0.5)
+		if _healthLabel: tween.tween_property(_healthLabel, "modulate:a", 1.0, 0.5)
+		get_tree().create_timer(4.0).timeout.connect(func():
 			var fade = create_tween().set_parallel(true)
-			fade.tween_property(_healthProgress, "modulate:a", 0.5, 1.0)
-			if _healthLabel: fade.tween_property(_healthLabel, "modulate:a", 0.5, 1.0)
+			fade.tween_property(_healthProgress, "modulate:a", 0.5, 2.0)
+			if _healthLabel: fade.tween_property(_healthLabel, "modulate:a", 0.5, 2.0)
 		)
 
 func _on_marker_overlay_draw():
 	if _player == null or not is_instance_valid(_player): return
 	var cam_transform = _player.get_viewport().get_canvas_transform(); var cam_pos = cam_transform.affine_inverse().get_origin(); var cam_scale = cam_transform.get_scale(); var view_size = get_viewport().get_visible_rect().size / cam_scale; var screen_rect = Rect2(cam_pos, view_size)
+
+	# ВОССТАНОВЛЕНО: Маркер штаба под атакой
+	if _base_under_attack:
+		_draw_marker_for(_player_base_pos, Color.GREEN, _marker_icons.warning, screen_rect, true, 1.0)
+
 	var enemy_bases = get_tree().get_nodes_in_group("bases").filter(func(b): return b.get("type_base") == 1)
 	if enemy_bases.size() == 0:
 		for enemy in get_tree().get_nodes_in_group("enemies"):
@@ -289,12 +330,27 @@ func _draw_marker_for(target_pos: Vector2, color: Color, icon: Texture2D, screen
 	if screen_rect.has_point(target_pos): return
 	var center = screen_rect.get_center(); var dir = (target_pos - center).normalized(); var dist = center.distance_to(target_pos); var marker_pos = _get_intersect_pos(center, dir, screen_rect); var margin = 80.0
 	marker_pos.x = clamp(marker_pos.x, screen_rect.position.x + margin, screen_rect.end.x - margin); marker_pos.y = clamp(marker_pos.y, screen_rect.position.y + margin, screen_rect.end.y - margin)
-	var draw_pos = _player.get_viewport().get_canvas_transform() * marker_pos; var base_scale = clamp(remap(dist, 800, 3000, max_scale, 0.5), 0.5, max_scale); var scale_factor = base_scale * (SaveManager.get_setting("game", "marker_scale", 1.0) if SaveManager else 1.0)
-	if pulse: scale_factor *= 1.0 + (sin(Time.get_ticks_msec() * 0.005) * 0.12)
-	_marker_overlay.draw_circle(draw_pos, 25 * scale_factor, Color(0, 0, 0, 0.4)); _marker_overlay.draw_circle(draw_pos, 22 * scale_factor, Color(color.r, color.g, color.b, 0.7))
+	var draw_pos = _player.get_viewport().get_canvas_transform() * marker_pos;
+
+	var base_scale = clamp(remap(dist, 800, 3000, max_scale, 0.5), 0.5, max_scale)
+	var scale_factor = base_scale * (SaveManager.get_setting("game", "marker_scale", 1.0) if SaveManager else 1.0)
+	if pulse: scale_factor *= 1.0 + (sin(Time.get_ticks_msec() * 0.005) * 0.15)
+
+	_marker_overlay.draw_circle(draw_pos, 45 * scale_factor, Color(0, 0, 0, 0.4))
+	_marker_overlay.draw_circle(draw_pos, 40 * scale_factor, Color(color.r, color.g, color.b, 0.7))
 	if icon:
-		var icon_size = Vector2(32, 32) * scale_factor; _marker_overlay.draw_texture_rect(icon, Rect2(draw_pos - icon_size/2, icon_size), false, Color(1, 1, 1, 0.9))
-	var pts = PackedVector2Array([draw_pos + dir * (35 * scale_factor), draw_pos + dir.rotated(0.4) * (20 * scale_factor), draw_pos + dir.rotated(-0.4) * (20 * scale_factor)]); _marker_overlay.draw_colored_polygon(pts, Color(color.r, color.g, color.b, 0.7))
+		var icon_size = Vector2(56, 56) * scale_factor
+		_marker_overlay.draw_texture_rect(icon, Rect2(draw_pos - icon_size/2, icon_size), false, Color(1, 1, 1, 0.9))
+
+	# Сдвигаем стрелку дальше от центра, чтобы она не заходила внутрь круга (радиус круга 40)
+	var tip_dist = 65 * scale_factor
+	var base_dist = 42 * scale_factor
+	var pts = PackedVector2Array([
+		draw_pos + dir * tip_dist,
+		draw_pos + dir.rotated(0.4) * base_dist,
+		draw_pos + dir.rotated(-0.4) * base_dist
+	])
+	_marker_overlay.draw_colored_polygon(pts, Color(color.r, color.g, color.b, 0.7))
 
 func _get_intersect_pos(center: Vector2, dir: Vector2, rect: Rect2) -> Vector2:
 	var t_max = Vector2.ZERO

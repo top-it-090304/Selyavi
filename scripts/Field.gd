@@ -147,84 +147,46 @@ func _show_game_over_screen(is_victory: bool, reason: String = ""):
 	var style = StyleBoxFlat.new()
 	style.bg_color = Color(0.1, 0.11, 0.1, 0.96)
 	style.set_border_width_all(4)
+	# ВОССТАНОВЛЕНО: Зеленая окантовка для победы, красная для поражения
+	style.border_color = Color(0.2, 0.8, 0.2) if is_victory else Color(0.8, 0.2, 0.2)
 	style.set_corner_radius_all(20)
 	panel.add_theme_stylebox_override("panel", style)
 
 	var margin = MarginContainer.new()
-	margin.add_theme_constant_override("margin_left", 30)
-	margin.add_theme_constant_override("margin_right", 30)
-	margin.add_theme_constant_override("margin_top", 30)
-	margin.add_theme_constant_override("margin_bottom", 30)
+	margin.add_theme_constant_override("margin_left", 30); margin.add_theme_constant_override("margin_right", 30)
+	margin.add_theme_constant_override("margin_top", 30); margin.add_theme_constant_override("margin_bottom", 30)
 	panel.add_child(margin)
 
-	var vbox = VBoxContainer.new()
-	vbox.add_theme_constant_override("separation", 20)
-	margin.add_child(vbox)
+	var vbox = VBoxContainer.new(); vbox.add_theme_constant_override("separation", 20); margin.add_child(vbox)
+	var title = Label.new(); title.text = "ПОБЕДА!" if is_victory else "ПОРАЖЕНИЕ"; title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER; title.add_theme_font_size_override("font_size", 48); vbox.add_child(title)
+	var desc = Label.new(); desc.text = reason; desc.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER; desc.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART; desc.custom_minimum_size = Vector2(400, 0); vbox.add_child(desc)
 
-	var title = Label.new()
-	title.text = "ПОБЕДА!" if is_victory else "ПОРАЖЕНИЕ"
-	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	title.add_theme_font_size_override("font_size", 48)
-	vbox.add_child(title)
-
-	var desc = Label.new()
-	desc.text = reason
-	desc.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	desc.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	desc.custom_minimum_size = Vector2(400, 0)
-	vbox.add_child(desc)
-
-	var btn_container = VBoxContainer.new()
-	btn_container.add_theme_constant_override("separation", 12)
-	vbox.add_child(btn_container)
+	var btn_container = VBoxContainer.new(); btn_container.add_theme_constant_override("separation", 12); vbox.add_child(btn_container)
 
 	var style_btn = func(btn: Button):
 		btn.custom_minimum_size = Vector2(0, 56)
-		var btn_style = StyleBoxFlat.new()
-		btn_style.bg_color = Color(0.2, 0.22, 0.2)
-		btn_style.set_corner_radius_all(12)
-		btn.add_theme_stylebox_override("normal", btn_style)
-		btn.add_theme_font_size_override("font_size", 24)
+		var btn_style = StyleBoxFlat.new(); btn_style.bg_color = Color(0.2, 0.22, 0.2); btn_style.set_corner_radius_all(12)
+		btn.add_theme_stylebox_override("normal", btn_style); btn.add_theme_font_size_override("font_size", 24)
 
 	if is_victory and current_level < 20:
-		var btn_next = Button.new()
-		btn_next.text = "СЛЕДУЮЩАЯ МИССИЯ"
-		style_btn.call(btn_next)
-		btn_container.add_child(btn_next)
-		btn_next.pressed.connect(func():
-			get_tree().paused = false
-			var next_lvl = current_level + 1
-			if SaveManager: SaveManager.current_level = next_lvl
-			get_tree().change_scene_to_file("res://scenes/Levels/Level_" + str(next_lvl) + ".tscn")
-		)
+		var btn_next = Button.new(); btn_next.text = "СЛЕДУЮЩАЯ МИССИЯ"; style_btn.call(btn_next); btn_container.add_child(btn_next)
+		btn_next.pressed.connect(func(): get_tree().paused = false; var next_lvl = current_level + 1; if SaveManager: SaveManager.current_level = next_lvl; get_tree().change_scene_to_file("res://scenes/Levels/Level_" + str(next_lvl) + ".tscn"))
 
-	var btn_retry = Button.new()
-	btn_retry.text = "ИГРАТЬ СНОВА"
-	style_btn.call(btn_retry)
-	btn_container.add_child(btn_retry)
-	btn_retry.pressed.connect(func():
-		get_tree().paused = false
-		get_tree().reload_current_scene()
-	)
+	var btn_retry = Button.new(); btn_retry.text = "ИГРАТЬ СНОВА"; style_btn.call(btn_retry); btn_container.add_child(btn_retry)
+	btn_retry.pressed.connect(func(): get_tree().paused = false; get_tree().reload_current_scene())
 
-	var btn_menu = Button.new()
-	btn_menu.text = "В ГЛАВНОЕ МЕНЮ"
-	style_btn.call(btn_menu)
-	btn_container.add_child(btn_menu)
-	btn_menu.pressed.connect(func():
-		get_tree().paused = false
-		get_tree().change_scene_to_file("res://scenes/MenuScenes/Menu.tscn")
-	)
+	# ВОССТАНОВЛЕНО: Кнопка выбора миссии
+	var btn_levels = Button.new(); btn_levels.text = "ВЫБОР МИССИИ"; style_btn.call(btn_levels); btn_container.add_child(btn_levels)
+	btn_levels.pressed.connect(func(): get_tree().paused = false; get_tree().change_scene_to_file("res://scenes/MenuScenes/LevelSelector.tscn"))
+
+	var btn_menu = Button.new(); btn_menu.text = "В ГЛАВНОЕ МЕНЮ"; style_btn.call(btn_menu); btn_container.add_child(btn_menu)
+	btn_menu.pressed.connect(func(): get_tree().paused = false; get_tree().change_scene_to_file("res://scenes/MenuScenes/Menu.tscn"))
 
 func _cleanup_global_objects():
 	for node in get_tree().root.get_children():
 		if node == get_tree().current_scene: continue
-		if node.is_in_group("enemies") or node.name.contains("Bullet"):
-			node.queue_free()
+		if node.is_in_group("enemies") or node.name.contains("Bullet"): node.queue_free()
 
 func toggle_pause():
 	if get_tree().paused: return
-	get_tree().paused = true
-	var p = _pauseScene.instantiate()
-	p.process_mode = Node.PROCESS_MODE_ALWAYS
-	add_child(p)
+	get_tree().paused = true; var p = _pauseScene.instantiate(); p.process_mode = Node.PROCESS_MODE_ALWAYS; add_child(p)

@@ -132,14 +132,6 @@ text = "МИССИЯ 1.1"
 label_settings = SubResource("LabelSettings_level")
 horizontal_alignment = 1
 
-[node name="PauseButton" type="TouchScreenButton" parent="."]
-modulate = Color(1, 1, 1, 0.5)
-position = Vector2(60, 60)
-scale = Vector2(0.2, 0.2)
-texture_normal = ExtResource("6")
-passby_press = true
-visibility_mode = 1
-
 [node name="Controls" type="Control" parent="."]
 layout_mode = 3
 anchors_preset = 15
@@ -156,11 +148,11 @@ anchors_preset = 2
 anchor_top = 1.0
 anchor_bottom = 1.0
 offset_left = 60.0
-offset_top = -280.0
+offset_top = -240.0
 offset_right = 320.0
 grow_vertical = 0
 theme_override_constants/margin_left = 60
-theme_override_constants/margin_bottom = 80
+theme_override_constants/margin_bottom = 40
 
 [node name="Joystick" parent="Controls/MoveJoystickContainer" instance=ExtResource("5")]
 layout_mode = 2
@@ -174,16 +166,30 @@ anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
 offset_left = -320.0
-offset_top = -280.0
+offset_top = -240.0
 offset_right = -60.0
 grow_horizontal = 0
 grow_vertical = 0
 theme_override_constants/margin_right = 60
-theme_override_constants/margin_bottom = 80
+theme_override_constants/margin_bottom = 40
 
 [node name="Aim" parent="Controls/AimJoystickContainer" instance=ExtResource("5")]
 layout_mode = 2
 
-[node name="AmmoAnchor" type="Control" parent="Controls/AimJoystickContainer"]
-layout_mode = 2
+[node name="AmmoAnchor" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 0
+grow_vertical = 0
 mouse_filter = 2
+
+[node name="PauseButton" type="TouchScreenButton" parent="."]
+modulate = Color(1, 1, 1, 0.5)
+position = Vector2(60, 60)
+scale = Vector2(0.2, 0.2)
+texture_normal = ExtResource("6")
+visibility_mode = 1
