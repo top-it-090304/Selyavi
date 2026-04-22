@@ -12,6 +12,7 @@ var _buffIcon: TextureRect
 var _marker_overlay: Control
 var _move_joy_c: MarginContainer
 var _aim_joy_c: MarginContainer
+var _aim: Node
 var _ammo_anchor: Control
 
 var _top_right: Control
@@ -56,6 +57,7 @@ func _ready():
 
 	_move_joy_c = find_child("MoveJoystickContainer", true)
 	_aim_joy_c = find_child("AimJoystickContainer", true)
+	_aim = find_child("Aim", true)
 	_ammo_anchor = find_child("AmmoAnchor", true)
 
 	if _move_joy_c: _move_joy_c.modulate.a = 0.4
@@ -81,6 +83,10 @@ func _ready():
 	_start_level_label_fade()
 	call_deferred("_find_player_and_connect")
 
+func activate_radar():
+	_radar_active = true
+	_show_base_markers = true
+
 func _on_viewport_size_changed():
 	if _ammo_buttons.size() > 0:
 		_update_ammo_positions()
@@ -88,8 +94,9 @@ func _on_viewport_size_changed():
 func _update_ammo_positions():
 	if !_ammo_anchor or !_aim_joy_c: return
 
-	var joy_center_global = _aim_joy_c.global_position + _aim_joy_c.size / 2
-	var relative_joy = joy_center_global - _ammo_anchor.global_position
+	# Используем контейнер джойстика для точного определения центра (он Control)
+	var joy_center_global = _aim_joy_c.global_position + (_aim_joy_c.size / 2)
+	var relative_joy = _ammo_anchor.get_global_transform().affine_inverse() * joy_center_global
 
 	var center_angle = -PI / 2
 	var spread = 0.63
@@ -129,8 +136,8 @@ func _setup_ammo_selection():
 	if _player != null and is_instance_valid(_player) and _player.has_method("get_ammo_loadout"):
 		loadout = _player.get_ammo_loadout()
 
-	var joy_center_global = _aim_joy_c.global_position + _aim_joy_c.size / 2
-	var relative_joy = joy_center_global - _ammo_anchor.global_position
+	var joy_center_global = _aim_joy_c.global_position + (_aim_joy_c.size / 2)
+	var relative_joy = _ammo_anchor.get_global_transform().affine_inverse() * joy_center_global
 
 	var center_angle = -PI / 2
 	var spread = 0.63
@@ -200,7 +207,10 @@ func _ammo_icon_path(ammo_id: int) -> String:
 func _process(delta):
 	_update_ammo_cooldowns()
 	_level_time += delta
-	if !_radar_active and _level_time >= BASE_MARKER_TIME: _show_base_markers = true
+	# Если радар активен, маркеры баз должны быть всегда
+	if _radar_active: _show_base_markers = true
+	elif _level_time >= BASE_MARKER_TIME: _show_base_markers = true
+
 	if _base_under_attack:
 		_attack_warning_timer -= delta
 		if _attack_warning_timer <= 0:
@@ -300,10 +310,16 @@ func _update_level_display():
 	var lvl = SaveManager.current_level if SaveManager else 1
 	_levelLabel.text = "МИССИЯ " + str(((lvl-1)/5)+1) + "." + str(((lvl-1)%5)+1)
 
+	if lvl % 5 == 0:
+		_levelLabel.add_theme_color_override("font_color", Color(1, 0.2, 0.2)) # Красный
+	else:
+		_levelLabel.add_theme_color_override("font_color", Color(1, 1, 0)) # Желтый
+
 func _find_player_and_connect():
 	_player = get_tree().get_first_node_in_group("players")
 	if _player:
 		_setup_ammo_selection()
+		_update_level_display() # Принудительное обновление при подключении игрока
 		if not _player.health_changed.is_connected(_on_health_changed): _player.health_changed.connect(_on_health_changed)
 		if not _player.lives_changed.is_connected(_on_lives_changed): _player.lives_changed.connect(_on_lives_changed)
 		if not _player.money_changed.is_connected(_on_money_changed): _player.money_changed.connect(_on_money_changed)
@@ -346,14 +362,14 @@ func _on_marker_overlay_draw():
 	if _player == null or not is_instance_valid(_player): return
 	var cam_transform = _player.get_viewport().get_canvas_transform(); var cam_pos = cam_transform.affine_inverse().get_origin(); var cam_scale = cam_transform.get_scale(); var view_size = get_viewport().get_visible_rect().size / cam_scale; var screen_rect = Rect2(cam_pos, view_size)
 	if _base_under_attack:
-		_draw_marker_for(_player_base_pos, Color.GREEN, _marker_icons.warning, screen_rect, true, 1.0)
+		_draw_marker_for(_player_base_pos, Color.GREEN, _marker_icons.warning, screen_rect, true, 1.2)
 	var enemy_bases = get_tree().get_nodes_in_group("bases").filter(func(b): return b.get("type_base") == 1)
 	if enemy_bases.size() == 0:
 		for enemy in get_tree().get_nodes_in_group("enemies"):
-			if is_instance_valid(enemy) and enemy.get("_type_enemy") != 5: _draw_marker_for(enemy.global_position, Color(0, 0.5, 1, 0.7), _marker_icons.enemy, screen_rect, false, 1.0)
+			if is_instance_valid(enemy) and enemy.get("_type_enemy") != 5: _draw_marker_for(enemy.global_position, Color(0, 0.5, 1, 0.7), _marker_icons.enemy, screen_rect, false, 0.9)
 	if _show_base_markers:
 		for base in get_tree().get_nodes_in_group("bases"):
-			if is_instance_valid(base) and base.get("type_base") == 1: _draw_marker_for(base.global_position, Color(1, 1, 0, 0.7), _marker_icons.base, screen_rect, false, 1.0)
+			if is_instance_valid(base) and base.get("type_base") == 1: _draw_marker_for(base.global_position, Color(1, 1, 0, 0.7), _marker_icons.base, screen_rect, false, 0.9)
 	for enemy in get_tree().get_nodes_in_group("enemies"):
 		if is_instance_valid(enemy) and enemy.get("_type_enemy") == 5: _draw_marker_for(enemy.global_position, Color("#f34235"), _marker_icons.boss, screen_rect, false, 1.3)
 
@@ -362,16 +378,18 @@ func _draw_marker_for(target_pos: Vector2, color: Color, icon: Texture2D, screen
 	var center = screen_rect.get_center(); var dir = (target_pos - center).normalized(); var dist = center.distance_to(target_pos); var marker_pos = _get_intersect_pos(center, dir, screen_rect); var margin = 80.0
 	marker_pos.x = clamp(marker_pos.x, screen_rect.position.x + margin, screen_rect.end.x - margin); marker_pos.y = clamp(marker_pos.y, screen_rect.position.y + margin, screen_rect.end.y - margin)
 	var draw_pos = _player.get_viewport().get_canvas_transform() * marker_pos;
-	var base_scale = clamp(remap(dist, 800, 3000, max_scale, 0.5), 0.5, max_scale)
+	var base_scale = clamp(remap(dist, 800, 3000, max_scale, 0.4), 0.4, max_scale)
 	var scale_factor = base_scale * (SaveManager.get_setting("game", "marker_scale", 1.0) if SaveManager else 1.0)
 	if pulse: scale_factor *= 1.0 + (sin(Time.get_ticks_msec() * 0.005) * 0.15)
-	_marker_overlay.draw_circle(draw_pos, 45 * scale_factor, Color(0, 0, 0, 0.4))
-	_marker_overlay.draw_circle(draw_pos, 40 * scale_factor, Color(color.r, color.g, color.b, 0.7))
+
+	_marker_overlay.draw_circle(draw_pos, 35 * scale_factor, Color(0, 0, 0, 0.4))
+	_marker_overlay.draw_circle(draw_pos, 30 * scale_factor, Color(color.r, color.g, color.b, 0.7))
 	if icon:
-		var icon_size = Vector2(56, 56) * scale_factor
+		var icon_size = Vector2(44, 44) * scale_factor
 		_marker_overlay.draw_texture_rect(icon, Rect2(draw_pos - icon_size/2, icon_size), false, Color(1, 1, 1, 0.9))
-	var tip_dist = 65 * scale_factor
-	var base_dist = 42 * scale_factor
+
+	var tip_dist = 55 * scale_factor
+	var base_dist = 32 * scale_factor
 	var pts = PackedVector2Array([
 		draw_pos + dir * tip_dist,
 		draw_pos + dir.rotated(0.4) * base_dist,

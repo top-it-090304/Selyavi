@@ -34,10 +34,10 @@ func _ready():
 
 	if _body:
 		_body.texture = load("res://assets/future_tanks/PNG/Hulls_Color_D/Hull_08.png")
-		_body.modulate = Color(0.8, 0.25, 1.0)
+		_body.self_modulate = Color(0.8, 0.25, 1.0)
 	if _gun:
 		_gun.texture = load("res://assets/future_tanks/PNG/Weapon_Color_D/Gun_02.png")
-		_gun.modulate = Color(0.9, 0.4, 1.0)
+		_gun.self_modulate = Color(0.9, 0.4, 1.0)
 
 	_setup_hp_bar()
 
@@ -95,8 +95,8 @@ func _play_body_hit_flash():
 	var base_color = Color(0.8, 0.25, 1.0) if not _phase2_active else Color(0.6, 0.05, 0.8)
 
 	_hit_flash_tween = create_tween()
-	_hit_flash_tween.tween_property(_body, "modulate", Color(4.5, 4.5, 4.5, 1.0), 0.05)
-	_hit_flash_tween.tween_property(_body, "modulate", base_color, 0.07)
+	_hit_flash_tween.tween_property(_body, "self_modulate", Color(4.5, 4.5, 4.5, 1.0), 0.05)
+	_hit_flash_tween.tween_property(_body, "self_modulate", base_color, 0.07)
 
 func _start_transformation():
 	_phase2_active = true
@@ -149,8 +149,8 @@ func _finish_transformation():
 
 	if _body:
 		var tween = create_tween().set_loops()
-		tween.tween_property(_body, "modulate", Color(1.5, 0.1, 1.5), 0.3)
-		tween.tween_property(_body, "modulate", Color(0.6, 0.05, 0.8), 0.3)
+		tween.tween_property(_body, "self_modulate", Color(1.5, 0.1, 1.5), 0.3)
+		tween.tween_property(_body, "self_modulate", Color(0.6, 0.05, 0.8), 0.3)
 
 func _fire_at_pos(pos: Vector2):
 	if _is_transforming or _shoot_timer.time_left > 0 or _ricochet_scene == null:
