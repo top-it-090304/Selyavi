@@ -98,6 +98,23 @@ func use_move_vector(move_vector: Vector2):
 	rotation = move_vector.angle() + PI/2
 	_handle_movement_sound(velocity)
 
+# Функция для безопасного спавна пули (чтобы не пролетала сквозь стены вплотную)
+func _get_safe_bullet_spawn_pos() -> Vector2:
+	var start_pos = global_position # Центр танка
+	var end_pos = _bullet_position.global_position # Кончик дула
+
+	var space_state = get_world_2d().direct_space_state
+	var query = PhysicsRayQueryParameters2D.create(start_pos, end_pos)
+	query.exclude = [self]
+	query.collision_mask = 1 # Только стены
+
+	var result = space_state.intersect_ray(query)
+	if result:
+		# Если дуло залезло в стену, спавним пулю прямо перед поверхностью стены
+		return result.position - (end_pos - start_pos).normalized() * 5.0
+
+	return end_pos
+
 func fire_touch():
 	if _shoot_timer.time_left > 0: return
 
@@ -111,11 +128,13 @@ func fire_touch():
 			sound_type = PLASMA
 		AudioManager.play_bullet_sound(sound_type, global_position)
 
+	var spawn_pos = _get_safe_bullet_spawn_pos()
+
 	if _type_bullet == RICOCHET:
 		if _ricochet_bullet_scene == null:
 			return
 		var rb = _ricochet_bullet_scene.instantiate()
-		rb.global_position = _bullet_position.global_position
+		rb.global_position = spawn_pos
 		rb.rotation_degrees = _gun.global_rotation_degrees
 		get_parent().add_child(rb)
 		var base_bullet_damage = 22
@@ -125,7 +144,7 @@ func fire_touch():
 		rb.init(true, final_damage, final_splash, get_rid(), 2, false)
 	else:
 		var bullet = _bullet_scene.instantiate()
-		bullet.global_position = _bullet_position.global_position
+		bullet.global_position = spawn_pos
 		bullet.rotation_degrees = _gun.global_rotation_degrees
 		get_parent().add_child(bullet)
 
