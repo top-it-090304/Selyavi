@@ -1,4 +1,4 @@
-[gd_scene load_steps=16 format=4 uid="uid://dhi7h2hkywvuo"]
+[gd_scene load_steps=15 format=4 uid="uid://dhi7h2hkywvuo"]
 
 [ext_resource type="PackedScene" uid="uid://mfxaskty4hrm" path="res://scenes/Tank/Player.tscn" id="2"]
 [ext_resource type="Texture2D" uid="uid://d0bnoilig7yxs" path="res://assets/ground_shaker_asset/Terrains/terrain.png" id="2_mssve"]
@@ -7,12 +7,10 @@
 [ext_resource type="PackedScene" uid="uid://dwrghveyttq4p" path="res://scenes/Walls/DestructibleWall.tscn" id="5"]
 [ext_resource type="AudioStream" uid="uid://bxl5wv7crhm5" path="res://assets/Music/68. Sad Eyes.mp3" id="6"]
 [ext_resource type="Script" uid="uid://3wsw25sk74o6" path="res://scripts/Field.gd" id="8"]
-[ext_resource type="Texture2D" uid="uid://dsiq4t7qegc5x" path="res://assets/ButtonSprites/pause_594725.png" id="9"]
 [ext_resource type="PackedScene" uid="uid://dfpgy8w1vxtx0" path="res://scenes/Tank/Enemy.tscn" id="11_fn4ql"]
 [ext_resource type="Resource" uid="uid://d17w5hoo3u0qm" path="res://resources/enemies/enemy_stationary.tres" id="12_ht2ea"]
 [ext_resource type="PackedScene" uid="uid://bjw4bj0fr4c7q" path="res://scenes/Base.tscn" id="15"]
 [ext_resource type="PackedScene" uid="uid://336qfi6ddylt" path="res://scenes/Tank/HUD.tscn" id="21"]
-
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_2i15a"]
 texture = ExtResource("2_mssve")
@@ -88,13 +86,6 @@ drag_left_margin = 0.1
 drag_top_margin = 0.1
 drag_right_margin = 0.1
 drag_bottom_margin = 0.1
-
-[node name="PauseButton" type="CanvasLayer" parent="PlayerTank"]
-
-[node name="PauseButton" type="TouchScreenButton" parent="PlayerTank/PauseButton"]
-position = Vector2(18.0001, 4)
-scale = Vector2(0.177734, 0.177734)
-texture_normal = ExtResource("9")
 
 [node name="MusicPlayer" type="AudioStreamPlayer" parent="."]
 stream = ExtResource("6")
@@ -320,5 +311,3 @@ _type_enemy = 3
 
 [node name="Area2D" parent="." instance=ExtResource("15")]
 position = Vector2(2586, 919)
-
-[connection signal="pressed" from="PlayerTank/PauseButton/PauseButton" to="." method="_on_TouchScreenButton_pressed"]
