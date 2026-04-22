@@ -130,7 +130,7 @@ func _fire_burst(angle: float):
 	_burst_count += 1
 	var is_exp_burst = (_burst_count % 3 == 0)
 
-	# Во второй фазе: 3 отскока для обычных, 2 для взрывных
+	# Во второй фазе: 3 отскока для обычных, 2 для взрывных (но взрывные сразу о стену)
 	var bounces = 2 if is_exp_burst else 3
 
 	var offsets = [-0.2, 0.2]
@@ -169,7 +169,7 @@ func _fire_at_pos(pos: Vector2):
 	var spread = randf_range(-0.2, 0.2)
 
 	if not _phase2_active:
-		# Сохраняем старую логику для 1 фазы (хотя _fire_at_pos обычно для 2 фазы)
+		# Сохраняем старую логику для 1 фазы
 		_bullet_count += 1
 		var is_exp = (_bullet_count % 3 == 0)
 		_spawn_boss_bullet(base_angle + spread, 1, is_exp)
@@ -187,7 +187,11 @@ func _spawn_boss_bullet(angle: float, bounces_val: int, explosive: bool):
 	bullet.global_position = _bullet_position.global_position
 	bullet.global_rotation = angle
 	get_parent().add_child(bullet)
-	bullet.init(false, _damage, int(_damage * 1.8), get_rid(), bounces_val, explosive)
+
+	# Во второй фазе взрывные снаряды взрываются при первом же касании стены
+	var explodes_on_wall = explosive and _phase2_active
+
+	bullet.init(false, _damage, int(_damage * 1.8), get_rid(), bounces_val, explosive, explodes_on_wall)
 
 func _prune_minion_list():
 	_boss_minions = _boss_minions.filter(func(n): return is_instance_valid(n) and not n.is_queued_for_deletion())

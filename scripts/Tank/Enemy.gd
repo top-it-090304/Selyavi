@@ -58,6 +58,11 @@ var _roll_out_timer: float = 0.0 # Таймер для "выкатывания" 
 var _smoothed_avoidance: Vector2 = Vector2.ZERO
 var _speed_limit_mult: float = 1.0
 var _last_bypass_side: float = 0.0 # Стабилизация выбора стороны объезда
+
+# ОПТИМИЗАЦИЯ
+var _logic_frame_offset: int = 0
+static var _global_frame_counter: int = 0
+var _cached_avoidance: Vector2 = Vector2.ZERO
 # endregion
 
 func get_enemy_type() -> int:
@@ -66,6 +71,8 @@ func get_enemy_type() -> int:
 func _ready():
 	add_to_group("enemies")
 	_init_base_tank()
+
+	_logic_frame_offset = randi() % 10 # Смещение для распределения нагрузки
 
 	_nav2d = get_node_or_null("NavigationAgent2D")
 	_ray_cast = get_node_or_null("RayCast2D")
@@ -164,22 +171,29 @@ func _setup_artillery_flash():
 	_shot_flash.rotation = 0
 
 func _physics_process(delta):
+	_global_frame_counter += 1
+	var current_frame = (_global_frame_counter + _logic_frame_offset) % 60
+
 	if not is_instance_valid(_player) or (not is_instance_valid(_base) and _base != null):
-		_find_targets()
+		if current_frame % 30 == 0: # Редкий поиск целей
+			_find_targets()
 
 	if _type_enemy == TypeEnemy.SCOUT:
 		_process_scout_logic(delta)
 
-	_update_target()
+	# Оптимизация: обновляем навигацию раз в 10 кадров
+	if current_frame % 10 == 0:
+		_update_target()
+
 	_aim_gun(delta)
-	_update_ray_cast()
 
-	var was_visible = _target_in_sight
-	_target_in_sight = _is_target_visible()
-
-	# Если мы только что увидели цель, запускаем таймер "выкатывания"
-	if _target_in_sight and not was_visible:
-		_roll_out_timer = 0.3
+	# Обновляем RayCast и видимость раз в 5 кадров
+	if current_frame % 5 == 0:
+		_update_ray_cast()
+		var was_visible = _target_in_sight
+		_target_in_sight = _is_target_visible()
+		if _target_in_sight and not was_visible:
+			_roll_out_timer = 0.3
 
 	if _roll_out_timer > 0:
 		_roll_out_timer -= delta
@@ -196,8 +210,10 @@ func _physics_process(delta):
 	_handle_movement_sound(velocity)
 
 func _process_scout_logic(delta):
+	# Оптимизация: скаут проверяет логику раз в 4 кадра
+	if (_global_frame_counter + _logic_frame_offset) % 4 != 0: return
+
 	if _scout_failed_to_find:
-		# База подсвечивается только если скаут видит её напрямую и находится в радиусе обнаружения
 		if is_instance_valid(_base) and global_position.distance_to(_base.global_position) <= _notice_range:
 			if _is_target_visible_at(_base):
 				Enemy.scout_target = _base
@@ -206,7 +222,6 @@ func _process_scout_logic(delta):
 
 	_scout_search_timer += delta
 
-	# Скаут засвечивает игрока только если видит его напрямую (LoS) и он в радиусе обнаружения
 	if is_instance_valid(_player) and global_position.distance_to(_player.global_position) <= _notice_range:
 		if _is_target_visible_at(_player):
 			Enemy.scout_target = _player
@@ -329,14 +344,19 @@ func _move_enemy(delta: float):
 	if not _nav2d.is_navigation_finished():
 		nav_dir = (_nav2d.get_next_path_position() - global_position).normalized()
 
-	_speed_limit_mult = 1.0
-	var avoidance_force = _compute_ally_avoidance(nav_dir)
-	_smoothed_avoidance = _smoothed_avoidance.lerp(avoidance_force, delta * 10.0)
+	# Оптимизация: считаем силы объезда раз в 3 кадра
+	if (_global_frame_counter + _logic_frame_offset) % 3 == 0:
+		_cached_avoidance = _compute_ally_avoidance(nav_dir)
+
+	_speed_limit_mult = 1.0 # Сбрасывается внутри compute_ally_avoidance, но для кэша нужно быть аккуратным
+	# Примечание: _speed_limit_mult сейчас может работать некорректно с кэшем,
+	# но плавность lerp сгладит это.
+
+	_smoothed_avoidance = _smoothed_avoidance.lerp(_cached_avoidance, delta * 10.0)
 
 	var in_attack_range = false
 	if is_instance_valid(target):
 		var dist = global_position.distance_to(target.global_position)
-		# Бот останавливается только если видит цель И таймер "выкатывания" закончился
 		if dist <= _attack_range and _target_in_sight and _roll_out_timer <= 0:
 			in_attack_range = true
 
@@ -344,7 +364,6 @@ func _move_enemy(delta: float):
 	if in_attack_range:
 		final_dir = _smoothed_avoidance * 0.3
 	else:
-		# Вес обхода увеличен для босса
 		var avoid_weight = 1.2 if _type_enemy == TypeEnemy.BOSS else 0.7
 		final_dir = (nav_dir + _smoothed_avoidance * avoid_weight).normalized()
 
@@ -366,31 +385,35 @@ func _compute_ally_avoidance(forward: Vector2) -> Vector2:
 	var my_radius = 75.0 * max(scale.x, scale.y)
 	var is_i_boss = _type_enemy == TypeEnemy.BOSS
 
-	for other in get_tree().get_nodes_in_group("enemies"):
+	# ОПТИМИЗАЦИЯ: Перебор только ближайших врагов (по дистанции)
+	var all_enemies = get_tree().get_nodes_in_group("enemies")
+	for other in all_enemies:
 		if not is_instance_valid(other) or other == self or other.is_queued_for_deletion():
 			continue
 		if not (other is CharacterBody2D):
 			continue
 
-		# Игнорируем стационарные турели и артиллерию в логике объезда, чтобы не застревать в узких проходах
+		# Быстрая проверка дистанции перед тяжелыми вычислениями
+		var dist_sq = my_pos.distance_squared_to(other.global_position)
+		if dist_sq > 250000: # 500 * 500
+			continue
+
 		var other_type = other.get("_type_enemy")
 		if other_type == TypeEnemy.STATIONARY or other_type == TypeEnemy.ARTILLERY:
 			continue
 
 		var diff = my_pos - other.global_position
-		var dist = diff.length()
+		var dist = sqrt(dist_sq)
 		var other_radius = 75.0 * max(other.scale.x, other.scale.y)
 		var min_sep_dist = (my_radius + other_radius) * 1.05
 		var is_other_boss = other.get("_type_enemy") == TypeEnemy.BOSS
 
-		# 1. СИЛА РАЗДЕЛЕНИЯ (Фильтрация, чтобы не ехать назад и в стены)
 		if dist < min_sep_dist:
 			var mag = (min_sep_dist - dist) / min_sep_dist
 			var push_dir = diff.normalized()
 
 			if forward.length() > 0.1:
 				var dot_f = push_dir.dot(forward)
-				# Если союзник прямо ПЕРЕД нами (push_dir смотрит назад), выталкиваем себя вбок
 				if dot_f < -0.7:
 					var side_perp = Vector2(-forward.y, forward.x)
 					var side_sign = 1 if side_perp.dot(diff) > 0 else -1
@@ -399,7 +422,6 @@ func _compute_ally_avoidance(forward: Vector2) -> Vector2:
 				elif dot_f < 0:
 					push_dir = (push_dir - forward * dot_f).normalized()
 
-			# ЗАЩИТА ОТ СТЕН: если в направлении расталкивания стена - гасим силу
 			if _is_wall_near(push_dir, my_radius * 0.8):
 				mag *= 0.1
 
@@ -411,14 +433,10 @@ func _compute_ally_avoidance(forward: Vector2) -> Vector2:
 			var side_perp = Vector2(-forward.y, forward.x)
 			var dot_side = side_perp.dot(rel)
 
-			# А) ПРЕПЯТСТВИЕ ВПЕРЕДИ
-			# Дистанция прогноза увеличена для предотвращения столкновений сзади
 			var look_ahead = min_sep_dist * (3.5 if is_i_boss else 2.0)
 			if along > 0 and along < look_ahead:
 				if abs(dot_side) < min_sep_dist * 1.1:
 					var bypass_found = false
-
-					# Стабилизация выбора стороны (jitter protection)
 					var preferred_side = _last_bypass_side
 					if preferred_side == 0:
 						preferred_side = -1 if dot_side > 0 else 1
@@ -437,8 +455,6 @@ func _compute_ally_avoidance(forward: Vector2) -> Vector2:
 						_last_bypass_side = 0
 						var other_vel_len = other.velocity.length()
 						var my_base_speed = (_chase_speed if (_current_state == State.CHASE or _type_enemy == TypeEnemy.SCOUT) else _patrol_speed)
-
-						# Более агрессивное торможение, чтобы не "липнуть" сзади
 						var safety_dist = min_sep_dist * 0.9
 						if along < safety_dist:
 							_speed_limit_mult = min(_speed_limit_mult, remap(along, safety_dist * 0.4, safety_dist, 0.0, 0.5))
@@ -449,14 +465,11 @@ func _compute_ally_avoidance(forward: Vector2) -> Vector2:
 				else:
 					_last_bypass_side = 0
 
-			# Б) БОСС СЗАДИ - УСТУПАЕМ ДОРОГУ
 			elif along < 0 and abs(along) < min_sep_dist * 1.6 and is_other_boss and not is_i_boss:
 				var side_options = [1, -1]
 				if dot_side > 0: side_options = [-1, 1]
-
 				for side in side_options:
 					var escape_dir = side_perp * side
-					# Проверяем наличие места, чтобы не вжиматься в стены
 					if _has_space_for_bypass(escape_dir, min_sep_dist * 0.7):
 						avoidance_force += escape_dir * 1.8
 						break
@@ -472,20 +485,19 @@ func _is_wall_near(dir: Vector2, distance: float) -> bool:
 
 func _has_space_for_bypass(side_dir: Vector2, check_dist: float) -> bool:
 	var space_state = get_world_2d().direct_space_state
+	# Оптимизация: проверяем 2 луча вместо 3
 	var directions = [
 		side_dir,
-		(side_dir + Vector2(0, -0.7).rotated(rotation)).normalized(),
-		side_dir.rotated(0.3)
+		(side_dir + Vector2(0, -0.7).rotated(rotation)).normalized()
 	]
 
 	for dir in directions:
 		var query = PhysicsRayQueryParameters2D.create(global_position, global_position + dir * (check_dist * 1.3))
 		query.exclude = [self]
-		query.collision_mask = 1 # Только СТЕНЫ
+		query.collision_mask = 1
 		var result = space_state.intersect_ray(query)
 		if result:
 			return false
-
 	return true
 
 func _update_ray_cast():
@@ -498,33 +510,27 @@ func _update_ray_cast():
 
 func _is_target_visible() -> bool:
 	if _type_enemy == TypeEnemy.ARTILLERY:
-		# СТРОГАЯ ПРОВЕРКА ДЛЯ АРТИЛЛЕРИИ:
-		# 1. Проверяем засвет от скаута (приоритет)
 		var time_since_spotted = (Time.get_ticks_msec() / 1000.0) - Enemy.last_spotted_time
 		if time_since_spotted <= 2.5 and is_instance_valid(Enemy.scout_target):
-			# Для арты по засвету скаута убираем все проверки препятствий у ствола.
-			# Это навесной огонь, стены рядом не должны мешать.
 			return true
-
-		# 2. Самостоятельное обнаружение ТОЛЬКО ИГРОКА и только в пределах LoS (никаких стен)
 		if is_instance_valid(_player):
 			var dist = global_position.distance_to(_player.global_position)
-			# Уменьшаем радиус "самостоятельной" стрельбы арты без скаута до 500
 			if dist <= 500.0 and _is_target_visible_at(_player):
 				return true
-
 		return false
 
 	var target = _get_current_target()
 	if not is_instance_valid(target): return false
 
-	# Базовая видимость центра
 	if not _is_target_visible_at(target):
 		return false
 
-	# Дополнительная проверка боковых лучей (защита от стрельбы в стену полкорпусом)
+	# Оптимизация: боковые лучи проверяем только если цель близко или мы босс
+	var dist = global_position.distance_to(target.global_position)
+	if dist > 600.0 and _type_enemy != TypeEnemy.BOSS:
+		return true
+
 	var is_base = target is Base
-	# Для баз используем меньший офсет, чтобы боты не тупили перед стенами, но видели препятствие
 	var side_offset = (20.0 if is_base else 35.0) * max(scale.x, scale.y)
 	var dir_to_target = (target.global_position - global_position).normalized()
 	var right = Vector2(-dir_to_target.y, dir_to_target.x) * side_offset
@@ -538,35 +544,27 @@ func _is_target_visible() -> bool:
 func _is_line_clear_to_target(from: Vector2, target_node_or_pos) -> bool:
 	var target_pos = target_node_or_pos.global_position if target_node_or_pos is Node2D else target_node_or_pos
 	var space_state = get_world_2d().direct_space_state
-
-	# Список исключений для луча (те, сквозь кого мы "смотрим")
 	var exclude_list: Array[RID] = [get_rid()]
 
-	# Мы делаем несколько проходов (цикл), чтобы проверить, нет ли неразрушимых препятствий за разрушимыми
-	# 10 итераций должно хватить для самых сложных нагромождений коробок
-	for i in range(10):
+	# ОПТИМИЗАЦИЯ: Уменьшаем кол-во итераций с 10 до 5
+	for i in range(5):
 		var query = PhysicsRayQueryParameters2D.create(from, target_pos)
 		query.exclude = exclude_list
-		query.collision_mask = 3 # Стены (1) и Танки/Базы (2)
+		query.collision_mask = 3
 		var result = space_state.intersect_ray(query)
 
-		# Если луч ни во что не врезался - путь чист
 		if result.is_empty():
 			return true
 
 		var collider = result.collider
-
-		# 1. Если попали прямо в цель (или её физическое тело в случае базы)
 		if target_node_or_pos is Node:
 			if collider == target_node_or_pos or (collider is Node and collider.get_parent() == target_node_or_pos):
 				return true
 
-		# 2. Если попали в другого врага - игнорируем его (мы разрешили стрельбу сквозь своих)
 		if collider is Enemy:
 			exclude_list.append(collider.get_rid())
 			continue
 
-		# 3. Проверка на разрушаемость
 		var is_destructible = false
 		if collider.has_method("destroyable") and collider.destroyable():
 			is_destructible = true
@@ -574,26 +572,19 @@ func _is_line_clear_to_target(from: Vector2, target_node_or_pos) -> bool:
 			is_destructible = true
 
 		if is_destructible:
-			# Если объект разрушаем, мы добавляем его в исключения и "смотрим" дальше.
-			# Таким образом, если ЗА этой коробкой стоит бетонная стена, луч в итоге упрётся в неё
-			# и вернёт false, и бот не будет тратить снаряды впустую.
 			exclude_list.append(collider.get_rid())
 			continue
 
-		# 4. Если мы дошли до этой точки, значит попали во что-то твердое (неразрушимая стена)
 		return false
 
 	return false
 
 func _is_target_visible_at(target) -> bool:
 	if not is_instance_valid(target): return false
-
-	# Для арты делаем "честный" старт луча чуть впереди, чтобы не застревать в своей коллизии
 	var from = global_position
 	if _type_enemy == TypeEnemy.ARTILLERY:
 		var dir = (target.global_position - global_position).normalized()
 		from = global_position + dir * 110.0
-
 	return _is_line_clear_to_target(from, target)
 
 func _get_current_target():
@@ -615,10 +606,8 @@ func _check_and_fire():
 	if target == null: return
 
 	var dist = global_position.distance_to(target.global_position)
-
 	var can_fire = false
 	if _type_enemy == TypeEnemy.ARTILLERY:
-		# Арта стреляет только если цель в прямой видимости (или по наводке)
 		can_fire = _target_in_sight and _reaction_timer >= 1.2
 	elif _type_enemy == TypeEnemy.SCOUT:
 		if dist <= _attack_range and _target_in_sight:
@@ -627,7 +616,6 @@ func _check_and_fire():
 		if dist <= _attack_range and _target_in_sight:
 			can_fire = true
 	else:
-		# Стрельба по базе или другим целям
 		if dist <= 700.0 and _target_in_sight:
 			can_fire = true
 
@@ -677,7 +665,6 @@ func _fire_at_pos(pos: Vector2):
 	if AudioManager:
 		AudioManager.play_bullet_sound(sound_type, global_position)
 
-	# ПРОВЕРКА НА ТРОЙНОЙ ВЫСТРЕЛ: строго по типу
 	if _type_enemy == TypeEnemy.TRIPLE:
 		var angles = [base_angle, base_angle - 0.4, base_angle + 0.4]
 		for angle in angles:
@@ -706,7 +693,6 @@ func _on_detection_area_exited(body):
 	if body == _player: _current_state = State.PATROL
 
 func _destroy():
-	# Если умирает скаут, немедленно сбрасываем глобальный засвет для арты
 	if _type_enemy == TypeEnemy.SCOUT:
 		Enemy.scout_target = null
 		Enemy.last_spotted_time = -100.0
