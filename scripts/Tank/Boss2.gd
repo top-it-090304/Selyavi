@@ -6,7 +6,7 @@ const MINION_SEPARATION: float = 72.0
 
 var _spawn_timer: Timer
 var _enemy_scene: PackedScene
-var _ricochet_scene: PackedScene
+var _ricochet_scene: PackedScene # Ссылка на сцену BossRicochetBullet.tscn
 
 var _hp_bar: ProgressBar
 var _hp_bar_label: Label
@@ -42,7 +42,7 @@ func _ready():
 	_setup_hp_bar()
 
 	_enemy_scene = load("res://scenes/Tank/Enemy.tscn")
-	_ricochet_scene = load("res://scenes/Tank/RicochetBullet.tscn")
+	_ricochet_scene = load("res://scenes/Tank/BossRicochetBullet.tscn")
 
 func _setup_hp_bar():
 	var canvas = CanvasLayer.new()
@@ -130,9 +130,12 @@ func _fire_burst(angle: float):
 	_burst_count += 1
 	var is_exp_burst = (_burst_count % 3 == 0)
 
+	# Во второй фазе: 3 отскока для обычных, 2 для взрывных
+	var bounces = 2 if is_exp_burst else 3
+
 	var offsets = [-0.2, 0.2]
 	for off in offsets:
-		_spawn_boss_bullet(angle + off, 2, is_exp_burst)
+		_spawn_boss_bullet(angle + off, bounces, is_exp_burst)
 
 func _finish_transformation():
 	_is_transforming = false
@@ -157,16 +160,20 @@ func _fire_at_pos(pos: Vector2):
 		AudioManager.play_bullet_sound(1, global_position)
 
 	var base_angle: float = (pos - _gun.global_position).angle() + PI * 0.5
-	var bounces = 2 if _phase2_active else 1
-	var spread = randf_range(-0.2, 0.2) if _phase2_active else 0.0
+
+	_burst_count += 1
+	var is_exp_burst = (_burst_count % 3 == 0)
+
+	# Во второй фазе: 3 отскока для обычных, 2 для взрывных
+	var bounces = 2 if is_exp_burst else 3
+	var spread = randf_range(-0.2, 0.2)
 
 	if not _phase2_active:
+		# Сохраняем старую логику для 1 фазы (хотя _fire_at_pos обычно для 2 фазы)
 		_bullet_count += 1
 		var is_exp = (_bullet_count % 3 == 0)
-		_spawn_boss_bullet(base_angle + spread, bounces, is_exp)
+		_spawn_boss_bullet(base_angle + spread, 1, is_exp)
 	else:
-		_burst_count += 1
-		var is_exp_burst = (_burst_count % 3 == 0)
 		var offsets = [-0.15, 0.15]
 		for off in offsets:
 			_spawn_boss_bullet(base_angle + off + spread, bounces, is_exp_burst)

@@ -32,6 +32,10 @@ func _ready():
 	_spawn_timer.timeout.connect(_spawn_minion)
 	add_child(_spawn_timer)
 
+	# Начальные параметры дальности
+	_notice_range = 1000.0
+	_attack_range = 1000.0
+
 func _setup_hp_bar():
 	var canvas = CanvasLayer.new()
 	add_child(canvas)
@@ -79,10 +83,14 @@ func take_damage(damage: int):
 func _activate_phase2():
 	_phase2_active = true
 	_is_transforming = true
-	# Лимит _max_minions не меняем, остается 3
 
-	_patrol_speed += 20
-	_chase_speed += 20
+	_patrol_speed += 40
+	_chase_speed += 40
+
+	# Увеличиваем дальность атаки во 2 фазе
+	_notice_range = 1200.0
+	_attack_range = 1200.0
+
 	_fire_rate *= 0.6
 
 	if _hp_bar_label: _hp_bar_label.text = "ПРИЗЫВАТЕЛЬ - В ЯРОСТИ"
@@ -91,7 +99,6 @@ func _activate_phase2():
 	var tween = create_tween()
 	tween.tween_property(self, "rotation_degrees", rotation_degrees + 720, 2.0).set_trans(Tween.TRANS_QUART).set_ease(Tween.EASE_IN_OUT)
 
-	# Призываем 3 дополнительных ботов, которые НЕ считаются миньонами босса
 	for i in range(3):
 		get_tree().create_timer(i * 0.4).timeout.connect(_spawn_independent_minion)
 
@@ -111,7 +118,9 @@ func _fire_at_pos(pos: Vector2):
 	bullet.global_position = _bullet_position.global_position
 	bullet.global_rotation = angle
 	get_parent().add_child(bullet)
-	bullet.init(0, false, _damage)
+
+	# Дальность снаряда равна дальности атаки босса
+	bullet.init(0, false, _damage, get_rid(), _attack_range)
 
 	if _shot_flash: _shot_flash.play("Fire")
 	_shoot_timer.start(_fire_rate)
@@ -148,7 +157,6 @@ func _get_valid_spawn_position() -> Vector2:
 		_spawn_attempts += 1
 	return candidate
 
-# Обычный призыв (с лимитом)
 func _spawn_minion():
 	if not is_instance_valid(_player): return
 	_prune_minion_list()
@@ -157,12 +165,10 @@ func _spawn_minion():
 	var minion = _create_minion_instance()
 	_boss_minions.append(minion)
 
-# Специальный призыв для 2 фазы (без лимита)
 func _spawn_independent_minion():
 	if not is_instance_valid(_player): return
 	_create_minion_instance()
 
-# Общая логика создания бота
 func _create_minion_instance() -> Node:
 	var minion = _enemy_scene.instantiate()
 	var allowed_types = [TypeEnemy.LIGHT, TypeEnemy.MEDIUM, TypeEnemy.HEAVY]
