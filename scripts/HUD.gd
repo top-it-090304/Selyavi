@@ -74,11 +74,36 @@ func _ready():
 		pause_btn.pressed.connect(_on_pause_pressed)
 		pause_btn.modulate.a = 0.5
 
+	get_viewport().size_changed.connect(_on_viewport_size_changed)
+
 	await get_tree().process_frame
-	_setup_ammo_selection()
 	_update_level_display()
 	_start_level_label_fade()
 	call_deferred("_find_player_and_connect")
+
+func _on_viewport_size_changed():
+	if _ammo_buttons.size() > 0:
+		_update_ammo_positions()
+
+func _update_ammo_positions():
+	if !_ammo_anchor or !_aim_joy_c: return
+
+	var joy_center_global = _aim_joy_c.global_position + _aim_joy_c.size / 2
+	var relative_joy = joy_center_global - _ammo_anchor.global_position
+
+	var center_angle = -PI / 2
+	var spread = 0.63
+	var angles = [center_angle - spread, center_angle, center_angle + spread]
+	var radius = 210.0
+
+	var children = _ammo_anchor.get_children()
+	var btn_idx = 0
+	for child in children:
+		if child is TouchScreenButton:
+			if btn_idx < angles.size():
+				var offset = Vector2(cos(angles[btn_idx]), sin(angles[btn_idx])) * radius
+				child.position = relative_joy + offset
+				btn_idx += 1
 
 func _start_level_label_fade():
 	if _levelLabel:
@@ -98,46 +123,60 @@ func _on_pause_pressed():
 func _setup_ammo_selection():
 	if !_ammo_anchor or !_aim_joy_c: return
 	for c in _ammo_anchor.get_children(): c.queue_free()
+	_ammo_buttons.clear()
 
 	var loadout = AMMO_DEFAULT_LOADOUT
 	if _player != null and is_instance_valid(_player) and _player.has_method("get_ammo_loadout"):
 		loadout = _player.get_ammo_loadout()
 
-	var joy_center = _aim_joy_c.global_position + _aim_joy_c.size / 2
-	var anchor_pos = _ammo_anchor.global_position
-	var relative_joy = joy_center - anchor_pos
+	var joy_center_global = _aim_joy_c.global_position + _aim_joy_c.size / 2
+	var relative_joy = joy_center_global - _ammo_anchor.global_position
 
-	var angles = [-2.2, -1.57, -0.94]
+	var center_angle = -PI / 2
+	var spread = 0.63
+	var angles = [center_angle - spread, center_angle, center_angle + spread]
 	var radius = 210.0
+
+	var mask_size = 128
+	var circle_img = Image.create(mask_size, mask_size, false, Image.FORMAT_RGBA8)
+	for y in range(mask_size):
+		for x in range(mask_size):
+			if Vector2(x - mask_size/2, y - mask_size/2).length() < mask_size/2:
+				circle_img.set_pixel(x, y, Color.WHITE)
+	var circle_tex = ImageTexture.create_from_image(circle_img)
 
 	for i in range(3):
 		var touch_btn = TouchScreenButton.new()
 		var offset = Vector2(cos(angles[i]), sin(angles[i])) * radius
-		touch_btn.position = relative_joy + offset - Vector2(AMMO_HITBOX_SIZE/2, AMMO_HITBOX_SIZE/2)
+		touch_btn.position = relative_joy + offset
 
 		var slot = Panel.new()
 		slot.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		slot.custom_minimum_size = Vector2(AMMO_BTN_SIZE, AMMO_BTN_SIZE)
 		var style = StyleBoxFlat.new()
-		style.bg_color = Color(0, 0, 0, 0.4); style.set_corner_radius_all(40); style.border_color = Color(0.6, 0.6, 0.6); style.set_border_width_all(2)
+		style.bg_color = Color(0, 0, 0, 0.3); style.set_corner_radius_all(40); style.border_color = Color(0.8, 0.8, 0.8, 0.5); style.set_border_width_all(2)
 		slot.add_theme_stylebox_override("panel", style)
-		slot.position = Vector2((AMMO_HITBOX_SIZE - AMMO_BTN_SIZE)/2, (AMMO_HITBOX_SIZE - AMMO_BTN_SIZE)/2)
+		slot.position = -Vector2(AMMO_BTN_SIZE/2, AMMO_BTN_SIZE/2)
 		touch_btn.add_child(slot)
 
 		var icon = TextureRect.new()
 		var ammo_id = loadout[i] if i < loadout.size() else AMMO_DEFAULT_LOADOUT[i]
 		icon.texture = load(_ammo_icon_path(ammo_id))
 		icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE; icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-		icon.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT); icon.offset_left = 10; icon.offset_top = 10; icon.offset_right = -10; icon.offset_bottom = -10
+		icon.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT); icon.offset_left = 12; icon.offset_top = 12; icon.offset_right = -12; icon.offset_bottom = -12
+		icon.pivot_offset = Vector2((AMMO_BTN_SIZE-24)/2, (AMMO_BTN_SIZE-24)/2)
+		icon.rotation_degrees = 0
 		slot.add_child(icon)
 
 		var cooldown = TextureProgressBar.new()
 		cooldown.name = "Cooldown"
 		cooldown.fill_mode = TextureProgressBar.FILL_CLOCKWISE
+		cooldown.texture_progress = circle_tex
+		cooldown.nine_patch_stretch = true
 		cooldown.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-		var img = Image.create(64, 64, false, Image.FORMAT_RGBA8); img.fill(Color.WHITE)
-		cooldown.texture_progress = ImageTexture.create_from_image(img)
-		cooldown.tint_progress = Color(0, 0, 0, 0.7); cooldown.visible = false
+		cooldown.tint_progress = Color(0, 0, 0, 0.6)
+		cooldown.visible = false
+		cooldown.step = 0.01
 		slot.add_child(cooldown)
 
 		touch_btn.shape = CircleShape2D.new(); touch_btn.shape.radius = AMMO_HITBOX_SIZE/2
@@ -145,12 +184,16 @@ func _setup_ammo_selection():
 		_ammo_anchor.add_child(touch_btn)
 		_ammo_buttons[i] = slot
 
+	if _player:
+		_on_ammo_changed(_player.get("_current_ammo_slot"))
+
 func _ammo_icon_path(ammo_id: int) -> String:
 	match ammo_id:
+		0: return "res://assets/future_tanks/PNG/Effects/Plasma.png"
 		1: return "res://assets/future_tanks/PNG/Effects/Medium_Shell.png"
 		2: return "res://assets/future_tanks/PNG/Effects/Light_Shell.png"
-		3: return "res://assets/future_tanks/PNG/Effects/Granade_Shell.png"
-		4: return "res://assets/future_tanks/PNG/Effects/Heavy_Shell.png"
+		3: return "res://assets/future_tanks/PNG/Effects/Heavy_Shell.png"
+		4: return "res://assets/future_tanks/PNG/Effects/Sniper_Shell.png"
 		5: return "res://assets/future_tanks/PNG/Effects/Laser.png"
 		_: return "res://assets/future_tanks/PNG/Effects/Plasma.png"
 
@@ -182,7 +225,7 @@ func _on_ammo_changed(type):
 		var slot = _ammo_buttons[i]
 		slot.modulate.a = 1.0 if i == type else 0.5
 		var style = slot.get_theme_stylebox("panel").duplicate()
-		style.border_color = Color(1, 0.8, 0) if i == type else Color(0.6, 0.6, 0.6)
+		style.border_color = Color(1, 0.8, 0) if i == type else Color(0.8, 0.8, 0.8, 0.5)
 		slot.add_theme_stylebox_override("panel", style)
 
 func _setup_buff_icon():
@@ -202,25 +245,17 @@ func set_buff_icon_visible(show_buff: bool):
 	if _buffIcon: _buffIcon.visible = show_buff
 
 func _setup_warning_label():
-	# ИСПРАВЛЕНИЕ: Центрированный VBoxContainer для всех надписей сверху
 	var top_center = find_child("TopCenter", true)
 	if !top_center: return
-
-	# Убеждаемся, что TopCenter - это CenterContainer или имеет правильные якоря
 	top_center.set_anchors_and_offsets_preset(Control.PRESET_CENTER_TOP)
-
 	var vbox = VBoxContainer.new()
 	vbox.name = "CenterLabelsVBox"
-	# Заставляем VBox растягиваться по ширине для центрирования текста
 	vbox.custom_minimum_size = Vector2(800, 0)
 	top_center.add_child(vbox)
-
-	# Перемещаем LevelLabel (номер миссии) в этот VBox
 	if _levelLabel and _levelLabel.get_parent():
 		_levelLabel.get_parent().remove_child(_levelLabel)
 		vbox.add_child(_levelLabel)
 		_levelLabel.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-
 	_warningLabel = Label.new()
 	_warningLabel.name = "WarningLabel"
 	_warningLabel.text = "ШТАБ АТАКУЮТ!"
@@ -229,7 +264,6 @@ func _setup_warning_label():
 	_warningLabel.add_theme_color_override("font_color", Color(1, 0.2, 0.2))
 	_warningLabel.add_theme_color_override("font_outline_color", Color.BLACK)
 	_warningLabel.add_theme_constant_override("outline_size", 12)
-
 	vbox.add_child(_warningLabel)
 	_warningLabel.visible = false
 
@@ -269,6 +303,7 @@ func _update_level_display():
 func _find_player_and_connect():
 	_player = get_tree().get_first_node_in_group("players")
 	if _player:
+		_setup_ammo_selection()
 		if not _player.health_changed.is_connected(_on_health_changed): _player.health_changed.connect(_on_health_changed)
 		if not _player.lives_changed.is_connected(_on_lives_changed): _player.lives_changed.connect(_on_lives_changed)
 		if not _player.money_changed.is_connected(_on_money_changed): _player.money_changed.connect(_on_money_changed)
@@ -277,7 +312,6 @@ func _find_player_and_connect():
 		_on_health_changed(_player.get_current_health(), _player.get_max_health())
 		_on_lives_changed(_player.get_lives())
 		_on_money_changed(_player.get_money())
-		_on_ammo_changed(_player.get("_current_ammo_slot"))
 	else:
 		get_tree().create_timer(0.5).timeout.connect(_find_player_and_connect)
 
@@ -311,11 +345,8 @@ func highlight_health():
 func _on_marker_overlay_draw():
 	if _player == null or not is_instance_valid(_player): return
 	var cam_transform = _player.get_viewport().get_canvas_transform(); var cam_pos = cam_transform.affine_inverse().get_origin(); var cam_scale = cam_transform.get_scale(); var view_size = get_viewport().get_visible_rect().size / cam_scale; var screen_rect = Rect2(cam_pos, view_size)
-
-	# ВОССТАНОВЛЕНО: Маркер штаба под атакой
 	if _base_under_attack:
 		_draw_marker_for(_player_base_pos, Color.GREEN, _marker_icons.warning, screen_rect, true, 1.0)
-
 	var enemy_bases = get_tree().get_nodes_in_group("bases").filter(func(b): return b.get("type_base") == 1)
 	if enemy_bases.size() == 0:
 		for enemy in get_tree().get_nodes_in_group("enemies"):
@@ -331,18 +362,14 @@ func _draw_marker_for(target_pos: Vector2, color: Color, icon: Texture2D, screen
 	var center = screen_rect.get_center(); var dir = (target_pos - center).normalized(); var dist = center.distance_to(target_pos); var marker_pos = _get_intersect_pos(center, dir, screen_rect); var margin = 80.0
 	marker_pos.x = clamp(marker_pos.x, screen_rect.position.x + margin, screen_rect.end.x - margin); marker_pos.y = clamp(marker_pos.y, screen_rect.position.y + margin, screen_rect.end.y - margin)
 	var draw_pos = _player.get_viewport().get_canvas_transform() * marker_pos;
-
 	var base_scale = clamp(remap(dist, 800, 3000, max_scale, 0.5), 0.5, max_scale)
 	var scale_factor = base_scale * (SaveManager.get_setting("game", "marker_scale", 1.0) if SaveManager else 1.0)
 	if pulse: scale_factor *= 1.0 + (sin(Time.get_ticks_msec() * 0.005) * 0.15)
-
 	_marker_overlay.draw_circle(draw_pos, 45 * scale_factor, Color(0, 0, 0, 0.4))
 	_marker_overlay.draw_circle(draw_pos, 40 * scale_factor, Color(color.r, color.g, color.b, 0.7))
 	if icon:
 		var icon_size = Vector2(56, 56) * scale_factor
 		_marker_overlay.draw_texture_rect(icon, Rect2(draw_pos - icon_size/2, icon_size), false, Color(1, 1, 1, 0.9))
-
-	# Сдвигаем стрелку дальше от центра, чтобы она не заходила внутрь круга (радиус круга 40)
 	var tip_dist = 65 * scale_factor
 	var base_dist = 42 * scale_factor
 	var pts = PackedVector2Array([
