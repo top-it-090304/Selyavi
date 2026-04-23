@@ -24,6 +24,10 @@ var _ammo_option_slots: Array[Panel] = []
 var _ammo_options_open: bool = false
 var _ammo_options_tween: Tween
 var _ammo_ui_mode: String = "classic"
+var _ammo_popup_root: Control
+var _ammo_hold_active: bool = false
+var _ammo_hover_slot: int = -1
+var _ammo_hold_touch_index: int = -1
 
 # Параметры маркеров
 var _level_time: float = 0.0
@@ -49,7 +53,7 @@ const AMMO_MAIN_BTN_SIZE = 116
 const AMMO_DEFAULT_LOADOUT = [2, 0, 1]
 const AMMO_UI_CLASSIC = "classic"
 const AMMO_UI_POPUP = "popup"
-const AMMO_POPUP_OFFSETS = [Vector2(-140, -105), Vector2(-170, 0), Vector2(-140, 105)]
+const AMMO_POPUP_OFFSETS = [Vector2(-240, -170), Vector2(-300, 0), Vector2(-240, 170)]
 
 func _ready():
 	add_to_group("hud")
@@ -309,6 +313,10 @@ func _clear_ammo_selection():
 	_ammo_buttons.clear()
 	_ammo_option_slots.clear()
 	_ammo_main_slot = null
+	_ammo_popup_root = null
+	_ammo_hold_active = false
+	_ammo_hover_slot = -1
+	_ammo_hold_touch_index = -1
 	_ammo_options_open = false
 	if _ammo_options_tween:
 		_ammo_options_tween.kill()
@@ -346,6 +354,7 @@ func _setup_popup_ammo_selection():
 	popup_root.name = "AmmoPopupContainer"
 	popup_root.custom_minimum_size = Vector2(AMMO_MAIN_BTN_SIZE, AMMO_MAIN_BTN_SIZE)
 	add_child(popup_root)
+	_ammo_popup_root = popup_root
 	popup_root.set_anchors_preset(Control.PRESET_BOTTOM_RIGHT)
 	popup_root.offset_left = -250
 	popup_root.offset_top = -430
@@ -365,12 +374,11 @@ func _setup_popup_ammo_selection():
 	main_btn.shape = RectangleShape2D.new()
 	main_btn.shape.size = Vector2(AMMO_MAIN_BTN_SIZE, AMMO_MAIN_BTN_SIZE)
 	main_btn.position = Vector2(AMMO_MAIN_BTN_SIZE / 2.0, AMMO_MAIN_BTN_SIZE / 2.0)
-	main_btn.pressed.connect(_toggle_ammo_options)
 	_ammo_main_slot.add_child(main_btn)
 
 	for i in range(3):
 		var ammo_id = loadout[i] if i < loadout.size() else AMMO_DEFAULT_LOADOUT[i]
-		var opt = _create_ammo_slot(ammo_id, i, AMMO_BTN_SIZE, true)
+		var opt = _create_ammo_slot(ammo_id, i, AMMO_BTN_SIZE, false)
 		opt.position = Vector2((AMMO_MAIN_BTN_SIZE - AMMO_BTN_SIZE) * 0.5, (AMMO_MAIN_BTN_SIZE - AMMO_BTN_SIZE) * 0.5)
 		opt.modulate.a = 0.0
 		opt.scale = Vector2(0.65, 0.65)
@@ -428,8 +436,56 @@ func _create_ammo_slot(ammo_id: int, slot_idx: int, size: int, connect_select: b
 
 	return slot
 
-func _toggle_ammo_options():
-	_set_ammo_options_open(not _ammo_options_open)
+func _on_ammo_main_pressed():
+	_ammo_hold_active = true
+	_ammo_hold_touch_index = -1
+	_ammo_hover_slot = -1
+	_set_ammo_options_open(true)
+
+func _on_ammo_main_released():
+	_finish_ammo_hold_selection()
+
+func _finish_ammo_hold_selection():
+	if not _ammo_hold_active:
+		return
+	_ammo_hold_active = false
+	_ammo_hold_touch_index = -1
+	if _ammo_hover_slot >= 0 and _player != null and is_instance_valid(_player):
+		_player._on_ammo_selected(_ammo_hover_slot)
+	_ammo_hover_slot = -1
+	_apply_popup_hover_visuals()
+	_set_ammo_options_open(false)
+
+func _update_popup_hover(screen_pos: Vector2):
+	if not _ammo_hold_active or not _ammo_options_open:
+		return
+	var hovered := -1
+	for i in range(_ammo_option_slots.size()):
+		var rect = _ammo_option_slots[i].get_global_rect()
+		if rect.has_point(screen_pos):
+			hovered = i
+			break
+	if hovered != _ammo_hover_slot:
+		_ammo_hover_slot = hovered
+		_apply_popup_hover_visuals()
+
+func _apply_popup_hover_visuals():
+	if _ammo_ui_mode != AMMO_UI_POPUP:
+		return
+	if _player != null and is_instance_valid(_player):
+		_on_ammo_changed(_player.get("_current_ammo_slot"))
+	for i in _ammo_buttons:
+		var slot = _ammo_buttons[i]
+		var style = slot.get_theme_stylebox("panel").duplicate()
+		if i == _ammo_hover_slot:
+			style.border_color = Color(0.25, 1.0, 0.95)
+			slot.modulate.a = 1.0
+		slot.add_theme_stylebox_override("panel", style)
+
+func _is_over_ammo_main_button(screen_pos: Vector2) -> bool:
+	if _ammo_main_slot == null:
+		return false
+	return _ammo_main_slot.get_global_rect().has_point(screen_pos)
 
 func _set_ammo_options_open(open: bool):
 	if _ammo_ui_mode != AMMO_UI_POPUP:
@@ -480,6 +536,28 @@ func _process(delta):
 			_base_under_attack = false
 			if _warningLabel: _warningLabel.visible = false
 	if _marker_overlay: _marker_overlay.queue_redraw()
+
+func _input(event):
+	if _ammo_ui_mode != AMMO_UI_POPUP:
+		return
+	if event is InputEventScreenTouch:
+		if event.pressed and _is_over_ammo_main_button(event.position):
+			_on_ammo_main_pressed()
+			_ammo_hold_touch_index = event.index
+			_update_popup_hover(event.position)
+		elif not event.pressed and _ammo_hold_active and (_ammo_hold_touch_index == -1 or event.index == _ammo_hold_touch_index):
+			_finish_ammo_hold_selection()
+	elif event is InputEventScreenDrag:
+		if _ammo_hold_active and (_ammo_hold_touch_index == -1 or event.index == _ammo_hold_touch_index):
+			_update_popup_hover(event.position)
+	elif event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
+		if event.pressed and _is_over_ammo_main_button(event.position):
+			_on_ammo_main_pressed()
+			_update_popup_hover(event.position)
+		elif not event.pressed and _ammo_hold_active:
+			_finish_ammo_hold_selection()
+	elif event is InputEventMouseMotion and _ammo_hold_active and Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT):
+		_update_popup_hover(event.position)
 
 func _update_ammo_cooldowns():
 	if _player == null or not is_instance_valid(_player): return
