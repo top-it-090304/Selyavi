@@ -81,6 +81,7 @@ theme_override_constants/margin_bottom = 20
 
 [node name="Label" type="Label" parent="Control/DialogPanel/MarginContainer"]
 layout_mode = 2
+theme_override_constants/line_spacing = 10
 theme_override_fonts/font = ExtResource("3")
 theme_override_font_sizes/font_size = 32
 text = "Добро пожаловать, Командир! Рады видеть тебя в строю."
