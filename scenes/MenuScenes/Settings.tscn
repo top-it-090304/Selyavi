@@ -353,6 +353,21 @@ theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
 theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
 
+[node name="AmmoUiModeLabel" type="Label" parent="VBoxMain/ContentContainer/SettingsPanel/GameSettings/Margin/VBox/Grid"]
+layout_mode = 2
+text = "Смена боеприпасов"
+label_settings = SubResource("LabelSettings_label")
+
+[node name="OptionButton_AmmoUiMode" type="OptionButton" parent="VBoxMain/ContentContainer/SettingsPanel/GameSettings/Margin/VBox/Grid"]
+layout_mode = 2
+size_flags_horizontal = 3
+focus_mode = 0
+theme_override_fonts/font = ExtResource("2")
+theme_override_font_sizes/font_size = 22
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
+
 [node name="ScopeLabel" type="Label" parent="VBoxMain/ContentContainer/SettingsPanel/GameSettings/Margin/VBox/Grid"]
 layout_mode = 2
 text = "Лазерный прицел"

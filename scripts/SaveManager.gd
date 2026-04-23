@@ -39,6 +39,7 @@ var settings_data = {
 		"scope_enabled": true,
 		"aim_assist": true,
 		"lefty_mode": false,
+		"ammo_ui_mode": "popup",
 		"camera_fov": 80.0,
 		"marker_scale": 1.0,
 		"graphics_quality": "high"
@@ -65,6 +66,7 @@ func load_settings():
 		settings_data["game"]["scope_enabled"] = config.get_value("game", "scope_enabled", true)
 		settings_data["game"]["aim_assist"] = config.get_value("game", "aim_assist", true)
 		settings_data["game"]["lefty_mode"] = config.get_value("game", "lefty_mode", false)
+		settings_data["game"]["ammo_ui_mode"] = config.get_value("game", "ammo_ui_mode", "popup")
 		settings_data["game"]["camera_fov"] = config.get_value("game", "camera_fov", 80.0)
 		settings_data["game"]["marker_scale"] = config.get_value("game", "marker_scale", 1.0)
 		settings_data["game"]["graphics_quality"] = config.get_value("game", "graphics_quality", "high")
@@ -78,6 +80,7 @@ func save_settings():
 	config.set_value("game", "scope_enabled", settings_data["game"]["scope_enabled"])
 	config.set_value("game", "aim_assist", settings_data["game"]["aim_assist"])
 	config.set_value("game", "lefty_mode", settings_data["game"]["lefty_mode"])
+	config.set_value("game", "ammo_ui_mode", settings_data["game"]["ammo_ui_mode"])
 	config.set_value("game", "camera_fov", settings_data["game"]["camera_fov"])
 	config.set_value("game", "marker_scale", settings_data["game"]["marker_scale"])
 	config.set_value("game", "graphics_quality", settings_data["game"]["graphics_quality"])

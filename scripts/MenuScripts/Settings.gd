@@ -14,6 +14,7 @@ var _left_hand_toggler: CheckButton
 var _fov_slider: HSlider
 var _marker_slider: HSlider
 var _graphics_quality_selector: OptionButton
+var _ammo_ui_selector: OptionButton
 var _return_button: Button
 var _reset_progress_btn: Button
 
@@ -29,11 +30,13 @@ func _ready():
 	_fov_slider = game_settings.find_child("HSlider_CameraFov", true)
 	_marker_slider = game_settings.find_child("HSlider_MarkerScale", true)
 	_graphics_quality_selector = game_settings.find_child("OptionButton_GraphicsQuality", true)
+	_ammo_ui_selector = game_settings.find_child("OptionButton_AmmoUiMode", true)
 	_reset_progress_btn = game_settings.find_child("ResetProgressBtn", true)
 
 	_return_button = find_child("Return_Button", true)
 
 	_setup_graphics_selector()
+	_setup_ammo_ui_selector()
 	_load_ui_values()
 	_update_return_button_text()
 	_setup_sfx_preview()
@@ -54,15 +57,24 @@ func _ready():
 	if _fov_slider: _fov_slider.value_changed.connect(_on_fov_slider_changed)
 	if _marker_slider: _marker_slider.value_changed.connect(_on_marker_scale_changed)
 	if _graphics_quality_selector: _graphics_quality_selector.item_selected.connect(_on_graphics_quality_selected)
+	if _ammo_ui_selector: _ammo_ui_selector.item_selected.connect(_on_ammo_ui_selected)
 
 func _setup_graphics_selector():
 	if _graphics_quality_selector == null:
 		return
 
 	_graphics_quality_selector.clear()
-	_graphics_quality_selector.add_item("Максимальные")
-	_graphics_quality_selector.add_item("Средние")
-	_graphics_quality_selector.add_item("Минимальные")
+	_graphics_quality_selector.add_item("Максимальное")
+	_graphics_quality_selector.add_item("Среднее")
+	_graphics_quality_selector.add_item("Минимальное")
+
+func _setup_ammo_ui_selector():
+	if _ammo_ui_selector == null:
+		return
+
+	_ammo_ui_selector.clear()
+	_ammo_ui_selector.add_item("Классика")
+	_ammo_ui_selector.add_item("Свайп")
 
 func _check_reset_button_visibility():
 	if _reset_progress_btn == null: return
@@ -183,6 +195,9 @@ func _load_ui_values():
 		if _graphics_quality_selector:
 			var quality = str(save_mgr.get_setting("game", "graphics_quality", "high"))
 			_graphics_quality_selector.select(_quality_to_index(quality))
+		if _ammo_ui_selector:
+			var ammo_ui_mode = str(save_mgr.get_setting("game", "ammo_ui_mode", "popup"))
+			_ammo_ui_selector.select(_ammo_ui_mode_to_index(ammo_ui_mode))
 
 	if game_mgr and _scope_toggler:
 		_scope_toggler.button_pressed = game_mgr.is_scope_currently_enabled()
@@ -199,6 +214,11 @@ func _on_graphics_quality_selected(index: int):
 	var save_mgr = get_node_or_null("/root/SaveManager")
 	if save_mgr:
 		save_mgr.set_setting("game", "graphics_quality", _index_to_quality(index))
+
+func _on_ammo_ui_selected(index: int):
+	var save_mgr = get_node_or_null("/root/SaveManager")
+	if save_mgr:
+		save_mgr.set_setting("game", "ammo_ui_mode", _index_to_ammo_ui_mode(index))
 
 func _quality_to_index(quality: String) -> int:
 	match quality:
@@ -217,6 +237,12 @@ func _index_to_quality(index: int) -> String:
 			return "medium"
 		_:
 			return "high"
+
+func _ammo_ui_mode_to_index(mode: String) -> int:
+	return 0 if mode == "classic" else 1
+
+func _index_to_ammo_ui_mode(index: int) -> String:
+	return "classic" if index == 0 else "popup"
 
 func _on_music_slider_changed(value: float):
 	var save_mgr = get_node_or_null("/root/SaveManager")
