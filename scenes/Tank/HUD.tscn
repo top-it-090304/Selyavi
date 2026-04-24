@@ -1,36 +1,19 @@
-[gd_scene load_steps=8 format=3 uid="uid://336qfi6ddylt"]
+[gd_scene load_steps=9 format=3 uid="uid://336qfi6ddylt"]
 
 [ext_resource type="FontFile" uid="uid://bsnvk4l0ue5ri" path="res://assets/fonts/ofont.ru_Shonen.ttf" id="1"]
 [ext_resource type="Texture2D" uid="uid://2erdir0xbnmk" path="res://assets/IngameAssets/HUD/HP.png" id="2"]
 [ext_resource type="Script" uid="uid://ojrswod2mfck" path="res://scripts/HUD.gd" id="4"]
 [ext_resource type="Texture2D" uid="uid://7egfcdg3ugki" path="res://assets/IngameAssets/HUD/Money.png" id="4_mxnk6"]
 [ext_resource type="PackedScene" uid="uid://dd7grnrhoeh4y" path="res://scenes/Tank/MobileJoystick.tscn" id="5"]
+[ext_resource type="Texture2D" uid="uid://dsiq4t7qegc5x" path="res://assets/ButtonSprites/pause_594725.png" id="6"]
 
 [sub_resource type="FontFile" id="1"]
 fallbacks = Array[Font]([ExtResource("1"), ExtResource("1")])
-subpixel_positioning = 0
-msdf_pixel_range = 14
-msdf_size = 128
 cache/0/16/0/ascent = 0.0
 cache/0/16/0/descent = 0.0
 cache/0/16/0/underline_position = 0.0
 cache/0/16/0/underline_thickness = 0.0
 cache/0/16/0/scale = 1.0
-cache/0/50/0/ascent = 0.0
-cache/0/50/0/descent = 0.0
-cache/0/50/0/underline_position = 0.0
-cache/0/50/0/underline_thickness = 0.0
-cache/0/50/0/scale = 1.0
-cache/0/40/0/ascent = 0.0
-cache/0/40/0/descent = 0.0
-cache/0/40/0/underline_position = 0.0
-cache/0/40/0/underline_thickness = 0.0
-cache/0/40/0/scale = 1.0
-cache/0/28/0/ascent = 0.0
-cache/0/28/0/descent = 0.0
-cache/0/28/0/underline_position = 0.0
-cache/0/28/0/underline_thickness = 0.0
-cache/0/28/0/scale = 1.0
 cache/0/32/0/ascent = 0.0
 cache/0/32/0/descent = 0.0
 cache/0/32/0/underline_position = 0.0
@@ -43,8 +26,6 @@ font_size = 32
 font_color = Color(1, 0.901961, 0.4, 1)
 outline_size = 8
 outline_color = Color(0, 0, 0, 1)
-shadow_size = 4
-shadow_color = Color(0, 0, 0, 0.5)
 
 [node name="HUD" type="CanvasLayer"]
 script = ExtResource("4")
@@ -194,3 +175,21 @@ theme_override_constants/margin_bottom = 40
 
 [node name="Aim" parent="Controls/AimJoystickContainer" instance=ExtResource("5")]
 layout_mode = 2
+
+[node name="AmmoAnchor" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 0
+grow_vertical = 0
+mouse_filter = 2
+
+[node name="PauseButton" type="TouchScreenButton" parent="."]
+modulate = Color(1, 1, 1, 0.5)
+position = Vector2(60, 60)
+scale = Vector2(0.2, 0.2)
+texture_normal = ExtResource("6")
+visibility_mode = 1

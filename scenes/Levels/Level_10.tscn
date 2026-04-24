@@ -1,11 +1,10 @@
-[gd_scene load_steps=13 format=4 uid="uid://b4fecvo8j8ur0"]
+[gd_scene load_steps=12 format=4 uid="uid://b4fecvo8j8ur0"]
 
 [ext_resource type="Script" uid="uid://3wsw25sk74o6" path="res://scripts/Field.gd" id="1"]
 [ext_resource type="PackedScene" uid="uid://336qfi6ddylt" path="res://scenes/Tank/HUD.tscn" id="2"]
 [ext_resource type="PackedScene" uid="uid://mfxaskty4hrm" path="res://scenes/Tank/Player.tscn" id="3"]
 [ext_resource type="PackedScene" uid="uid://crbjyol17koge" path="res://scenes/obtacles/wall.tscn" id="5"]
 [ext_resource type="Texture2D" uid="uid://d0bnoilig7yxs" path="res://assets/ground_shaker_asset/Terrains/terrain.png" id="6"]
-[ext_resource type="Texture2D" uid="uid://dsiq4t7qegc5x" path="res://assets/ButtonSprites/pause_594725.png" id="7"]
 [ext_resource type="PackedScene" uid="uid://csfpndcf2sqpn" path="res://scenes/WallLayer.tscn" id="8"]
 [ext_resource type="AudioStream" uid="uid://bxl5wv7crhm5" path="res://assets/Music/68. Sad Eyes.mp3" id="9"]
 [ext_resource type="PackedScene" uid="uid://ejq58wechvg0" path="res://scenes/Tank/Boss2.tscn" id="9_7ug7m"]
@@ -81,13 +80,6 @@ limit_right = 3070
 limit_bottom = 2300
 position_smoothing_enabled = true
 
-[node name="PauseButton" type="CanvasLayer" parent="PlayerTank"]
-
-[node name="PauseButton" type="TouchScreenButton" parent="PlayerTank/PauseButton"]
-position = Vector2(20, 20)
-scale = Vector2(0.2, 0.2)
-texture_normal = ExtResource("7")
-
 [node name="MusicPlayer" type="AudioStreamPlayer" parent="."]
 stream = ExtResource("9")
 volume_db = -20.0
@@ -142,5 +134,3 @@ polygon = PackedVector2Array(1300, 940, 1528, 875, 1759, 934, 1791, 1141, 1736, 
 
 [node name="Boss2" parent="." instance=ExtResource("9_7ug7m")]
 position = Vector2(2136, 1160)
-
-[connection signal="pressed" from="PlayerTank/PauseButton/PauseButton" to="." method="_on_TouchScreenButton_pressed"]

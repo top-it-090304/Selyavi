@@ -1,5 +1,15 @@
 extends Area2D
 
+# КЭШ РЕСУРСОВ (Убирает микро-фризы при выстрелах)
+const TEX_PLASMA = preload("res://assets/future_tanks/PNG/Effects/Plasma.png")
+const TEX_MEDIUM = preload("res://assets/future_tanks/PNG/Effects/Medium_Shell.png")
+const TEX_LIGHT = preload("res://assets/future_tanks/PNG/Effects/Light_Shell.png")
+const TEX_HE = preload("res://assets/future_tanks/PNG/Effects/Granade_Shell.png")
+const TEX_BOPS = preload("res://assets/future_tanks/PNG/Effects/Heavy_Shell.png")
+
+# Кэш скрипта эффекта (статическая переменная на уровне класса)
+static var _effect_script = preload("res://scripts/ExplosionEffect.gd")
+
 var _bullet_speed: int = 7
 var _velocity: Vector2 = Vector2.ZERO
 var _bullet_sound: AudioStreamPlayer
@@ -10,11 +20,11 @@ var _damage: int = 0
 var _is_player: bool = false
 var _traveled_distance: float = 0.0
 var _max_range: float = 1000.0
-var _ignored_body_rid: RID # RID тела, которое пуля игнорирует (например, стрелявшая база)
+var _ignored_body_rid: RID
 var _pierce_left: int = 0
 var _aoe_radius: float = 0.0
 var _aoe_damage_multiplier: float = 0.0
-var _hit_targets: Array = [] # Список уже пораженных целей для пробития
+var _hit_targets: Array = []
 
 const PLASMA: int = 0
 const MEDIUM: int = 1
@@ -30,7 +40,8 @@ func _ready():
 	
 	body_entered.connect(_on_body_entered)
 	area_entered.connect(_on_area_entered)
-	_visibility_bullet.screen_exited.connect(_on_screen_exited)
+	if _visibility_bullet:
+		_visibility_bullet.screen_exited.connect(_on_screen_exited)
 
 func is_player() -> bool:
 	return _is_player
@@ -39,15 +50,14 @@ func get_damage() -> int:
 	return _damage
 
 func _process(delta):
-	var move_step = _velocity * _bullet_speed
-	position += move_step
-	_traveled_distance += move_step.length()
-	# Если пролетели всю дистанцию, просто удаляем пулю без взрыва
-	if _traveled_distance >= _max_range: _destroy()
+	# ОПТИМИЗАЦИЯ: убрали length(), используем скалярную скорость
+	position += _velocity * _bullet_speed
+	_traveled_distance += _bullet_speed
+
+	if _traveled_distance >= _max_range:
+		_destroy()
 
 func _on_area_entered(_area):
-	# При контакте с Area2D (например, штабом) вызываем детонацию через _destroy
-	# Сама база нанесет себе урон через свой сигнал area_entered
 	pass
 
 func _on_body_entered(body):
@@ -95,29 +105,23 @@ func _handle_base_hit(base_node: Node):
 		_hit_targets.append(base_node)
 		if base_node.has_method("take_damage"):
 			base_node.take_damage(_damage)
-		# БОПС: пробитие только по танкам; база всегда останавливает снаряд.
 		_explode(base_node)
 	else:
 		_explode(base_node)
 
 func _explode(exclude_body: Node = null):
-	# Метод оставлен для совместимости с логикой попадания в тела
 	_destroy(exclude_body)
 
 func _play_shockwave_effect():
-	var effect_scene = load("res://scripts/ExplosionEffect.gd")
-	if not effect_scene: return
+	if not _effect_script: return
 	var effect = Node2D.new()
-	effect.set_script(effect_scene)
+	effect.set_script(_effect_script)
 	get_parent().add_child(effect)
 	effect.global_position = global_position
 	if effect.has_method("init"):
 		effect.init(_aoe_radius, Color(1, 0.6, 0.2, 0.8))
 
-# Глобальный метод уничтожения
 func _destroy(exclude_body: Node = null):
-	# Если это фугас и мы во что-то попали (не по дистанции), запускаем взрыв
-	# (Проверка дистанции в _process вызывает _destroy без аргументов)
 	if _type_bullet == HE and exclude_body != null:
 		_play_shockwave_effect()
 		if _aoe_radius > 0.0:
@@ -136,23 +140,22 @@ func init(type_bullet: int, is_player: bool, damage: int = 0, ignored_rid: RID =
 func _update_visuals_and_speed():
 	match _type_bullet:
 		PLASMA:
-			_bullet_sprite.texture = load("res://assets/future_tanks/PNG/Effects/Plasma.png")
+			_bullet_sprite.texture = TEX_PLASMA
 			_bullet_speed = 9; _max_range = 650.0
 		MEDIUM:
-			_bullet_sprite.texture = load("res://assets/future_tanks/PNG/Effects/Medium_Shell.png")
+			_bullet_sprite.texture = TEX_MEDIUM
 			_bullet_speed = 4; _max_range = 300.0
 		LIGHT:
-			_bullet_sprite.texture = load("res://assets/future_tanks/PNG/Effects/Light_Shell.png")
+			_bullet_sprite.texture = TEX_LIGHT
 			_bullet_speed = 7; _max_range = 1000.0
 		HE:
-			_bullet_sprite.texture = load("res://assets/future_tanks/PNG/Effects/Granade_Shell.png")
+			_bullet_sprite.texture = TEX_HE
 			_bullet_speed = 5; _max_range = 550.0
 			_aoe_radius = 105.0
 			_aoe_damage_multiplier = 0.65
 		BOPS:
-			_bullet_sprite.texture = load("res://assets/future_tanks/PNG/Effects/Heavy_Shell.png")
+			_bullet_sprite.texture = TEX_BOPS
 			_bullet_speed = 8; _max_range = 1100.0
-			# 1 = после первого танка снаряд летит дальше; второй танк — последний (всего 2 танка).
 			_pierce_left = 1
 
 func _apply_aoe_damage(hit_body: Node):
@@ -167,7 +170,7 @@ func _apply_aoe_damage(hit_body: Node):
 		query.exclude.append(_ignored_body_rid)
 
 	var splash_damage = int(float(_damage) * _aoe_damage_multiplier)
-	var results = space_state.intersect_shape(query, 24)
+	var results = space_state.intersect_shape(query, 12)
 	for result in results:
 		var c = result.collider
 		if c == hit_body: continue
@@ -179,6 +182,4 @@ func _apply_aoe_damage(hit_body: Node):
 			elif c is Base and c.get("type_base") == 0: c.take_damage(splash_damage)
 
 func _on_screen_exited():
-	var tween = create_tween()
-	tween.tween_property(_bullet_sound, "volume_db", -80, 1.0)
-	tween.finished.connect(queue_free)
+	queue_free()

@@ -4,16 +4,7 @@
     <option name="autoReloadType" value="NONE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="33129e0a-8a1f-4647-8ff9-20d5e301da8a" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/scenes/Tank/BossRicochetBullet.tscn" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/scripts/Tank/BossRicochetBullet.gd" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/scripts/MenuScripts/LoadingScreen.gd" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/MenuScripts/LoadingScreen.gd" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/scripts/Tank/Boss.gd" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/Tank/Boss.gd" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/scripts/Tank/Boss2.gd" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/Tank/Boss2.gd" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/scripts/Tank/Player.gd" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/Tank/Player.gd" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/scripts/Tank/RicochetBullet.gd" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/Tank/RicochetBullet.gd" afterDir="false" />
-    </list>
+    <list default="true" id="33129e0a-8a1f-4647-8ff9-20d5e301da8a" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -31,12 +22,12 @@
     &quot;assignee&quot;: &quot;Max252t&quot;
   }
 }</component>
-  <component name="GithubPullRequestsUISettings"><![CDATA[{
-  "selectedUrlAndAccountId": {
-    "url": "https://github.com/top-it-090304/Selyavi.git",
-    "accountId": "e8612725-56bd-4723-a7cb-524e4278dfc0"
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/top-it-090304/Selyavi.git&quot;,
+    &quot;accountId&quot;: &quot;e8612725-56bd-4723-a7cb-524e4278dfc0&quot;
   }
-}]]></component>
+}</component>
   <component name="ProjectColorInfo">{
   &quot;customColor&quot;: &quot;&quot;,
   &quot;associatedIndex&quot;: 5
