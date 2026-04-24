@@ -21,6 +21,15 @@ var _total_enemy_bases: int = 0
 var _destroyed_count: int = 0
 var _player
 var _ammo_buttons = {}
+var _ammo_main_slot: Panel
+var _ammo_option_slots: Array[Panel] = []
+var _ammo_options_open: bool = false
+var _ammo_options_tween: Tween
+var _ammo_ui_mode: String = "classic"
+var _ammo_popup_root: Control
+var _ammo_hold_active: bool = false
+var _ammo_hover_slot: int = -1
+var _ammo_hold_touch_index: int = -1
 
 # Параметры маркеров
 var _level_time: float = 0.0
@@ -41,9 +50,12 @@ var _marker_icons = {
 	"warning": preload("res://assets/IngameAssets/Markers/free-icon-broken-shield-4046202.png")
 }
 
-const AMMO_BTN_SIZE = 75
-const AMMO_HITBOX_SIZE = 120
+const AMMO_BTN_SIZE = 120
+const AMMO_MAIN_BTN_SIZE = 116
 const AMMO_DEFAULT_LOADOUT = [2, 0, 1]
+const AMMO_UI_CLASSIC = "classic"
+const AMMO_UI_POPUP = "popup"
+const AMMO_POPUP_OFFSETS = [Vector2(-240, -170), Vector2(-300, 0), Vector2(-240, 170)]
 
 func _ready():
 	add_to_group("hud")
@@ -136,8 +148,10 @@ func _setup_ammo_selection():
 	if _player != null and is_instance_valid(_player) and _player.has_method("get_ammo_loadout"):
 		loadout = _player.get_ammo_loadout()
 
-	var joy_center_global = _aim_joy_c.global_position + (_aim_joy_c.size / 2)
-	var relative_joy = _ammo_anchor.get_global_transform().affine_inverse() * joy_center_global
+func _on_settings_changed_hud():
+	_apply_lefty_joystick_layout()
+	_load_marker_settings()
+	_setup_ammo_selection()
 
 	var center_angle = -PI / 2
 	var spread = 0.63
@@ -347,16 +361,310 @@ func _update_health_bar_color(curr, m):
 func _on_lives_changed(l): if _livesLabel: _livesLabel.text = "Жизни: " + str(l)
 func _on_money_changed(m): if _moneyLabel: _moneyLabel.text = str(m)
 
-func highlight_health():
-	if _healthProgress:
-		var tween = create_tween().set_parallel(true)
-		tween.tween_property(_healthProgress, "modulate:a", 1.0, 0.5)
-		if _healthLabel: tween.tween_property(_healthLabel, "modulate:a", 1.0, 0.5)
-		get_tree().create_timer(4.0).timeout.connect(func():
-			var fade = create_tween().set_parallel(true)
-			fade.tween_property(_healthProgress, "modulate:a", 0.5, 2.0)
-			if _healthLabel: fade.tween_property(_healthLabel, "modulate:a", 0.5, 2.0)
+func _setup_ammo_selection():
+	_clear_ammo_selection()
+	_ammo_ui_mode = _get_ammo_ui_mode()
+	if _ammo_ui_mode == AMMO_UI_POPUP:
+		_setup_popup_ammo_selection()
+	else:
+		_setup_classic_ammo_selection()
+
+	if _player != null and is_instance_valid(_player):
+		_on_ammo_changed(_player.get("_current_ammo_slot"))
+
+func _clear_ammo_selection():
+	if has_node("AmmoPanelContainer"):
+		get_node("AmmoPanelContainer").queue_free()
+	if has_node("AmmoPopupContainer"):
+		get_node("AmmoPopupContainer").queue_free()
+	_ammo_buttons.clear()
+	_ammo_option_slots.clear()
+	_ammo_main_slot = null
+	_ammo_popup_root = null
+	_ammo_hold_active = false
+	_ammo_hover_slot = -1
+	_ammo_hold_touch_index = -1
+	_ammo_options_open = false
+	if _ammo_options_tween:
+		_ammo_options_tween.kill()
+		_ammo_options_tween = null
+
+func _get_ammo_ui_mode() -> String:
+	if SaveManager == null:
+		return AMMO_UI_CLASSIC
+	var mode = str(SaveManager.get_setting("game", "ammo_ui_mode", AMMO_UI_CLASSIC))
+	return mode if mode == AMMO_UI_POPUP else AMMO_UI_CLASSIC
+
+func _setup_classic_ammo_selection():
+	var ammo_container = CenterContainer.new()
+	ammo_container.name = "AmmoPanelContainer"
+	add_child(ammo_container)
+	ammo_container.set_anchors_preset(Control.PRESET_CENTER_BOTTOM)
+	ammo_container.offset_top = -180; ammo_container.offset_bottom = -30
+	ammo_container.anchor_left = 0.5; ammo_container.anchor_right = 0.5
+	ammo_container.offset_left = -500; ammo_container.offset_right = 500
+
+	var ammo_panel = HBoxContainer.new()
+	ammo_panel.name = "AmmoPanel"
+	ammo_panel.add_theme_constant_override("separation", 25)
+	ammo_container.add_child(ammo_panel)
+
+	var loadout = _get_current_ammo_loadout()
+	for i in range(3):
+		var ammo_id = loadout[i] if i < loadout.size() else AMMO_DEFAULT_LOADOUT[i]
+		var slot = _create_ammo_slot(ammo_id, i, AMMO_BTN_SIZE, true)
+		ammo_panel.add_child(slot)
+		_ammo_buttons[i] = slot
+
+func _setup_popup_ammo_selection():
+	var popup_root = Control.new()
+	popup_root.name = "AmmoPopupContainer"
+	popup_root.custom_minimum_size = Vector2(AMMO_MAIN_BTN_SIZE, AMMO_MAIN_BTN_SIZE)
+	add_child(popup_root)
+	_ammo_popup_root = popup_root
+	popup_root.set_anchors_preset(Control.PRESET_BOTTOM_RIGHT)
+	popup_root.offset_left = -250
+	popup_root.offset_top = -430
+	popup_root.offset_right = -130
+	popup_root.offset_bottom = -310
+
+	var loadout = _get_current_ammo_loadout()
+	var selected_slot := 0
+	if _player != null and is_instance_valid(_player):
+		selected_slot = clampi(int(_player.get("_current_ammo_slot")), 0, 2)
+	var selected_ammo = loadout[selected_slot] if selected_slot < loadout.size() else AMMO_DEFAULT_LOADOUT[selected_slot]
+
+	_ammo_main_slot = _create_ammo_slot(selected_ammo, -1, AMMO_MAIN_BTN_SIZE, false)
+	_ammo_main_slot.position = Vector2.ZERO
+	popup_root.add_child(_ammo_main_slot)
+	var main_btn = TouchScreenButton.new()
+	main_btn.shape = RectangleShape2D.new()
+	main_btn.shape.size = Vector2(AMMO_MAIN_BTN_SIZE, AMMO_MAIN_BTN_SIZE)
+	main_btn.position = Vector2(AMMO_MAIN_BTN_SIZE / 2.0, AMMO_MAIN_BTN_SIZE / 2.0)
+	_ammo_main_slot.add_child(main_btn)
+
+	for i in range(3):
+		var ammo_id = loadout[i] if i < loadout.size() else AMMO_DEFAULT_LOADOUT[i]
+		var opt = _create_ammo_slot(ammo_id, i, AMMO_BTN_SIZE, false)
+		opt.position = Vector2((AMMO_MAIN_BTN_SIZE - AMMO_BTN_SIZE) * 0.5, (AMMO_MAIN_BTN_SIZE - AMMO_BTN_SIZE) * 0.5)
+		opt.modulate.a = 0.0
+		opt.scale = Vector2(0.65, 0.65)
+		opt.visible = false
+		popup_root.add_child(opt)
+		_ammo_option_slots.append(opt)
+		_ammo_buttons[i] = opt
+
+func _get_current_ammo_loadout() -> Array[int]:
+	if _player != null and is_instance_valid(_player) and _player.has_method("get_ammo_loadout"):
+		return _player.get_ammo_loadout()
+	return [AMMO_DEFAULT_LOADOUT[0], AMMO_DEFAULT_LOADOUT[1], AMMO_DEFAULT_LOADOUT[2]]
+
+func _create_ammo_slot(ammo_id: int, slot_idx: int, size: int, connect_select: bool) -> Panel:
+	var slot = Panel.new()
+	slot.custom_minimum_size = Vector2(size, size)
+	var style = StyleBoxFlat.new()
+	style.bg_color = Color(0.1, 0.1, 0.1, 0.6)
+	style.set_corner_radius_all(15)
+	style.border_color = Color(0.4, 0.4, 0.4)
+	style.set_border_width_all(3)
+	slot.add_theme_stylebox_override("panel", style)
+
+	var icon = TextureRect.new()
+	icon.name = "Icon"
+	icon.texture = load(_ammo_icon_path(ammo_id))
+	icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	icon.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	icon.offset_left = 18; icon.offset_top = 18; icon.offset_right = -18; icon.offset_bottom = -18
+	slot.add_child(icon)
+
+	var cooldown = Panel.new()
+	var cd_style = StyleBoxFlat.new()
+	cd_style.bg_color = Color(0, 0, 0, 0.7)
+	cd_style.set_corner_radius_all(15)
+	cooldown.add_theme_stylebox_override("panel", cd_style)
+	cooldown.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	cooldown.visible = false
+	cooldown.name = "Cooldown"
+	slot.add_child(cooldown)
+
+	if connect_select:
+		var touch_btn = TouchScreenButton.new()
+		touch_btn.shape = RectangleShape2D.new()
+		touch_btn.shape.size = Vector2(size, size)
+		touch_btn.position = Vector2(size / 2.0, size / 2.0)
+		touch_btn.pressed.connect(func():
+			if _player:
+				_player._on_ammo_selected(slot_idx)
+			if _ammo_ui_mode == AMMO_UI_POPUP:
+				_set_ammo_options_open(false)
 		)
+		slot.add_child(touch_btn)
+
+	return slot
+
+func _on_ammo_main_pressed():
+	_ammo_hold_active = true
+	_ammo_hold_touch_index = -1
+	_ammo_hover_slot = -1
+	_set_ammo_options_open(true)
+
+func _on_ammo_main_released():
+	_finish_ammo_hold_selection()
+
+func _finish_ammo_hold_selection():
+	if not _ammo_hold_active:
+		return
+	_ammo_hold_active = false
+	_ammo_hold_touch_index = -1
+	if _ammo_hover_slot >= 0 and _player != null and is_instance_valid(_player):
+		_player._on_ammo_selected(_ammo_hover_slot)
+	_ammo_hover_slot = -1
+	_apply_popup_hover_visuals()
+	_set_ammo_options_open(false)
+
+func _update_popup_hover(screen_pos: Vector2):
+	if not _ammo_hold_active or not _ammo_options_open:
+		return
+	var hovered := -1
+	for i in range(_ammo_option_slots.size()):
+		var rect = _ammo_option_slots[i].get_global_rect()
+		if rect.has_point(screen_pos):
+			hovered = i
+			break
+	if hovered != _ammo_hover_slot:
+		_ammo_hover_slot = hovered
+		_apply_popup_hover_visuals()
+
+func _apply_popup_hover_visuals():
+	if _ammo_ui_mode != AMMO_UI_POPUP:
+		return
+	if _player != null and is_instance_valid(_player):
+		_on_ammo_changed(_player.get("_current_ammo_slot"))
+	for i in _ammo_buttons:
+		var slot = _ammo_buttons[i]
+		var style = slot.get_theme_stylebox("panel").duplicate()
+		if i == _ammo_hover_slot:
+			style.border_color = Color(0.25, 1.0, 0.95)
+			slot.modulate.a = 1.0
+		slot.add_theme_stylebox_override("panel", style)
+
+func _is_over_ammo_main_button(screen_pos: Vector2) -> bool:
+	if _ammo_main_slot == null:
+		return false
+	return _ammo_main_slot.get_global_rect().has_point(screen_pos)
+
+func _set_ammo_options_open(open: bool):
+	if _ammo_ui_mode != AMMO_UI_POPUP:
+		return
+	if _ammo_options_tween:
+		_ammo_options_tween.kill()
+		_ammo_options_tween = null
+
+	_ammo_options_open = open
+	_ammo_options_tween = create_tween().set_parallel(true)
+
+	for i in range(_ammo_option_slots.size()):
+		var slot = _ammo_option_slots[i]
+		var base_pos = Vector2((AMMO_MAIN_BTN_SIZE - AMMO_BTN_SIZE) * 0.5, (AMMO_MAIN_BTN_SIZE - AMMO_BTN_SIZE) * 0.5)
+		if open:
+			slot.visible = true
+			_ammo_options_tween.tween_property(slot, "position", base_pos + AMMO_POPUP_OFFSETS[i], 0.2).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+			_ammo_options_tween.tween_property(slot, "modulate:a", 1.0, 0.18)
+			_ammo_options_tween.tween_property(slot, "scale", Vector2.ONE, 0.2).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+		else:
+			_ammo_options_tween.tween_property(slot, "position", base_pos, 0.16).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN)
+			_ammo_options_tween.tween_property(slot, "modulate:a", 0.0, 0.14)
+			_ammo_options_tween.tween_property(slot, "scale", Vector2(0.65, 0.65), 0.16).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN)
+
+	if not open:
+		_ammo_options_tween.finished.connect(func():
+			for slot in _ammo_option_slots:
+				slot.visible = false
+		)
+
+func _ammo_icon_path(ammo_id: int) -> String:
+	match ammo_id:
+		0: return "res://assets/future_tanks/PNG/Effects/Plasma.png"
+		1: return "res://assets/future_tanks/PNG/Effects/Medium_Shell.png"
+		2: return "res://assets/future_tanks/PNG/Effects/Light_Shell.png"
+		3: return "res://assets/future_tanks/PNG/Effects/Granade_Shell.png"
+		4: return "res://assets/future_tanks/PNG/Effects/Heavy_Shell.png"
+		5: return "res://assets/future_tanks/PNG/Effects/Laser.png"
+		_: return "res://assets/future_tanks/PNG/Effects/Plasma.png"
+
+func _process(delta):
+	_update_ammo_cooldowns()
+	_level_time += delta
+	if !_radar_active and _level_time >= BASE_MARKER_TIME: _show_base_markers = true
+	if _base_under_attack:
+		_attack_warning_timer -= delta
+		if _attack_warning_timer <= 0:
+			_base_under_attack = false
+			if _warningLabel: _warningLabel.visible = false
+	if _marker_overlay: _marker_overlay.queue_redraw()
+
+func _input(event):
+	if _ammo_ui_mode != AMMO_UI_POPUP:
+		return
+	if event is InputEventScreenTouch:
+		if event.pressed and _is_over_ammo_main_button(event.position):
+			_on_ammo_main_pressed()
+			_ammo_hold_touch_index = event.index
+			_update_popup_hover(event.position)
+		elif not event.pressed and _ammo_hold_active and (_ammo_hold_touch_index == -1 or event.index == _ammo_hold_touch_index):
+			_finish_ammo_hold_selection()
+	elif event is InputEventScreenDrag:
+		if _ammo_hold_active and (_ammo_hold_touch_index == -1 or event.index == _ammo_hold_touch_index):
+			_update_popup_hover(event.position)
+	elif event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
+		if event.pressed and _is_over_ammo_main_button(event.position):
+			_on_ammo_main_pressed()
+			_update_popup_hover(event.position)
+		elif not event.pressed and _ammo_hold_active:
+			_finish_ammo_hold_selection()
+	elif event is InputEventMouseMotion and _ammo_hold_active and Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT):
+		_update_popup_hover(event.position)
+
+func _update_ammo_cooldowns():
+	if _player == null or not is_instance_valid(_player): return
+	var timer = _player.get("_shoot_timer")
+	if _ammo_ui_mode == AMMO_UI_POPUP and _ammo_main_slot != null:
+		var main_cd = _ammo_main_slot.get_node("Cooldown")
+		if timer and not timer.is_stopped():
+			main_cd.visible = true
+			var main_ratio = timer.time_left / timer.wait_time
+			main_cd.anchor_top = 1.0 - main_ratio
+			main_cd.anchor_bottom = 1.0
+			main_cd.offset_top = 0
+			main_cd.offset_bottom = 0
+		else:
+			main_cd.visible = false
+		return
+
+	for i in range(3):
+		if not _ammo_buttons.has(i): continue
+		var slot = _ammo_buttons[i]
+		var cd = slot.get_node("Cooldown")
+		if timer and not timer.is_stopped() and i == _player.get("_current_ammo_slot"):
+			cd.visible = true; var ratio = timer.time_left / timer.wait_time
+			cd.anchor_top = 1.0 - ratio; cd.anchor_bottom = 1.0; cd.offset_top = 0; cd.offset_bottom = 0
+		else: cd.visible = false
+
+func _on_ammo_changed(type):
+	type = int(type)
+	var loadout = _get_current_ammo_loadout()
+	if _ammo_ui_mode == AMMO_UI_POPUP and _ammo_main_slot != null:
+		var selected_ammo = loadout[type] if type >= 0 and type < loadout.size() else AMMO_DEFAULT_LOADOUT[0]
+		var main_icon = _ammo_main_slot.get_node_or_null("Icon") as TextureRect
+		if main_icon != null:
+			main_icon.texture = load(_ammo_icon_path(selected_ammo))
+	for i in _ammo_buttons:
+		var slot = _ammo_buttons[i]
+		var style = slot.get_theme_stylebox("panel").duplicate()
+		if i == type: style.border_color = Color(1, 0.8, 0.2); slot.modulate.a = 1.0
+		else: style.border_color = Color(0.4, 0.4, 0.4); slot.modulate.a = 0.6
+		slot.add_theme_stylebox_override("panel", style)
 
 func _on_marker_overlay_draw():
 	if _player == null or not is_instance_valid(_player): return
