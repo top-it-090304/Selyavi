@@ -56,6 +56,9 @@ const AMMO_DEFAULT_LOADOUT = [2, 0, 1]
 const AMMO_UI_CLASSIC = "classic"
 const AMMO_UI_POPUP = "popup"
 const AMMO_POPUP_OFFSETS = [Vector2(-240, -170), Vector2(-300, 0), Vector2(-240, 170)]
+const AMMO_SECTOR_INNER_RADIUS = 72.0
+const AMMO_SECTOR_OUTER_RADIUS = 380.0
+const AMMO_SECTOR_MAX_ANGLE_DEG = 36.0
 
 func _ready():
 	add_to_group("hud")
@@ -526,15 +529,43 @@ func _finish_ammo_hold_selection():
 func _update_popup_hover(screen_pos: Vector2):
 	if not _ammo_hold_active or not _ammo_options_open:
 		return
-	var hovered := -1
-	for i in range(_ammo_option_slots.size()):
-		var rect = _ammo_option_slots[i].get_global_rect()
-		if rect.has_point(screen_pos):
-			hovered = i
-			break
+	var hovered := _get_popup_slot_by_sector(screen_pos)
+	if hovered == -1:
+		for i in range(_ammo_option_slots.size()):
+			var rect = _ammo_option_slots[i].get_global_rect()
+			if rect.has_point(screen_pos):
+				hovered = i
+				break
 	if hovered != _ammo_hover_slot:
 		_ammo_hover_slot = hovered
 		_apply_popup_hover_visuals()
+
+func _get_popup_slot_by_sector(screen_pos: Vector2) -> int:
+	if _ammo_popup_root == null or _ammo_option_slots.is_empty():
+		return -1
+
+	var popup_origin = _ammo_popup_root.get_global_rect().position
+	var main_center = popup_origin + Vector2(AMMO_MAIN_BTN_SIZE * 0.5, AMMO_MAIN_BTN_SIZE * 0.5)
+	var to_pointer = screen_pos - main_center
+	var pointer_dist = to_pointer.length()
+	if pointer_dist < AMMO_SECTOR_INNER_RADIUS or pointer_dist > AMMO_SECTOR_OUTER_RADIUS:
+		return -1
+	if to_pointer.x >= 0.0:
+		return -1
+
+	var pointer_dir = to_pointer / pointer_dist
+	var angle_limit = cos(deg_to_rad(AMMO_SECTOR_MAX_ANGLE_DEG))
+	var best_slot := -1
+	var best_dot := -1.0
+
+	for i in range(min(_ammo_option_slots.size(), AMMO_POPUP_OFFSETS.size())):
+		var sector_dir = AMMO_POPUP_OFFSETS[i].normalized()
+		var dir_dot = pointer_dir.dot(sector_dir)
+		if dir_dot >= angle_limit and dir_dot > best_dot:
+			best_dot = dir_dot
+			best_slot = i
+
+	return best_slot
 
 func _apply_popup_hover_visuals():
 	if _ammo_ui_mode != AMMO_UI_POPUP:
