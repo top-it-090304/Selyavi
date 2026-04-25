@@ -56,48 +56,48 @@ var _ammo_left_margin: MarginContainer = null
 
 # Item Data - Tank
 var bodies = [
-	{"id": 0, "name": "Легкий корпус", "price": 25000, "hp": 80, "speed": 280, "armor": -15, "file": "Hull_05", "offset": -15},
+	{"id": 0, "name": "Легкий корпус", "price": 12500, "hp": 80, "speed": 280, "armor": -15, "file": "Hull_05", "offset": -15},
 	{"id": 1, "name": "Средний корпус", "price": 0, "hp": 100, "speed": 250, "armor": 0, "file": "Hull_02", "offset": -20},
-	{"id": 2, "name": "Тяжелый корпус", "price": 5000, "hp": 250, "speed": 200, "armor": 30, "file": "Hull_06", "offset": -15},
-	{"id": 3, "name": "Облегченный корпус", "price": 7500, "hp": 120, "speed": 260, "armor": 10, "file": "Hull_01", "offset": -5},
-	{"id": 4, "name": "Утяжеленный корпус", "price": 12000, "hp": 175, "speed": 220, "armor": 20, "file": "Hull_03", "offset": -10}
+	{"id": 2, "name": "Тяжелый корпус", "price": 2500, "hp": 250, "speed": 200, "armor": 30, "file": "Hull_06", "offset": -15},
+	{"id": 3, "name": "Облегченный корпус", "price": 3750, "hp": 120, "speed": 260, "armor": 10, "file": "Hull_01", "offset": -5},
+	{"id": 4, "name": "Утяжеленный корпус", "price": 6000, "hp": 175, "speed": 220, "armor": 20, "file": "Hull_03", "offset": -10}
 ]
 
 var guns = [
-	{"id": 0, "name": "Легкая пушка", "price": 20000, "dmg_mod": 0.7, "rof": 0.65, "file": "Gun_01"},
+	{"id": 0, "name": "Легкая пушка", "price": 10000, "dmg_mod": 0.7, "rof": 0.65, "file": "Gun_01"},
 	{"id": 1, "name": "Средняя пушка", "price": 0, "dmg_mod": 1.0, "rof": 1.0, "file": "Gun_03"},
-	{"id": 2, "name": "Тяжелая пушка", "price": 4000, "dmg_mod": 2.5, "rof": 1.8, "file": "Gun_08"},
-	{"id": 3, "name": "Облегченная пушка", "price": 9000, "dmg_mod": 1.15, "rof": 0.9, "file": "Gun_04"},
-	{"id": 4, "name": "Утяжеленная пушка", "price": 11000, "dmg_mod": 1.3, "rof": 0.8, "file": "Gun_07"}
+	{"id": 2, "name": "Тяжелая пушка", "price": 2000, "dmg_mod": 2.5, "rof": 1.8, "file": "Gun_08"},
+	{"id": 3, "name": "Облегченная пушка", "price": 4500, "dmg_mod": 1.15, "rof": 0.9, "file": "Gun_04"},
+	{"id": 4, "name": "Утяжеленная пушка", "price": 5500, "dmg_mod": 1.3, "rof": 0.8, "file": "Gun_07"}
 ]
 
 var colors = [
 	{"id": 0, "name": "Коричневый", "price": 0, "hp_bonus": 0, "speed_bonus": 0, "armor_bonus": 0, "rof_bonus": 0.0, "folder": "Color_A", "color": Color("a47d6c")},
-	{"id": 1, "name": "Зеленый", "price": 4000, "hp_bonus": 30, "speed_bonus": -15, "armor_bonus": 10, "rof_bonus": 0.1, "folder": "Color_B", "color": Color("888456")},
-	{"id": 2, "name": "Лазурный", "price": 8000, "hp_bonus": 5, "speed_bonus": 30, "armor_bonus": -10, "rof_bonus": 0.05, "folder": "Color_C", "color": Color("699f9c")}
+	{"id": 1, "name": "Зеленый", "price": 2000, "hp_bonus": 30, "speed_bonus": -15, "armor_bonus": 10, "rof_bonus": 0.1, "folder": "Color_B", "color": Color("888456")},
+	{"id": 2, "name": "Лазурный", "price": 4000, "hp_bonus": 5, "speed_bonus": 30, "armor_bonus": -10, "rof_bonus": 0.05, "folder": "Color_C", "color": Color("699f9c")}
 ]
 
 var ammo_types = [
 	{"id": 0, "name": "Плазма", "price": 0, "desc": "Сбалансированный плазменный снаряд со средней дальностью.", "icon": "res://assets/future_tanks/PNG/Effects/Plasma.png"},
 	{"id": 1, "name": "Средний", "price": 0, "desc": "Тяжелее и мощнее: выше урон, но короче дистанция.", "icon": "res://assets/future_tanks/PNG/Effects/Medium_Shell.png"},
 	{"id": 2, "name": "Легкий", "price": 0, "desc": "Быстрый и дальнобойный снаряд с меньшим уроном.", "icon": "res://assets/future_tanks/PNG/Effects/Light_Shell.png"},
-	{"id": 3, "name": "Фугас", "price": 6000, "desc": "Взрывной снаряд: наносит урон по площади вокруг точки попадания.", "icon": "res://assets/future_tanks/PNG/Effects/Granade_Shell.png"},
-	{"id": 4, "name": "БОПС", "price": 9000, "desc": "Бронебойный оперенный снаряд: пробивает не более двух танков по одной линии.", "icon": "res://assets/future_tanks/PNG/Effects/Heavy_Shell.png"},
-	{"id": 5, "name": "Рикошет", "price": 7500, "desc": "Снаряд отскакивает от стен; после каждого рикошета прямой урон и взрыв становятся сильнее.", "icon": "res://assets/future_tanks/PNG/Effects/Laser.png"}
+	{"id": 3, "name": "Фугас", "price": 3000, "desc": "Взрывной снаряд: наносит урон по площади вокруг точки попадания.", "icon": "res://assets/future_tanks/PNG/Effects/Granade_Shell.png"},
+	{"id": 4, "name": "БОПС", "price": 4500, "desc": "Бронебойный оперенный снаряд: пробивает не более двух танков по одной линии.", "icon": "res://assets/future_tanks/PNG/Effects/Heavy_Shell.png"},
+	{"id": 5, "name": "Рикошет", "price": 3750, "desc": "Снаряд отскакивает от стен; после каждого рикошета прямой урон и взрыв становятся сильнее.", "icon": "res://assets/future_tanks/PNG/Effects/Laser.png"}
 ]
 
 # Item Data - Base
 var base_hps = [
 	{"id": 0, "name": "Деревянные баррикады", "price": 0, "hp": 150},
-	{"id": 1, "name": "Стальные пластины", "price": 3000, "hp": 200},
-	{"id": 2, "name": "Бетонный бункер", "price": 7000, "hp": 250},
-	{"id": 3, "name": "Титановая защита", "price": 15000, "hp": 350}
+	{"id": 1, "name": "Стальные пластины", "price": 1500, "hp": 200},
+	{"id": 2, "name": "Бетонный бункер", "price": 3500, "hp": 250},
+	{"id": 3, "name": "Титановая защита", "price": 7500, "hp": 350}
 ]
 
 var base_heals = [
 	{"id": 0, "name": "Полевой ремонт", "price": 0, "heal": 5},
-	{"id": 1, "name": "Новые ремкомплеткы", "price": 4000, "heal": 7},
-	{"id": 2, "name": "Элитные механики", "price": 10000, "heal": 10}
+	{"id": 1, "name": "Новые ремкомплеткы", "price": 2000, "heal": 7},
+	{"id": 2, "name": "Элитные механики", "price": 5000, "heal": 10}
 ]
 
 var base_bonuses = [
