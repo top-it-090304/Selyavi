@@ -1,0 +1,21 @@
+[gd_scene load_steps=3 format=3 uid="uid://cturret001"]
+
+[ext_resource type="Script" uid="uid://cturret001" path="res://scripts/Traps/Turret.gd" id="1_script"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_turret"]
+radius = 450.0
+
+[node name="Turret" type="Area2D"]
+collision_layer = 0
+collision_mask = 3
+script = ExtResource("1_script")
+
+[node name="BaseSprite" type="Sprite2D" parent="."]
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+
+[node name="MuzzleFlash" type="AnimatedSprite2D" parent="."]
+visible = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_turret")

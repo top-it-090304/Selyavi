@@ -41,7 +41,7 @@ var _notice_range: float = 850.0
 var _attack_range: float = 450.0
 
 # Переменные для артиллерии
-var _blind_fire_range: float = 600.0
+var _blind_fire_range: float = 700.0
 
 # Переменные для разведчика
 var _scout_search_timer: float = 0.0
@@ -102,7 +102,7 @@ func _ready():
 	match _type_enemy:
 		TypeEnemy.ARTILLERY:
 			_patrol_speed = 0; _chase_speed = 0
-			_blind_fire_range = 650.0; _setup_artillery_flash()
+			_blind_fire_range = 750.0; _setup_artillery_flash()
 		TypeEnemy.SCOUT:
 			_scout_search_duration = 20.0; _scout_search_timer = 0.0; _current_state = State.CHASE
 
@@ -320,7 +320,9 @@ func _check_and_fire():
 	else: can_fire = _target_in_sight and dist <= (_attack_range if target == _player or _type_enemy == TypeEnemy.SCOUT else 700.0)
 	if can_fire:
 		if _type_enemy == TypeEnemy.STATIONARY:
-			if _reaction_timer >= 1.0: _fire_at_pos(target.global_position)
+			var lvl = SaveManager.current_level if SaveManager else 1
+			var stationary_reaction = 0.5 if lvl >= 10 else 1.0
+			if _reaction_timer >= stationary_reaction: _fire_at_pos(target.global_position)
 		elif _type_enemy == TypeEnemy.ARTILLERY: _fire_artillery(target.global_position)
 		else: _fire_at_pos(target.global_position)
 

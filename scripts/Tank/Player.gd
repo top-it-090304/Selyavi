@@ -22,6 +22,9 @@ var _type_gun: int = 1
 var _color: int = 0
 var _invul_tween: Tween
 
+var _controls_inverted: bool = false
+var _inverse_timer: float = 0.0
+
 const PLASMA: int = 0
 const MEDIUM: int = 1
 const LIGHT: int = 2
@@ -59,6 +62,13 @@ func _ready():
 			SaveManager.settings_changed.connect(_apply_camera_fov)
 	call_deferred("_apply_camera_fov")
 
+func set_controls_inverted(inverted: bool, duration: float = 0.0):
+	_controls_inverted = inverted
+	if inverted and duration > 0:
+		_inverse_timer = duration
+	elif !inverted and _inverse_timer <= 0:
+		_controls_inverted = false
+
 func _connect_hud_controls():
 	var hud = get_tree().get_first_node_in_group("hud")
 	if hud:
@@ -94,8 +104,10 @@ func get_lives() -> int: return _lives
 func get_money() -> int: return _money
 
 func use_move_vector(move_vector: Vector2):
-	velocity = move_vector * _speed
-	rotation = move_vector.angle() + PI/2
+	var final_vector = -move_vector if _controls_inverted else move_vector
+	velocity = final_vector * _speed
+	if final_vector.length() > 0.01:
+		rotation = final_vector.angle() + PI/2
 	_handle_movement_sound(velocity)
 
 # Функция для безопасного спавна пули (чтобы не пролетала сквозь стены вплотную)
@@ -177,8 +189,8 @@ func _get_reload_time() -> float:
 	return max(0.1, reload_base + rof_color_bonus)
 
 func use_move_vector_aim(move_vector: Vector2):
-	var desired_dir = move_vector.normalized()
-	var final_angle = move_vector.angle() + PI/2
+	var desired_dir = -move_vector.normalized() if _controls_inverted else move_vector.normalized()
+	var final_angle = desired_dir.angle() + PI/2
 	var is_assist_on = SaveManager.get_setting("game", "aim_assist", true) if SaveManager else true
 
 	if is_assist_on:
@@ -205,9 +217,15 @@ func _is_enemy_on_screen(enemy: Node) -> bool:
 	var screen_pos = get_viewport().get_canvas_transform() * enemy.global_position
 	return get_viewport().get_visible_rect().has_point(screen_pos)
 
-func _physics_process(_delta):
+func _physics_process(delta):
+	if _inverse_timer > 0:
+		_inverse_timer -= delta
+		if _inverse_timer <= 0:
+			_controls_inverted = false
+
 	if _joystick == null or not _joystick.get_is_joystick_active():
 		var input_dir = Input.get_vector("move_left", "move_right", "move_up", "move_down")
+		if _controls_inverted: input_dir = -input_dir
 		if input_dir.length() > 0:
 			velocity = input_dir * _speed
 			rotation = velocity.angle() + PI/2
