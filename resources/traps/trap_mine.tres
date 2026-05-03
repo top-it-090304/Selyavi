@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="TrapData" load_steps=3 format=3 uid="uid://b8m1n3m1n3m1n"]
+
+[ext_resource type="Script" uid="uid://ctrapdata001" path="res://scripts/Resources/TrapData.gd" id="1"]
+[ext_resource type="Texture2D" uid="uid://cmine96" path="res://assets/TrapsSprites/icons8-land-mine-96.png" id="2"]
+
+[resource]
+script = ExtResource("1")
+damage = 40
+fire_rate = 0.0
+activation_radius = 400.0
+sprite_texture = ExtResource("2")
+sprite_scale = Vector2(0.5, 0.5)
+base_scale = Vector2(1, 1)
+rotation_speed = 0.0
+mine_trigger_radius = 65.0
+mine_base_alpha = 0.25

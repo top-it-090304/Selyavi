@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="TrapData" load_steps=3 format=3 uid="uid://b9t2n4t2n4t2n"]
+
+[ext_resource type="Script" uid="uid://ctrapdata001" path="res://scripts/Resources/TrapData.gd" id="1"]
+[ext_resource type="Texture2D" uid="uid://cturret001" path="res://assets/TrapsSprites/M230LF_sentry_gun.png" id="2"]
+
+[resource]
+script = ExtResource("1")
+damage = 25
+fire_rate = 0.25
+activation_radius = 450.0
+sprite_texture = ExtResource("2")
+sprite_scale = Vector2(0.7, 0.7)
+base_scale = Vector2(1, 1)
+rotation_speed = 8.0
+mine_trigger_radius = 0.0
+mine_base_alpha = 1.0

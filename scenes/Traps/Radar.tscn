@@ -1,0 +1,18 @@
+[gd_scene load_steps=3 format=3 uid="uid://cradar001"]
+
+[ext_resource type="Script" uid="uid://cradar001" path="res://scripts/Traps/Radar.gd" id="1_script"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_radar"]
+radius = 500.0
+
+[node name="Radar" type="Area2D"]
+collision_layer = 0
+collision_mask = 3
+script = ExtResource("1_script")
+
+[node name="BaseSprite" type="Sprite2D" parent="."]
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_radar")
