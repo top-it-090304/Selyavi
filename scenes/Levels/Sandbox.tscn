@@ -1,4 +1,4 @@
-[gd_scene load_steps=23 format=4 uid="uid://d33d0cj1m5fb6"]
+[gd_scene load_steps=20 format=4 uid="uid://d33d0cj1m5fb6"]
 
 [ext_resource type="PackedScene" uid="uid://mfxaskty4hrm" path="res://scenes/Tank/Player.tscn" id="2"]
 [ext_resource type="Texture2D" uid="uid://d0bnoilig7yxs" path="res://assets/ground_shaker_asset/Terrains/terrain.png" id="2_mssve"]
@@ -18,6 +18,7 @@
 [ext_resource type="Resource" uid="uid://b1e1m1p1r1a1d" path="res://resources/traps/trap_emp.tres" id="16_dvvaa"]
 [ext_resource type="PackedScene" path="res://scenes/Traps/Turret.tscn" id="17_pvlhr"]
 [ext_resource type="PackedScene" uid="uid://336qfi6ddylt" path="res://scenes/Tank/HUD.tscn" id="21"]
+[ext_resource type="PackedScene" path="res://scenes/Tank/Boss3.tscn" id="22_boss3"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_2i15a"]
 texture = ExtResource("2_mssve")

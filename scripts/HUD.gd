@@ -54,6 +54,10 @@ const AMMO_DEFAULT_LOADOUT = [2, 0, 1]
 const AMMO_UI_CLASSIC = "classic"
 const AMMO_UI_POPUP = "popup"
 const AMMO_POPUP_OFFSETS = [Vector2(-240, -170), Vector2(-300, 0), Vector2(-240, 170)]
+const AMMO_SWIPE_MIN_RADIUS = 70.0
+const AMMO_SWIPE_MAX_RADIUS = 380.0
+const AMMO_SWIPE_HOVER_DOT = 0.58
+const AMMO_SWIPE_ACTIVATION_DOT = 0.3
 
 func _ready():
 	add_to_group("hud")
@@ -480,15 +484,39 @@ func _finish_ammo_hold_selection():
 func _update_popup_hover(screen_pos: Vector2):
 	if not _ammo_hold_active or not _ammo_options_open:
 		return
-	var hovered := -1
-	for i in range(_ammo_option_slots.size()):
-		var rect = _ammo_option_slots[i].get_global_rect()
-		if rect.has_point(screen_pos):
-			hovered = i
-			break
+	var hovered := _get_popup_hover_slot(screen_pos)
 	if hovered != _ammo_hover_slot:
 		_ammo_hover_slot = hovered
 		_apply_popup_hover_visuals()
+
+func _get_popup_hover_slot(screen_pos: Vector2) -> int:
+	for i in range(_ammo_option_slots.size()):
+		var rect = _ammo_option_slots[i].get_global_rect()
+		if rect.has_point(screen_pos):
+			return i
+
+	if _ammo_popup_root == null:
+		return -1
+
+	var center = _get_ammo_popup_center_global()
+	var to_point = screen_pos - center
+	var dist = to_point.length()
+	if dist < AMMO_SWIPE_MIN_RADIUS or dist > AMMO_SWIPE_MAX_RADIUS:
+		return -1
+	if to_point.x > 50.0:
+		return -1
+
+	var dir = to_point.normalized()
+	var best_idx := -1
+	var best_dot := -1.0
+	for i in range(AMMO_POPUP_OFFSETS.size()):
+		var opt_dir = AMMO_POPUP_OFFSETS[i].normalized()
+		var dot = dir.dot(opt_dir)
+		if dot > best_dot:
+			best_dot = dot
+			best_idx = i
+
+	return best_idx if best_dot >= AMMO_SWIPE_HOVER_DOT else -1
 
 func _apply_popup_hover_visuals():
 	if _ammo_ui_mode != AMMO_UI_POPUP:
@@ -507,6 +535,30 @@ func _is_over_ammo_main_button(screen_pos: Vector2) -> bool:
 	if _ammo_main_slot == null:
 		return false
 	return _ammo_main_slot.get_global_rect().has_point(screen_pos)
+
+func _is_over_ammo_swipe_activation_area(screen_pos: Vector2) -> bool:
+	if _is_over_ammo_main_button(screen_pos):
+		return true
+	if _ammo_popup_root == null:
+		return false
+
+	var center = _get_ammo_popup_center_global()
+	var to_point = screen_pos - center
+	var dist = to_point.length()
+	if dist < AMMO_MAIN_BTN_SIZE * 0.5 or dist > AMMO_SWIPE_MAX_RADIUS:
+		return false
+	if to_point.x > 80.0:
+		return false
+
+	var dir = to_point.normalized()
+	var best_dot := -1.0
+	for offset in AMMO_POPUP_OFFSETS:
+		best_dot = max(best_dot, dir.dot(offset.normalized()))
+
+	return best_dot >= AMMO_SWIPE_ACTIVATION_DOT
+
+func _get_ammo_popup_center_global() -> Vector2:
+	return _ammo_popup_root.global_position + Vector2(AMMO_MAIN_BTN_SIZE * 0.5, AMMO_MAIN_BTN_SIZE * 0.5)
 
 func _set_ammo_options_open(open: bool):
 	if _ammo_ui_mode != AMMO_UI_POPUP:
@@ -562,7 +614,7 @@ func _input(event):
 	if _ammo_ui_mode != AMMO_UI_POPUP:
 		return
 	if event is InputEventScreenTouch:
-		if event.pressed and _is_over_ammo_main_button(event.position):
+		if event.pressed and _is_over_ammo_swipe_activation_area(event.position):
 			_on_ammo_main_pressed()
 			_ammo_hold_touch_index = event.index
 			_update_popup_hover(event.position)
@@ -572,7 +624,7 @@ func _input(event):
 		if _ammo_hold_active and (_ammo_hold_touch_index == -1 or event.index == _ammo_hold_touch_index):
 			_update_popup_hover(event.position)
 	elif event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
-		if event.pressed and _is_over_ammo_main_button(event.position):
+		if event.pressed and _is_over_ammo_swipe_activation_area(event.position):
 			_on_ammo_main_pressed()
 			_update_popup_hover(event.position)
 		elif not event.pressed and _ammo_hold_active:
