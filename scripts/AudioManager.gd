@@ -91,3 +91,14 @@ func play_bullet_sound(type: int, _pos: Vector2 = Vector2.ZERO):
 
 	sfx_player.play()
 	sfx_player.finished.connect(sfx_player.queue_free)
+
+
+func play_flamethrower_sound(_pos: Vector2 = Vector2.ZERO):
+	var sfx_player := AudioStreamPlayer.new()
+	add_child(sfx_player)
+	sfx_player.bus = "SFX"
+	sfx_player.stream = sfx_light
+	sfx_player.volume_db = -10.0
+	sfx_player.pitch_scale = 0.32
+	sfx_player.play()
+	sfx_player.finished.connect(sfx_player.queue_free)

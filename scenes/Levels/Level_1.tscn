@@ -1,4 +1,4 @@
-[gd_scene load_steps=18 format=4 uid="uid://3npfo77iqe53"]
+[gd_scene load_steps=18 format=4 uid="uid://b8wk2m7p4nqx1"]
 
 [ext_resource type="PackedScene" uid="uid://mfxaskty4hrm" path="res://scenes/Tank/Player.tscn" id="2"]
 [ext_resource type="Texture2D" uid="uid://d0bnoilig7yxs" path="res://assets/ground_shaker_asset/Terrains/terrain.png" id="2_mssve"]
