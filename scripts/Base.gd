@@ -223,7 +223,7 @@ func _sync_current_level():
 func _update_spawn_interval():
 	var lvl = 1
 	if SaveManager: lvl = SaveManager.current_level
-	_spawn_interval = 10.0 if lvl <= 5 else (8.0 if lvl <= 10 else 6.0)
+	_spawn_interval = 10.0 if lvl <= 5 else (8.0 if lvl <= 10 else 7.0)
 
 func _setup_base_collision():
 	_base_body = StaticBody2D.new()
