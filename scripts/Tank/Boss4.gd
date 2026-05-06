@@ -96,15 +96,14 @@ func _fire_at_pos(pos: Vector2):
 		return
 
 	var pattern := randi() % 3
-	match pattern:
-		0:
-			_spawn_shell(pos, _damage, 130.0, 2.2)
-		1:
-			for _i in range(3):
-				var offset := Vector2(randf_range(-170.0, 170.0), randf_range(-170.0, 170.0))
-				_spawn_shell(pos + offset, int(round(_damage * 0.72)), 88.0, 1.55)
-		2:
-			_spawn_shell(pos, int(round(_damage * 1.55)), 175.0, 2.8)
+	if pattern == 0:
+		_spawn_shell(pos, _damage, 130.0, 2.2)
+	elif pattern == 1:
+		for _i in range(3):
+			var offset := Vector2(randf_range(-170.0, 170.0), randf_range(-170.0, 170.0))
+			_spawn_shell(pos + offset, int(round(_damage * 0.72)), 88.0, 1.55)
+	else:
+		_spawn_shell(pos, int(round(_damage * 1.55)), 175.0, 2.8)
 
 	if AudioManager:
 		AudioManager.play_bullet_sound(2, global_position)

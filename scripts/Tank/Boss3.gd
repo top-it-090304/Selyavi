@@ -1,8 +1,10 @@
 extends Enemy
 
 const PHASE2_HP_RATIO: float = 0.5
+const ARTILLERY_SCENE: PackedScene = preload("res://scenes/Tank/ArtilleryTarget.tscn")
 
 var _phase2: bool = false
+var _phase2_barrage_cd: float = 2.6
 
 var _flame_burst_left: float = 0.0
 var _flame_tick_accum: float = 0.0
@@ -28,9 +30,10 @@ func _ready():
 
 	_patrol_speed = int(_patrol_speed * 1.35 + 25)
 	_chase_speed = int(_chase_speed * 1.45 + 35)
-	_notice_range = 920.0
-	_attack_range = 320.0
-	_fire_rate = 1.22
+	_notice_range = 1080.0
+	_attack_range = 430.0
+	_fire_rate = 0.95
+	_damage = int(round(_damage * 1.18))
 
 	if _body:
 		_body.texture = load("res://assets/future_tanks/PNG/Hulls_Color_D/Hull_06.png")
@@ -48,16 +51,19 @@ func _ready():
 
 
 func _burst_duration() -> float:
-	return 0.85 if not _phase2 else 1.15
+	return 1.2 if not _phase2 else 1.55
 
 
 func _flame_tick_period() -> float:
-	return 0.09 if not _phase2 else 0.065
+	# Подгоняем под 1с инвул игрока: редкие тяжелые пульсы вместо частых слабых тиков
+	return 1.02 if not _phase2 else 0.9
 
 
 func _flame_damage_tick() -> int:
-	var mult: float = 0.22 if not _phase2 else 0.32
-	return maxi(1, int(round(_damage * mult)))
+	# Большой урон за попадание: один пульс должен быть опасным даже через броню
+	var mult: float = 1.65 if not _phase2 else 2.35
+	var base = int(round(_damage * mult))
+	return maxi(34 if not _phase2 else 52, base)
 
 
 func _setup_flame_particles():
@@ -274,14 +280,14 @@ func _enter_phase2():
 
 
 func _apply_phase2_stats():
-	_fire_rate *= 0.68
-	_flame_range = 320.0
-	_flame_spread_deg = 24.0
+	_fire_rate *= 0.58
+	_flame_range = 460.0
+	_flame_spread_deg = 27.0
 	_flame_ray_count = 7
-	_damage = int(round(_damage * 1.2))
-	_patrol_speed = int(_patrol_speed * 1.12)
-	_chase_speed = int(_chase_speed * 1.12)
-	_attack_range = 365.0
+	_damage = int(round(_damage * 1.62))
+	_patrol_speed = int(_patrol_speed * 1.2)
+	_chase_speed = int(_chase_speed * 1.2)
+	_attack_range = 560.0
 	_body_idle_modulate = Color(1.0, 0.35, 0.12, 1.0)
 	if _body:
 		_body.self_modulate = _body_idle_modulate
@@ -327,6 +333,12 @@ func _move_enemy(delta: float):
 
 func _physics_process(delta: float):
 	super._physics_process(delta)
+	if _phase2:
+		_phase2_barrage_cd -= delta
+		if _phase2_barrage_cd <= 0.0:
+			_phase2_barrage_cd = 3.3
+			_try_phase2_barrage()
+
 	var period := _flame_tick_period()
 	if _flame_burst_left > 0.0:
 		_flame_burst_left -= delta
@@ -399,6 +411,28 @@ func _do_flame_damage_tick():
 			(col as Player).take_damage(dmg)
 		elif col is Base:
 			(col as Base).take_damage(dmg)
+
+func _try_phase2_barrage():
+	if not _phase2 or ARTILLERY_SCENE == null:
+		return
+	var tgt = _get_current_target()
+	if not is_instance_valid(tgt) or not (tgt is Node2D):
+		return
+	var center: Vector2 = (tgt as Node2D).global_position
+	# Фаза 2: шесть крупных ударов вокруг цели + один в центр
+	for i in range(6):
+		var ang = TAU * float(i) / 6.0
+		var pos = center + Vector2.from_angle(ang) * 140.0
+		_spawn_phase2_shell(pos, int(round(_damage * 0.9)), 120.0, 1.0 + float(i) * 0.07)
+	_spawn_phase2_shell(center, int(round(_damage * 1.25)), 155.0, 1.25)
+
+func _spawn_phase2_shell(pos: Vector2, dmg: int, radius: float, duration: float):
+	var shell = ARTILLERY_SCENE.instantiate()
+	shell.global_position = pos + Vector2(randf_range(-30.0, 30.0), randf_range(-30.0, 30.0))
+	shell.set("_damage", dmg)
+	shell.set("_radius", radius)
+	shell.set("_duration", duration)
+	get_parent().add_child(shell)
 
 
 func _destroy():
