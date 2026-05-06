@@ -57,7 +57,6 @@ const AMMO_POPUP_OFFSETS = [Vector2(-240, -170), Vector2(-300, 0), Vector2(-240,
 const AMMO_SWIPE_MIN_RADIUS = 70.0
 const AMMO_SWIPE_MAX_RADIUS = 380.0
 const AMMO_SWIPE_HOVER_DOT = 0.58
-const AMMO_SWIPE_ACTIVATION_DOT = 0.3
 
 func _ready():
 	add_to_group("hud")
@@ -536,27 +535,6 @@ func _is_over_ammo_main_button(screen_pos: Vector2) -> bool:
 		return false
 	return _ammo_main_slot.get_global_rect().has_point(screen_pos)
 
-func _is_over_ammo_swipe_activation_area(screen_pos: Vector2) -> bool:
-	if _is_over_ammo_main_button(screen_pos):
-		return true
-	if _ammo_popup_root == null:
-		return false
-
-	var center = _get_ammo_popup_center_global()
-	var to_point = screen_pos - center
-	var dist = to_point.length()
-	if dist < AMMO_MAIN_BTN_SIZE * 0.5 or dist > AMMO_SWIPE_MAX_RADIUS:
-		return false
-	if to_point.x > 80.0:
-		return false
-
-	var dir = to_point.normalized()
-	var best_dot := -1.0
-	for offset in AMMO_POPUP_OFFSETS:
-		best_dot = max(best_dot, dir.dot(offset.normalized()))
-
-	return best_dot >= AMMO_SWIPE_ACTIVATION_DOT
-
 func _get_ammo_popup_center_global() -> Vector2:
 	return _ammo_popup_root.global_position + Vector2(AMMO_MAIN_BTN_SIZE * 0.5, AMMO_MAIN_BTN_SIZE * 0.5)
 
@@ -614,7 +592,7 @@ func _input(event):
 	if _ammo_ui_mode != AMMO_UI_POPUP:
 		return
 	if event is InputEventScreenTouch:
-		if event.pressed and _is_over_ammo_swipe_activation_area(event.position):
+		if event.pressed and _is_over_ammo_main_button(event.position):
 			_on_ammo_main_pressed()
 			_ammo_hold_touch_index = event.index
 			_update_popup_hover(event.position)
@@ -624,7 +602,7 @@ func _input(event):
 		if _ammo_hold_active and (_ammo_hold_touch_index == -1 or event.index == _ammo_hold_touch_index):
 			_update_popup_hover(event.position)
 	elif event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
-		if event.pressed and _is_over_ammo_swipe_activation_area(event.position):
+		if event.pressed and _is_over_ammo_main_button(event.position):
 			_on_ammo_main_pressed()
 			_update_popup_hover(event.position)
 		elif not event.pressed and _ammo_hold_active:

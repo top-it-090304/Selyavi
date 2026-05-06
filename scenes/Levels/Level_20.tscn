@@ -1,4 +1,4 @@
-[gd_scene load_steps=12 format=4 uid="uid://juvvajhi72is"]
+[gd_scene load_steps=13 format=4 uid="uid://juvvajhi72is"]
 
 [ext_resource type="Script" uid="uid://3wsw25sk74o6" path="res://scripts/Field.gd" id="1"]
 [ext_resource type="PackedScene" uid="uid://336qfi6ddylt" path="res://scenes/Tank/HUD.tscn" id="2"]
@@ -8,6 +8,7 @@
 [ext_resource type="Texture2D" uid="uid://d0bnoilig7yxs" path="res://assets/ground_shaker_asset/Terrains/terrain.png" id="6"]
 [ext_resource type="PackedScene" uid="uid://csfpndcf2sqpn" path="res://scenes/WallLayer.tscn" id="8"]
 [ext_resource type="AudioStream" uid="uid://bxl5wv7crhm5" path="res://assets/Music/68. Sad Eyes.mp3" id="9"]
+[ext_resource type="PackedScene" path="res://scenes/Tank/Boss4.tscn" id="10_boss4"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_80ied"]
 texture = ExtResource("6")
@@ -111,6 +112,9 @@ position = Vector2(2800, 300)
 
 [node name="EnemyBase2" parent="." instance=ExtResource("4")]
 position = Vector2(2800, 1200)
+
+[node name="Boss4" parent="." instance=ExtResource("10_boss4")]
+position = Vector2(2480, 760)
 
 [node name="Navigation2D" type="Node2D" parent="."]
 
