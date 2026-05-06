@@ -13,6 +13,7 @@ var music_tutorial = preload("res://assets/Music/Hearts-of-Iron-chosic.com_.mp3"
 var sfx_plasma = preload("res://assets/sounds/plasma_gun_06.mp3")
 var sfx_medium = preload("res://assets/sounds/vystrel-tanka.mp3")
 var sfx_light = preload("res://assets/sounds/light_bullet.mp3")
+var sfx_turret = preload("res://assets/sounds/M2Browning.ogg")
 
 enum Track { NONE, MENU, BOSS, TUTORIAL }
 var current_track = Track.NONE
@@ -87,6 +88,7 @@ func play_bullet_sound(type: int, _pos: Vector2 = Vector2.ZERO):
 		0: sfx_player.stream = sfx_plasma
 		1: sfx_player.stream = sfx_medium
 		2: sfx_player.stream = sfx_light
+		10: sfx_player.stream = sfx_turret # Специальный тип для турели
 		_: sfx_player.stream = sfx_medium
 
 	sfx_player.play()

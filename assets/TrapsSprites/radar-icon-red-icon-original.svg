@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="148mm" height="148mm" version="1.1" viewBox="0 0 148 148" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+ <defs>
+  <linearGradient id="frame-gradient">
+   <stop stop-color="#787878" offset="0"/>
+   <stop stop-color="#272727" offset="1"/>
+  </linearGradient>
+  <linearGradient id="linearGradient1874" x1="76.7" x2="130" y1="77.2" y2="213" gradientTransform="matrix(.899 0 0 1.06 -12.8 -74.3)" gradientUnits="userSpaceOnUse" xlink:href="#frame-gradient"/>
+  <linearGradient id="linearGradient1898" x1="17.7" x2="193" y1="61" y2="236" gradientTransform="matrix(.847 0 0 .846 -8.16 -44.7)" gradientUnits="userSpaceOnUse" xlink:href="#frame-gradient"/>
+  <linearGradient id="linearGradient1927" x1="130" x2="76.7" y1="213" y2="77.1" gradientTransform="matrix(2.11 0 0 1.09 -137 -239)" gradientUnits="userSpaceOnUse" xlink:href="#frame-gradient"/>
+  <filter id="filter1946" x="-.00128" y="-1.52e-5" width="1" height="1" color-interpolation-filters="sRGB">
+   <feGaussianBlur stdDeviation="0.00090947379"/>
+  </filter>
+  <linearGradient id="linearGradient1974" x1="6.81" x2="155" y1="6.81" y2="155" gradientTransform="matrix(.737 0 0 .737 21.3 21.3)" gradientUnits="userSpaceOnUse" xlink:href="#frame-gradient"/>
+  <linearGradient id="linearGradient1994" x1="6.81" x2="155" y1="6.81" y2="155" gradientTransform="matrix(1.31 0 0 1.31 -25.1 -25.1)" gradientUnits="userSpaceOnUse" xlink:href="#frame-gradient"/>
+  <linearGradient id="linearGradient2031" x1="6.81" x2="155" y1="6.81" y2="155" gradientTransform="matrix(.694 0 0 .694 24.7 24.7)" gradientUnits="userSpaceOnUse" xlink:href="#frame-gradient"/>
+  <linearGradient id="linearGradient2083" x1="9.63" x2="219" y1="4.42e-6" y2="-1.28e-5" gradientTransform="matrix(1.01 0 0 1.01 -.698 -.728)" gradientUnits="userSpaceOnUse" xlink:href="#frame-gradient"/>
+  <linearGradient id="linearGradient2304" x1="31.7" x2="180" y1="75.2" y2="223" gradientTransform="translate(-1.03 .451)" gradientUnits="userSpaceOnUse" xlink:href="#frame-gradient"/>
+  <filter x="-.0374" y="-.138" width="1.07" height="1.28" color-interpolation-filters="sRGB">
+   <feGaussianBlur stdDeviation="2.3987104"/>
+  </filter>
+ </defs>
+ <g transform="translate(-31.7 -75.2)">
+  <ellipse transform="scale(-1)" cx="-106" cy="-149" rx="63" ry="62.8" fill="#d44c4c" fill-rule="evenodd" stroke-width="1.84" style="paint-order:normal">
+   <title>Glass</title>
+  </ellipse>
+  <circle cx="71.4" cy="127" r="7.41" fill="#f9999c" stroke="url(#linearGradient2304)" stroke-width="2.8" style="paint-order:normal">
+   <title>Circle Scope</title>
+  </circle>
+ </g>
+ <g transform="translate(7.49e-6 .000295)">
+  <path transform="scale(1,-1)" d="m112-30.6a55 54 0 0 1-38.4 15.8l-0.525-54z" fill="#f99999" fill-rule="evenodd" stroke-width="8.06" style="paint-order:normal">
+   <title>Major Fade</title>
+  </path>
+  <path transform="scale(-1)" d="m-51.9-20.5a31.8 19.5 0 0 1-22.2 5.72l-0.304-19.5z" fill="#f99999" fill-rule="evenodd" stroke-width="3.69" style="paint-order:normal">
+   <title>Minor Fade (Partial)</title>
+  </path>
+  <path d="m53.9 19.4-9.97 6.04 19.5 5.6-20.7 10 20.6-3.54-7.74 10.7h14.8l-9.77 6.77 8.92-0.785-3.46 6.26 8.25 5.26 0.347-46.6z" fill="#f9999c" stroke-width=".265">
+   <title>Fade Cut</title>
+  </path>
+ </g>
+ <g transform="translate(-6.81 -6.81)" fill-rule="evenodd">
+  <rect transform="matrix(.703 .712 -.703 .712 0 0)" x="114" y="-58.7" width="1.08e-12" height="58" fill="url(#linearGradient2083)" stroke="url(#linearGradient2083)" stroke-width="2.47" style="paint-order:normal">
+   <title>Scan Line</title>
+  </rect>
+  <g>
+   <rect transform="matrix(2.34 0 0 1.03 -107 -1.06)" x="79.3" y="7.65" width="1.71" height="144" fill="url(#linearGradient1874)" stroke-width="2.2" style="paint-order:normal">
+    <title>Frame Grid (Y)</title>
+   </rect>
+   <rect transform="rotate(90)" x="78.8" y="-155" width="4" height="148" fill="url(#linearGradient1927)" stroke-width="1.94" style="paint-order:normal">
+    <title>Frame Grid (X)</title>
+   </rect>
+   <circle cx="80.9" cy="80.9" r="5" fill="url(#linearGradient1974)" stroke-width="1.96" style="paint-order:normal">
+    <title>Centerpoint</title>
+   </circle>
+  </g>
+  <g fill="none">
+   <circle cx="80.8" cy="80.8" r="48.6" stroke="url(#linearGradient1994)" stroke-width="2.88" style="paint-order:normal">
+    <title>Outer Ring</title>
+   </circle>
+   <circle cx="80.8" cy="80.8" r="25.7" stroke="url(#linearGradient2031)" stroke-width="1.53" style="paint-order:normal">
+    <title>Inner Ring</title>
+   </circle>
+   <ellipse transform="matrix(1 -.000481 .000483 1 0 0)" cx="80.8" cy="80.8" rx="67.9" ry="67.8" stroke="url(#linearGradient1898)" stroke-width="12.3" style="mix-blend-mode:normal">
+    <title>Frame</title>
+   </ellipse>
+  </g>
+ </g>
+</svg>
