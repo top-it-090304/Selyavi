@@ -5,27 +5,15 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="33129e0a-8a1f-4647-8ff9-20d5e301da8a" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/resources/traps/trap_emp.tres" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/resources/traps/trap_mine.tres" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/resources/traps/trap_turret.tres" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/scenes/Traps/Mine.tscn" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/scenes/Traps/Radar.tscn" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/scenes/Traps/Turret.tscn" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/scripts/Resources/TrapData.gd" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/scripts/Traps/BaseTrap.gd" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/scripts/Traps/Mine.gd" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/scripts/Traps/Radar.gd" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/scripts/Traps/Trap.gd" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/scripts/Traps/Turret.gd" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/caches/deviceStreaming.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/caches/deviceStreaming.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/enemies/enemy_triple.tres" beforeDir="false" afterPath="$PROJECT_DIR$/resources/enemies/enemy_triple.tres" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/project.godot" beforeDir="false" afterPath="$PROJECT_DIR$/project.godot" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scenes/Levels/Level_1.tscn" beforeDir="false" afterPath="$PROJECT_DIR$/scenes/Levels/Level_1.tscn" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/scenes/Levels/Level_11.tscn" beforeDir="false" afterPath="$PROJECT_DIR$/scenes/Levels/Level_11.tscn" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/scenes/Levels/Level_12.tscn" beforeDir="false" afterPath="$PROJECT_DIR$/scenes/Levels/Level_12.tscn" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/scenes/Levels/Level_9.tscn" beforeDir="false" afterPath="$PROJECT_DIR$/scenes/Levels/Level_9.tscn" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/scenes/Levels/Sandbox.tscn" beforeDir="false" afterPath="$PROJECT_DIR$/scenes/Levels/Sandbox.tscn" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/scripts/AudioManager.gd" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/AudioManager.gd" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/scripts/Tank/Enemy.gd" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/Tank/Enemy.gd" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/scripts/Tank/Player.gd" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/Tank/Player.gd" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scenes/Levels/Level_13.tscn" beforeDir="false" afterPath="$PROJECT_DIR$/scenes/Levels/Level_13.tscn" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scenes/Levels/Level_14.tscn" beforeDir="false" afterPath="$PROJECT_DIR$/scenes/Levels/Level_14.tscn" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scenes/Levels/Level_15.tscn" beforeDir="false" afterPath="$PROJECT_DIR$/scenes/Levels/Level_15.tscn" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -71,7 +59,7 @@
     "dart.analysis.tool.window.visible": "false",
     "git-widget-placeholder": "missions",
     "kotlin-language-version-configured": "true",
-    "settings.editor.selected.configurable": "com.google.gct.login2.settings.GoogleLoginApplicationSettingsConfigurableProvider",
+    "settings.editor.selected.configurable": "com.android.studio.ml.templates",
     "show.migrate.to.gradle.popup": "false"
   }
 }]]></component>

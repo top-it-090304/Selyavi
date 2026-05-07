@@ -107,14 +107,8 @@ scale = Vector2(1, 5)
 position = Vector2(200, 750)
 type_base = 0
 
-[node name="EnemyBase1" parent="." instance=ExtResource("4")]
-position = Vector2(2800, 300)
-
-[node name="EnemyBase2" parent="." instance=ExtResource("4")]
-position = Vector2(2800, 1200)
-
 [node name="Boss3" parent="." instance=ExtResource("10_boss3")]
-position = Vector2(2480, 760)
+position = Vector2(2601, 511)
 
 [node name="Navigation2D" type="Node2D" parent="."]
 

@@ -122,7 +122,6 @@ position = Vector2(3527, 340)
 position = Vector2(2934, 330)
 
 [node name="Navigation2D" type="Node2D" parent="."]
-visible = false
 
 [node name="NavigationRegion2D" type="NavigationRegion2D" parent="Navigation2D"]
 navigation_polygon = SubResource("NavigationPolygon_bwyig")
