@@ -5,16 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="33129e0a-8a1f-4647-8ff9-20d5e301da8a" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/scripts/FirePatch.gd" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/scripts/Tank/InfernoLatticeBullet.gd" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/project.godot" beforeDir="false" afterPath="$PROJECT_DIR$/project.godot" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/scenes/Levels/Level_14.tscn" beforeDir="false" afterPath="$PROJECT_DIR$/scenes/Levels/Level_14.tscn" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/scenes/Levels/Level_15.tscn" beforeDir="false" afterPath="$PROJECT_DIR$/scenes/Levels/Level_15.tscn" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/scripts/MenuScripts/LoadingScreen.gd" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/MenuScripts/LoadingScreen.gd" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/scripts/Tank/ArtilleryIndicator.gd" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/Tank/ArtilleryIndicator.gd" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/scripts/Tank/Boss3.gd" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/Tank/Boss3.gd" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/scripts/Tank/Player.gd" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/Tank/Player.gd" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

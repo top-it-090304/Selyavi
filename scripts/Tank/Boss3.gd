@@ -37,7 +37,7 @@ var _p2_lattice_started: bool = false
 
 # ЛОГИКА РЫВКА
 var _dash_cooldown: float = 0.0
-var _dash_timer: float = 0.0
+var _dash_timer: float = 0.0 # Время действия импульса
 const DASH_CD_MAX: float = 7.0
 const DASH_DURATION_P1: float = 0.4
 const DASH_DURATION_P2: float = 0.22
@@ -63,6 +63,11 @@ func _ready():
 		_gun.texture = load("res://assets/future_tanks/PNG/Weapon_Color_D/Gun_05.png")
 		_gun.self_modulate = Color(1.0, 0.45, 0.2, 1.0)
 		_gun_home_local = _gun.position
+
+	# УМЕНЬШЕНИЕ КОЛЛИЗИИ: Делаем босса более "проходимым"
+	var col = get_node_or_null("CollisionShape2D")
+	if col and col.shape is CircleShape2D:
+		col.shape.radius *= 0.75 # Уменьшаем физический размер на 25%
 
 	_setup_flame_particles()
 	_setup_flame_beams()
@@ -314,19 +319,22 @@ func _start_phase2_pulse():
 
 
 func _move_enemy(delta: float):
-	# УЛУЧШЕННЫЙ РЫВОК: Теперь использует навигацию, чтобы не врезаться в стены
 	if _dash_timer > 0:
 		var dash_dir = Vector2.ZERO
 		if _nav2d and not _nav2d.is_navigation_finished():
 			dash_dir = (_nav2d.get_next_path_position() - global_position).normalized()
 		else:
-			# Если пути нет, летим прямо на игрока
 			var target = _get_current_target()
 			if is_instance_valid(target):
 				dash_dir = global_position.direction_to(target.global_position)
 
 		velocity = dash_dir * DASH_VELOCITY
 		move_and_slide()
+
+		# Анти-застревание: Если во время рывка скорость упала почти до нуля
+		if _dash_timer < 0.3 and get_real_velocity().length() < 150.0:
+			_dash_timer = 0
+
 		if velocity.length() > 15.0:
 			rotation = lerp_angle(rotation, velocity.angle() + PI / 2, delta * 12.0)
 		return
@@ -444,8 +452,7 @@ func _spawn_lattice():
 	if get_viewport().get_camera_2d():
 		zoom = get_viewport().get_camera_2d().zoom.x
 
-	# Спавним чуть дальше видимой границы экрана
-	var spawn_dist = (max(view_size.x, view_size.y) / zoom) * 0.7
+	var spawn_dist = (max(view_size.x, view_size.y) / zoom) * 0.75
 	var spacing = 240.0
 	var count = 12
 
@@ -503,7 +510,8 @@ func _try_phase1_artillery():
 
 func _try_phase2_barrage():
 	if not _phase2 or ARTILLERY_SCENE == null: return
-	var tgt = _get_current_target(); if not is_instance_valid(tgt) or not (tgt is Node2D): return
+	var tgt = _get_current_target()
+	if not is_instance_valid(tgt) or not (tgt is Node2D): return
 	var center: Vector2 = (tgt as Node2D).global_position
 	for i in range(6):
 		var ang = TAU * float(i) / 6.0; var pos = center + Vector2.from_angle(ang) * 140.0
