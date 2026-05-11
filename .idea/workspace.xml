@@ -5,7 +5,13 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="33129e0a-8a1f-4647-8ff9-20d5e301da8a" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/scenes/Levels/Level_14.tscn" beforeDir="false" afterPath="$PROJECT_DIR$/scenes/Levels/Level_14.tscn" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/caches/deviceStreaming.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/caches/deviceStreaming.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scenes/Levels/Level_13.tscn" beforeDir="false" afterPath="$PROJECT_DIR$/scenes/Levels/Level_13.tscn" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scenes/Levels/Level_19.tscn" beforeDir="false" afterPath="$PROJECT_DIR$/scenes/Levels/Level_19.tscn" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scenes/Levels/Level_20.tscn" beforeDir="false" afterPath="$PROJECT_DIR$/scenes/Levels/Level_20.tscn" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/Tank/Boss4.gd" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/Tank/Boss4.gd" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/Tank/Enemy.gd" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/Tank/Enemy.gd" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

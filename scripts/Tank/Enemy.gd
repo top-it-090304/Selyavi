@@ -62,6 +62,7 @@ var _last_bypass_side: float = 0.0 # Стабилизация выбора ст�
 # ОПТИМИЗАЦИЯ
 var _logic_frame_offset: int = 0
 var _cached_avoidance: Vector2 = Vector2.ZERO
+var _is_on_screen: bool = true
 # endregion
 
 func get_enemy_type() -> int:
@@ -136,34 +137,71 @@ func _setup_artillery_flash():
 
 func _physics_process(delta):
 	var current_frame = Engine.get_physics_frames() + _logic_frame_offset
-	if not is_instance_valid(_player) or (not is_instance_valid(_base) and _base != null):
-		if current_frame % 30 == 0: _find_targets()
+
+	# ОПТИМИЗАЦИЯ: Проверка "на экране" раз в 30 кадров
+	if current_frame % 30 == 0:
+		if is_instance_valid(_player):
+			var d_sq = global_position.distance_squared_to(_player.global_position)
+			_is_on_screen = d_sq < 1562500.0 # ~1250 пикселей (край экрана + запас)
+		else:
+			_is_on_screen = false
+
+	var is_special = (_type_enemy == TypeEnemy.ARTILLERY or _type_enemy == TypeEnemy.BOSS)
+
+	# ГЛУБОКАЯ ОПТИМИЗАЦИЯ ДЛЯ ЗАЭКРАННЫХ БОТОВ
+	if not _is_on_screen and not is_special:
+		if current_frame % 120 == 0: _find_targets()
+		if current_frame % 60 == 0: _update_target()
+		# Двигаемся без обхода союзников (экономим 80% CPU на ИИ)
+		_move_enemy_simple(delta)
+		move_and_slide()
+		return
+
+	# Обычный цикл логики
+	if current_frame % 60 == 0:
+		if not is_instance_valid(_player) or (not is_instance_valid(_base) and _base != null):
+			_find_targets()
+
 	if _type_enemy == TypeEnemy.SCOUT: _process_scout_logic(delta)
-	if current_frame % 2 == 0: _update_target()
+
+	if current_frame % 15 == 0: _update_target()
+
 	_aim_gun(delta)
 	_update_ray_cast()
+
 	var was_visible = _target_in_sight
 	_target_in_sight = _is_target_visible()
+
 	if _target_in_sight and not was_visible: _roll_out_timer = 0.1
 	if _roll_out_timer > 0: _roll_out_timer -= delta
 	if _target_in_sight: _reaction_timer += delta
 	else: _reaction_timer = 0.0
-	_check_and_fire(); _move_enemy(delta); move_and_slide(); _handle_movement_sound(velocity)
+
+	_check_and_fire(); _move_enemy(delta); move_and_slide()
+
+	if _is_on_screen: _handle_movement_sound(velocity)
 
 func _process_scout_logic(delta):
-	if (Engine.get_physics_frames() + _logic_frame_offset) % 4 != 0: return
+	if (Engine.get_physics_frames() + _logic_frame_offset) % 8 != 0: return
+
 	if _scout_failed_to_find:
 		if is_instance_valid(_base) and global_position.distance_to(_base.global_position) <= _notice_range:
 			if _is_target_visible_at(_base):
 				Enemy.scout_target = _base; Enemy.last_spotted_time = Time.get_ticks_msec() / 1000.0
+		elif not is_instance_valid(_base):
+			_scout_failed_to_find = false; _scout_search_timer = 0.0
 		return
+
 	_scout_search_timer += delta
 	if is_instance_valid(_player) and global_position.distance_to(_player.global_position) <= _notice_range:
 		if _is_target_visible_at(_player):
 			Enemy.scout_target = _player; _scout_found_player = true; Enemy.last_spotted_time = Time.get_ticks_msec() / 1000.0; _scout_search_timer = 0.0
 		else: _scout_found_player = false
 	else: _scout_found_player = false
-	if _scout_search_timer >= _scout_search_duration: _scout_failed_to_find = true
+
+	if _scout_search_timer >= _scout_search_duration:
+		if is_instance_valid(_base): _scout_failed_to_find = true
+		else: _scout_search_timer = 0.0
 
 func _apply_data_from_resource():
 	if not enemy_data: return
@@ -218,30 +256,44 @@ func _aim_gun(delta: float):
 			_gun.global_rotation = lerp_angle(_gun.global_rotation, target_angle, 0.25)
 
 func _move_enemy(delta: float):
-	_speed_limit_mult = 1.0 # СБРАСЫВАЕМ СКОРОСТЬ КАЖДЫЙ КАДР
+	_speed_limit_mult = 1.0
 	var current_speed = _chase_speed if (_current_state == State.CHASE or _type_enemy == TypeEnemy.SCOUT) else _patrol_speed
 	if _nav2d == null or _type_enemy == TypeEnemy.STATIONARY or _type_enemy == TypeEnemy.ARTILLERY or current_speed <= 0:
 		velocity = velocity.move_toward(Vector2.ZERO, delta * 600.0); return
 	var target = _get_current_target()
 	var nav_dir = Vector2.ZERO
 	if not _nav2d.is_navigation_finished(): nav_dir = (_nav2d.get_next_path_position() - global_position).normalized()
-	if (Engine.get_physics_frames() + _logic_frame_offset) % 2 == 0:
+
+	if (Engine.get_physics_frames() + _logic_frame_offset) % 8 == 0:
 		_cached_avoidance = _compute_ally_avoidance(nav_dir)
+
 	_smoothed_avoidance = _smoothed_avoidance.lerp(_cached_avoidance, delta * 12.0)
 	var in_attack_range = false
 	if is_instance_valid(target):
-		var dist = global_position.distance_to(target.global_position)
-		if dist <= _attack_range and _target_in_sight and _roll_out_timer <= 0: in_attack_range = true
+		var dist_sq = global_position.distance_squared_to(target.global_position)
+		if dist_sq <= _attack_range * _attack_range and _target_in_sight and _roll_out_timer <= 0: in_attack_range = true
 	var final_dir = _smoothed_avoidance * 0.3 if in_attack_range else (nav_dir + _smoothed_avoidance * (1.2 if _type_enemy == TypeEnemy.BOSS else 0.7)).normalized()
 	velocity = velocity.lerp(final_dir * current_speed * _speed_limit_mult, delta * 9.0)
 	if velocity.length() > 15.0: rotation = lerp_angle(rotation, velocity.angle() + PI/2, delta * 6.0)
 
+# УПРОЩЕННОЕ ДВИЖЕНИЕ ДЛЯ ТЕХ, КТО ЗА ЭКРАНОМ
+func _move_enemy_simple(delta: float):
+	var current_speed = _chase_speed if (_current_state == State.CHASE or _type_enemy == TypeEnemy.SCOUT) else _patrol_speed
+	if _nav2d == null or current_speed <= 0:
+		velocity = velocity.move_toward(Vector2.ZERO, delta * 600.0); return
+	var nav_dir = Vector2.ZERO
+	if not _nav2d.is_navigation_finished(): nav_dir = (_nav2d.get_next_path_position() - global_position).normalized()
+	velocity = velocity.lerp(nav_dir * current_speed, delta * 5.0)
+	if velocity.length() > 15.0: rotation = lerp_angle(rotation, velocity.angle() + PI/2, delta * 4.0)
+
 func _compute_ally_avoidance(forward: Vector2) -> Vector2:
 	var avoidance_force = Vector2.ZERO; var my_pos = global_position; var my_radius = 75.0 * max(scale.x, scale.y); var is_i_boss = _type_enemy == TypeEnemy.BOSS
+	var check_dist_sq = 160000.0 # 400 пикселей
+
 	for other in get_tree().get_nodes_in_group("enemies"):
 		if not is_instance_valid(other) or other == self or other.is_queued_for_deletion() or not (other is CharacterBody2D): continue
 		var dist_sq = my_pos.distance_squared_to(other.global_position)
-		if dist_sq > 360000: continue
+		if dist_sq > check_dist_sq: continue
 		var other_type = other.get("_type_enemy")
 		if other_type == TypeEnemy.STATIONARY or other_type == TypeEnemy.ARTILLERY: continue
 		var diff = my_pos - other.global_position; var dist = sqrt(dist_sq); var min_sep_dist = (my_radius + (75.0 * max(other.scale.x, other.scale.y))) * 1.05
@@ -267,14 +319,15 @@ func _compute_ally_avoidance(forward: Vector2) -> Vector2:
 func _is_wall_near(dir: Vector2, distance: float) -> bool:
 	var q = PhysicsRayQueryParameters2D.create(global_position, global_position + dir * distance); q.exclude = [self]; q.collision_mask = 1; return get_world_2d().direct_space_state.intersect_ray(q) != null
 
-func _has_space_for_bypass(side_dir: Vector2, check_dist: float) -> bool:
-	for dir in [side_dir, (side_dir + Vector2(0, -0.7).rotated(rotation)).normalized()]:
+func _has_space_for_bypass(target_dir: Vector2, check_dist: float) -> bool:
+	for dir in [target_dir, (target_dir + Vector2(0, -0.7).rotated(rotation)).normalized()]:
 		var q = PhysicsRayQueryParameters2D.create(global_position, global_position + dir * (check_dist * 1.3)); q.exclude = [self]; q.collision_mask = 1
 		if get_world_2d().direct_space_state.intersect_ray(q): return false
 	return true
 
 func _update_ray_cast():
 	if _ray_cast == null: return
+	if (Engine.get_physics_frames() + _logic_frame_offset) % 4 != 0: return
 	var target = _get_current_target()
 	if target: _ray_cast.target_position = _ray_cast.to_local(target.global_position); _ray_cast.enabled = true; _ray_cast.force_raycast_update()
 
@@ -285,7 +338,7 @@ func _is_target_visible() -> bool:
 		return false
 	var target = _get_current_target(); if not is_instance_valid(target): return false
 	if not _is_target_visible_at(target): return false
-	if (Engine.get_physics_frames() + _logic_frame_offset) % 2 != 0: return true
+	if (Engine.get_physics_frames() + _logic_frame_offset) % 4 != 0: return true
 	var dir = (target.global_position - global_position).normalized(); var right = Vector2(-dir.y, dir.x) * (35.0 * max(scale.x, scale.y))
 	for offset in [right, -right]:
 		if not _is_line_clear_to_target(global_position + offset, target): return false
@@ -293,7 +346,7 @@ func _is_target_visible() -> bool:
 
 func _is_line_clear_to_target(from: Vector2, target_node_or_pos) -> bool:
 	var target_pos = target_node_or_pos.global_position if target_node_or_pos is Node2D else target_node_or_pos; var space_state = get_world_2d().direct_space_state; var exclude_list: Array[RID] = [get_rid()]
-	for i in range(10):
+	for i in range(4):
 		var q = PhysicsRayQueryParameters2D.create(from, target_pos); q.exclude = exclude_list; q.collision_mask = 3; var res = space_state.intersect_ray(q)
 		if res.is_empty(): return true
 		var c = res.collider
@@ -315,9 +368,9 @@ func _get_current_target():
 
 func _check_and_fire():
 	var target = _get_current_target(); if target == null: return
-	var dist = global_position.distance_to(target.global_position); var can_fire = false
+	var dist_sq = global_position.distance_squared_to(target.global_position); var can_fire = false
 	if _type_enemy == TypeEnemy.ARTILLERY: can_fire = _target_in_sight and _reaction_timer >= 1.2
-	else: can_fire = _target_in_sight and dist <= (_attack_range if target == _player or _type_enemy == TypeEnemy.SCOUT else 700.0)
+	else: can_fire = _target_in_sight and dist_sq <= (_attack_range * _attack_range if target == _player or _type_enemy == TypeEnemy.SCOUT else 490000.0)
 	if can_fire:
 		if _type_enemy == TypeEnemy.STATIONARY:
 			var lvl = SaveManager.current_level if SaveManager else 1
