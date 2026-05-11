@@ -16,8 +16,9 @@ func _ready():
 	_spread = 0.35
 	_patrol_speed = 0
 	_chase_speed = 0
-	_notice_range = 2600.0
-	_attack_range = 2400.0
+	# УСТАНАВЛИВАЕМ ДАЛЬНОСТЬ НА 6000 ПИКСЕЛЕЙ
+	_notice_range = 6000.0
+	_attack_range = 6000.0
 	_shoot_timer.wait_time = _fire_rate
 
 	if _body:
@@ -78,22 +79,22 @@ func take_damage(damage: int):
 	if _hp_bar:
 		_hp_bar.value = _hp
 
+func _is_target_visible() -> bool:
+	var target = _get_current_target()
+	if not is_instance_valid(target): return false
+	# Босс видит сквозь стены в радиусе обнаружения (теперь 6000)
+	return global_position.distance_to(target.global_position) <= _notice_range
+
 func _check_and_fire():
 	var target: Node2D = _get_current_target() as Node2D
-	if target == null:
-		return
+	if target == null: return
+	if global_position.distance_to(target.global_position) > _attack_range: return
 
-	var dist := global_position.distance_to(target.global_position)
-	if dist > _attack_range:
-		return
-
-	# Boss can shoot without direct line of sight.
 	if _reaction_timer >= 0.9:
 		_fire_at_pos(target.global_position)
 
 func _fire_at_pos(pos: Vector2):
-	if _shoot_timer.time_left > 0.0 or ARTILLERY_SCENE == null:
-		return
+	if _shoot_timer.time_left > 0.0 or ARTILLERY_SCENE == null: return
 
 	var pattern := randi() % 3
 	if pattern == 0:
@@ -105,18 +106,13 @@ func _fire_at_pos(pos: Vector2):
 	else:
 		_spawn_shell(pos, int(round(_damage * 1.55)), 175.0, 2.8)
 
-	if AudioManager:
-		AudioManager.play_bullet_sound(2, global_position)
-	if _shot_flash:
-		_shot_flash.play("Fire")
-
+	if AudioManager: AudioManager.play_bullet_sound(2, global_position)
+	if _shot_flash: _shot_flash.play("Fire")
 	_shoot_timer.start(_fire_rate)
 
 func _spawn_shell(target_pos: Vector2, dmg: int, radius: float, duration: float):
 	var artillery := ARTILLERY_SCENE.instantiate()
 	var jitter := Vector2(randf_range(-1.0, 1.0), randf_range(-1.0, 1.0)).normalized()
 	artillery.global_position = target_pos + jitter * randf_range(0.0, _spread * 500.0)
-	artillery.set("_damage", dmg)
-	artillery.set("_radius", radius)
-	artillery.set("_duration", duration)
+	artillery.set("_damage", dmg); artillery.set("_radius", radius); artillery.set("_duration", duration)
 	get_parent().add_child(artillery)
