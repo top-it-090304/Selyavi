@@ -364,17 +364,17 @@ func select_type(body_type: int, gun_type: int, color_type: int):
 func _update_stats():
 	var hp_base = 100; var speed_base = 250; var dmg_mod = 1.0; var reload_base = 1.0; var armor_base = 0.0
 	match _type_body:
-		BODY_LIGHT: hp_base = 80; speed_base = 280; armor_base = -0.15
+		BODY_LIGHT: hp_base = 110; speed_base = 280; armor_base = -0.15
 		BODY_MEDIUM: hp_base = 100; speed_base = 250; armor_base = 0.0
-		BODY_HEAVY: hp_base = 250; speed_base = 200; armor_base = 0.3
+		BODY_HEAVY: hp_base = 200; speed_base = 180; armor_base = 0.3
 		BODY_LMEDIUM: hp_base = 120; speed_base = 260; armor_base = 0.1
 		BODY_MHEAVY: hp_base = 175; speed_base = 220; armor_base = 0.2
 	match _type_gun:
 		GUN_LIGHT: dmg_mod = 0.7; reload_base = 0.65
 		GUN_MEDIUM: dmg_mod = 1.0; reload_base = 1.0
-		GUN_HEAVY: dmg_mod = 2.5; reload_base = 1.8
-		GUN_LMEDIUM: dmg_mod = 1.15; reload_base = 0.9
-		GUN_MHEAVY: dmg_mod = 1.3; reload_base = 0.8
+		GUN_HEAVY: dmg_mod = 3.0; reload_base = 1.8
+		GUN_LMEDIUM: dmg_mod = 1.15; reload_base = 0.75
+		GUN_MHEAVY: dmg_mod = 1.6; reload_base = 1.0
 	var hp_bonus = 30 if _color == COLOR_GREEN else 5 if _color == COLOR_AZURE else 0
 	var speed_bonus = -15 if _color == COLOR_GREEN else 20 if _color == COLOR_AZURE else 0
 	_max_hp = hp_base + hp_bonus; _hp = _max_hp; _speed = speed_base + speed_bonus
