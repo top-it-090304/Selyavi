@@ -246,7 +246,7 @@ theme_override_styles/focus = SubResource("StyleBoxEmpty_focus")
 theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
 theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
-text = "Миссии"
+text = "ИГРАТЬ"
 
 [node name="Shop_Button" type="Button" parent="UI/MainMargin/Buttons"]
 custom_minimum_size = Vector2(0, 90)
