@@ -385,6 +385,7 @@ func _update_stats():
 
 func add_money(amount: int):
 	_money += amount; money_changed.emit(_money)
+	if amount > 0 and AchievementManager: AchievementManager.report("money_earned", amount)
 	if SaveManager: SaveManager.save_game()
 
 func _update_appearance():

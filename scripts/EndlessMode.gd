@@ -82,6 +82,7 @@ func _on_player_lives_changed(lives: int):
 
 func _start_next_wave():
 	wave_number += 1
+	if AchievementManager: AchievementManager.report("endless_wave", wave_number)
 	_wave_points_left = BASE_WAVE_POINTS + (wave_number - 1) * WAVE_POINTS_GROWTH
 	_wave_in_progress = true
 	_update_wave_hud()

@@ -232,11 +232,11 @@ theme_override_constants/margin_bottom = 60
 custom_minimum_size = Vector2(380, 0)
 layout_mode = 2
 size_flags_horizontal = 0
-theme_override_constants/separation = 20
+theme_override_constants/separation = 14
 alignment = 1
 
 [node name="Play_Button" type="Button" parent="UI/MainMargin/Buttons"]
-custom_minimum_size = Vector2(0, 90)
+custom_minimum_size = Vector2(0, 78)
 layout_mode = 2
 focus_mode = 0
 theme_override_colors/font_hover_color = Color(0.878431, 0.941176, 0.839216, 1)
@@ -249,7 +249,7 @@ theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
 text = "ИГРАТЬ"
 
 [node name="Shop_Button" type="Button" parent="UI/MainMargin/Buttons"]
-custom_minimum_size = Vector2(0, 90)
+custom_minimum_size = Vector2(0, 78)
 layout_mode = 2
 focus_mode = 0
 theme_override_colors/font_hover_color = Color(0.878431, 0.941176, 0.839216, 1)
@@ -261,8 +261,21 @@ theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
 theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
 text = "МАГАЗИН"
 
+[node name="Achievements_Button" type="Button" parent="UI/MainMargin/Buttons"]
+custom_minimum_size = Vector2(0, 78)
+layout_mode = 2
+focus_mode = 0
+theme_override_colors/font_hover_color = Color(0.878431, 0.941176, 0.839216, 1)
+theme_override_fonts/font = ExtResource("2")
+theme_override_font_sizes/font_size = 40
+theme_override_styles/focus = SubResource("StyleBoxEmpty_focus")
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
+text = "ДОСТИЖЕНИЯ"
+
 [node name="Settings_Button" type="Button" parent="UI/MainMargin/Buttons"]
-custom_minimum_size = Vector2(0, 90)
+custom_minimum_size = Vector2(0, 78)
 layout_mode = 2
 focus_mode = 0
 theme_override_colors/font_hover_color = Color(0.878431, 0.941176, 0.839216, 1)
@@ -275,7 +288,7 @@ theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
 text = "НАСТРОЙКИ"
 
 [node name="Info_Button" type="Button" parent="UI/MainMargin/Buttons"]
-custom_minimum_size = Vector2(0, 90)
+custom_minimum_size = Vector2(0, 78)
 layout_mode = 2
 focus_mode = 0
 theme_override_colors/font_hover_color = Color(0.878431, 0.941176, 0.839216, 1)
@@ -288,7 +301,7 @@ theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
 text = "ОБ ИГРЕ"
 
 [node name="Quit_Button" type="Button" parent="UI/MainMargin/Buttons"]
-custom_minimum_size = Vector2(0, 90)
+custom_minimum_size = Vector2(0, 78)
 layout_mode = 2
 focus_mode = 0
 theme_override_colors/font_hover_color = Color(0.878431, 0.941176, 0.839216, 1)
@@ -302,6 +315,7 @@ text = "ВЫЙТИ"
 
 [connection signal="pressed" from="UI/MainMargin/Buttons/Play_Button" to="." method="_on_Play_Button_pressed"]
 [connection signal="pressed" from="UI/MainMargin/Buttons/Shop_Button" to="." method="_on_Shop_Button_pressed"]
+[connection signal="pressed" from="UI/MainMargin/Buttons/Achievements_Button" to="." method="_on_Achievements_Button_pressed"]
 [connection signal="pressed" from="UI/MainMargin/Buttons/Settings_Button" to="." method="_on_Settings_Button_pressed"]
 [connection signal="pressed" from="UI/MainMargin/Buttons/Info_Button" to="." method="_on_Info_Button_pressed"]
 [connection signal="pressed" from="UI/MainMargin/Buttons/Quit_Button" to="." method="_on_Quit_Button_pressed"]

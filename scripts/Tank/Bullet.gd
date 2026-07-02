@@ -25,6 +25,7 @@ var _pierce_left: int = 0
 var _aoe_radius: float = 0.0
 var _aoe_damage_multiplier: float = 0.0
 var _hit_targets: Array = []
+var _bops_kills_this_shot: int = 0
 
 const PLASMA: int = 0
 const MEDIUM: int = 1
@@ -83,6 +84,10 @@ func _on_body_entered(body):
 		if _is_player:
 			_hit_targets.append(body)
 			body.take_damage(_damage)
+			if _type_bullet == BOPS and body.is_queued_for_deletion():
+				_bops_kills_this_shot += 1
+				if _bops_kills_this_shot >= 2 and AchievementManager:
+					AchievementManager.report("bops_double_kill")
 			if _type_bullet == BOPS and _pierce_left > 0:
 				_pierce_left -= 1
 			else:

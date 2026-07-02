@@ -84,6 +84,9 @@ func _show_play_submenu():
 func _on_Shop_Button_pressed():
 	get_tree().change_scene_to_file("res://scenes/MenuScenes/Shop.tscn")
 
+func _on_Achievements_Button_pressed():
+	get_tree().change_scene_to_file("res://scenes/MenuScenes/Achievements.tscn")
+
 func _on_Settings_Button_pressed():
 	get_tree().change_scene_to_file("res://scenes/MenuScenes/Settings.tscn")
 

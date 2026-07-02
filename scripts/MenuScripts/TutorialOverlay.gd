@@ -117,7 +117,9 @@ func _next_step():
 	if _current_step >= _steps.size(): _finish_tutorial()
 	else: _start_step()
 
-func _on_skip_pressed(): _finish_tutorial()
+func _on_skip_pressed():
+	if AchievementManager: AchievementManager.report("tutorial_skipped")
+	_finish_tutorial()
 
 func _finish_tutorial():
 	get_tree().paused = false
