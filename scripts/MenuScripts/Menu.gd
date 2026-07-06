@@ -18,4 +18,5 @@ func _on_Info_Button_pressed():
 	get_tree().change_scene_to_file("res://scenes/MenuScenes/Info.tscn")
 
 func _on_Quit_Button_pressed():
+	await PycoLog.log_stop_playing()
 	get_tree().quit()

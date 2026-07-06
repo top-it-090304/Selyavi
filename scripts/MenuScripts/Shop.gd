@@ -605,6 +605,7 @@ func _handle_buy(category: String, id: int, price: int, stat_name: String):
 		SaveManager.save_data["money"] = money
 		SaveManager.add_purchased(category, id)
 		SaveManager.set_player_stat(stat_name, id)
+		PycoLog.log_event_by_type("shop_purchase", {"category": category, "id": id, "price": price})
 	SaveManager.save_game()
 	update_ui()
 
@@ -628,6 +629,7 @@ func _on_buy_ammo_pressed():
 		money -= price
 		SaveManager.save_data["money"] = money
 		SaveManager.add_purchased("ammo_types", current_ammo_idx)
+		PycoLog.log_event_by_type("shop_purchase", {"category": "ammo_types", "id": current_ammo_idx, "price": price})
 	SaveManager.save_game()
 	update_ui()
 func _on_ammo_left_pressed(): current_ammo_idx = (current_ammo_idx - 1 + ammo_types.size()) % ammo_types.size(); update_ui()

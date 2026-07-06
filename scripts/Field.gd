@@ -45,6 +45,7 @@ func _ready():
 
 	_pauseScene = load("res://scenes/MenuScenes/PauseScreen.tscn")
 	call_deferred("_connect_player_lives")
+	PycoLog.log_event_by_type("level_start", {"level": current_level})
 
 	if current_level == 1:
 		call_deferred("_launch_tutorial")
@@ -86,10 +87,12 @@ func _on_player_lives_changed(lives: int):
 		_show_game_over_screen(false, "У вас закончились жизни")
 
 func _on_enemy_died(_type: int):
+	PycoLog.log_event_by_type("enemy_killed", {"level": current_level})
 	call_deferred("_check_victory_conditions")
 
 func _on_base_destroyed(type: int):
 	if type == 1:
+		PycoLog.log_event_by_type("enemy_base_destroyed", {"level": current_level})
 		var players = get_tree().get_nodes_in_group("players")
 		if players.size() > 0 and players[0].has_method("add_money"):
 			players[0].add_money(200)
@@ -125,6 +128,10 @@ func _show_game_over_screen(is_victory: bool, reason: String = ""):
 	get_tree().paused = true
 
 	if is_victory and SaveManager: SaveManager.unlock_level(current_level + 1)
+	if is_victory:
+		PycoLog.log_event_by_type("level_complete", {"level": current_level})
+	else:
+		PycoLog.log_event_by_type("level_failed", {"level": current_level, "reason": reason})
 
 	var canvas = CanvasLayer.new()
 	canvas.layer = 100
