@@ -300,6 +300,8 @@ func _update_damage_visuals():
 	tween.tween_property(sprite, "modulate", target_color, 0.05)
 
 func _destroy():
+	if type_base == TypeBase.ENEMY and AchievementManager:
+		AchievementManager.report("base_destroyed")
 	base_state.emit(type_base)
 	queue_free()
 

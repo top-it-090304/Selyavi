@@ -8,6 +8,7 @@ var _basesLabel: Label
 var _levelLabel: Label
 var _warningLabel: Label
 var _basesIcon: TextureRect
+var _basesRow: HBoxContainer
 var _buffIcon: TextureRect
 var _marker_overlay: Control
 var _move_joy_c: MarginContainer
@@ -117,12 +118,20 @@ func _on_pause_pressed():
 			get_tree().paused = true
 
 func _start_level_label_fade():
-	if _levelLabel:
+	if _levelLabel and get_tree().current_scene and get_tree().current_scene.name != "EndlessMode":
 		get_tree().create_timer(6.0).timeout.connect(func():
 			var tween = create_tween()
 			tween.tween_property(_levelLabel, "modulate:a", 0.0, 1.5)
 			tween.finished.connect(func(): _levelLabel.visible = false)
 		)
+
+func set_header_label(text: String, color := Color(1, 0.9, 0.4)):
+	if _levelLabel:
+		_levelLabel.visible = true
+		_levelLabel.modulate.a = 1.0
+		_levelLabel.text = text
+		if _levelLabel.label_settings:
+			_levelLabel.label_settings.font_color = color
 
 func highlight_health():
 	if _healthProgress:
@@ -239,6 +248,7 @@ func _setup_bases_label():
 	var bases_row = HBoxContainer.new()
 	bases_row.alignment = BoxContainer.ALIGNMENT_END
 	stats_container.add_child(bases_row)
+	_basesRow = bases_row
 	_basesIcon = TextureRect.new()
 	_basesIcon.texture = load("res://assets/backround/PNG/Props/Platform.png")
 	_basesIcon.custom_minimum_size = Vector2(40, 40)
@@ -255,6 +265,7 @@ func _initialize_bases_count():
 	await get_tree().process_frame
 	_total_enemy_bases = get_tree().get_nodes_in_group("bases").filter(func(b): return b.get("type_base") == 1).size()
 	_destroyed_count = 0
+	if _basesRow: _basesRow.visible = _total_enemy_bases > 0
 	_update_label_text()
 
 func update_bases_count():

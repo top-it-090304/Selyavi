@@ -56,19 +56,19 @@ var _ammo_left_margin: MarginContainer = null
 
 # Item Data - Tank
 var bodies = [
-	{"id": 0, "name": "Легкий корпус", "price": 4000, "hp": 80, "speed": 280, "armor": -15, "file": "Hull_05", "offset": -15},
+	{"id": 0, "name": "Легкий корпус", "price": 4000, "hp": 110, "speed": 280, "armor": -15, "file": "Hull_05", "offset": -15},
 	{"id": 1, "name": "Средний корпус", "price": 0, "hp": 100, "speed": 250, "armor": 0, "file": "Hull_02", "offset": -20},
-	{"id": 2, "name": "Тяжелый корпус", "price": 6000, "hp": 250, "speed": 200, "armor": 30, "file": "Hull_06", "offset": -15},
-	{"id": 3, "name": "Облегченный корпус", "price": 3750, "hp": 120, "speed": 260, "armor": 10, "file": "Hull_01", "offset": -5},
+	{"id": 2, "name": "Тяжелый корпус", "price": 6000, "hp": 200, "speed": 180, "armor": 30, "file": "Hull_06", "offset": -15},
+	{"id": 3, "name": "Облегченный корпус", "price": 4200, "hp": 120, "speed": 260, "armor": 10, "file": "Hull_01", "offset": -5},
 	{"id": 4, "name": "Утяжеленный корпус", "price": 6000, "hp": 175, "speed": 220, "armor": 20, "file": "Hull_03", "offset": -10}
 ]
 
 var guns = [
 	{"id": 0, "name": "Легкая пушка", "price": 7000, "dmg_mod": 0.7, "rof": 0.65, "file": "Gun_01"},
 	{"id": 1, "name": "Средняя пушка", "price": 0, "dmg_mod": 1.0, "rof": 1.0, "file": "Gun_03"},
-	{"id": 2, "name": "Тяжелая пушка", "price": 2000, "dmg_mod": 2.5, "rof": 1.8, "file": "Gun_08"},
-	{"id": 3, "name": "Облегченная пушка", "price": 4500, "dmg_mod": 1.15, "rof": 0.9, "file": "Gun_04"},
-	{"id": 4, "name": "Утяжеленная пушка", "price": 5500, "dmg_mod": 1.3, "rof": 0.8, "file": "Gun_07"}
+	{"id": 2, "name": "Тяжелая пушка", "price": 2000, "dmg_mod": 3.0, "rof": 1.8, "file": "Gun_08"},
+	{"id": 3, "name": "Облегченная пушка", "price": 4500, "dmg_mod": 1.15, "rof": 0.75, "file": "Gun_04"},
+	{"id": 4, "name": "Утяжеленная пушка", "price": 5500, "dmg_mod": 1.6, "rof": 1.0, "file": "Gun_07"}
 ]
 
 var colors = [

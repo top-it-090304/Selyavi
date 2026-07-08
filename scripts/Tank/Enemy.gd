@@ -414,6 +414,9 @@ func _destroy():
 	enemy_died.emit(_type_enemy)
 	if is_instance_valid(_player) and _player.has_method("add_money"): _player.add_money(enemy_data.reward_money if enemy_data else _get_reward())
 	if _type_enemy == TypeEnemy.STATIONARY or randf() <= 0.25: _spawn_heal_pickup()
+	if AchievementManager:
+		AchievementManager.report("enemy_killed")
+		if _type_enemy == TypeEnemy.BOSS: AchievementManager.report("boss_killed")
 	super._destroy()
 
 func _spawn_heal_pickup():

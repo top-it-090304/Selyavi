@@ -8,7 +8,7 @@
 script = ExtResource("1")
 hp = 60
 hp_early_levels = 60
-damage = 50
+damage = 55
 fire_rate = 5.0
 spread = 0.2
 reward_money = 70

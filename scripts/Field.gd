@@ -87,8 +87,18 @@ func _on_player_lives_changed(lives: int):
 		_show_game_over_screen(false, "У вас закончились жизни")
 
 func _on_enemy_died(_type: int):
+	if _type == Enemy.TypeEnemy.BOSS: _report_boss_achievement()
 	PycoLog.log_event_by_type("enemy_killed", {"level": current_level})
 	call_deferred("_check_victory_conditions")
+
+func _report_boss_achievement():
+	if not AchievementManager: return
+	if current_level != 10 and current_level != 15: return
+	var player = get_tree().get_first_node_in_group("players")
+	if not is_instance_valid(player): return
+	if player.get("_type_body") != Player.BODY_MEDIUM or player.get("_type_gun") != Player.GUN_MEDIUM: return
+	if current_level == 10: AchievementManager.report("boss_ricochet_medium")
+	elif current_level == 15: AchievementManager.report("boss_inferno_medium")
 
 func _on_base_destroyed(type: int):
 	if type == 1:
@@ -132,6 +142,11 @@ func _show_game_over_screen(is_victory: bool, reason: String = ""):
 		PycoLog.log_event_by_type("level_complete", {"level": current_level})
 	else:
 		PycoLog.log_event_by_type("level_failed", {"level": current_level, "reason": reason})
+
+	if is_victory and current_level == 19 and AchievementManager:
+		var player = get_tree().get_first_node_in_group("players")
+		if is_instance_valid(player) and player.get("_type_body") == Player.BODY_LIGHT:
+			AchievementManager.report("level19_light_hull")
 
 	var canvas = CanvasLayer.new()
 	canvas.layer = 100

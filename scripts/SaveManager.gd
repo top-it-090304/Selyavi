@@ -27,7 +27,9 @@ var save_data = {
 		"base_heal": [0],
 		"base_bonus": [0],
 		"base_features": [0]
-	}
+	},
+	"achievements": {},
+	"achievements_unlocked": []
 }
 
 var settings_data = {
@@ -144,6 +146,8 @@ func load_game():
 		var data = JSON.parse_string(json_string)
 		if data is Dictionary:
 			_merge_dict(save_data, data)
+			if typeof(save_data.purchased.get("ammo_types")) != TYPE_ARRAY:
+				save_data.purchased["ammo_types"] = []
 			for base_ammo in [0, 1, 2]:
 				if not is_purchased("ammo_types", base_ammo):
 					save_data.purchased["ammo_types"].append(base_ammo)
@@ -181,6 +185,8 @@ func add_purchased(category: String, item_id: int):
 		save_data.purchased[category].append(item_id)
 		save_game()
 
+	if AchievementManager: AchievementManager.report("shop_purchase")
+
 func set_player_stat(stat: String, value: int):
 	if save_data.player_stats.has(stat):
 		save_data.player_stats[stat] = value
@@ -194,6 +200,7 @@ func unlock_level(level_num: int):
 	if level_num > save_data.get("unlocked_levels", 1):
 		save_data["unlocked_levels"] = level_num
 		save_game()
+	if AchievementManager: AchievementManager.report("levels_unlocked", level_num)
 
 func reset_progress():
 	save_data = {
@@ -216,7 +223,9 @@ func reset_progress():
 			"base_heal": [0],
 			"base_bonus": [0],
 			"base_features": [0]
-		}
+		},
+		"achievements": {},
+		"achievements_unlocked": []
 	}
 	save_game()
 	money_loaded.emit(0)
