@@ -22,6 +22,8 @@ GameManager="*res://scripts/GameManager.gd"
 SaveManager="*res://scripts/SaveManager.gd"
 AchievementManager="*res://scripts/AchievementManager.gd"
 LoadingManager="*res://scripts/LoadingManager.gd"
+PycoLog="*res://addons/pycolytics/pyco_log.gd"
+AppFocus="*res://scripts/app_focus.gd"
 
 [display]
 
