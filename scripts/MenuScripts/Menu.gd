@@ -72,11 +72,11 @@ func _show_play_submenu():
 		btn.add_theme_font_size_override("font_size", 28)
 		btn.add_theme_font_override("font", font)
 
-	var btn_endless = Button.new(); btn_endless.text = "БЕСКОНЕЧНЫЙ РЕЖИМ"; style_btn.call(btn_endless); btn_container.add_child(btn_endless)
-	btn_endless.pressed.connect(_go_to_endless_mode)
-
 	var btn_missions = Button.new(); btn_missions.text = "МИССИИ"; style_btn.call(btn_missions); btn_container.add_child(btn_missions)
 	btn_missions.pressed.connect(_go_to_missions)
+
+	var btn_endless = Button.new(); btn_endless.text = "БЕСКОНЕЧНЫЙ РЕЖИМ"; style_btn.call(btn_endless); btn_container.add_child(btn_endless)
+	btn_endless.pressed.connect(_go_to_endless_mode)
 
 	var btn_back = Button.new(); btn_back.text = "НАЗАД"; style_btn.call(btn_back); btn_container.add_child(btn_back)
 	btn_back.pressed.connect(func(): canvas.queue_free())
