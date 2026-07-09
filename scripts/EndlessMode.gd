@@ -17,8 +17,7 @@ const ENEMY_POOL := [
 	{"res": "res://resources/enemies/enemy_scout.tres", "cost": 24.0, "min_wave": 6},
 ]
 const BOSS_RES := "res://resources/enemies/enemy_boss.tres"
-const TWIN_BOSS_RES := "res://resources/enemies/enemy_twin.tres"
-const TWIN_BOSS_SCRIPT := preload("res://scripts/Tank/TwinBoss.gd")
+const TWIN_BOSS_SCENE := preload("res://scenes/Tank/TwinBoss.tscn")
 const TWIN_WAVE_INTERVAL := BOSS_WAVE_INTERVAL * 2
 
 var wave_number: int = 0
@@ -101,19 +100,18 @@ func _spawn_twin_bosses():
 	if _spawn_points.size() < 2: return
 	var indices = range(_spawn_points.size())
 	indices.shuffle()
-	var twin_a = _instantiate_twin(_spawn_points[indices[0]].global_position)
-	var twin_b = _instantiate_twin(_spawn_points[indices[1]].global_position)
-	if twin_a and twin_b:
-		twin_a.setup_twin(twin_b, TwinBoss.Role.AGGRESSOR)
-		twin_b.setup_twin(twin_a, TwinBoss.Role.BASE_ATTACKER)
+	var melee = _instantiate_twin(_spawn_points[indices[0]].global_position, TwinBoss.TwinVariant.MELEE)
+	var ranged = _instantiate_twin(_spawn_points[indices[1]].global_position, TwinBoss.TwinVariant.RANGED)
+	if melee and ranged:
+		melee.twin = ranged
+		ranged.twin = melee
 
-func _instantiate_twin(origin: Vector2) -> TwinBoss:
+func _instantiate_twin(origin: Vector2, variant: int) -> TwinBoss:
 	var pos = _get_safe_spawn_pos(origin)
 	if pos == Vector2.ZERO: return null
 
-	var enemy = _enemy_scene.instantiate()
-	enemy.set_script(TWIN_BOSS_SCRIPT)
-	enemy.enemy_data = load(TWIN_BOSS_RES)
+	var enemy = TWIN_BOSS_SCENE.instantiate()
+	enemy.variant = variant
 	enemy.global_position = pos
 	add_child(enemy)
 	return enemy
