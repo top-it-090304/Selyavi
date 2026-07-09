@@ -1,0 +1,102 @@
+[gd_scene load_steps=9 format=3 uid="uid://cap6uk4dmskct"]
+
+[ext_resource type="Texture2D" uid="uid://d0bnoilig7yxs" path="res://assets/ground_shaker_asset/Terrains/terrain.png" id="1_atmtc"]
+[ext_resource type="PackedScene" uid="uid://csfpndcf2sqpn" path="res://scenes/WallLayer.tscn" id="2_wcauu"]
+[ext_resource type="PackedScene" uid="uid://336qfi6ddylt" path="res://scenes/Tank/HUD.tscn" id="3_qlrir"]
+[ext_resource type="PackedScene" uid="uid://mfxaskty4hrm" path="res://scenes/Tank/Player.tscn" id="4_a2ox4"]
+[ext_resource type="AudioStream" uid="uid://bxl5wv7crhm5" path="res://assets/Music/68. Sad Eyes.mp3" id="5_0e1i2"]
+[ext_resource type="PackedScene" uid="uid://crbjyol17koge" path="res://scenes/obtacles/wall.tscn" id="6_dhydj"]
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_uglx7"]
+texture = ExtResource("1_atmtc")
+texture_region_size = Vector2i(128, 128)
+0:0/0 = 0
+1:0/0 = 0
+2:0/0 = 0
+3:0/0 = 0
+4:0/0 = 0
+5:0/0 = 0
+6:0/0 = 0
+0:1/0 = 0
+1:1/0 = 0
+2:1/0 = 0
+3:1/0 = 0
+4:1/0 = 0
+5:1/0 = 0
+6:1/0 = 0
+0:2/0 = 0
+1:2/0 = 0
+2:2/0 = 0
+3:2/0 = 0
+4:2/0 = 0
+5:2/0 = 0
+6:2/0 = 0
+0:3/0 = 0
+1:3/0 = 0
+2:3/0 = 0
+3:3/0 = 0
+4:3/0 = 0
+5:3/0 = 0
+6:3/0 = 0
+0:4/0 = 0
+1:4/0 = 0
+2:4/0 = 0
+3:4/0 = 0
+4:4/0 = 0
+5:4/0 = 0
+6:4/0 = 0
+
+[sub_resource type="TileSet" id="TileSet_xwwev"]
+tile_size = Vector2i(128, 128)
+sources/0 = SubResource("TileSetAtlasSource_uglx7")
+
+[node name="Field" type="Node2D"]
+
+[node name="TileMapLayer" type="TileMapLayer" parent="."]
+z_index = -1
+tile_set = SubResource("TileSet_xwwev")
+
+[node name="WallLayer" parent="." instance=ExtResource("2_wcauu")]
+
+[node name="HUD" parent="." instance=ExtResource("3_qlrir")]
+
+[node name="PlayerTank" parent="." instance=ExtResource("4_a2ox4")]
+position = Vector2(655, 1202)
+
+[node name="Camera2D" type="Camera2D" parent="PlayerTank"]
+limit_left = 0
+limit_top = 0
+limit_right = 3070
+limit_bottom = 2300
+position_smoothing_enabled = true
+
+[node name="MusicPlayer" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("5_0e1i2")
+volume_db = -20.0
+autoplay = true
+bus = &"Music"
+
+[node name="BorderWalls" type="Node" parent="."]
+
+[node name="wall_left" parent="BorderWalls" instance=ExtResource("6_dhydj")]
+position = Vector2(-20, 0)
+scale = Vector2(1.27032, 3.81096)
+
+[node name="wall_right" parent="BorderWalls" instance=ExtResource("6_dhydj")]
+position = Vector2(3095, 0)
+scale = Vector2(1.27032, 3.81096)
+
+[node name="wall_top" parent="BorderWalls" instance=ExtResource("6_dhydj")]
+position = Vector2(3095, -20)
+rotation = 1.5708
+scale = Vector2(1.03698, 5.18489)
+
+[node name="wall_bottom" parent="BorderWalls" instance=ExtResource("6_dhydj")]
+position = Vector2(3095, 2314)
+rotation = 1.5708
+scale = Vector2(1.03698, 5.18489)
+
+[node name="Navigation2D" type="Node2D" parent="."]
+visible = false
+
+[node name="NavigationRegion2D" type="NavigationRegion2D" parent="Navigation2D"]

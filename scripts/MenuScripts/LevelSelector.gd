@@ -3,7 +3,7 @@ extends Control
 @onready var scroll_container = $UI/CenterContainer/LevelScroll
 @onready var grid = $UI/CenterContainer/LevelScroll/GridContainer
 
-var _level_count = 20
+var _level_count = 25
 var _unlocked_levels = 1
 
 # Параметры для плавной прокрутки
