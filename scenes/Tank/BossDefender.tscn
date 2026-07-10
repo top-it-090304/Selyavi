@@ -1,0 +1,7 @@
+[gd_scene load_steps=3 format=3 uid="uid://d1k1k1k1k1k1"]
+
+[ext_resource type="PackedScene" uid="uid://dfpgy8w1vxtx0" path="res://scenes/Tank/Enemy.tscn" id="1_basic"]
+[ext_resource type="Script" uid="uid://dydef4f4f4f4" path="res://scripts/Tank/DefenderEnemy.gd" id="2_def"]
+
+[node name="BossDefender" instance=ExtResource("1_basic")]
+script = ExtResource("2_def")

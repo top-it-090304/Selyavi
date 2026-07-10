@@ -4,7 +4,7 @@ extends Tank
 signal enemy_died(type: int)
 
 enum State { PATROL, CHASE }
-enum TypeEnemy { LIGHT, MEDIUM, HEAVY, STATIONARY, TRIPLE, BOSS, ARTILLERY, SCOUT, MECHANIC, NONE, CUSTOM }
+enum TypeEnemy { LIGHT, MEDIUM, HEAVY, STATIONARY, TRIPLE, BOSS, ARTILLERY, SCOUT, MECHANIC, KAMIKAZE, DEFENDER, NONE, CUSTOM }
 
 # Глобальная цель для всей артиллерии, которую "подсвечивают" разведчики
 static var scout_target: Node2D = null
@@ -146,7 +146,7 @@ func _physics_process(delta):
 		else:
 			_is_on_screen = false
 
-	var is_special = (_type_enemy == TypeEnemy.ARTILLERY or _type_enemy == TypeEnemy.BOSS)
+	var is_special = (_type_enemy == TypeEnemy.ARTILLERY or _type_enemy == TypeEnemy.BOSS or _type_enemy == TypeEnemy.KAMIKAZE or _type_enemy == TypeEnemy.DEFENDER)
 
 	# ГЛУБОКАЯ ОПТИМИЗАЦИЯ ДЛЯ ЗАЭКРАННЫХ БОТОВ
 	if not _is_on_screen and not is_special:
@@ -226,6 +226,7 @@ func _auto_assign_resource_by_type():
 		TypeEnemy.ARTILLERY: enemy_data = load(path + "enemy_artillery.tres")
 		TypeEnemy.SCOUT: enemy_data = load(path + "enemy_scout.tres")
 		TypeEnemy.MECHANIC: enemy_data = load(path + "enemy_medium.tres")
+		TypeEnemy.KAMIKAZE: enemy_data = load(path + "enemy_kamikaze.tres")
 
 func _find_targets():
 	var players = get_tree().get_nodes_in_group("players")
@@ -367,6 +368,7 @@ func _get_current_target():
 	return _player if (is_instance_valid(_player) and (_current_state == State.CHASE or _base == null)) else _base
 
 func _check_and_fire():
+	if _type_enemy == TypeEnemy.KAMIKAZE: return # Камикадзе не стреляет
 	var target = _get_current_target(); if target == null: return
 	var dist_sq = global_position.distance_squared_to(target.global_position); var can_fire = false
 	if _type_enemy == TypeEnemy.ARTILLERY: can_fire = _target_in_sight and _reaction_timer >= 1.2
@@ -433,6 +435,7 @@ func _get_reward() -> int:
 		TypeEnemy.BOSS: return 500
 		TypeEnemy.ARTILLERY: return 300
 		TypeEnemy.SCOUT: return 150
+		TypeEnemy.KAMIKAZE: return 150
 		_: return 50
 
 func _apply_enemy_stats(): pass
