@@ -1,4 +1,4 @@
-[gd_scene load_steps=9 format=3 uid="uid://cap6uk4dmskct"]
+[gd_scene load_steps=10 format=3 uid="uid://cap6uk4dmskct"]
 
 [ext_resource type="Texture2D" uid="uid://d0bnoilig7yxs" path="res://assets/ground_shaker_asset/Terrains/terrain.png" id="1_atmtc"]
 [ext_resource type="PackedScene" uid="uid://csfpndcf2sqpn" path="res://scenes/WallLayer.tscn" id="2_wcauu"]
@@ -6,6 +6,7 @@
 [ext_resource type="PackedScene" uid="uid://mfxaskty4hrm" path="res://scenes/Tank/Player.tscn" id="4_a2ox4"]
 [ext_resource type="AudioStream" uid="uid://bxl5wv7crhm5" path="res://assets/Music/68. Sad Eyes.mp3" id="5_0e1i2"]
 [ext_resource type="PackedScene" uid="uid://crbjyol17koge" path="res://scenes/obtacles/wall.tscn" id="6_dhydj"]
+[ext_resource type="PackedScene" uid="uid://bjw4bj0fr4c7q" path="res://scenes/Base.tscn" id="7_wcauu"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_uglx7"]
 texture = ExtResource("1_atmtc")
@@ -66,8 +67,8 @@ position = Vector2(655, 1202)
 [node name="Camera2D" type="Camera2D" parent="PlayerTank"]
 limit_left = 0
 limit_top = 0
-limit_right = 3070
-limit_bottom = 2300
+limit_right = 3920
+limit_bottom = 2970
 position_smoothing_enabled = true
 
 [node name="MusicPlayer" type="AudioStreamPlayer" parent="."]
@@ -80,21 +81,28 @@ bus = &"Music"
 
 [node name="wall_left" parent="BorderWalls" instance=ExtResource("6_dhydj")]
 position = Vector2(-20, 0)
-scale = Vector2(1.27032, 3.81096)
+scale = Vector2(1.66854, 5.00563)
 
 [node name="wall_right" parent="BorderWalls" instance=ExtResource("6_dhydj")]
-position = Vector2(3095, 0)
-scale = Vector2(1.27032, 3.81096)
+position = Vector2(3945, 0)
+scale = Vector2(1.66854, 5.00563)
 
 [node name="wall_top" parent="BorderWalls" instance=ExtResource("6_dhydj")]
-position = Vector2(3095, -20)
+position = Vector2(3945, -20)
 rotation = 1.5708
-scale = Vector2(1.03698, 5.18489)
+scale = Vector2(1.33809, 6.69042)
 
 [node name="wall_bottom" parent="BorderWalls" instance=ExtResource("6_dhydj")]
-position = Vector2(3095, 2314)
+position = Vector2(3945, 2987)
 rotation = 1.5708
-scale = Vector2(1.03698, 5.18489)
+scale = Vector2(1.33809, 6.69042)
+
+[node name="BasePlayer" parent="." instance=ExtResource("7_wcauu")]
+position = Vector2(1723, 1609)
+type_base = 0
+
+[node name="EnemyBase1" parent="." instance=ExtResource("7_wcauu")]
+position = Vector2(3545, 239)
 
 [node name="Navigation2D" type="Node2D" parent="."]
 visible = false

@@ -25,6 +25,11 @@ var _special_pool: Array[EnemyData] = [] # Пул всех особых бото
 @export var _spawn_interval: float = 6.0
 var _time_since_last_check: float = 0.0
 
+# Логика спец-врагов
+var _spawn_cycle_counter: int = 0
+var _threshold_66_triggered: bool = false
+var _threshold_33_triggered: bool = false
+
 # Эффекты частиц
 var _smoke_particles: CPUParticles2D
 var _fire_particles: CPUParticles2D
@@ -68,7 +73,7 @@ func _ready():
 	_setup_base_appearance()
 	_setup_particles()
 	_setup_feature_sprites()
-	_load_special_enemies() # Загружаем всех доступных особых ботов
+	_load_special_enemies()
 
 	_spawn_timer = Timer.new(); _spawn_timer.wait_time = 0.1; _spawn_timer.one_shot = true; add_child(_spawn_timer); _spawn_timer.start()
 	_heal_timer = Timer.new(); _heal_timer.wait_time = _heal_interval; _heal_timer.one_shot = false; add_child(_heal_timer)
@@ -86,10 +91,11 @@ func _ready():
 
 func _load_special_enemies():
 	_special_pool.clear()
-	# ПРЯМАЯ ЗАГРУЗКА БЕЗ АРТИЛЛЕРИИ
 	var paths = [
 		"res://resources/enemies/enemy_scout.tres",
-		]
+		"res://resources/enemies/enemy_kamikaze.tres",
+		"res://resources/enemies/enemy_defender.tres"
+	]
 
 	for p in paths:
 		if ResourceLoader.exists(p):
@@ -116,7 +122,6 @@ func _setup_feature_sprites():
 		_turret_sprite.z_index = 2
 		add_child(_turret_sprite)
 
-		# Создаем стандартную анимацию вспышки как у танков
 		_shot_flash = AnimatedSprite2D.new()
 		_shot_flash.sprite_frames = SpriteFrames.new()
 		_shot_flash.sprite_frames.add_animation("Fire")
@@ -228,7 +233,6 @@ func _update_spawn_interval():
 func _setup_base_collision():
 	_base_body = StaticBody2D.new()
 	_base_body.name = "BaseStaticBody"
-	# Устанавливаем слои 1 и 2, чтобы в базу врезались и игроки, и танки
 	_base_body.collision_layer = 1 | 2
 	_base_body.collision_mask = 0
 	add_child(_base_body)
@@ -236,7 +240,6 @@ func _setup_base_collision():
 	var cs = CollisionShape2D.new()
 	var circle = CircleShape2D.new()
 	var area_shape = get_node_or_null("CollisionShape2D")
-	# Делаем коллизию чуть меньше спрайта для честности
 	circle.radius = (area_shape.shape.radius if area_shape and area_shape.shape is CircleShape2D else 60.0) * 0.95
 	cs.shape = circle
 	_base_body.add_child(cs)
@@ -264,10 +267,37 @@ func take_damage(amount: int):
 	_hp -= amount
 	_update_damage_visuals()
 	_update_destruction_effects()
+
+	if type_base == TypeBase.ENEMY:
+		_check_defender_thresholds()
+
 	if type_base == TypeBase.PLAYER:
 		var hud = get_tree().get_first_node_in_group("hud")
 		if hud and hud.has_method("trigger_base_attack_warning"): hud.trigger_base_attack_warning(global_position)
 	if _hp <= 0: _destroy()
+
+func _check_defender_thresholds():
+	var lvl = SaveManager.current_level if SaveManager else 1
+	if lvl < 21: return
+
+	var hp_percent = float(_hp) / float(_max_hp)
+
+	if not _threshold_66_triggered and hp_percent <= 0.66:
+		_threshold_66_triggered = true
+		_try_spawn_defender()
+
+	if not _threshold_33_triggered and hp_percent <= 0.33:
+		_threshold_33_triggered = true
+		_try_spawn_defender()
+
+func _try_spawn_defender():
+	_my_spawned_enemies = _my_spawned_enemies.filter(func(enemy): return is_instance_valid(enemy) and not enemy.is_queued_for_deletion())
+	var special_on_map = _my_spawned_enemies.filter(func(e): return e.get("enemy_data") and e.enemy_data.is_special)
+
+	if special_on_map.size() == 0:
+		var def_res = load("res://resources/enemies/enemy_defender.tres")
+		if def_res:
+			_do_spawn(def_res)
 
 func take_heal(amount: int):
 	var old_hp = _hp
@@ -310,63 +340,70 @@ func _spawn_enemy():
 	if get_tree().has_group("tutorial"): return
 
 	_my_spawned_enemies = _my_spawned_enemies.filter(func(enemy): return is_instance_valid(enemy) and not enemy.is_queued_for_deletion())
-
 	var regulars = _my_spawned_enemies.filter(func(e): return not (e.get("enemy_data") and e.enemy_data.is_special))
 	var special_on_map = _my_spawned_enemies.filter(func(e): return e.get("enemy_data") and e.enemy_data.is_special)
 
 	var lvl = SaveManager.current_level if SaveManager else 1
+	_spawn_cycle_counter += 1
 
-	# 1. ПРИОРИТЕТ: Особый бот (с 6 уровня)
-	if special_on_map.size() == 0 and lvl >= 6:
-		var special_to_spawn = null
+	# Цикл: 1 (Спец), 2 (Обыч), 3 (Обыч), 4 (Спец)...
+	if _spawn_cycle_counter % 3 == 1 and special_on_map.size() == 0 and lvl >= 6:
+		# Рандом: 60% шанс на спец-врага, 40% на обычный танк
+		if randf() <= 0.6:
+			var special_to_spawn = _select_special_enemy(lvl)
+			if special_to_spawn:
+				if _do_spawn(special_to_spawn):
+					_time_since_last_check = 0
+					return
 
-		# Сначала пробуем назначенный ресурс
-		if _special_enemy_resource and _special_enemy_resource.can_be_spawned_by_base and _check_special_condition(_special_enemy_resource):
-			# ГАРАНТИРУЕМ ЧТО ЭТО НЕ АРТИЛЛЕРИЯ
-			if _special_enemy_resource.enemy_type != 6:
-				special_to_spawn = _special_enemy_resource
-
-		if not special_to_spawn:
-			# Если назначенный не подошел, ищем в пуле
-			var possible_specials = _special_pool.filter(func(res): return _check_special_condition(res))
-			if possible_specials.size() > 0:
-				special_to_spawn = possible_specials[randi() % possible_specials.size()]
-
-		if special_to_spawn:
-			if _do_spawn(special_to_spawn):
-				_time_since_last_check = 0
-				return
-			else:
-				_time_since_last_check = _spawn_interval - 1.0 # Ретрай через сек если мешает стена
-				return
-
-	# 2. Обычные боты (лимит 3)
 	if regulars.size() < _max_enemies:
 		if _do_spawn(null):
 			_time_since_last_check = 0
 		else:
 			_time_since_last_check = _spawn_interval - 1.0
 
-func _check_special_condition(res: EnemyData) -> bool:
-	if res.enemy_type == 7: # SCOUT
-		var all_enemies = get_tree().get_nodes_in_group("enemies")
-		for e in all_enemies:
-			if is_instance_valid(e) and e.has_method("get_enemy_type") and e.get_enemy_type() == 6: # ARTILLERY
-				return true
-		return false
-	return true
+func _select_special_enemy(lvl: int) -> EnemyData:
+	var has_arta = false
+	var all_enemies = get_tree().get_nodes_in_group("enemies")
+	for e in all_enemies:
+		if is_instance_valid(e) and e.has_method("get_enemy_type") and e.get_enemy_type() == 6:
+			has_arta = true; break
+
+	var scout_res = load("res://resources/enemies/enemy_scout.tres")
+	var kamikaze_res = load("res://resources/enemies/enemy_kamikaze.tres")
+
+	if lvl <= 5:
+		return null
+
+	if lvl <= 20:
+		if has_arta: return scout_res
+		return null
+
+	if has_arta:
+		return scout_res if randf() <= 0.7 else kamikaze_res
+	else:
+		return kamikaze_res
 
 func _do_spawn(data: EnemyData) -> bool:
 	var spawn_pos = _get_safe_spawn_pos()
 	if spawn_pos == Vector2.ZERO: return false
 
-	var enemy = _enemy_scene.instantiate()
+	var scene_to_use = _enemy_scene
 	if data:
-		enemy.enemy_data = data
-	else:
+		if data.enemy_type == 9: # KAMIKAZE
+			scene_to_use = load("res://scenes/Tank/KamikazeEnemy.tscn")
+		elif data.enemy_type == 10: # DEFENDER
+			scene_to_use = load("res://scenes/Tank/BossDefender.tscn")
+			if not ResourceLoader.exists("res://scenes/Tank/BossDefender.tscn"):
+				scene_to_use = _enemy_scene
+
+	var enemy = scene_to_use.instantiate()
+	enemy.enemy_data = data if data else null
+	if not data:
 		_assign_random_enemy_data(enemy)
 
 	enemy.global_position = spawn_pos
+	enemy.creator_base = self
 	get_parent().add_child(enemy)
 	_my_spawned_enemies.append(enemy)
 	return true
@@ -396,11 +433,8 @@ func _get_safe_spawn_pos() -> Vector2:
 	var base_angle = (target_pos - global_position).angle() if target_pos != Vector2.ZERO else 0.0
 
 	for attempts in range(50):
-		# Ограничиваем угол спавна вперед к цели (PI/2 вместо PI)
 		var angle = base_angle + randf_range(-PI/3, PI/3) if target_pos != Vector2.ZERO else randf_range(0, 2*PI)
 		var spawn_pos = global_position + Vector2(cos(angle), sin(angle)) * randf_range(200, 400)
-
-		# ПРОВЕРКА: находится ли точка на навигационной сетке (внутри уровня)
 		if _is_pos_on_nav_mesh(spawn_pos) and _is_pos_safe(spawn_pos) and _is_spawn_line_clear(spawn_pos):
 			return spawn_pos
 	return Vector2.ZERO
@@ -408,7 +442,6 @@ func _get_safe_spawn_pos() -> Vector2:
 func _is_pos_on_nav_mesh(pos: Vector2) -> bool:
 	var map = get_world_2d().get_navigation_map()
 	var closest_pos = NavigationServer2D.map_get_closest_point(map, pos)
-	# Если ближайшая точка на сетке слишком далеко от желаемой, значит мы за границей уровня
 	return pos.distance_to(closest_pos) < 50.0
 
 func _is_spawn_line_clear(pos: Vector2) -> bool:
@@ -504,10 +537,7 @@ func _fire_turret():
 	var target = _find_nearest_enemy()
 	if target:
 		var dir = (target.global_position - global_position).normalized()
-
-		if _shot_flash:
-			_shot_flash.play("Fire")
-
+		if _shot_flash: _shot_flash.play("Fire")
 		var shoot_tween = create_tween()
 		shoot_tween.tween_property(_turret_sprite, "position", -dir * 20.0, 0.05)
 		shoot_tween.parallel().tween_property(_turret_sprite, "scale", Vector2(0.5, 0.5), 0.05)
@@ -516,15 +546,12 @@ func _fire_turret():
 
 		var bullet_scene = load("res://scenes/Tank/Bullet.tscn")
 		var bullet = bullet_scene.instantiate()
-
 		bullet.global_position = global_position + dir * 185.0
 		bullet.rotation = dir.angle() + PI/2
-
 		get_parent().add_child(bullet)
 
 		if bullet.has_method("init"):
 			var ignored_rid = _base_body.get_rid() if is_instance_valid(_base_body) else get_rid()
-			# Передаем _turret_range как custom_range для пули
 			bullet.init(1, true, _turret_damage, ignored_rid, _turret_range)
 			var sprite = bullet.get_node_or_null("BulletSprite")
 			if sprite: sprite.texture = load("res://assets/future_tanks/PNG/Effects/Heavy_Shell.png")

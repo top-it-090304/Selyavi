@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=4 format=3 uid="uid://brxoo4fx8fext"]
+
+[ext_resource type="Script" uid="uid://dipqcqff40858" path="res://scripts/Resources/EnemyData.gd" id="1"]
+[ext_resource type="Texture2D" uid="uid://c5lwctr2cc65n" path="res://assets/future_tanks/PNG/Weapon_Color_C/Gun_05_B.png" id="1_kam_gun"]
+[ext_resource type="Texture2D" uid="uid://bhpjhlegcjtow" path="res://assets/future_tanks/PNG/Hulls_Color_C/Hull_08.png" id="2_kam_hull"]
+
+[resource]
+script = ExtResource("1")
+hp = 20
+hp_early_levels = 20
+damage = 50
+fire_rate = 1.0
+spread = 0.0
+reward_money = 150
+is_special = true
+is_boss = false
+can_be_spawned_by_base = true
+enemy_type = 9
+patrol_speed = 180
+chase_speed = 180
+notice_range = 10000.0
+attack_range = 80.0
+hull_texture = ExtResource("2_kam_hull")
+gun_texture = ExtResource("1_kam_gun")
+gun_offset = 0.0
+scale = Vector2(1, 1)

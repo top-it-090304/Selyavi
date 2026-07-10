@@ -33,6 +33,7 @@ func _on_RestartButton_pressed():
 			get_node("/root/LoadingManager").load_level(current_scene_path)
 		else:
 			get_tree().reload_current_scene()
+		queue_free()
 	)
 
 func _on_ReturnToSettingsButton_pressed():
@@ -41,18 +42,21 @@ func _on_ReturnToSettingsButton_pressed():
 			GameManager.set_meta("from_scene", get_tree().current_scene.scene_file_path)
 		get_tree().paused = false
 		get_tree().change_scene_to_file("res://scenes/MenuScenes/Settings.tscn")
+		queue_free()
 	)
 
 func _on_LevelSelectorButton_pressed():
 	_show_confirm_dialog("ВЫБОР МИССИИ?", "Вы покинете текущий бой.", func():
 		get_tree().paused = false
 		get_tree().change_scene_to_file("res://scenes/MenuScenes/LevelSelector.tscn")
+		queue_free()
 	)
 
 func _on_ReturnToMenuButton_pressed():
 	_show_confirm_dialog("В ГЛАВНОЕ МЕНЮ?", "Прогресс миссии будет утерян!", func():
 		get_tree().paused = false
 		get_tree().change_scene_to_file("res://scenes/MenuScenes/Menu.tscn")
+		queue_free()
 	)
 
 func _show_confirm_dialog(title_text: String, desc_text: String, on_confirm: Callable):
