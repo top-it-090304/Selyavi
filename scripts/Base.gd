@@ -27,8 +27,7 @@ var _time_since_last_check: float = 0.0
 
 # Логика спец-врагов
 var _spawn_cycle_counter: int = 0
-var _threshold_66_triggered: bool = false
-var _threshold_33_triggered: bool = false
+var _threshold_50_triggered: bool = false
 
 # Эффекты частиц
 var _smoke_particles: CPUParticles2D
@@ -278,22 +277,21 @@ func take_damage(amount: int):
 
 func _check_defender_thresholds():
 	var lvl = SaveManager.current_level if SaveManager else 1
+	# Защитники вступают в игру с 21 уровня
 	if lvl < 21: return
 
 	var hp_percent = float(_hp) / float(_max_hp)
 
-	if not _threshold_66_triggered and hp_percent <= 0.66:
-		_threshold_66_triggered = true
-		_try_spawn_defender()
-
-	if not _threshold_33_triggered and hp_percent <= 0.33:
-		_threshold_33_triggered = true
+	if not _threshold_50_triggered and hp_percent <= 0.5:
+		_threshold_50_triggered = true
 		_try_spawn_defender()
 
 func _try_spawn_defender():
 	_my_spawned_enemies = _my_spawned_enemies.filter(func(enemy): return is_instance_valid(enemy) and not enemy.is_queued_for_deletion())
 	var special_on_map = _my_spawned_enemies.filter(func(e): return e.get("enemy_data") and e.enemy_data.is_special)
 
+	# Если спец-слот пуст -> Мгновенный спавн Защитника.
+	# Если занят -> База пропускает этот триггер.
 	if special_on_map.size() == 0:
 		var def_res = load("res://resources/enemies/enemy_defender.tres")
 		if def_res:
@@ -379,6 +377,7 @@ func _select_special_enemy(lvl: int) -> EnemyData:
 		if has_arta: return scout_res
 		return null
 
+	# Миссии 21+
 	if has_arta:
 		return scout_res if randf() <= 0.7 else kamikaze_res
 	else:
@@ -404,7 +403,10 @@ func _do_spawn(data: EnemyData) -> bool:
 
 	enemy.global_position = spawn_pos
 	enemy.creator_base = self
-	get_parent().add_child(enemy)
+
+	# ИСПОЛЬЗУЕМ call_deferred, чтобы избежать ошибки "Can't change this state while flushing queries"
+	get_parent().call_deferred("add_child", enemy)
+
 	_my_spawned_enemies.append(enemy)
 	return true
 

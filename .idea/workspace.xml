@@ -5,21 +5,17 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="33129e0a-8a1f-4647-8ff9-20d5e301da8a" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/resources/enemies/enemy_defender.tres" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/resources/enemies/enemy_kamikaze.tres" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/scenes/Tank/BossDefender.tscn" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/scenes/Tank/KamikazeEnemy.tscn" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/scripts/Tank/DefenderEnemy.gd" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/scripts/Tank/KamikazeEnemy.gd" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/enemies/enemy_light.tres" beforeDir="false" afterPath="$PROJECT_DIR$/resources/enemies/enemy_light.tres" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/enemies/enemy_defender.tres" beforeDir="false" afterPath="$PROJECT_DIR$/resources/enemies/enemy_defender.tres" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/scenes/Levels/Level_21.tscn" beforeDir="false" afterPath="$PROJECT_DIR$/scenes/Levels/Level_21.tscn" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/scenes/Levels/Level_22.tscn" beforeDir="false" afterPath="$PROJECT_DIR$/scenes/Levels/Level_22.tscn" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/scenes/Levels/Level_23.tscn" beforeDir="false" afterPath="$PROJECT_DIR$/scenes/Levels/Level_23.tscn" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/scenes/Levels/Level_24.tscn" beforeDir="false" afterPath="$PROJECT_DIR$/scenes/Levels/Level_24.tscn" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/scenes/Levels/Level_25.tscn" beforeDir="false" afterPath="$PROJECT_DIR$/scenes/Levels/Level_25.tscn" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/scripts/Base.gd" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/Base.gd" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/scripts/MenuScripts/PauseScreen.gd" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/MenuScripts/PauseScreen.gd" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/Field.gd" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/Field.gd" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/HealPickup.gd" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/HealPickup.gd" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/Tank/DefenderEnemy.gd" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/Tank/DefenderEnemy.gd" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/scripts/Tank/Enemy.gd" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/Tank/Enemy.gd" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -58,6 +54,7 @@
   &quot;keyToString&quot;: {
     &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.cidr.known.project.marker&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.readMode.enableVisualFormatting&quot;: &quot;true&quot;,
