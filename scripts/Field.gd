@@ -169,7 +169,6 @@ func _show_game_over_screen(is_victory: bool, reason: String = ""):
 	var style = StyleBoxFlat.new()
 	style.bg_color = Color(0.1, 0.11, 0.1, 0.96)
 	style.set_border_width_all(4)
-	# ВОССТАНОВЛЕНО: Зеленая окантовка для победы, красная для поражения
 	style.border_color = Color(0.2, 0.8, 0.2) if is_victory else Color(0.8, 0.2, 0.2)
 	style.set_corner_radius_all(20)
 	panel.add_theme_stylebox_override("panel", style)
@@ -190,14 +189,14 @@ func _show_game_over_screen(is_victory: bool, reason: String = ""):
 		var btn_style = StyleBoxFlat.new(); btn_style.bg_color = Color(0.2, 0.22, 0.2); btn_style.set_corner_radius_all(12)
 		btn.add_theme_stylebox_override("normal", btn_style); btn.add_theme_font_size_override("font_size", 24)
 
-	if is_victory and current_level < 20:
+	# ИСПРАВЛЕНО: Кнопка "Следующая миссия" теперь доступна всегда до 25 миссии (или до лимита твоих уровней)
+	if is_victory and current_level < 25:
 		var btn_next = Button.new(); btn_next.text = "СЛЕДУЮЩАЯ МИССИЯ"; style_btn.call(btn_next); btn_container.add_child(btn_next)
 		btn_next.pressed.connect(func(): get_tree().paused = false; var next_lvl = current_level + 1; if SaveManager: SaveManager.current_level = next_lvl; get_tree().change_scene_to_file("res://scenes/Levels/Level_" + str(next_lvl) + ".tscn"))
 
 	var btn_retry = Button.new(); btn_retry.text = "ИГРАТЬ СНОВА"; style_btn.call(btn_retry); btn_container.add_child(btn_retry)
 	btn_retry.pressed.connect(func(): get_tree().paused = false; get_tree().reload_current_scene())
 
-	# ВОССТАНОВЛЕНО: Кнопка выбора миссии
 	var btn_levels = Button.new(); btn_levels.text = "ВЫБОР МИССИИ"; style_btn.call(btn_levels); btn_container.add_child(btn_levels)
 	btn_levels.pressed.connect(func(): get_tree().paused = false; get_tree().change_scene_to_file("res://scenes/MenuScenes/LevelSelector.tscn"))
 

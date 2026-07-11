@@ -1,6 +1,7 @@
-[gd_scene load_steps=10 format=3 uid="uid://cap6uk4dmskct"]
+[gd_scene load_steps=11 format=3 uid="uid://cap6uk4dmskct"]
 
 [ext_resource type="Texture2D" uid="uid://d0bnoilig7yxs" path="res://assets/ground_shaker_asset/Terrains/terrain.png" id="1_atmtc"]
+[ext_resource type="Script" uid="uid://3wsw25sk74o6" path="res://scripts/Field.gd" id="1_qlrir"]
 [ext_resource type="PackedScene" uid="uid://csfpndcf2sqpn" path="res://scenes/WallLayer.tscn" id="2_wcauu"]
 [ext_resource type="PackedScene" uid="uid://336qfi6ddylt" path="res://scenes/Tank/HUD.tscn" id="3_qlrir"]
 [ext_resource type="PackedScene" uid="uid://mfxaskty4hrm" path="res://scenes/Tank/Player.tscn" id="4_a2ox4"]
@@ -52,6 +53,7 @@ tile_size = Vector2i(128, 128)
 sources/0 = SubResource("TileSetAtlasSource_uglx7")
 
 [node name="Field" type="Node2D"]
+script = ExtResource("1_qlrir")
 
 [node name="TileMapLayer" type="TileMapLayer" parent="."]
 z_index = -1

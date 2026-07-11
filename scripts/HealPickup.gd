@@ -34,8 +34,9 @@ func _setup_pickup():
 
 	body_entered.connect(_on_body_entered)
 
-	# Таймер до начала исчезновения (15 секунд всего, 11 секунд до начала моргания)
-	get_tree().create_timer(11.0).timeout.connect(_start_disappear_sequence)
+	# Таймер до начала исчезновения (11 секунд до начала моргания)
+	# ВТОРОЙ ПАРАМЕТР false означает, что таймер СТОИТ на паузе
+	get_tree().create_timer(11.0, false).timeout.connect(_start_disappear_sequence)
 
 func _start_disappear_sequence():
 	if _is_being_picked_up or not is_instance_valid(self):
@@ -51,8 +52,8 @@ func _start_disappear_sequence():
 	tween_blink.tween_property(self, "modulate:a", 0.4, 0.25)
 	tween_blink.tween_property(self, "modulate:a", 1.0, 0.25)
 
-	# Финальное удаление
-	get_tree().create_timer(4.0).timeout.connect(func():
+	# Финальное удаление (таймер на 4 секунды, тоже учитывает паузу)
+	get_tree().create_timer(4.0, false).timeout.connect(func():
 		if is_instance_valid(self) and not _is_being_picked_up:
 			queue_free()
 	)

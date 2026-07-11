@@ -56,12 +56,14 @@ var _roll_out_timer: float = 0.0 # Таймер для "выкатывания" 
 
 # Стабилизация движения
 var _smoothed_avoidance: Vector2 = Vector2.ZERO
+var _wall_avoidance: Vector2 = Vector2.ZERO
 var _speed_limit_mult: float = 1.0
 var _last_bypass_side: float = 0.0 # Стабилизация выбора стороны объезда
 
 # ОПТИМИЗАЦИЯ
 var _logic_frame_offset: int = 0
 var _cached_avoidance: Vector2 = Vector2.ZERO
+var _cached_wall_avoidance: Vector2 = Vector2.ZERO
 var _is_on_screen: bool = true
 # endregion
 
@@ -152,7 +154,6 @@ func _physics_process(delta):
 	if not _is_on_screen and not is_special:
 		if current_frame % 120 == 0: _find_targets()
 		if current_frame % 60 == 0: _update_target()
-		# Двигаемся без обхода союзников (экономим 80% CPU на ИИ)
 		_move_enemy_simple(delta)
 		move_and_slide()
 		return
@@ -261,19 +262,35 @@ func _move_enemy(delta: float):
 	var current_speed = _chase_speed if (_current_state == State.CHASE or _type_enemy == TypeEnemy.SCOUT) else _patrol_speed
 	if _nav2d == null or _type_enemy == TypeEnemy.STATIONARY or _type_enemy == TypeEnemy.ARTILLERY or current_speed <= 0:
 		velocity = velocity.move_toward(Vector2.ZERO, delta * 600.0); return
+
 	var target = _get_current_target()
 	var nav_dir = Vector2.ZERO
 	if not _nav2d.is_navigation_finished(): nav_dir = (_nav2d.get_next_path_position() - global_position).normalized()
 
-	if (Engine.get_physics_frames() + _logic_frame_offset) % 8 == 0:
+	var frame_idx = Engine.get_physics_frames() + _logic_frame_offset
+	if frame_idx % 8 == 0:
 		_cached_avoidance = _compute_ally_avoidance(nav_dir)
+	if frame_idx % 10 == 0:
+		_cached_wall_avoidance = _compute_wall_avoidance(nav_dir)
 
 	_smoothed_avoidance = _smoothed_avoidance.lerp(_cached_avoidance, delta * 12.0)
+	_wall_avoidance = _wall_avoidance.lerp(_cached_wall_avoidance, delta * 10.0)
+
 	var in_attack_range = false
 	if is_instance_valid(target):
 		var dist_sq = global_position.distance_squared_to(target.global_position)
 		if dist_sq <= _attack_range * _attack_range and _target_in_sight and _roll_out_timer <= 0: in_attack_range = true
-	var final_dir = _smoothed_avoidance * 0.3 if in_attack_range else (nav_dir + _smoothed_avoidance * (1.2 if _type_enemy == TypeEnemy.BOSS else 0.7)).normalized()
+
+	# Объединяем навигацию, обход союзников и отталкивание от стен
+	var avoidance_force = _smoothed_avoidance * (1.2 if _type_enemy == TypeEnemy.BOSS else 0.7)
+	var wall_force = _wall_avoidance * 1.5
+
+	var final_dir = Vector2.ZERO
+	if in_attack_range:
+		final_dir = (avoidance_force * 0.3 + wall_force).normalized()
+	else:
+		final_dir = (nav_dir + avoidance_force + wall_force).normalized()
+
 	velocity = velocity.lerp(final_dir * current_speed * _speed_limit_mult, delta * 9.0)
 	if velocity.length() > 15.0: rotation = lerp_angle(rotation, velocity.angle() + PI/2, delta * 6.0)
 
@@ -301,9 +318,9 @@ func _compute_ally_avoidance(forward: Vector2) -> Vector2:
 		if dist < min_sep_dist:
 			var mag = (min_sep_dist - dist) / min_sep_dist; var push_dir = diff.normalized()
 			if forward.length() > 0.1:
-				var dot_f = push_dir.dot(forward)
-				if dot_f < -0.7: var side_perp = Vector2(-forward.y, forward.x); push_dir = (side_perp * (1 if side_perp.dot(diff) > 0 else -1)).normalized(); mag *= 1.5
-				elif dot_f < 0: push_dir = (push_dir - forward * dot_f).normalized()
+				var tone_f = push_dir.dot(forward)
+				if tone_f < -0.7: var side_perp = Vector2(-forward.y, forward.x); push_dir = (side_perp * (1 if side_perp.dot(diff) > 0 else -1)).normalized(); mag *= 1.5
+				elif tone_f < 0: push_dir = (push_dir - forward * tone_f).normalized()
 			if _is_wall_near(push_dir, my_radius * 0.8): mag *= 0.1
 			avoidance_force += push_dir * mag * (3.5 if other.get("_type_enemy") == TypeEnemy.BOSS else 2.5)
 		if forward.length() > 0.1:
@@ -316,6 +333,38 @@ func _compute_ally_avoidance(forward: Vector2) -> Vector2:
 					elif _has_space_for_bypass(side_perp * -side, min_sep_dist): avoidance_force += (side_perp * -side) * remap(along, 0, look_ahead, (2.5 if is_i_boss else 1.5), 0.4); _last_bypass_side = -side
 					else: _last_bypass_side = 0
 	return avoidance_force
+
+# ОБЪЕЗД СТЕН НА ОСНОВЕ ГАБАРИТОВ (ХИТБОКСА)
+func _compute_wall_avoidance(forward: Vector2) -> Vector2:
+	if forward.length() < 0.1: return Vector2.ZERO
+
+	var avoidance = Vector2.ZERO
+	# Длина "усиков" зависит от размера танка (хитбокса)
+	var tank_size = 80.0 * max(scale.x, scale.y)
+	var ray_length = tank_size * 1.5
+	var side_ray_length = tank_size * 1.1
+
+	var space_state = get_world_2d().direct_space_state
+	var my_rid = get_rid()
+
+	# Направления лучей: прямо, чуть левее, чуть правее
+	var angles = [0, deg_to_rad(-25), deg_to_rad(25)]
+	for i in range(angles.size()):
+		var dir = forward.rotated(angles[i])
+		var length = ray_length if i == 0 else side_ray_length
+
+		var query = PhysicsRayQueryParameters2D.create(global_position, global_position + dir * length)
+		query.exclude = [my_rid]
+		query.collision_mask = 1 # Слой стен
+
+		var result = space_state.intersect_ray(query)
+		if result:
+			# Если луч попал в стену, создаем силу отталкивания от нормали стены
+			var dist = global_position.distance_to(result.position)
+			var force_mag = (length - dist) / length
+			avoidance += result.normal * force_mag
+
+	return avoidance
 
 func _is_wall_near(dir: Vector2, distance: float) -> bool:
 	var q = PhysicsRayQueryParameters2D.create(global_position, global_position + dir * distance); q.exclude = [self]; q.collision_mask = 1; return get_world_2d().direct_space_state.intersect_ray(q) != null
@@ -399,12 +448,18 @@ func _fire_artillery(pos: Vector2):
 func _fire_at_pos(pos: Vector2):
 	if _shoot_timer.time_left > 0: return
 	var a = (pos - _gun.global_position).angle() + PI/2; var s = 2 if _type_enemy == TypeEnemy.STATIONARY else (1 if _type_enemy == TypeEnemy.TRIPLE else 0)
+
+	# ПРИРАВНИВАЕМ ДАЛЬНОСТЬ ПУЛИ К ДАЛЬНОСТИ СТРЕЛЬБЫ ТОЛЬКО ДЛЯ ЗАЩИТНИКА
+	var bullet_range = -1.0
+	if _type_enemy == TypeEnemy.DEFENDER:
+		bullet_range = _attack_range
+
 	if AudioManager: AudioManager.play_bullet_sound(s, global_position)
 	if _type_enemy == TypeEnemy.TRIPLE:
 		for off in [0.0, -0.4, 0.4]:
-			var b = _bullet_scene.instantiate(); b.global_position = _bullet_position.global_position; b.global_rotation = a + off; get_parent().add_child(b); b.init(1, false, _damage, get_rid())
+			var b = _bullet_scene.instantiate(); b.global_position = _bullet_position.global_position; b.global_rotation = a + off; get_parent().add_child(b); b.init(1, false, _damage, get_rid(), bullet_range)
 	else:
-		var b = _bullet_scene.instantiate(); b.global_position = _bullet_position.global_position; b.global_rotation = a + randf_range(-_spread, _spread); get_parent().add_child(b); b.init(2 if _type_enemy == TypeEnemy.STATIONARY else 0, false, _damage, get_rid())
+		var b = _bullet_scene.instantiate(); b.global_position = _bullet_position.global_position; b.global_rotation = a + randf_range(-_spread, _spread); get_parent().add_child(b); b.init(2 if _type_enemy == TypeEnemy.STATIONARY else 0, false, _damage, get_rid(), bullet_range)
 	if _shot_flash: _shot_flash.play("Fire")
 	_shoot_timer.start()
 
