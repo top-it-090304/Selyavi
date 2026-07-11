@@ -1,4 +1,4 @@
-[gd_scene load_steps=11 format=3 uid="uid://cap6uk4dmskct"]
+[gd_scene load_steps=17 format=4 uid="uid://cap6uk4dmskct"]
 
 [ext_resource type="Texture2D" uid="uid://d0bnoilig7yxs" path="res://assets/ground_shaker_asset/Terrains/terrain.png" id="1_atmtc"]
 [ext_resource type="Script" uid="uid://3wsw25sk74o6" path="res://scripts/Field.gd" id="1_qlrir"]
@@ -8,6 +8,12 @@
 [ext_resource type="AudioStream" uid="uid://bxl5wv7crhm5" path="res://assets/Music/68. Sad Eyes.mp3" id="5_0e1i2"]
 [ext_resource type="PackedScene" uid="uid://crbjyol17koge" path="res://scenes/obtacles/wall.tscn" id="6_dhydj"]
 [ext_resource type="PackedScene" uid="uid://bjw4bj0fr4c7q" path="res://scenes/Base.tscn" id="7_wcauu"]
+[ext_resource type="PackedScene" uid="uid://dfpgy8w1vxtx0" path="res://scenes/Tank/Enemy.tscn" id="9_dhydj"]
+[ext_resource type="Resource" uid="uid://5g6rkidwys1a" path="res://resources/enemies/enemy_dummy.tres" id="10_uglx7"]
+[ext_resource type="Resource" uid="uid://dsh37cwiuha28" path="res://resources/enemies/enemy_medium.tres" id="11_xwwev"]
+[ext_resource type="Resource" uid="uid://2eb3ua56oci1" path="res://resources/enemies/enemy_artillery.tres" id="12_nqvcm"]
+[ext_resource type="Resource" uid="uid://ce5jll0l7qe6v" path="res://resources/enemies/enemy_defender.tres" id="13_782qc"]
+[ext_resource type="Resource" uid="uid://d17w5hoo3u0qm" path="res://resources/enemies/enemy_stationary.tres" id="14_o4eil"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_uglx7"]
 texture = ExtResource("1_atmtc")
@@ -60,6 +66,7 @@ z_index = -1
 tile_set = SubResource("TileSet_xwwev")
 
 [node name="WallLayer" parent="." instance=ExtResource("2_wcauu")]
+tile_map_data = PackedByteArray("AAALAAoAAgAAAAAAAAALAAsAAgAAAAAAAAALAAwAAgAAAAAAAAALAA0AAgAAAAAAAAALAA4AAgAAAAAAAAALAA8AAgAAAAAAAAALABAAAgAAAAAAAAALABEAAgAAAAAAAAALABIAAgAAAAAAAAAMABIAAgAAAAAAAAANABIAAgAAAAAAAAAOABIAAgAAAAAAAAAPABIAAgAAAAAAAAAQABIAAgAAAAAAAAARABIAAgAAAAAAAAAUABIAAgAAAAAAAAAVABIAAgAAAAAAAAAWABIAAgAAAAAAAAAXABIAAgAAAAAAAAAYABIAAgAAAAAAAAAZABIAAgAAAAAAAAAaABIAAgAAAAAAAAAaABEAAgAAAAAAAAAaABAAAgAAAAAAAAAaAA8AAgAAAAAAAAAaAA4AAgAAAAAAAAAaAA0AAgAAAAAAAAAaAAwAAgAAAAAAAAAaAAsAAgAAAAAAAAAaAAoAAgAAAAAAAAAZAAoAAgAAAAAAAAAYAAoAAgAAAAAAAAAXAAoAAgAAAAAAAAAWAAoAAgAAAAAAAAAVAAoAAgAAAAAAAAAUAAoAAgAAAAAAAAARAAoAAgAAAAAAAAAQAAoAAgAAAAAAAAAPAAoAAgAAAAAAAAAOAAoAAgAAAAAAAAANAAoAAgAAAAAAAAAMAAoAAgAAAAAAAAARAAsAAgAAAAAAAAARAAwAAgAAAAAAAAARAA0AAgAAAAAAAAARAA4AAgAAAAAAAAARAA8AAgAAAAAAAAARABAAAgAAAAAAAAARABEAAgAAAAAAAAAUAAsAAgAAAAAAAAAUAAwAAgAAAAAAAAAUAA0AAgAAAAAAAAAUAA4AAgAAAAAAAAAUAA8AAgAAAAAAAAAUABAAAgAAAAAAAAAUABEAAgAAAAAAAAA=")
 
 [node name="HUD" parent="." instance=ExtResource("3_qlrir")]
 
@@ -100,13 +107,36 @@ rotation = 1.5708
 scale = Vector2(1.33809, 6.69042)
 
 [node name="BasePlayer" parent="." instance=ExtResource("7_wcauu")]
-position = Vector2(1723, 1609)
+position = Vector2(567, 2421)
 type_base = 0
 
 [node name="EnemyBase1" parent="." instance=ExtResource("7_wcauu")]
 position = Vector2(3545, 239)
 
 [node name="Navigation2D" type="Node2D" parent="."]
-visible = false
 
 [node name="NavigationRegion2D" type="NavigationRegion2D" parent="Navigation2D"]
+
+[node name="Enemy" parent="." instance=ExtResource("9_dhydj")]
+position = Vector2(2875, 1759)
+enemy_data = ExtResource("10_uglx7")
+
+[node name="Enemy2" parent="." instance=ExtResource("9_dhydj")]
+position = Vector2(2041, 1798)
+enemy_data = ExtResource("11_xwwev")
+
+[node name="Enemy3" parent="." instance=ExtResource("9_dhydj")]
+position = Vector2(1631, 1487)
+enemy_data = ExtResource("12_nqvcm")
+
+[node name="Enemy4" parent="." instance=ExtResource("9_dhydj")]
+position = Vector2(1714, 2154)
+enemy_data = ExtResource("13_782qc")
+
+[node name="Enemy5" parent="." instance=ExtResource("9_dhydj")]
+position = Vector2(1638, 1877)
+enemy_data = ExtResource("14_o4eil")
+
+[node name="Enemy6" parent="." instance=ExtResource("9_dhydj")]
+position = Vector2(2107, 2195)
+enemy_data = ExtResource("14_o4eil")

@@ -35,6 +35,7 @@ var _scan_angle: float = 0.0
 var _scan_dir: int = 1
 var _scan_wait_timer: float = 0.0
 var _scan_limit: float = 45.0
+var _scan_speed: float = 35.0
 
 # Дистанции поведения
 var _notice_range: float = 850.0
@@ -76,6 +77,13 @@ func _ready():
 
 	_logic_frame_offset = randi() % 10
 
+	# АУТЕНТИЧНОСТЬ: Рандомизируем начальное состояние
+	rotation = randf() * TAU # Корпус в любую сторону
+	_scan_limit = randf_range(30.0, 60.0) # Индивидуальный сектор обзора
+	_scan_speed = randf_range(20.0, 50.0) # Разная скорость вращения башни
+	_scan_angle = randf_range(-_scan_limit, _scan_limit)
+	_scan_dir = 1 if randf() > 0.5 else -1
+
 	_nav2d = get_node_or_null("NavigationAgent2D")
 	_ray_cast = get_node_or_null("RayCast2D")
 	_detection_area = get_node_or_null("DetectionArea")
@@ -114,6 +122,9 @@ func _ready():
 			_shot_flash.get_parent().remove_child(_shot_flash)
 			_bullet_position.add_child(_shot_flash)
 		_shot_flash.position = Vector2.ZERO; _shot_flash.rotation = 0; _shot_flash.scale = Vector2(0.5, 0.5)
+
+	# Устанавливаем начальный поворот башни
+	if _gun: _gun.rotation = deg_to_rad(_scan_angle)
 
 	var players = get_tree().get_nodes_in_group("players")
 	if players.size() > 0: _player = players[0]
@@ -246,16 +257,29 @@ func _update_target():
 
 func _aim_gun(delta: float):
 	if _gun == null: return
-	if _type_enemy == TypeEnemy.STATIONARY and _current_state == State.PATROL:
-		if _scan_wait_timer > 0: _scan_wait_timer -= delta; return
-		_scan_angle += 40.0 * delta * _scan_dir
-		if abs(_scan_angle) >= _scan_limit: _scan_dir *= -1; _scan_wait_timer = 1.5
-		_gun.rotation_degrees = _scan_angle
-	else:
+
+	# Если мы видим цель — целимся в неё (плавно поворачивая башню)
+	if _target_in_sight:
 		var target = _get_current_target()
 		if target:
 			var target_angle = (target.global_position - _gun.global_position).angle() + PI / 2
 			_gun.global_rotation = lerp_angle(_gun.global_rotation, target_angle, 0.25)
+			# Синхронизируем угол поиска, чтобы начать сканирование отсюда, если цель пропадет
+			_scan_angle = clamp(wrapf(rad_to_deg(_gun.rotation), -180, 180), -_scan_limit, _scan_limit)
+	else:
+		# РЕЖИМ ПОИСКА: Если цель не видна, плавно водим башней из стороны в сторону
+		if _scan_wait_timer > 0:
+			_scan_wait_timer -= delta
+			return
+
+		_scan_angle += _scan_speed * delta * _scan_dir
+		if abs(_scan_angle) >= _scan_limit:
+			_scan_dir *= -1
+			_scan_angle = clamp(_scan_angle, -_scan_limit, _scan_limit)
+			_scan_wait_timer = randf_range(0.5, 1.5) # Пауза в крайних точках для реализма
+			_scan_speed = randf_range(20.0, 50.0) # РАНДОМИЗИРУЕМ СКОРОСТЬ ДЛЯ СЛЕДУЮЩЕГО ПОВОРОТА
+
+		_gun.rotation = lerp_angle(_gun.rotation, deg_to_rad(_scan_angle), delta * 4.0)
 
 func _move_enemy(delta: float):
 	_speed_limit_mult = 1.0
@@ -318,9 +342,9 @@ func _compute_ally_avoidance(forward: Vector2) -> Vector2:
 		if dist < min_sep_dist:
 			var mag = (min_sep_dist - dist) / min_sep_dist; var push_dir = diff.normalized()
 			if forward.length() > 0.1:
-				var tone_f = push_dir.dot(forward)
-				if tone_f < -0.7: var side_perp = Vector2(-forward.y, forward.x); push_dir = (side_perp * (1 if side_perp.dot(diff) > 0 else -1)).normalized(); mag *= 1.5
-				elif tone_f < 0: push_dir = (push_dir - forward * tone_f).normalized()
+				var dot_f = push_dir.dot(forward)
+				if dot_f < -0.7: var side_perp = Vector2(-forward.y, forward.x); push_dir = (side_perp * (1 if side_perp.dot(diff) > 0 else -1)).normalized(); mag *= 1.5
+				elif dot_f < 0: push_dir = (push_dir - forward * dot_f).normalized()
 			if _is_wall_near(push_dir, my_radius * 0.8): mag *= 0.1
 			avoidance_force += push_dir * mag * (3.5 if other.get("_type_enemy") == TypeEnemy.BOSS else 2.5)
 		if forward.length() > 0.1:
@@ -401,7 +425,9 @@ func _is_line_clear_to_target(from: Vector2, target_node_or_pos) -> bool:
 		if res.is_empty(): return true
 		var c = res.collider
 		if target_node_or_pos is Node and (c == target_node_or_pos or (c is Node and c.get_parent() == target_node_or_pos)): return true
-		if c is Enemy or (c.has_method("destroyable") and c.destroyable()) or (c.is_in_group("walls") and c.has_method("destroyable") and c.destroyable()):
+
+		# БОТЫ БОЛЬШЕ НЕ ВИДЯТ СКВОЗЬ ДРУГИХ БОТОВ
+		if (c.has_method("destroyable") and c.destroyable()) or (c.is_in_group("walls") and c.has_method("destroyable") and c.destroyable()):
 			exclude_list.append(c.get_rid()); continue
 		return false
 	return false
