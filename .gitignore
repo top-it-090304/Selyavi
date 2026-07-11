@@ -23,3 +23,6 @@ Tanks_2026_arm64.rpm_buildroot/
 the effect of taking the default
 
 android/
+
+# Teto's memory
+.teto_memory.md
