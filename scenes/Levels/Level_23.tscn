@@ -1,4 +1,4 @@
-[gd_scene load_steps=11 format=3 uid="uid://dimsjg628wtdr"]
+[gd_scene load_steps=13 format=4 uid="uid://dimsjg628wtdr"]
 
 [ext_resource type="Texture2D" uid="uid://d0bnoilig7yxs" path="res://assets/ground_shaker_asset/Terrains/terrain.png" id="1_a1jei"]
 [ext_resource type="Script" uid="uid://3wsw25sk74o6" path="res://scripts/Field.gd" id="1_w1ohj"]
@@ -8,6 +8,8 @@
 [ext_resource type="AudioStream" uid="uid://bxl5wv7crhm5" path="res://assets/Music/68. Sad Eyes.mp3" id="5_jnmvd"]
 [ext_resource type="PackedScene" uid="uid://crbjyol17koge" path="res://scenes/obtacles/wall.tscn" id="6_8madr"]
 [ext_resource type="PackedScene" uid="uid://bjw4bj0fr4c7q" path="res://scenes/Base.tscn" id="7_ndbnq"]
+[ext_resource type="PackedScene" uid="uid://dfpgy8w1vxtx0" path="res://scenes/Tank/Enemy.tscn" id="9_gwxw1"]
+[ext_resource type="Resource" uid="uid://5g6rkidwys1a" path="res://resources/enemies/enemy_dummy.tres" id="10_jnmvd"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_52fu8"]
 texture = ExtResource("1_a1jei")
@@ -60,6 +62,7 @@ z_index = -1
 tile_set = SubResource("TileSet_cencl")
 
 [node name="WallLayer" parent="." instance=ExtResource("2_ndbnq")]
+tile_map_data = PackedByteArray("AAAOAAYAAgAAAAAAAAAPAAYAAgAAAAAAAAAQAAYAAgAAAAAAAAARAAYAAgAAAAAAAAASAAYAAgAAAAAAAAATAAYAAgAAAAAAAAAUAAYAAgAAAAAAAAAVAAYAAgAAAAAAAAAWAAYAAgAAAAAAAAAXAAYAAgAAAAAAAAAYAAYAAgAAAAAAAAAZAAYAAgAAAAAAAAAZAAcAAgAAAAAAAAAZAAgAAgAAAAAAAAAaAAgAAgAAAAAAAAAaAAkAAgAAAAAAAAAaAAoAAgAAAAAAAAAaAAsAAgAAAAAAAAAaAAwAAgAAAAAAAAAZAA0AAgAAAAAAAAAZAA4AAgAAAAAAAAAZAA8AAgAAAAAAAAAZABAAAgAAAAAAAAAZABEAAgAAAAAAAAAZABIAAgAAAAAAAAAOABMAAgAAAAAAAAAPABMAAgAAAAAAAAAQABMAAgAAAAAAAAARABMAAgAAAAAAAAASABMAAgAAAAAAAAATABMAAgAAAAAAAAATABEAAgAAAAAAAAATABIAAgAAAAAAAAA=")
 
 [node name="HUD" parent="." instance=ExtResource("3_w1ohj")]
 
@@ -100,7 +103,7 @@ rotation = 1.5708
 scale = Vector2(1.33809, 6.69042)
 
 [node name="BasePlayer" parent="." instance=ExtResource("7_ndbnq")]
-position = Vector2(1723, 1609)
+position = Vector2(602, 2142)
 type_base = 0
 
 [node name="EnemyBase1" parent="." instance=ExtResource("7_ndbnq")]
@@ -110,3 +113,15 @@ position = Vector2(3545, 239)
 visible = false
 
 [node name="NavigationRegion2D" type="NavigationRegion2D" parent="Navigation2D"]
+
+[node name="Enemy" parent="." instance=ExtResource("9_gwxw1")]
+position = Vector2(2732, 1828)
+enemy_data = ExtResource("10_jnmvd")
+
+[node name="Enemy2" parent="." instance=ExtResource("9_gwxw1")]
+position = Vector2(1954, 2056)
+enemy_data = ExtResource("10_jnmvd")
+
+[node name="Enemy3" parent="." instance=ExtResource("9_gwxw1")]
+position = Vector2(2131, 1363)
+enemy_data = ExtResource("10_jnmvd")

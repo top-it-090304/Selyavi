@@ -18,6 +18,14 @@ var _ammo_ui_selector: OptionButton
 var _return_button: Button
 var _reset_progress_btn: Button
 
+# Переменные для выбора цвета прицела
+var _btn_main_prev: Button
+var _btn_main_next: Button
+var _rect_main: Panel
+var _btn_bounce_prev: Button
+var _btn_bounce_next: Button
+var _rect_bounce: Panel
+
 var _sfx_preview_timer: Timer
 
 func _ready():
@@ -32,6 +40,14 @@ func _ready():
 	_graphics_quality_selector = game_settings.find_child("OptionButton_GraphicsQuality", true)
 	_ammo_ui_selector = game_settings.find_child("OptionButton_AmmoUiMode", true)
 	_reset_progress_btn = game_settings.find_child("ResetProgressBtn", true)
+
+	# Инициализация кнопок выбора цвета
+	_btn_main_prev = game_settings.find_child("BtnScopeMainPrev", true)
+	_btn_main_next = game_settings.find_child("BtnScopeMainNext", true)
+	_rect_main = game_settings.find_child("RectScopeMain", true)
+	_btn_bounce_prev = game_settings.find_child("BtnScopeBouncePrev", true)
+	_btn_bounce_next = game_settings.find_child("BtnScopeBounceNext", true)
+	_rect_bounce = game_settings.find_child("RectScopeBounce", true)
 
 	_return_button = find_child("Return_Button", true)
 
@@ -58,6 +74,38 @@ func _ready():
 	if _marker_slider: _marker_slider.value_changed.connect(_on_marker_scale_changed)
 	if _graphics_quality_selector: _graphics_quality_selector.item_selected.connect(_on_graphics_quality_selected)
 	if _ammo_ui_selector: _ammo_ui_selector.item_selected.connect(_on_ammo_ui_selected)
+
+	# Коннекты для цветов
+	if _btn_main_prev: _btn_main_prev.pressed.connect(func(): _change_scope_color("scope_color_main_idx", -1))
+	if _btn_main_next: _btn_main_next.pressed.connect(func(): _change_scope_color("scope_color_main_idx", 1))
+	if _btn_bounce_prev: _btn_bounce_prev.pressed.connect(func(): _change_scope_color("scope_color_bounce_idx", -1))
+	if _btn_bounce_next: _btn_bounce_next.pressed.connect(func(): _change_scope_color("scope_color_bounce_idx", 1))
+
+func _change_scope_color(setting_key: String, direction: int):
+	if SaveManager == null: return
+	var current_idx = SaveManager.get_setting("game", setting_key, 0)
+	var colors_count = SaveManager.SCOPE_COLORS.size()
+	var new_idx = (current_idx + direction + colors_count) % colors_count
+
+	SaveManager.set_setting("game", setting_key, new_idx)
+	_update_color_previews()
+
+func _update_color_previews():
+	if SaveManager == null: return
+
+	if _rect_main:
+		var idx = SaveManager.get_setting("game", "scope_color_main_idx", 0)
+		var style = _rect_main.get_theme_stylebox("panel").duplicate()
+		if style is StyleBoxFlat:
+			style.bg_color = SaveManager.SCOPE_COLORS[idx]
+			_rect_main.add_theme_stylebox_override("panel", style)
+
+	if _rect_bounce:
+		var idx = SaveManager.get_setting("game", "scope_color_bounce_idx", 4)
+		var style = _rect_bounce.get_theme_stylebox("panel").duplicate()
+		if style is StyleBoxFlat:
+			style.bg_color = SaveManager.SCOPE_COLORS[idx]
+			_rect_bounce.add_theme_stylebox_override("panel", style)
 
 func _setup_graphics_selector():
 	if _graphics_quality_selector == null:
@@ -198,6 +246,8 @@ func _load_ui_values():
 		if _ammo_ui_selector:
 			var ammo_ui_mode = str(save_mgr.get_setting("game", "ammo_ui_mode", "popup"))
 			_ammo_ui_selector.select(_ammo_ui_mode_to_index(ammo_ui_mode))
+
+		_update_color_previews()
 
 	if game_mgr and _scope_toggler:
 		_scope_toggler.button_pressed = game_mgr.is_scope_currently_enabled()

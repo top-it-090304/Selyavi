@@ -12,6 +12,10 @@ var _speed: int = 250
 var _start_position: Vector2
 var is_scope_on: bool = true
 
+# Цвета прицела для синхронизации
+var _scope_color_main: Color = Color(1.0, 0.25, 0.25, 0.62)
+var _scope_color_bounce: Color = Color(0.35, 0.92, 1.0, 0.72)
+
 var _joystick: Node
 var _aim: Node
 var _type_bullet: int = 0
@@ -66,9 +70,24 @@ func _ready():
 		is_scope_on = GameManager.is_scope_currently_enabled()
 
 	if SaveManager != null:
-		if not SaveManager.settings_changed.is_connected(_apply_camera_fov):
-			SaveManager.settings_changed.connect(_apply_camera_fov)
-	call_deferred("_apply_camera_fov")
+		if not SaveManager.settings_changed.is_connected(_on_settings_changed):
+			SaveManager.settings_changed.connect(_on_settings_changed)
+	_on_settings_changed() # Применяем при старте
+
+func _on_settings_changed():
+	_apply_camera_fov()
+	_apply_scope_colors()
+
+func _apply_scope_colors():
+	if SaveManager == null: return
+	var main_idx = SaveManager.get_setting("game", "scope_color_main_idx", 0)
+	var bounce_idx = SaveManager.get_setting("game", "scope_color_bounce_idx", 4)
+
+	if main_idx < SaveManager.SCOPE_COLORS.size():
+		_scope_color_main = SaveManager.SCOPE_COLORS[main_idx]
+	if bounce_idx < SaveManager.SCOPE_COLORS.size():
+		_scope_color_bounce = SaveManager.SCOPE_COLORS[bounce_idx]
+	queue_redraw()
 
 func _setup_burn_particles():
 	_burn_particles = CPUParticles2D.new()
@@ -225,33 +244,69 @@ func _get_reload_time() -> float:
 	var rof_color_bonus = 0.1 if _color == COLOR_GREEN else 0.05 if _color == COLOR_AZURE else 0.0
 	return max(0.1, reload_base + rof_color_bonus)
 
+func _get_current_bullet_range() -> float:
+	if _type_bullet == RICOCHET:
+		return 2200.0
+	match _type_bullet:
+		PLASMA: return 650.0
+		MEDIUM: return 300.0
+		LIGHT: return 1000.0
+		HE: return 550.0
+		BOPS: return 1100.0
+	return 650.0
+
 func use_move_vector_aim(move_vector: Vector2):
 	var desired_dir = -move_vector.normalized() if _controls_inverted else move_vector.normalized()
 	var final_angle = desired_dir.angle() + PI/2
 	var is_assist_on = SaveManager.get_setting("game", "aim_assist", true) if SaveManager else true
 
 	if is_assist_on:
-		var best_enemy = null
+		var best_target = null
 		var min_angle_diff = deg_to_rad(35.0)
-		for enemy in get_tree().get_nodes_in_group("enemies"):
-			if is_instance_valid(enemy) and _is_enemy_visible_for_assist(enemy) and _is_enemy_on_screen(enemy):
-				var dir_to_enemy = (enemy.global_position - global_position).normalized()
-				var angle_diff = abs(desired_dir.angle_to(dir_to_enemy))
+		var bullet_range = _get_current_bullet_range()
+
+		# Собираем всех потенциальных врагов (танки и вражеские базы)
+		var targets = []
+		targets.append_array(get_tree().get_nodes_in_group("enemies"))
+		for b in get_tree().get_nodes_in_group("bases"):
+			if b.get("type_base") == 1: # 1 == Base.TypeBase.ENEMY
+				targets.append(b)
+
+		for target in targets:
+			if is_instance_valid(target) and _is_target_visible_for_assist(target) and _is_target_on_screen(target):
+				# Проверка дальности: если враг дальше, чем летит снаряд (с буфером 50), не наводимся
+				var dist = global_position.distance_to(target.global_position)
+				if dist > bullet_range + 50:
+					continue
+
+				var dir_to_target = (target.global_position - global_position).normalized()
+				var angle_diff = abs(desired_dir.angle_to(dir_to_target))
 				if angle_diff < min_angle_diff:
 					min_angle_diff = angle_diff
-					best_enemy = enemy
-		if best_enemy:
-			final_angle = (best_enemy.global_position - global_position).angle() + PI/2
+					best_target = target
+		if best_target:
+			final_angle = (best_target.global_position - global_position).angle() + PI/2
 
 	_gun.global_rotation = final_angle
 
-func _is_enemy_visible_for_assist(enemy: Node) -> bool:
-	var query = PhysicsRayQueryParameters2D.create(global_position, enemy.global_position)
-	query.exclude = [self, enemy]; query.collision_mask = 1
-	return get_world_2d().direct_space_state.intersect_ray(query).is_empty()
+func _is_target_visible_for_assist(target: Node) -> bool:
+	var query = PhysicsRayQueryParameters2D.create(global_position, target.global_position)
+	query.exclude = [self]
+	query.collision_mask = 1
+	var result = get_world_2d().direct_space_state.intersect_ray(query)
 
-func _is_enemy_on_screen(enemy: Node) -> bool:
-	var screen_pos = get_viewport().get_canvas_transform() * enemy.global_position
+	if result.is_empty():
+		return true
+
+	var hit_collider = result.collider
+	# Для танков это сам танк, для баз - его StaticBody2D ребенок
+	if hit_collider == target or hit_collider.get_parent() == target:
+		return true
+
+	return false
+
+func _is_target_on_screen(target: Node) -> bool:
+	var screen_pos = get_viewport().get_canvas_transform() * target.global_position
 	return get_viewport().get_visible_rect().has_point(screen_pos)
 
 func _physics_process(delta):
@@ -411,15 +466,8 @@ func _draw():
 			_draw_ricochet_scope_preview(direction.normalized())
 			return
 
-		var range_len = 650.0
-		match _type_bullet:
-			PLASMA: range_len = 650.0
-			MEDIUM: range_len = 300.0
-			LIGHT: range_len = 1000.0
-			HE: range_len = 550.0
-			BOPS: range_len = 1100.0
-
-		draw_line(to_local(_bullet_position.global_position), to_local(_bullet_position.global_position + direction * range_len), Color(1, 0, 0, 0.5), 2.0)
+		var range_len = _get_current_bullet_range()
+		draw_line(to_local(_bullet_position.global_position), to_local(_bullet_position.global_position + direction * range_len), _scope_color_main, 2.0)
 
 
 func _is_wall_ricochet_preview(c: Object) -> bool:
@@ -444,8 +492,6 @@ func _draw_ricochet_scope_preview(dir: Vector2):
 	var remaining := PREVIEW_MAX_RANGE
 	var bounces_left := PLAYER_RICOCHET_BOUNCES
 	var last_local := to_local(pos_g)
-	var col_main := Color(1.0, 0.25, 0.25, 0.62)
-	var col_bounce := Color(0.35, 0.92, 1.0, 0.72)
 
 	var space := get_world_2d().direct_space_state
 	var safety := 0
@@ -458,25 +504,32 @@ func _draw_ricochet_scope_preview(dir: Vector2):
 
 		if hit.is_empty():
 			var end_g := pos_g + dir * reach
-			draw_line(last_local, to_local(end_g), col_main if bounces_left == PLAYER_RICOCHET_BOUNCES else col_bounce, 2.0)
+			draw_line(last_local, to_local(end_g), _scope_color_main if bounces_left == PLAYER_RICOCHET_BOUNCES else _scope_color_bounce, 2.0)
 			return
 
 		var hit_pos: Vector2 = hit.position
 		var dist := pos_g.distance_to(hit_pos)
 		if dist > remaining:
 			var clip_g := pos_g + dir * remaining
-			draw_line(last_local, to_local(clip_g), col_main if bounces_left == PLAYER_RICOCHET_BOUNCES else col_bounce, 2.0)
+			draw_line(last_local, to_local(clip_g), _scope_color_main if bounces_left == PLAYER_RICOCHET_BOUNCES else _scope_color_bounce, 2.0)
 			return
 
 		var collider: Object = hit.collider
 		var hit_local := to_local(hit_pos)
 
 		if collider is Enemy:
-			draw_line(last_local, hit_local, col_main if bounces_left == PLAYER_RICOCHET_BOUNCES else col_bounce, 2.0)
+			draw_line(last_local, hit_local, _scope_color_main if bounces_left == PLAYER_RICOCHET_BOUNCES else _scope_color_bounce, 2.0)
 			return
 
+		var hit_parent = collider.get_parent() if collider is Node else null
+		if hit_parent and hit_parent.is_in_group("bases"):
+			if hit_parent.get("type_base") == 1: # Enemy Base
+				draw_line(last_local, hit_local, _scope_color_main if bounces_left == PLAYER_RICOCHET_BOUNCES else _scope_color_bounce, 2.0)
+				return
+			# Если это база игрока, она будет обработана ниже в _is_wall_ricochet_preview и отрисует рикошет
+
 		if _is_wall_ricochet_preview(collider):
-			draw_line(last_local, hit_local, col_main if bounces_left == PLAYER_RICOCHET_BOUNCES else col_bounce, 2.0)
+			draw_line(last_local, hit_local, _scope_color_main if bounces_left == PLAYER_RICOCHET_BOUNCES else _scope_color_bounce, 2.0)
 			remaining = maxf(0.0, remaining - dist)
 			if bounces_left <= 0:
 				return
@@ -495,7 +548,7 @@ func _draw_ricochet_scope_preview(dir: Vector2):
 			last_local = to_local(pos_g)
 			continue
 
-		draw_line(last_local, hit_local, col_main, 2.0)
+		draw_line(last_local, hit_local, _scope_color_main, 2.0)
 		return
 
 func _on_sfx_volume_changed(value: float):
