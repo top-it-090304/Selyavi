@@ -44,9 +44,22 @@ var settings_data = {
 		"ammo_ui_mode": "popup",
 		"camera_fov": 80.0,
 		"marker_scale": 1.0,
-		"graphics_quality": "high"
+		"graphics_quality": "high",
+		"scope_color_main_idx": 0,
+		"scope_color_bounce_idx": 4
 	}
 }
+
+# Доступные цвета для прицела
+const SCOPE_COLORS = [
+	Color(1.0, 0.25, 0.25, 0.7), # 0: Красный (базовый)
+	Color(0.25, 1.0, 0.25, 0.7), # 1: Зеленый
+	Color(0.25, 0.5, 1.0, 0.7),  # 2: Синий
+	Color(1.0, 1.0, 0.25, 0.7),  # 3: Желтый
+	Color(0.35, 0.92, 1.0, 0.7), # 4: Бирюзовый
+	Color(1.0, 0.25, 1.0, 0.7),  # 5: Фиолетовый
+	Color(1.0, 1.0, 1.0, 0.7)    # 6: Белый
+]
 
 const SETTINGS_FILE = "user://settings.cfg"
 
@@ -72,6 +85,8 @@ func load_settings():
 		settings_data["game"]["camera_fov"] = config.get_value("game", "camera_fov", 80.0)
 		settings_data["game"]["marker_scale"] = config.get_value("game", "marker_scale", 1.0)
 		settings_data["game"]["graphics_quality"] = config.get_value("game", "graphics_quality", "high")
+		settings_data["game"]["scope_color_main_idx"] = config.get_value("game", "scope_color_main_idx", 0)
+		settings_data["game"]["scope_color_bounce_idx"] = config.get_value("game", "scope_color_bounce_idx", 4)
 	_apply_graphics_quality(str(settings_data["game"].get("graphics_quality", "high")))
 	settings_changed.emit()
 
@@ -86,6 +101,8 @@ func save_settings():
 	config.set_value("game", "camera_fov", settings_data["game"]["camera_fov"])
 	config.set_value("game", "marker_scale", settings_data["game"]["marker_scale"])
 	config.set_value("game", "graphics_quality", settings_data["game"]["graphics_quality"])
+	config.set_value("game", "scope_color_main_idx", settings_data["game"]["scope_color_main_idx"])
+	config.set_value("game", "scope_color_bounce_idx", settings_data["game"]["scope_color_bounce_idx"])
 	config.save(SETTINGS_FILE)
 
 func get_setting(section: String, key: String, default):
