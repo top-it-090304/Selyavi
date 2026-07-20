@@ -1,4 +1,4 @@
-[gd_scene load_steps=18 format=4 uid="uid://b8wk2m7p4nqx1"]
+[gd_scene load_steps=20 format=4 uid="uid://b8wk2m7p4nqx1"]
 
 [ext_resource type="PackedScene" uid="uid://mfxaskty4hrm" path="res://scenes/Tank/Player.tscn" id="2"]
 [ext_resource type="Texture2D" uid="uid://d0bnoilig7yxs" path="res://assets/ground_shaker_asset/Terrains/terrain.png" id="2_mssve"]
@@ -10,6 +10,8 @@
 [ext_resource type="Texture2D" uid="uid://dflh11hetycup" path="res://assets/backround/PNG/Blocks/Block_A_02.png" id="10_block_a"]
 [ext_resource type="Texture2D" uid="uid://0o1k3bwfch45" path="res://assets/backround/PNG/Blocks/Block_C_02.png" id="11_block_c"]
 [ext_resource type="Script" uid="uid://lxo4dtnvkpka" path="res://scripts/WallTileMap.gd" id="12_wall_script"]
+[ext_resource type="PackedScene" uid="uid://dfpgy8w1vxtx0" path="res://scenes/Tank/Enemy.tscn" id="13_l2fsl"]
+[ext_resource type="Resource" uid="uid://qsjfx3w3rsll" path="res://resources/enemies/enemy_light.tres" id="14_6q3ph"]
 [ext_resource type="PackedScene" uid="uid://bjw4bj0fr4c7q" path="res://scenes/Base.tscn" id="15"]
 [ext_resource type="PackedScene" uid="uid://336qfi6ddylt" path="res://scenes/Tank/HUD.tscn" id="21"]
 
@@ -298,3 +300,7 @@ polygon = PackedVector2Array(1400, 7, 1404, 224, 1294, 265, 1286, 452, 1461, 429
 
 [node name="EnemyBase" parent="." instance=ExtResource("15")]
 position = Vector2(2289, 1093)
+
+[node name="Enemy" parent="." instance=ExtResource("13_l2fsl")]
+position = Vector2(1746, 450)
+enemy_data = ExtResource("14_6q3ph")
