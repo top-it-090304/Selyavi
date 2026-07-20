@@ -242,6 +242,11 @@ func set_joysticks_opacity(alpha: float):
 	if _move_joy_c: _move_joy_c.modulate.a = alpha
 	if _aim_joy_c: _aim_joy_c.modulate.a = alpha
 
+func refresh_hud_opacity():
+	_apply_lefty_joystick_layout()
+	if _player != null and is_instance_valid(_player):
+		_on_ammo_changed(_player.get("_current_ammo_slot"))
+
 func _setup_bases_label():
 	var stats_container = find_child("Stats", true)
 	if !stats_container: return
@@ -648,6 +653,7 @@ func _update_ammo_cooldowns():
 
 func _on_ammo_changed(type):
 	type = int(type)
+	var is_tutorial = get_tree().has_group("tutorial")
 	var loadout = _get_current_ammo_loadout()
 	if _ammo_ui_mode == AMMO_UI_POPUP and _ammo_main_slot != null:
 		var selected_ammo = loadout[type] if type >= 0 and type < loadout.size() else AMMO_DEFAULT_LOADOUT[0]
@@ -657,8 +663,12 @@ func _on_ammo_changed(type):
 	for i in _ammo_buttons:
 		var slot = _ammo_buttons[i]
 		var style = slot.get_theme_stylebox("panel").duplicate()
-		if i == type: style.border_color = Color(1, 0.8, 0.2); slot.modulate.a = 1.0
-		else: style.border_color = Color(0.4, 0.4, 0.4); slot.modulate.a = 0.6
+		if i == type:
+			style.border_color = Color(1, 0.8, 0.2)
+			slot.modulate.a = 1.0 if is_tutorial else 0.5
+		else:
+			style.border_color = Color(0.4, 0.4, 0.4)
+			slot.modulate.a = 0.6 if is_tutorial else 0.3
 		slot.add_theme_stylebox_override("panel", style)
 
 func _on_marker_overlay_draw():

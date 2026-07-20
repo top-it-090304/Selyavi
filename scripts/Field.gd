@@ -56,6 +56,23 @@ func _launch_tutorial():
 		var tutorial = tutorial_scene.instantiate()
 		add_child(tutorial)
 
+		var am = get_node_or_null("/root/AudioManager")
+		if am:
+			am.play_tutorial()
+
+		if _musicPlayer:
+			_musicPlayer.stop()
+
+		tutorial.tutorial_finished.connect(_on_tutorial_finished)
+
+func _on_tutorial_finished():
+	var am = get_node_or_null("/root/AudioManager")
+	if am:
+		am.stop()
+
+	if _musicPlayer and current_level % 5 != 0:
+		_musicPlayer.play()
+
 func _on_node_added(node):
 	if node.is_in_group("bases"):
 		_connect_base(node)
@@ -189,7 +206,6 @@ func _show_game_over_screen(is_victory: bool, reason: String = ""):
 		var btn_style = StyleBoxFlat.new(); btn_style.bg_color = Color(0.2, 0.22, 0.2); btn_style.set_corner_radius_all(12)
 		btn.add_theme_stylebox_override("normal", btn_style); btn.add_theme_font_size_override("font_size", 24)
 
-	# ИСПРАВЛЕНО: Кнопка "Следующая миссия" теперь доступна всегда до 25 миссии (или до лимита твоих уровней)
 	if is_victory and current_level < 25:
 		var btn_next = Button.new(); btn_next.text = "СЛЕДУЮЩАЯ МИССИЯ"; style_btn.call(btn_next); btn_container.add_child(btn_next)
 		btn_next.pressed.connect(func(): get_tree().paused = false; var next_lvl = current_level + 1; if SaveManager: SaveManager.current_level = next_lvl; get_tree().change_scene_to_file("res://scenes/Levels/Level_" + str(next_lvl) + ".tscn"))
