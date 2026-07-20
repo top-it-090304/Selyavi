@@ -108,7 +108,7 @@ theme_override_constants/separation = 40
 alignment = 1
 
 [node name="ImageRect" type="TextureRect" parent="UI/MainPanel/ContentContainer"]
-custom_minimum_size = Vector2(0, 300)
+custom_minimum_size = Vector2(0, 150)
 layout_mode = 2
 size_flags_vertical = 3
 expand_mode = 1
@@ -120,9 +120,9 @@ layout_mode = 2
 theme_override_constants/separation = 20
 
 [node name="FOVSlider" type="HSlider" parent="UI/MainPanel/ContentContainer/FOVSliderContainer"]
-custom_minimum_size = Vector2(600, 60)
+custom_minimum_size = Vector2(250, 60)
 layout_mode = 2
-size_flags_horizontal = 4
+size_flags_horizontal = 3
 theme_override_styles/slider = SubResource("StyleBoxFlat_slider_bg")
 theme_override_styles/grabber_area = SubResource("StyleBoxFlat_slider_fill")
 theme_override_styles/grabber_area_highlight = SubResource("StyleBoxFlat_slider_fill")
@@ -132,15 +132,18 @@ value = 50.0
 [node name="TextLabel" type="Label" parent="UI/MainPanel/ContentContainer"]
 custom_minimum_size = Vector2(200, 0)
 layout_mode = 2
+size_flags_vertical = 1
 theme_override_constants/line_spacing = 25
 theme_override_fonts/font = ExtResource("3")
 theme_override_font_sizes/font_size = 42
 text = "Инструкция Командира..."
 horizontal_alignment = 1
+vertical_alignment = 1
 autowrap_mode = 3
 
 [node name="SkipButton" type="Button" parent="UI/MainPanel"]
-layout_mode = 0
+layout_mode = 1
+anchors_preset = -1
 offset_left = 25.0
 offset_top = 25.0
 offset_right = 115.0
