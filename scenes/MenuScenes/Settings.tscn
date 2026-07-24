@@ -512,6 +512,18 @@ theme_override_styles/pressed = SubResource("StyleBoxFlat_red_pressed")
 theme_override_styles/normal = SubResource("StyleBoxFlat_red_normal")
 text = "СБРОСИТЬ ПРОГРЕСС"
 
+[node name="ResetAchievementsBtn" type="Button" parent="VBoxMain/ContentContainer/SettingsPanel/GameSettings/Margin/VBox"]
+custom_minimum_size = Vector2(350, 70)
+layout_mode = 2
+size_flags_horizontal = 4
+focus_mode = 0
+theme_override_fonts/font = ExtResource("2")
+theme_override_font_sizes/font_size = 24
+theme_override_styles/hover = SubResource("StyleBoxFlat_red_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_red_pressed")
+theme_override_styles/normal = SubResource("StyleBoxFlat_red_normal")
+text = "СБРОСИТЬ ДОСТИЖЕНИЯ"
+
 [node name="Spacer" type="Control" parent="VBoxMain/ContentContainer/SettingsPanel/GameSettings/Margin/VBox"]
 custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
@@ -603,13 +615,28 @@ initial_position = 2
 size = Vector2i(800, 500)
 unresizable = true
 borderless = true
+transparent = true
 always_on_top = true
 ok_button_text = "ДА, СБРОСИТЬ"
 dialog_text = "Вы уверены, что хотите сбросить весь прогресс? Это действие необратимо."
 cancel_button_text = "ОТМЕНА"
 
+[node name="ResetAchievementsConfirmation" type="ConfirmationDialog" parent="."]
+title = "ПОДТВЕРЖДЕНИЕ"
+initial_position = 2
+size = Vector2i(800, 500)
+unresizable = true
+borderless = true
+transparent = true
+always_on_top = true
+ok_button_text = "ДА, СБРОСИТЬ"
+dialog_text = "Вы уверены, что хотите сбросить прогресс всех достижений? Это действие необратимо."
+cancel_button_text = "ОТМЕНА"
+
 [connection signal="pressed" from="VBoxMain/ContentContainer/SideMenu/GameTab" to="." method="_on_tab_pressed" binds= ["game"]]
 [connection signal="pressed" from="VBoxMain/ContentContainer/SideMenu/AudioTab" to="." method="_on_tab_pressed" binds= ["audio"]]
 [connection signal="pressed" from="VBoxMain/ContentContainer/SettingsPanel/GameSettings/Margin/VBox/ResetProgressBtn" to="." method="_on_reset_btn_pressed"]
+[connection signal="pressed" from="VBoxMain/ContentContainer/SettingsPanel/GameSettings/Margin/VBox/ResetAchievementsBtn" to="." method="_on_reset_achievements_pressed"]
 [connection signal="pressed" from="VBoxMain/Return_Button" to="." method="_on_Return_Button_pressed"]
 [connection signal="confirmed" from="ResetConfirmation" to="." method="_on_reset_progress_confirmed"]
+[connection signal="confirmed" from="ResetAchievementsConfirmation" to="." method="_on_reset_achievements_confirmed"]

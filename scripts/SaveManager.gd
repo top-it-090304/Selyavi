@@ -227,6 +227,10 @@ func reset_progress():
 			"body_type": 1,
 			"gun_type": 1,
 			"color_type": 0,
+			"ammo_type": 0,
+			"ammo_slot_0": 2,
+			"ammo_slot_1": 0,
+			"ammo_slot_2": 1,
 			"base_hp_level": 0,
 			"base_heal_level": 0,
 			"base_bonus_level": 0,
@@ -236,6 +240,7 @@ func reset_progress():
 			"bodies": [1],
 			"guns": [1],
 			"colors": [0],
+			"ammo_types": [0, 1, 2],
 			"base_hp": [0],
 			"base_heal": [0],
 			"base_bonus": [0],
@@ -246,3 +251,8 @@ func reset_progress():
 	}
 	save_game()
 	money_loaded.emit(0)
+
+func reset_achievements():
+	save_data["achievements"] = {}
+	save_data["achievements_unlocked"] = []
+	save_game()

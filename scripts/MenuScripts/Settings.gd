@@ -5,6 +5,7 @@ extends Control
 @onready var game_tab_btn = find_child("GameTab", true)
 @onready var audio_tab_btn = find_child("AudioTab", true)
 @onready var reset_dialog = get_node("ResetConfirmation")
+@onready var reset_achievements_dialog = get_node_or_null("ResetAchievementsConfirmation")
 
 var _music_slider: Slider
 var _sound_slider: Slider
@@ -17,6 +18,7 @@ var _graphics_quality_selector: OptionButton
 var _ammo_ui_selector: OptionButton
 var _return_button: Button
 var _reset_progress_btn: Button
+var _reset_achievements_btn: Button
 
 # Переменные для выбора цвета прицела
 var _btn_main_prev: Button
@@ -40,6 +42,7 @@ func _ready():
 	_graphics_quality_selector = game_settings.find_child("OptionButton_GraphicsQuality", true)
 	_ammo_ui_selector = game_settings.find_child("OptionButton_AmmoUiMode", true)
 	_reset_progress_btn = game_settings.find_child("ResetProgressBtn", true)
+	_reset_achievements_btn = game_settings.find_child("ResetAchievementsBtn", true)
 
 	# Инициализация кнопок выбора цвета
 	_btn_main_prev = game_settings.find_child("BtnScopeMainPrev", true)
@@ -57,7 +60,10 @@ func _ready():
 	_update_return_button_text()
 	_setup_sfx_preview()
 	_apply_tab_styles()
-	_setup_reset_dialog_style()
+
+	_setup_reset_dialog_style(reset_dialog)
+	_setup_reset_dialog_style(reset_achievements_dialog)
+
 	_check_reset_button_visibility()
 
 	# Коннекты
@@ -125,26 +131,44 @@ func _setup_ammo_ui_selector():
 	_ammo_ui_selector.add_item("Свайп")
 
 func _check_reset_button_visibility():
-	if _reset_progress_btn == null: return
-
+	var is_from_menu = true
 	var game_mgr = get_node_or_null("/root/GameManager")
-	var is_from_menu = true # По умолчанию считаем, что мы в меню
 
 	if game_mgr and game_mgr.has_meta("from_scene"):
 		var last_scene = game_mgr.get_meta("from_scene")
-		# Если мы пришли из миссии (не из меню), скрываем кнопку
 		if not last_scene.contains("Menu.tscn"):
 			is_from_menu = false
 
-	_reset_progress_btn.visible = is_from_menu
+	if _reset_progress_btn:
+		_reset_progress_btn.visible = is_from_menu
+	if _reset_achievements_btn:
+		_reset_achievements_btn.visible = is_from_menu
 
-func _setup_reset_dialog_style():
-	if not reset_dialog: return
+func _setup_reset_dialog_style(dialog: ConfirmationDialog):
+	if not dialog: return
 
 	var main_font = load("res://assets/fonts/ofont.ru_Shonen.ttf")
 
+	# Настройка основной рамки окна
+	var bg_style = StyleBoxFlat.new()
+	bg_style.bg_color = Color(0.12, 0.15, 0.12, 0.98)
+	bg_style.border_width_left = 6
+	bg_style.border_width_top = 6
+	bg_style.border_width_right = 6
+	bg_style.border_width_bottom = 6
+	bg_style.border_color = Color(0.34, 0.38, 0.27)
+	bg_style.corner_radius_top_left = 30
+	bg_style.corner_radius_top_right = 30
+	bg_style.corner_radius_bottom_right = 30
+	bg_style.corner_radius_bottom_left = 30
+	bg_style.shadow_size = 25
+	bg_style.shadow_color = Color(0, 0, 0, 0.6)
+	bg_style.shadow_offset = Vector2(0, 10)
+
+	dialog.add_theme_stylebox_override("panel", bg_style)
+
 	# Текст сообщения
-	var label = reset_dialog.get_label()
+	var label = dialog.get_label()
 	if label:
 		label.add_theme_font_override("font", main_font)
 		label.add_theme_font_size_override("font_size", 36)
@@ -154,8 +178,8 @@ func _setup_reset_dialog_style():
 		label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		label.custom_minimum_size = Vector2(700, 200)
 
-	# Кнопка ОК (ДА, СБРОСИТЬ)
-	var ok_btn = reset_dialog.get_ok_button()
+	# Кнопка ОК
+	var ok_btn = dialog.get_ok_button()
 	if ok_btn:
 		ok_btn.add_theme_font_override("font", main_font)
 		ok_btn.add_theme_font_size_override("font_size", 32)
@@ -187,7 +211,7 @@ func _setup_reset_dialog_style():
 		ok_btn.add_theme_stylebox_override("focus", StyleBoxEmpty.new())
 
 	# Кнопка ОТМЕНА
-	var cancel_btn = reset_dialog.get_cancel_button()
+	var cancel_btn = dialog.get_cancel_button()
 	if cancel_btn:
 		cancel_btn.add_theme_font_override("font", main_font)
 		cancel_btn.add_theme_font_size_override("font_size", 32)
@@ -214,10 +238,20 @@ func _on_reset_btn_pressed():
 	if reset_dialog:
 		reset_dialog.popup_centered()
 
+func _on_reset_achievements_pressed():
+	if reset_achievements_dialog:
+		reset_achievements_dialog.popup_centered()
+
 func _on_reset_progress_confirmed():
 	var save_mgr = get_node_or_null("/root/SaveManager")
 	if save_mgr and save_mgr.has_method("reset_progress"):
 		save_mgr.reset_progress()
+		get_tree().reload_current_scene()
+
+func _on_reset_achievements_confirmed():
+	var save_mgr = get_node_or_null("/root/SaveManager")
+	if save_mgr and save_mgr.has_method("reset_achievements"):
+		save_mgr.reset_achievements()
 		get_tree().reload_current_scene()
 
 func _on_tab_pressed(tab_name: String):
