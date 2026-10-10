@@ -1,11 +1,8 @@
-[gd_scene load_steps=12 format=4 uid="uid://du53ygvgui6ux"]
+[gd_scene load_steps=9 format=4 uid="uid://du53ygvgui6ux"]
 
-[ext_resource type="Script" uid="uid://wed2dxu8oo17" path="res://scripts/EndlessMode.gd" id="1_tfemr"]
+[ext_resource type="Script" uid="uid://ch0yina2bsfae" path="res://scripts/Levels/EndlessMap.gd" id="1_tfemr"]
 [ext_resource type="Texture2D" uid="uid://d0bnoilig7yxs" path="res://assets/ground_shaker_asset/Terrains/terrain.png" id="2_31hlq"]
 [ext_resource type="PackedScene" uid="uid://csfpndcf2sqpn" path="res://scenes/WallLayer.tscn" id="3_bxwm1"]
-[ext_resource type="PackedScene" uid="uid://336qfi6ddylt" path="res://scenes/Tank/HUD.tscn" id="4_kg4l8"]
-[ext_resource type="PackedScene" uid="uid://mfxaskty4hrm" path="res://scenes/Tank/Player.tscn" id="5_6v6fj"]
-[ext_resource type="AudioStream" uid="uid://bxl5wv7crhm5" path="res://assets/Music/68. Sad Eyes.mp3" id="6_a2aeq"]
 [ext_resource type="PackedScene" uid="uid://crbjyol17koge" path="res://scenes/obtacles/wall.tscn" id="7_oc11q"]
 [ext_resource type="PackedScene" uid="uid://bar6i6iu6fl7r" path="res://scenes/Tank/Boss4.tscn" id="8_tfemr"]
 
@@ -57,8 +54,10 @@ vertices = PackedVector2Array(1328.97, 1308, 1874.7, 1308, 1858.29, 1865.66, 136
 polygons = Array[PackedInt32Array]([PackedInt32Array(0, 1, 2, 3, 4, 5), PackedInt32Array(6, 7, 8, 9, 10), PackedInt32Array(4, 3, 11, 12), PackedInt32Array(12, 11, 13, 14, 15), PackedInt32Array(16, 17, 18, 7, 6), PackedInt32Array(19, 10, 9, 20, 21), PackedInt32Array(22, 23, 24, 25, 26, 27, 28), PackedInt32Array(29, 23, 22, 30, 31), PackedInt32Array(32, 33, 34, 26, 25), PackedInt32Array(35, 36, 31, 30, 37, 38), PackedInt32Array(38, 37, 39, 40), PackedInt32Array(40, 39, 41, 42), PackedInt32Array(43, 42, 41, 28, 27), PackedInt32Array(44, 45, 46, 47, 48), PackedInt32Array(49, 50, 51, 52), PackedInt32Array(19, 53, 10), PackedInt32Array(54, 21, 20, 55, 56, 57), PackedInt32Array(57, 56, 58, 59), PackedInt32Array(60, 61, 62, 63, 64), PackedInt32Array(51, 65, 66, 67, 52), PackedInt32Array(68, 69, 70, 59, 71), PackedInt32Array(67, 72, 73, 74, 75), PackedInt32Array(76, 77, 78, 48, 47), PackedInt32Array(75, 79, 52, 67), PackedInt32Array(80, 75, 74), PackedInt32Array(81, 80, 74, 82), PackedInt32Array(13, 81, 82, 83, 84), PackedInt32Array(13, 84, 14), PackedInt32Array(85, 86, 15, 14), PackedInt32Array(12, 15, 87, 88), PackedInt32Array(89, 88, 87, 90, 60), PackedInt32Array(76, 71, 59, 58, 91, 77), PackedInt32Array(32, 45, 44, 33), PackedInt32Array(43, 27, 0, 5, 92), PackedInt32Array(63, 92, 5, 64), PackedInt32Array(60, 64, 89)])
 outlines = Array[PackedVector2Array]([PackedVector2Array(2952, 3049, 3931, 3049, 3942, 2438, 3736, 2438, 3747, 2115, 3942, 2126, 3942, 1581, 3808, 1531, 3814, 1048, 3669, 1037, 3669, 720, 3931, 714, 3936, 8, 3108, 19, 3102, 125, 2863, 275, 2646, 280, 2658, 136, 1946, 125, 1963, 697, 1746, 664, 1762, 280, 1551, 280, 1512, 141, 978, 153, 995, 2, 267, 14, 272, 130, 156, 581, 239, 987, 684, 1003, 678, 1298, 417, 1431, 28, 1431, 11, 2004, 139, 2004, 361, 2271, 556, 2276, 534, 2527, 534, 2910, 756, 2927, 1012, 2521, 1279, 2538, 1679, 2682, 2191, 2688, 2669, 2143, 2774, 2143, 2791, 1415, 2402, 1409, 2391, 1281, 2213, 1276, 2213, 1409, 2068, 1409, 2074, 1498, 2313, 1504, 2313, 1637, 2452, 1637, 2457, 1915, 2185, 2204, 1245, 2199, 1251, 2032, 1368, 1859, 1868, 1876, 1885, 1298, 1340, 1298, 1384, 848, 1585, 848, 1568, 953, 2391, 975, 2380, 436, 2602, 458, 2580, 848, 2674, 853, 2908, 1114, 3480, 1137, 3486, 1309, 3347, 1626, 3358, 1932, 3219, 2299, 2724, 2799, 3041, 2760)])
 
-[node name="EndlessMode" type="Node2D"]
+[node name="BossMap4" type="Node2D"]
 script = ExtResource("1_tfemr")
+limit_right = 3967
+limit_bottom = 3044
 
 [node name="TileMapLayer" type="TileMapLayer" parent="."]
 z_index = -1
@@ -66,24 +65,6 @@ tile_map_data = PackedByteArray("AAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAIAAAAAAAA
 tile_set = SubResource("TileSet_7ch0h")
 
 [node name="WallLayer" parent="." instance=ExtResource("3_bxwm1")]
-
-[node name="HUD" parent="." instance=ExtResource("4_kg4l8")]
-
-[node name="PlayerTank" parent="." instance=ExtResource("5_6v6fj")]
-position = Vector2(965, 1592)
-
-[node name="Camera2D" type="Camera2D" parent="PlayerTank"]
-limit_left = 0
-limit_top = 0
-limit_right = 3967
-limit_bottom = 3044
-position_smoothing_enabled = true
-
-[node name="MusicPlayer" type="AudioStreamPlayer" parent="."]
-stream = ExtResource("6_a2aeq")
-volume_db = -20.0
-autoplay = true
-bus = &"Music"
 
 [node name="BorderWalls" type="Node" parent="."]
 
@@ -119,3 +100,6 @@ polygon = PackedVector2Array(356, 386, 506, 208, 934, 214, 934, 503, 773, 692, 3
 
 [node name="Boss4" parent="." instance=ExtResource("8_tfemr")]
 position = Vector2(3136, 1875)
+
+[node name="PlayerStart" type="Marker2D" parent="."]
+position = Vector2(965, 1592)

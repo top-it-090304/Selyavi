@@ -3,6 +3,7 @@
 [ext_resource type="Script" path="res://scripts/EndlessMode.gd" id="1"]
 [ext_resource type="PackedScene" uid="uid://336qfi6ddylt" path="res://scenes/Tank/HUD.tscn" id="2"]
 [ext_resource type="PackedScene" uid="uid://mfxaskty4hrm" path="res://scenes/Tank/Player.tscn" id="3"]
+[ext_resource type="AudioStream" uid="uid://bxl5wv7crhm5" path="res://assets/Music/68. Sad Eyes.mp3" id="4"]
 
 [node name="EndlessController" type="Node2D"]
 script = ExtResource("1")
@@ -21,3 +22,8 @@ position_smoothing_enabled = true
 
 [node name="MapContainer" type="Node2D" parent="."]
 z_index = -1
+
+[node name="MusicPlayer" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("4")
+volume_db = -20.0
+bus = &"Music"

@@ -1,4 +1,4 @@
-[gd_scene load_steps=11 format=4 uid="uid://rmwhk4qmodn2"]
+[gd_scene load_steps=11 format=4 uid="uid://b6su27gb0hxju"]
 
 [ext_resource type="Script" uid="uid://wed2dxu8oo17" path="res://scripts/EndlessMode.gd" id="1"]
 [ext_resource type="PackedScene" uid="uid://336qfi6ddylt" path="res://scenes/Tank/HUD.tscn" id="2"]

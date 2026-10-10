@@ -32,9 +32,9 @@ const BOSS_MAPS := [
 	"res://scenes/Levels/EndlessMode/BossWaves/BossMap5.tscn"
 ]
 
-const BOSS_RES := "res://resources/enemies/enemy_boss.tres"
-
 var wave_number: int = 0
+var _last_regular_map: String = ""
+var _last_boss_map: String = ""
 var _wave_points_left: float = 0.0
 var _wave_in_progress: bool = false
 var _spawn_points: Array = []
@@ -84,12 +84,18 @@ func _start_next_wave():
 		_begin_wave_logic()
 
 func _switch_to_random_map():
-	var map_pool = REGULAR_MAPS
 	if wave_number % BOSS_WAVE_INTERVAL == 0:
-		map_pool = BOSS_MAPS
+		_last_boss_map = _pick_without_repeat(BOSS_MAPS, _last_boss_map)
+		_load_map(_last_boss_map)
+	else:
+		_last_regular_map = _pick_without_repeat(REGULAR_MAPS, _last_regular_map)
+		_load_map(_last_regular_map)
 
-	var random_map_path = map_pool[randi() % map_pool.size()]
-	_load_map(random_map_path)
+func _pick_without_repeat(pool: Array, last: String) -> String:
+	var options = pool.filter(func(p): return p != last)
+	if options.is_empty():
+		options = pool
+	return options[randi() % options.size()]
 
 func _load_map(path: String):
 	_fade_screen(true)
@@ -105,8 +111,12 @@ func _load_map(path: String):
 		return
 
 	_current_map_node = map_scene.instantiate()
-	add_child(_current_map_node)
-	move_child(_current_map_node, 0)
+	var container = get_node_or_null("MapContainer")
+	if container:
+		container.add_child(_current_map_node)
+	else:
+		add_child(_current_map_node)
+		move_child(_current_map_node, 0)
 
 	_spawn_points.clear()
 	var spawn_root = _current_map_node.get_node_or_null("EnemySpawnPoints")
@@ -138,9 +148,7 @@ func _begin_wave_logic():
 	_wave_in_progress = true
 	_update_wave_hud()
 
-	if wave_number % BOSS_WAVE_INTERVAL == 0:
-		_spawn_from_resource(BOSS_RES)
-
+	# Босс уже стоит на своей карте; обычные враги спавнятся, только если на карте есть точки спавна
 	_spawn_timer.start()
 
 func _fade_screen(out: bool):
@@ -160,7 +168,7 @@ func _fade_screen(out: bool):
 	tween.tween_property(overlay, "color:a", 1.0 if out else 0.0, 0.4)
 
 func _on_spawn_tick():
-	if _wave_points_left <= 0:
+	if _wave_points_left <= 0 or _spawn_points.is_empty():
 		_spawn_timer.stop()
 		return
 
