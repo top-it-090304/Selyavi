@@ -260,7 +260,10 @@ func _update_wave_music():
 func _update_wave_hud():
 	var huds = get_tree().get_nodes_in_group("hud")
 	if huds.size() > 0 and huds[0].has_method("set_header_label"):
-		huds[0].set_header_label("ВОЛНА " + str(wave_number))
+		if wave_number % BOSS_WAVE_INTERVAL == 0:
+			huds[0].set_header_label("ВОЛНА " + str(wave_number), Color(1, 0.3, 0.3))
+		else:
+			huds[0].set_header_label("ВОЛНА " + str(wave_number))
 
 func _on_base_destroyed(type: int):
 	if type == 0:
