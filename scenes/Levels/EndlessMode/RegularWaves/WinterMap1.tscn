@@ -1,6 +1,6 @@
 [gd_scene load_steps=8 format=4 uid="uid://bixrlawo80ghx"]
 
-[ext_resource type="Script" path="res://scripts/Levels/EndlessMap.gd" id="1_r6b0d"]
+[ext_resource type="Script" uid="uid://ch0yina2bsfae" path="res://scripts/Levels/EndlessMap.gd" id="1_r6b0d"]
 [ext_resource type="Texture2D" uid="uid://d0bnoilig7yxs" path="res://assets/ground_shaker_asset/Terrains/terrain.png" id="2_bdy72"]
 [ext_resource type="PackedScene" uid="uid://csfpndcf2sqpn" path="res://scenes/WallLayer.tscn" id="3_qkqoc"]
 [ext_resource type="PackedScene" uid="uid://crbjyol17koge" path="res://scenes/obtacles/wall.tscn" id="4_lg7t6"]

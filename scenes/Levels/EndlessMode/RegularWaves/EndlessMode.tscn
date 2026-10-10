@@ -1,6 +1,6 @@
-[gd_scene load_steps=11 format=4]
+[gd_scene load_steps=11 format=4 uid="uid://rmwhk4qmodn2"]
 
-[ext_resource type="Script" path="res://scripts/EndlessMode.gd" id="1"]
+[ext_resource type="Script" uid="uid://wed2dxu8oo17" path="res://scripts/EndlessMode.gd" id="1"]
 [ext_resource type="PackedScene" uid="uid://336qfi6ddylt" path="res://scenes/Tank/HUD.tscn" id="2"]
 [ext_resource type="PackedScene" uid="uid://mfxaskty4hrm" path="res://scenes/Tank/Player.tscn" id="3"]
 [ext_resource type="PackedScene" uid="uid://crbjyol17koge" path="res://scenes/obtacles/wall.tscn" id="5"]

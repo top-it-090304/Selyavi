@@ -11,7 +11,8 @@ func _go_to_missions():
 	get_tree().change_scene_to_file("res://scenes/MenuScenes/LevelSelector.tscn")
 
 func _go_to_endless_mode():
-	var path = "res://scenes/EndlessMode.tscn"
+	# Исправленный путь к контроллеру (он лежит в корне папки EndlessMode)
+	var path = "res://scenes/Levels/EndlessMode/EndlessMode.tscn"
 	if has_node("/root/LoadingManager"):
 		get_node("/root/LoadingManager").load_level(path)
 	else:

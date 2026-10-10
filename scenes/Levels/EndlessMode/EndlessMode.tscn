@@ -1,0 +1,23 @@
+[gd_scene load_steps=5 format=4]
+
+[ext_resource type="Script" path="res://scripts/EndlessMode.gd" id="1"]
+[ext_resource type="PackedScene" uid="uid://336qfi6ddylt" path="res://scenes/Tank/HUD.tscn" id="2"]
+[ext_resource type="PackedScene" uid="uid://mfxaskty4hrm" path="res://scenes/Tank/Player.tscn" id="3"]
+
+[node name="EndlessController" type="Node2D"]
+script = ExtResource("1")
+
+[node name="HUD" parent="." instance=ExtResource("2")]
+
+[node name="PlayerTank" parent="." instance=ExtResource("3")]
+position = Vector2(0, 0)
+
+[node name="Camera2D" type="Camera2D" parent="PlayerTank"]
+limit_left = 0
+limit_top = 0
+limit_right = 3967
+limit_bottom = 3044
+position_smoothing_enabled = true
+
+[node name="MapContainer" type="Node2D" parent="."]
+z_index = -1
