@@ -97,10 +97,6 @@ go_to_settings={
 
 pointing/emulate_touch_from_mouse=true
 
-[navigation]
-
-3d/merge_rasterizer_cell_scale=0.001
-
 [physics]
 
 common/enable_pause_aware_picking=true
