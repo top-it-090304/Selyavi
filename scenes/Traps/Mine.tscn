@@ -1,6 +1,6 @@
 [gd_scene load_steps=3 format=3 uid="uid://ht5iqky38mub"]
 
-[ext_resource type="Script" uid="uid://cmine001" path="res://scripts/Traps/Mine.gd" id="1_script"]
+[ext_resource type="Script" path="res://scripts/Traps/Mine.gd" id="1_script"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_mine"]
 radius = 60.0

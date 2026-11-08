@@ -1,7 +1,7 @@
 [gd_resource type="Resource" script_class="TrapData" load_steps=3 format=3 uid="uid://b8m1n3m1n3m1n"]
 
-[ext_resource type="Script" uid="uid://ctrapdata001" path="res://scripts/Resources/TrapData.gd" id="1"]
-[ext_resource type="Texture2D" uid="uid://cmine96" path="res://assets/TrapsSprites/icons8-land-mine-96.png" id="2"]
+[ext_resource type="Script" path="res://scripts/Resources/TrapData.gd" id="1"]
+[ext_resource type="Texture2D" path="res://assets/TrapsSprites/icons8-land-mine-96.png" id="2"]
 
 [resource]
 script = ExtResource("1")
