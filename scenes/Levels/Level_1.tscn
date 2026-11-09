@@ -107,12 +107,6 @@ drag_top_margin = 0.1
 drag_right_margin = 0.1
 drag_bottom_margin = 0.1
 
-[node name="MusicPlayer" type="AudioStreamPlayer" parent="."]
-stream = ExtResource("6")
-volume_db = -20.712
-autoplay = true
-bus = &"Music"
-
 [node name="IngameWalls" type="Node" parent="."]
 
 [node name="IndestructibleWall" parent="IngameWalls" instance=ExtResource("4")]
@@ -219,6 +213,12 @@ position = Vector2(981, 213)
 
 [node name="DestructibleWall8" parent="IngameWalls" instance=ExtResource("5")]
 position = Vector2(522, 84)
+
+[node name="MusicPlayer" type="AudioStreamPlayer" parent="IngameWalls"]
+stream = ExtResource("6")
+volume_db = -20.712
+autoplay = true
+bus = &"Music"
 
 [node name="IndestructibleWall#IndestructibleWall12" parent="." instance=ExtResource("4")]
 position = Vector2(1488, 78)

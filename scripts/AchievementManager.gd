@@ -33,7 +33,7 @@ const ACHIEVEMENTS := [
 	{"id": "level19_light_hull", "name": "Лёгкая победа", "desc": "Пройдите миссию 4.4, используя лёгкий корпус", "rank": "silver", "event": "level19_light_hull", "mode": "sum", "target": 1},
 	{"id": "shop_complete", "name": "Всё раскуплено", "desc": "Купите все улучшения и боеприпасы в магазине", "rank": "gold", "event": "shop_purchase", "mode": "custom", "target": 33},
 	{"id": "tutorial_skip", "name": "Ветеран", "desc": "Пропустите обучение в миссии 1.1", "rank": "bronze", "event": "tutorial_skipped", "mode": "sum", "target": 1},
-	{"id": "platinum", "name": "Платина", "desc": "Получите все остальные достижения", "rank": "platinum", "event": "", "mode": "meta", "target": 0},
+	{"id": "platinum", "name": "КОНЕЦ?", "desc": "Получите все остальные достижения", "rank": "platinum", "event": "", "mode": "meta", "target": 0},
 ]
 
 const SHOP_CATEGORY_TOTALS := {

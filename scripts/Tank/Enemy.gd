@@ -60,6 +60,13 @@ var _smoothed_avoidance: Vector2 = Vector2.ZERO
 var _wall_avoidance: Vector2 = Vector2.ZERO
 var _speed_limit_mult: float = 1.0
 var _last_bypass_side: float = 0.0 # Стабилизация выбора стороны объезда
+var _bypass_lock_until_ms: int = 0 # До этого момента сторону объезда не меняем
+var _follow_mult: float = 1.0 # Замедление, чтобы ехать за союзником, а не обгонять его
+var _cached_follow_mult: float = 1.0
+
+const BYPASS_LOCK_MS := 700
+const FOLLOW_SPEED_RATIO := 0.6 # Союзник впереди быстрее этой доли нашей скорости — едем за ним
+const STATIC_PUSH_FORCE := 1.0 # Отталкивание от стационарных и арты (у подвижных союзников 2.5)
 
 # ОПТИМИЗАЦИЯ
 var _logic_frame_offset: int = 0
@@ -299,6 +306,8 @@ func _move_enemy(delta: float):
 
 	_smoothed_avoidance = _smoothed_avoidance.lerp(_cached_avoidance, delta * 12.0)
 	_wall_avoidance = _wall_avoidance.lerp(_cached_wall_avoidance, delta * 10.0)
+	_follow_mult = lerp(_follow_mult, _cached_follow_mult, delta * 6.0)
+	_speed_limit_mult = _follow_mult
 
 	var in_attack_range = false
 	if is_instance_valid(target):
@@ -331,14 +340,25 @@ func _move_enemy_simple(delta: float):
 func _compute_ally_avoidance(forward: Vector2) -> Vector2:
 	var avoidance_force = Vector2.ZERO; var my_pos = global_position; var my_radius = 75.0 * max(scale.x, scale.y); var is_i_boss = _type_enemy == TypeEnemy.BOSS
 	var check_dist_sq = 160000.0 # 400 пикселей
+	var my_speed = max(_chase_speed if (_current_state == State.CHASE or _type_enemy == TypeEnemy.SCOUT) else _patrol_speed, 1.0)
+	var now_ms = Time.get_ticks_msec()
+	if now_ms >= _bypass_lock_until_ms: _last_bypass_side = 0
+	_cached_follow_mult = 1.0
 
 	for other in get_tree().get_nodes_in_group("enemies"):
 		if not is_instance_valid(other) or other == self or other.is_queued_for_deletion() or not (other is CharacterBody2D): continue
 		var dist_sq = my_pos.distance_squared_to(other.global_position)
 		if dist_sq > check_dist_sq: continue
 		var other_type = other.get("_type_enemy")
-		if other_type == TypeEnemy.STATIONARY or other_type == TypeEnemy.ARTILLERY: continue
 		var diff = my_pos - other.global_position; var dist = sqrt(dist_sq); var min_sep_dist = (my_radius + (75.0 * max(other.scale.x, other.scale.y))) * 1.05
+		if other_type == TypeEnemy.STATIONARY or other_type == TypeEnemy.ARTILLERY:
+			# Неподвижные никуда не уедут: только мягко отходим вбок, без торможения и объезда — проход знает навигация
+			if dist < min_sep_dist and forward.length() > 0.1:
+				var static_push = diff.normalized(); var dot_static = static_push.dot(forward)
+				if dot_static < 0: static_push -= forward * dot_static
+				if static_push.length() > 0.01 and not _is_wall_near(static_push.normalized(), my_radius * 0.8):
+					avoidance_force += static_push.normalized() * ((min_sep_dist - dist) / min_sep_dist) * STATIC_PUSH_FORCE
+			continue
 		if dist < min_sep_dist:
 			var mag = (min_sep_dist - dist) / min_sep_dist; var push_dir = diff.normalized()
 			if forward.length() > 0.1:
@@ -352,10 +372,22 @@ func _compute_ally_avoidance(forward: Vector2) -> Vector2:
 			if along > 0 and along < look_ahead:
 				var side_perp = Vector2(-forward.y, forward.x); var dot_side = side_perp.dot(rel)
 				if abs(dot_side) < min_sep_dist * 1.1:
-					var side = _last_bypass_side if _last_bypass_side != 0 else (-1 if dot_side > 0 else 1)
-					if _has_space_for_bypass(side_perp * side, min_sep_dist): avoidance_force += (side_perp * side) * remap(along, 0, look_ahead, (2.5 if is_i_boss else 1.5), 0.4); _last_bypass_side = side
-					elif _has_space_for_bypass(side_perp * -side, min_sep_dist): avoidance_force += (side_perp * -side) * remap(along, 0, look_ahead, (2.5 if is_i_boss else 1.5), 0.4); _last_bypass_side = -side
-					else: _last_bypass_side = 0
+					var other_speed_along = other.velocity.dot(forward)
+					if not is_i_boss and other_speed_along > my_speed * FOLLOW_SPEED_RATIO:
+						# Союзник едет туда же и не сильно медленнее: пристраиваемся следом и подстраиваем скорость
+						var t = clamp((along - min_sep_dist) / max(look_ahead - min_sep_dist, 1.0), 0.0, 1.0)
+						_cached_follow_mult = min(_cached_follow_mult, lerp(clamp(other_speed_along / my_speed, 0.0, 1.0), 1.0, t))
+					else:
+						# Союзник стоит или ползёт: объезжаем, держась выбранной стороны
+						var side = _last_bypass_side if _last_bypass_side != 0 else (-1 if dot_side > 0 else 1)
+						var bypass_mag = remap(along, 0, look_ahead, (2.5 if is_i_boss else 1.5), 0.4)
+						if _has_space_for_bypass(side_perp * side, min_sep_dist):
+							avoidance_force += (side_perp * side) * bypass_mag; _last_bypass_side = side; _bypass_lock_until_ms = now_ms + BYPASS_LOCK_MS
+						elif now_ms >= _bypass_lock_until_ms and _has_space_for_bypass(side_perp * -side, min_sep_dist):
+							avoidance_force += (side_perp * -side) * bypass_mag; _last_bypass_side = -side; _bypass_lock_until_ms = now_ms + BYPASS_LOCK_MS
+						else:
+							# Объехать негде — притормаживаем, а не дёргаемся влево-вправо
+							_cached_follow_mult = min(_cached_follow_mult, 0.4)
 	return avoidance_force
 
 # ОБЪЕЗД СТЕН НА ОСНОВЕ ГАБАРИТОВ (ХИТБОКСА)
