@@ -3,6 +3,12 @@ extends Control
 @onready var list_container = $UI/CenterContainer/AchievementScroll/AchievementList
 
 const RANK_ORDER := ["bronze", "silver", "gold", "platinum"]
+const MEDAL_PATHS := {
+	"bronze": "res://assets/achievements/medal_bronze-chevron.png",
+	"silver": "res://assets/achievements/medal_silver-chevron.png",
+	"gold": "res://assets/achievements/medal_gold-chevron.png",
+	"platinum": "res://assets/achievements/medal_platinum.png",
+}
 
 func _ready():
 	if has_node("/root/AudioManager"):
@@ -29,6 +35,8 @@ func _build_card(ach: Dictionary) -> Control:
 	var font = load("res://assets/fonts/ofont.ru_Shonen.ttf")
 
 	var panel = PanelContainer.new()
+	# Передаём перетаскивание карточки контейнеру прокрутки.
+	panel.mouse_filter = Control.MOUSE_FILTER_PASS
 	var style = StyleBoxFlat.new()
 	style.bg_color = Color(0.16, 0.19, 0.16, 1.0) if unlocked else Color(0.12, 0.13, 0.12, 0.85)
 	style.set_border_width_all(2); style.border_width_left = 8
@@ -39,14 +47,31 @@ func _build_card(ach: Dictionary) -> Control:
 
 	var hbox = HBoxContainer.new(); hbox.add_theme_constant_override("separation", 18); panel.add_child(hbox)
 
-	var rank_label = Label.new()
-	rank_label.text = AchievementManager.RANK_NAMES.get(ach.rank, "")
-	rank_label.custom_minimum_size = Vector2(110, 0)
-	rank_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	rank_label.add_theme_font_size_override("font_size", 18)
-	rank_label.add_theme_font_override("font", font)
-	rank_label.add_theme_color_override("font_color", rank_color if unlocked else rank_color.darkened(0.4))
-	hbox.add_child(rank_label)
+	var rank_box = VBoxContainer.new()
+	rank_box.custom_minimum_size = Vector2(110, 0)
+	rank_box.alignment = BoxContainer.ALIGNMENT_CENTER
+	hbox.add_child(rank_box)
+	if MEDAL_PATHS.has(ach.rank):
+		var medal = TextureRect.new()
+		medal.name = "RankMedal"
+		medal.texture = load(MEDAL_PATHS[ach.rank])
+		medal.custom_minimum_size = Vector2(0, 72)
+		medal.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		medal.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		medal.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		medal.self_modulate = Color.WHITE if unlocked else Color(0.45, 0.45, 0.45, 0.8)
+		rank_box.add_child(medal)
+
+	if not MEDAL_PATHS.has(ach.rank):
+		var rank_label = Label.new()
+		rank_label.text = AchievementManager.RANK_NAMES.get(ach.rank, "")
+		rank_label.custom_minimum_size = Vector2(110, 0)
+		rank_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+		rank_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		rank_label.add_theme_font_size_override("font_size", 18)
+		rank_label.add_theme_font_override("font", font)
+		rank_label.add_theme_color_override("font_color", rank_color if unlocked else rank_color.darkened(0.4))
+		rank_box.add_child(rank_label)
 
 	var vbox = VBoxContainer.new(); vbox.size_flags_horizontal = Control.SIZE_EXPAND_FILL; vbox.add_theme_constant_override("separation", 6); hbox.add_child(vbox)
 
@@ -78,6 +103,7 @@ func _build_card(ach: Dictionary) -> Control:
 		var bar_row = HBoxContainer.new(); bar_row.add_theme_constant_override("separation", 10); vbox.add_child(bar_row)
 
 		var bar = ProgressBar.new()
+		bar.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		bar.min_value = 0; bar.max_value = max(1, progress.target); bar.value = progress.current
 		bar.show_percentage = false
 		bar.custom_minimum_size = Vector2(0, 16)
