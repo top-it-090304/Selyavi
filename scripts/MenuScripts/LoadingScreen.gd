@@ -19,7 +19,7 @@ func _ready():
 		get_tree().change_scene_to_file("res://scenes/MenuScenes/Menu.tscn")
 		return
 
-	# Определяем, уровень ли это с боссом (уровни 5, 10, 15, 20)
+	# Определяем, уровень ли это с боссом (каждая пятая миссия).
 	var lvl = SaveManager.current_level if SaveManager else 1
 	_is_boss_level = (lvl % 5 == 0)
 
@@ -124,10 +124,12 @@ func _process(_delta):
 					boss_name = "РИКОШЕТИР"
 				elif lvl == 15:
 					boss_name = "ИНФЕРНО"
+				elif lvl == 25:
+					boss_name = "БЛИЗНЕЦЫ"
 				elif lvl >= 20:
 					boss_name = "АРТУ"
 
-				status_label.text = boss_name + " ЖДЕТ ТЕБЯ..."
+				status_label.text = boss_name + (" ЖДУТ ТЕБЯ..." if lvl == 25 else " ЖДЕТ ТЕБЯ...")
 				status_label.add_theme_color_override("font_color", Color(1, 0.3, 0.3))
 				_show_start_button()
 			else:

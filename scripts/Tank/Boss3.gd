@@ -213,7 +213,7 @@ func _setup_hp_bar():
 	var canvas := CanvasLayer.new()
 	add_child(canvas)
 
-	_hp_bar = ProgressBar.new()
+	_hp_bar = preload("res://scripts/BossHealthBar.gd").new()
 	_hp_bar.max_value = _max_hp
 	_hp_bar.value = _hp
 	_hp_bar.show_percentage = false

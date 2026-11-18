@@ -1,0 +1,9 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/Tank/TwinInstallationVisual.gd" id="1"]
+[ext_resource type="Texture2D" path="res://assets/effects/twins/mini_installation.png" id="2"]
+
+[node name="TwinInstallationVisual" type="Sprite2D"]
+scale = Vector2(0.08, 0.08)
+texture = ExtResource("2")
+script = ExtResource("1")

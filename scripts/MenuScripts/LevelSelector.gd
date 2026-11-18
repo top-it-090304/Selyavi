@@ -1,17 +1,28 @@
 extends Control
 
-@onready var scroll_container = $UI/CenterContainer/LevelScroll
-@onready var grid = $UI/CenterContainer/LevelScroll/GridContainer
+@onready var page_viewport: Control = $UI/PageViewport
+@onready var page_track: Control = $UI/PageViewport/PageTrack
+@onready var previous_button: Button = $UI/PreviousPage
+@onready var next_button: Button = $UI/NextPage
+@onready var page_indicator: Label = $UI/PageIndicator
+
+const LEVELS_PER_PAGE := 15
+const PAGE_DURATION := 0.3
+const DRAG_SLOP := 14.0
+const TAP_SLOP := 20.0
 
 var _level_count = 25
 var _unlocked_levels = 1
 
-# Параметры для плавной прокрутки
-var target_scroll = 0.0
-var scroll_speed = 0.15
-var is_dragging = false
-var touch_start_pos = Vector2.ZERO
-var scroll_start_pos = 0.0
+var _pages: Array[GridContainer] = []
+var _current_page := 0
+var _page_tween: Tween
+var _pointer_id := -2
+var _touch_start := Vector2.ZERO
+var _track_start := 0.0
+var _max_drag_distance := 0.0
+var _dragging := false
+var _pressed_level := 0
 
 func _ready():
 	if not self is Control: return
@@ -25,61 +36,24 @@ func _ready():
 	if SaveManager != null:
 		_unlocked_levels = SaveManager.save_data.get("unlocked_levels", 1)
 
-	_setup_grid()
+	_setup_pages()
+	_style_page_arrow(previous_button)
+	_style_page_arrow(next_button)
+	previous_button.pressed.connect(_change_page.bind(-1))
+	next_button.pressed.connect(_change_page.bind(1))
+	page_viewport.resized.connect(_layout_pages)
+	_layout_pages()
 
-	if scroll_container:
-		scroll_container.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-		scroll_container.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_AUTO
-		target_scroll = scroll_container.scroll_vertical
-		scroll_container.gui_input.connect(_on_scroll_input)
-
-func _process(_delta):
-	if scroll_container:
-		var current = scroll_container.scroll_vertical
-		if !OS.has_feature("mobile") and Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT):
-			target_scroll = current
-			return
-		if is_dragging:
-			return
-		if abs(current - target_scroll) > 0.5:
-			scroll_container.scroll_vertical = lerp(float(current), float(target_scroll), scroll_speed)
-		else:
-			scroll_container.scroll_vertical = int(target_scroll)
-
-func _on_scroll_input(event):
-	if event is InputEventMouseButton:
-		if event.button_index == MOUSE_BUTTON_WHEEL_UP:
-			target_scroll -= 180
-			_clamp_scroll()
-			accept_event()
-		elif event.button_index == MOUSE_BUTTON_WHEEL_DOWN:
-			target_scroll += 180
-			_clamp_scroll()
-			accept_event()
-
-	if event is InputEventScreenTouch:
-		if event.pressed:
-			is_dragging = true
-			target_scroll = scroll_container.scroll_vertical
-		else:
-			is_dragging = false
-			target_scroll = scroll_container.scroll_vertical
-			_clamp_scroll()
-
-	if event is InputEventScreenDrag:
-		is_dragging = true
-		target_scroll = scroll_container.scroll_vertical
-
-func _clamp_scroll():
-	if not scroll_container: return
-	var max_scroll = max(0, scroll_container.get_v_scroll_bar().max_value - scroll_container.size.y)
-	target_scroll = clamp(target_scroll, 0, max_scroll)
-
-func _setup_grid():
-	if grid == null: return
-	for child in grid.get_children():
-		child.queue_free()
-
+func _setup_pages():
+	for page_index in range(ceili(float(_level_count) / LEVELS_PER_PAGE)):
+		var page := GridContainer.new()
+		page.name = "Page_" + str(page_index + 1)
+		page.columns = 5
+		page.add_theme_constant_override("h_separation", 20)
+		page.add_theme_constant_override("v_separation", 20)
+		page.mouse_filter = Control.MOUSE_FILTER_PASS
+		page_track.add_child(page)
+		_pages.append(page)
 	for i in range(1, _level_count + 1):
 		var btn = Button.new()
 		btn.custom_minimum_size = Vector2(120, 120)
@@ -87,7 +61,7 @@ func _setup_grid():
 		btn.mouse_filter = Control.MOUSE_FILTER_PASS
 		btn.focus_mode = Control.FOCUS_NONE
 
-		var major = ((i - 1) / 5) + 1
+		var major = int((i - 1) / 5) + 1
 		var minor = ((i - 1) % 5) + 1
 		btn.text = str(major) + "." + str(minor)
 		btn.add_theme_font_size_override("font_size", 34)
@@ -95,9 +69,124 @@ func _setup_grid():
 		var is_locked = i > _unlocked_levels
 		_apply_button_style(btn, i, is_locked)
 
-		if !is_locked:
-			btn.gui_input.connect(_on_level_btn_gui_input.bind(i))
-		grid.add_child(btn)
+		_pages[int((i - 1) / LEVELS_PER_PAGE)].add_child(btn)
+
+func _layout_pages():
+	if _page_tween:
+		_page_tween.kill()
+	_pointer_id = -2
+	_dragging = false
+	page_track.size = Vector2(page_viewport.size.x * _pages.size(), page_viewport.size.y)
+	for index in range(_pages.size()):
+		var page := _pages[index]
+		var rows := ceili(float(page.get_child_count()) / 5.0)
+		page.size = Vector2(680, rows * 120 + (rows - 1) * 20)
+		page.position = Vector2(index * page_viewport.size.x + (page_viewport.size.x - page.size.x) * 0.5,
+			(page_viewport.size.y - page.size.y) * 0.5)
+	page_track.position.x = -_current_page * page_viewport.size.x
+	_update_page_controls()
+
+func _style_page_arrow(button: Button):
+	# Та же оливковая палитра, что у кнопки «В меню».
+	var menu_button: Button = $UI/ReturnButton
+	for state in ["normal", "hover", "pressed"]:
+		button.add_theme_stylebox_override(state, menu_button.get_theme_stylebox(state).duplicate())
+	var disabled_style := menu_button.get_theme_stylebox("normal").duplicate() as StyleBoxFlat
+	disabled_style.bg_color = Color(0.12, 0.15, 0.12, 0.65)
+	disabled_style.border_color = Color(0.24, 0.28, 0.22, 0.65)
+	button.add_theme_stylebox_override("disabled", disabled_style)
+	button.add_theme_stylebox_override("focus", StyleBoxEmpty.new())
+	button.add_theme_color_override("font_color", Color(0.74, 0.82, 0.71))
+	button.add_theme_color_override("font_hover_color", Color(0.88, 0.94, 0.84))
+	button.add_theme_color_override("font_pressed_color", Color(0.88, 0.94, 0.84))
+	button.add_theme_color_override("font_disabled_color", Color(0.37, 0.42, 0.34))
+
+func _update_page_controls():
+	var busy := _page_tween != null and _page_tween.is_running()
+	previous_button.disabled = busy or _current_page == 0
+	next_button.disabled = busy or _current_page == _pages.size() - 1
+	var dots := PackedStringArray()
+	for index in range(_pages.size()):
+		dots.append("●" if index == _current_page else "○")
+	page_indicator.text = "   ".join(dots)
+
+func _change_page(direction: int):
+	if _pointer_id != -2 or (_page_tween and _page_tween.is_running()):
+		return
+	_animate_to_page(_current_page + direction)
+
+func _animate_to_page(page_index: int):
+	_current_page = clampi(page_index, 0, _pages.size() - 1)
+	if _page_tween:
+		_page_tween.kill()
+	_page_tween = create_tween().set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+	_page_tween.tween_property(page_track, "position:x", -_current_page * page_viewport.size.x, PAGE_DURATION)
+	_update_page_controls()
+	_page_tween.finished.connect(_update_page_controls)
+
+func _input(event: InputEvent):
+	# Не обрабатываем второй раз события, сгенерированные эмуляцией мыши/тача.
+	if event.device == InputEvent.DEVICE_ID_EMULATION:
+		return
+	if event is InputEventScreenTouch:
+		if event.pressed:
+			_begin_gesture(event.position, event.index)
+		elif _pointer_id == event.index:
+			_end_gesture(event.position, event.canceled)
+	elif event is InputEventScreenDrag and _pointer_id == event.index:
+		_drag_gesture(event.position)
+	elif event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
+		if event.pressed:
+			_begin_gesture(event.position, -1)
+		elif _pointer_id == -1:
+			_end_gesture(event.position, event.canceled)
+	elif event is InputEventMouseMotion and _pointer_id == -1:
+		_drag_gesture(event.position)
+
+func _begin_gesture(point: Vector2, pointer: int):
+	if _pointer_id != -2 or not page_viewport.get_global_rect().has_point(point):
+		return
+	if _page_tween and _page_tween.is_running():
+		return
+	_pointer_id = pointer
+	_touch_start = point
+	_track_start = page_track.position.x
+	_max_drag_distance = 0.0
+	_dragging = false
+	_pressed_level = 0
+	for button in _pages[_current_page].get_children():
+		if not button.disabled and button.get_global_rect().has_point(point):
+			_pressed_level = int(str(button.name).trim_prefix("Level_"))
+			break
+
+func _drag_gesture(point: Vector2):
+	var offset := point - _touch_start
+	_max_drag_distance = maxf(_max_drag_distance, offset.length())
+	if not _dragging and absf(offset.x) >= DRAG_SLOP and absf(offset.x) > absf(offset.y):
+		_dragging = true
+	if _dragging:
+		var desired_x := _track_start + offset.x
+		var last_page_x := -(_pages.size() - 1) * page_viewport.size.x
+		# Небольшое сопротивление у краёв, затем возврат той же анимацией.
+		if desired_x > 0.0:
+			desired_x *= 0.2
+		elif desired_x < last_page_x:
+			desired_x = last_page_x + (desired_x - last_page_x) * 0.2
+		page_track.position.x = desired_x
+
+func _end_gesture(point: Vector2, canceled: bool = false):
+	_drag_gesture(point)
+	_pointer_id = -2
+	if _dragging:
+		var distance := point.x - _touch_start.x
+		var direction := 0
+		if not canceled and absf(distance) >= minf(100.0, page_viewport.size.x * 0.15):
+			direction = -1 if distance > 0 else 1
+		_dragging = false
+		_animate_to_page(_current_page + direction)
+	elif not canceled and _max_drag_distance < TAP_SLOP and _pressed_level > 0:
+		_on_level_pressed(_pressed_level)
+	_pressed_level = 0
 
 func _apply_button_style(btn, i, is_locked):
 	var is_passed = i < _unlocked_levels
@@ -135,33 +224,6 @@ func _apply_button_style(btn, i, is_locked):
 	btn.add_theme_stylebox_override("pressed", style_pressed)
 	btn.add_theme_stylebox_override("disabled", style_normal)
 	btn.add_theme_stylebox_override("focus", StyleBoxEmpty.new())
-
-func _on_level_btn_gui_input(event, level_num):
-	if event is InputEventScreenTouch:
-		if event.pressed:
-			is_dragging = false
-			touch_start_pos = event.position
-			scroll_start_pos = scroll_container.scroll_vertical
-		else:
-			var drag_dist = event.position.distance_to(touch_start_pos)
-			var scroll_dist = abs(scroll_container.scroll_vertical - scroll_start_pos)
-			if drag_dist < 20 and scroll_dist < 10:
-				_on_level_pressed(level_num)
-			is_dragging = false
-			target_scroll = scroll_container.scroll_vertical
-
-	if event is InputEventScreenDrag:
-		is_dragging = true
-		target_scroll = scroll_container.scroll_vertical
-
-	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
-		if event.pressed:
-			touch_start_pos = event.position
-			scroll_start_pos = scroll_container.scroll_vertical
-		else:
-			var drag_dist = event.position.distance_to(touch_start_pos)
-			if drag_dist < 10:
-				_on_level_pressed(level_num)
 
 func _on_level_pressed(level_num: int):
 	if SaveManager:
