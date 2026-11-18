@@ -54,6 +54,19 @@ func get_damage() -> int:
 func _physics_process(delta):
 	# Движение теперь не зависит от FPS (умножаем на delta)
 	var move_amount = _bullet_speed * delta * 60.0 # 60.0 для сохранения баланса скоростей
+	if _is_player:
+		var direction = get_parent().global_transform.basis_xform(_velocity).normalized()
+		var ray = PhysicsRayQueryParameters2D.create(global_position, global_position + direction * (move_amount + 30.0), 49)
+		ray.exclude = [get_rid()]
+		if _ignored_body_rid.is_valid(): ray.exclude.append(_ignored_body_rid)
+		var hit = get_world_2d().direct_space_state.intersect_ray(ray)
+		if hit and hit.collider.has_method("reflect_player_projectile"):
+			hit.collider.reflect_player_projectile(self, hit.position, hit.normal)
+			return
+		if hit and hit.collider.is_in_group("enemy_installations"):
+			global_position = hit.position
+			_on_body_entered(hit.collider)
+			return
 	position += _velocity * move_amount
 	_traveled_distance += move_amount
 
@@ -66,6 +79,15 @@ func _on_area_entered(_area):
 func _on_body_entered(body):
 	if body in _hit_targets: return
 	if _ignored_body_rid.is_valid() and body.get_rid() == _ignored_body_rid: return
+	if body.has_method("reflect_player_projectile"):
+		body.reflect_player_projectile(self, global_position, body.surface_normal(global_position))
+		return
+	if body.is_in_group("enemy_installations"):
+		if _is_player:
+			_hit_targets.append(body)
+			body.take_damage(_damage)
+			_explode(body)
+		return
 
 	var parent = body.get_parent()
 	if parent is Base or body.is_in_group("bases"):
@@ -139,10 +161,23 @@ func _destroy(exclude_body: Node = null):
 func init(type_bullet: int, is_player: bool, damage: int = 0, ignored_rid: RID = RID(), custom_range: float = -1.0):
 	_type_bullet = type_bullet
 	_is_player = is_player
+	set_collision_mask_value(5, _is_player)
+	set_collision_mask_value(6, _is_player)
 	_damage = damage
 	_ignored_body_rid = ignored_rid
 	_update_visuals_and_speed()
 	if custom_range > 0: _max_range = custom_range
+
+func reflect_from_shield(normal: Vector2, impact: Vector2, shield_rid: RID):
+	var direction = get_parent().global_transform.basis_xform(_velocity).normalized().bounce(normal)
+	_velocity = get_parent().global_transform.basis_xform_inv(direction).normalized()
+	rotation = _velocity.angle() + PI / 2
+	global_position = impact + direction * 5.0
+	_is_player = false
+	_ignored_body_rid = shield_rid
+	_hit_targets.clear()
+	set_collision_mask_value(5, false)
+	set_collision_mask_value(6, false)
 
 func _update_visuals_and_speed():
 	# ЦИФРЫ СКОРОСТИ СОХРАНЕНЫ ДЛЯ БАЛАНСА, НО ТЕПЕРЬ ОНИ СТАБИЛЬНЫ
@@ -184,6 +219,7 @@ func _apply_aoe_damage(hit_body: Node):
 		if c == hit_body: continue
 		if _is_player:
 			if c is Enemy: c.take_damage(splash_damage)
+			elif c.is_in_group("enemy_installations"): c.take_damage(splash_damage)
 			elif c is Base and c.get("type_base") == 1: c.take_damage(splash_damage)
 		else:
 			if c is Player: c.take_damage(splash_damage)

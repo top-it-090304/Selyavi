@@ -2,17 +2,22 @@ extends Control
 
 @onready var list_container = $UI/CenterContainer/AchievementScroll/AchievementList
 
-const RANK_ORDER := ["bronze", "silver", "gold", "platinum"]
+const RANK_ORDER := ["bronze", "silver", "gold", "sapphire", "platinum"]
+const HIDDEN_BAR_SCRIPT = preload("res://scripts/MenuScripts/HiddenAchievementBar.gd")
+const HIDDEN_MEDAL_PATH = "res://assets/achievements/medal_hidden_question.png"
 const MEDAL_PATHS := {
 	"bronze": "res://assets/achievements/medal_bronze-chevron.png",
 	"silver": "res://assets/achievements/medal_silver-chevron.png",
 	"gold": "res://assets/achievements/medal_gold-chevron.png",
+	"sapphire": "res://assets/achievements/medal_sapphire.png",
 	"platinum": "res://assets/achievements/medal_platinum.png",
 }
 
 func _ready():
 	if has_node("/root/AudioManager"):
 		get_node("/root/AudioManager").play_menu()
+	# Покупки из старого сохранения тоже должны выдать награду за полный магазин.
+	AchievementManager.report("shop_purchase")
 	_build_list()
 
 func _build_list():
@@ -31,6 +36,7 @@ func _build_list():
 
 func _build_card(ach: Dictionary) -> Control:
 	var unlocked = AchievementManager.is_unlocked(ach.id)
+	var hidden_locked = bool(ach.get("hidden", false)) and not unlocked
 	var rank_color: Color = AchievementManager.RANK_COLORS.get(ach.rank, Color.WHITE)
 	var font = load("res://assets/fonts/ofont.ru_Shonen.ttf")
 
@@ -42,7 +48,7 @@ func _build_card(ach: Dictionary) -> Control:
 	style.set_border_width_all(2); style.border_width_left = 8
 	style.border_color = rank_color if unlocked else rank_color.darkened(0.5)
 	style.set_corner_radius_all(14)
-	style.set_content_margin_all(16)
+	style.set_content_margin_all(20)
 	panel.add_theme_stylebox_override("panel", style)
 
 	var hbox = HBoxContainer.new(); hbox.add_theme_constant_override("separation", 18); panel.add_child(hbox)
@@ -54,12 +60,12 @@ func _build_card(ach: Dictionary) -> Control:
 	if MEDAL_PATHS.has(ach.rank):
 		var medal = TextureRect.new()
 		medal.name = "RankMedal"
-		medal.texture = load(MEDAL_PATHS[ach.rank])
-		medal.custom_minimum_size = Vector2(0, 72)
+		medal.texture = load(HIDDEN_MEDAL_PATH if hidden_locked else MEDAL_PATHS[ach.rank])
+		medal.custom_minimum_size = Vector2(0, 96)
 		medal.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 		medal.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 		medal.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		medal.self_modulate = Color.WHITE if unlocked else Color(0.45, 0.45, 0.45, 0.8)
+		medal.self_modulate = Color.WHITE if unlocked or hidden_locked else Color(0.45, 0.45, 0.45, 0.8)
 		rank_box.add_child(medal)
 
 	if not MEDAL_PATHS.has(ach.rank):
@@ -79,7 +85,7 @@ func _build_card(ach: Dictionary) -> Control:
 	var name_label = Label.new()
 	name_label.text = ach.name
 	name_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	name_label.add_theme_font_size_override("font_size", 24)
+	name_label.add_theme_font_size_override("font_size", 28)
 	name_label.add_theme_font_override("font", font)
 	name_label.add_theme_color_override("font_color", Color(0.94, 0.96, 0.92) if unlocked else Color(0.55, 0.58, 0.53))
 	title_row.add_child(name_label)
@@ -87,18 +93,24 @@ func _build_card(ach: Dictionary) -> Control:
 	if unlocked:
 		var check_label = Label.new()
 		check_label.text = "ПОЛУЧЕНО"
-		check_label.add_theme_font_size_override("font_size", 16)
+		check_label.add_theme_font_size_override("font_size", 18)
 		check_label.add_theme_font_override("font", font)
 		check_label.add_theme_color_override("font_color", rank_color)
 		title_row.add_child(check_label)
 
 	var desc_label = Label.new()
-	desc_label.text = ach.desc
-	desc_label.add_theme_font_size_override("font_size", 15)
+	desc_label.text = "Скрытое достижение" if hidden_locked else ach.desc
+	desc_label.add_theme_font_size_override("font_size", 18)
 	desc_label.add_theme_color_override("font_color", Color(0.75, 0.78, 0.72) if unlocked else Color(0.5, 0.52, 0.48))
 	vbox.add_child(desc_label)
 
-	if ach.mode != "meta":
+	if hidden_locked:
+		var hidden_bar = HIDDEN_BAR_SCRIPT.new()
+		hidden_bar.name = "HiddenProgress"
+		hidden_bar.custom_minimum_size = Vector2(0, 16)
+		hidden_bar.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		vbox.add_child(hidden_bar)
+	elif ach.mode != "meta":
 		var progress = AchievementManager.get_progress(ach.id)
 		var bar_row = HBoxContainer.new(); bar_row.add_theme_constant_override("separation", 10); vbox.add_child(bar_row)
 
@@ -117,7 +129,7 @@ func _build_card(ach: Dictionary) -> Control:
 		var count_label = Label.new()
 		count_label.text = str(progress.current) + "/" + str(progress.target)
 		count_label.custom_minimum_size = Vector2(70, 0)
-		count_label.add_theme_font_size_override("font_size", 14)
+		count_label.add_theme_font_size_override("font_size", 16)
 		count_label.add_theme_color_override("font_color", Color(0.75, 0.78, 0.72))
 		bar_row.add_child(count_label)
 	else:
@@ -127,7 +139,7 @@ func _build_card(ach: Dictionary) -> Control:
 			if other.id != ach.id and AchievementManager.is_unlocked(other.id): done += 1
 		var meta_label = Label.new()
 		meta_label.text = "Достижений получено: " + str(done) + "/" + str(total)
-		meta_label.add_theme_font_size_override("font_size", 14)
+		meta_label.add_theme_font_size_override("font_size", 16)
 		meta_label.add_theme_color_override("font_color", Color(0.75, 0.78, 0.72))
 		vbox.add_child(meta_label)
 

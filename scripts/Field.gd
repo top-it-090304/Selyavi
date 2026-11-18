@@ -208,7 +208,16 @@ func _show_game_over_screen(is_victory: bool, reason: String = ""):
 
 	if is_victory and current_level < 25:
 		var btn_next = Button.new(); btn_next.text = "СЛЕДУЮЩАЯ МИССИЯ"; style_btn.call(btn_next); btn_container.add_child(btn_next)
-		btn_next.pressed.connect(func(): get_tree().paused = false; var next_lvl = current_level + 1; if SaveManager: SaveManager.current_level = next_lvl; get_tree().change_scene_to_file("res://scenes/Levels/Level_" + str(next_lvl) + ".tscn"))
+		btn_next.pressed.connect(func():
+			get_tree().paused = false
+			var next_lvl = current_level + 1
+			if SaveManager: SaveManager.current_level = next_lvl
+			var path = "res://scenes/Levels/Level_" + str(next_lvl) + ".tscn"
+			if next_lvl % 5 == 0:
+				LoadingManager.load_level(path)
+			else:
+				get_tree().change_scene_to_file(path)
+		)
 
 	var btn_retry = Button.new(); btn_retry.text = "ИГРАТЬ СНОВА"; style_btn.call(btn_retry); btn_container.add_child(btn_retry)
 	btn_retry.pressed.connect(func(): get_tree().paused = false; get_tree().reload_current_scene())

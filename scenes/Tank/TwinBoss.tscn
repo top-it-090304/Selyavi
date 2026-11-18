@@ -1,7 +1,8 @@
-[gd_scene load_steps=16 format=3 uid="uid://cvjicglanktig"]
+[gd_scene load_steps=17 format=3 uid="uid://cvjicglanktig"]
 
 [ext_resource type="Script" path="res://scripts/Tank/TwinBoss.gd" id="1"]
-[ext_resource type="Texture2D" uid="uid://dhn7jrx5ylpaq" path="res://assets/future_tanks/PNG/Weapon_Color_D/Gun_03.png" id="2"]
+[ext_resource type="Texture2D" uid="uid://t7gtiennifdu" path="res://assets/future_tanks/PNG/Weapon_Color_D_256X256/Gun_06_B.png" id="2"]
+[ext_resource type="Texture2D" uid="uid://dh2c0ums6qdg5" path="res://assets/future_tanks/PNG/Weapon_Color_D_256X256/Gun_06_A.png" id="13_barrels"]
 [ext_resource type="Texture2D" uid="uid://ich10xfcjdqx" path="res://assets/future_tanks/PNG/Hulls_Color_D/Hull_01.png" id="3"]
 [ext_resource type="Texture2D" uid="uid://ckbpx037n4exd" path="res://assets/future_tanks/PNG/Effects/Explosion_C.png" id="4"]
 [ext_resource type="Texture2D" uid="uid://cxcea5x72q078" path="res://assets/future_tanks/PNG/Effects/Explosion_B.png" id="5"]
@@ -75,10 +76,21 @@ texture = ExtResource("3")
 [node name="Gun" type="Sprite2D" parent="BodyTank"]
 position = Vector2(2, 42)
 texture = ExtResource("2")
-offset = Vector2(0, -42)
+offset = Vector2(0, -22)
+
+[node name="Barrels" type="Sprite2D" parent="BodyTank/Gun"]
+show_behind_parent = true
+texture = ExtResource("13_barrels")
+offset = Vector2(0, -22)
+
+[node name="LeftMuzzle" type="Marker2D" parent="BodyTank/Gun/Barrels"]
+position = Vector2(-9, -121)
+
+[node name="RightMuzzle" type="Marker2D" parent="BodyTank/Gun/Barrels"]
+position = Vector2(8, -121)
 
 [node name="BulletPosition" type="Marker2D" parent="BodyTank/Gun"]
-position = Vector2(0, -85)
+position = Vector2(-9, -121)
 
 [node name="NavigationAgent2D" type="NavigationAgent2D" parent="."]
 target_desired_distance = 22.23

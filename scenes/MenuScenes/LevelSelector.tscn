@@ -1,4 +1,4 @@
-[gd_scene load_steps=19 format=4 uid="uid://c8y2vxtx0w1v"]
+[gd_scene load_steps=18 format=4 uid="uid://c8y2vxtx0w1v"]
 
 [ext_resource type="Script" uid="uid://bw3wldkknnu7n" path="res://scripts/MenuScripts/LevelSelector.gd" id="1"]
 [ext_resource type="FontFile" uid="uid://bsnvk4l0ue5ri" path="res://assets/fonts/ofont.ru_Shonen.ttf" id="2"]
@@ -63,8 +63,6 @@ outline_size = 14
 outline_color = Color(0.0784314, 0.0901961, 0.0784314, 1)
 shadow_size = 15
 shadow_color = Color(0, 0, 0, 0.4)
-
-[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_scroll"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn_hover"]
 bg_color = Color(0.25098, 0.301961, 0.25098, 1)
@@ -203,30 +201,65 @@ label_settings = SubResource("LabelSettings_title")
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="CenterContainer" type="CenterContainer" parent="UI"]
+[node name="PageViewport" type="Control" parent="UI"]
+clip_contents = true
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_top = 130.0
-offset_bottom = -100.0
+offset_left = 170.0
+offset_top = 150.0
+offset_right = -170.0
+offset_bottom = -170.0
 grow_horizontal = 2
 grow_vertical = 2
+mouse_filter = 1
+
+[node name="PageTrack" type="Control" parent="UI/PageViewport"]
+layout_mode = 0
+mouse_filter = 1
+
+[node name="PreviousPage" type="Button" parent="UI"]
+layout_mode = 1
+anchor_top = 0.5
+anchor_bottom = 0.5
+offset_left = 55.0
+offset_top = -56.0
+offset_right = 139.0
+offset_bottom = 36.0
+focus_mode = 0
+theme_override_font_sizes/font_size = 48
+text = "❮"
+
+[node name="NextPage" type="Button" parent="UI"]
+layout_mode = 1
+anchor_left = 1.0
+anchor_right = 1.0
+anchor_top = 0.5
+anchor_bottom = 0.5
+offset_left = -139.0
+offset_top = -56.0
+offset_right = -55.0
+offset_bottom = 36.0
+focus_mode = 0
+theme_override_font_sizes/font_size = 48
+text = "❯"
+
+[node name="PageIndicator" type="Label" parent="UI"]
+layout_mode = 1
+anchor_left = 0.5
+anchor_right = 0.5
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = -100.0
+offset_top = -150.0
+offset_right = 100.0
+offset_bottom = -110.0
 mouse_filter = 2
-
-[node name="LevelScroll" type="ScrollContainer" parent="UI/CenterContainer"]
-custom_minimum_size = Vector2(720, 500)
-layout_mode = 2
-theme_override_styles/panel = SubResource("StyleBoxEmpty_scroll")
-horizontal_scroll_mode = 0
-
-[node name="GridContainer" type="GridContainer" parent="UI/CenterContainer/LevelScroll"]
-layout_mode = 2
-size_flags_horizontal = 3
-size_flags_vertical = 3
-theme_override_constants/h_separation = 20
-theme_override_constants/v_separation = 20
-columns = 5
+theme_override_colors/font_color = Color(0.741176, 0.819608, 0.705882, 1)
+theme_override_font_sizes/font_size = 26
+horizontal_alignment = 1
+vertical_alignment = 1
 
 [node name="ReturnButton" type="Button" parent="UI"]
 layout_mode = 1

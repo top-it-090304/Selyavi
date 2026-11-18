@@ -628,8 +628,21 @@ func _input(event):
 
 func _update_ammo_cooldowns():
 	if _player == null or not is_instance_valid(_player): return
+	if _player.is_ram_stunned():
+		var slots = _ammo_buttons.values()
+		if is_instance_valid(_ammo_main_slot): slots.append(_ammo_main_slot)
+		for slot in slots:
+			var overlay = slot.get_node("Cooldown") as Control
+			overlay.visible = true
+			overlay.anchor_top = 0.0
+			overlay.anchor_bottom = 1.0
+			overlay.offset_top = 0.0
+			overlay.offset_bottom = 0.0
+		return
 	var timer = _player.get("_shoot_timer")
 	if _ammo_ui_mode == AMMO_UI_POPUP and _ammo_main_slot != null:
+		for slot in _ammo_option_slots:
+			slot.get_node("Cooldown").visible = false
 		var main_cd = _ammo_main_slot.get_node("Cooldown")
 		if timer and not timer.is_stopped():
 			main_cd.visible = true

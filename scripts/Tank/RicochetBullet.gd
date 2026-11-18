@@ -21,11 +21,13 @@ var _is_explosive: bool = false
 var _bullet_sprite: Sprite2D
 
 func is_player() -> bool:
-	return true
+	return _is_player
 
 func init(is_player_bullet: bool, damage_val: int, splash_dmg_val: int,
 		ignored_rid: RID = RID(), bounces: int = DEFAULT_BOUNCES, explosive: bool = false):
-	_is_player = true
+	_is_player = is_player_bullet
+	set_collision_mask_value(5, _is_player)
+	set_collision_mask_value(6, _is_player)
 	_damage = damage_val
 	_splash_damage = splash_dmg_val
 	_ignored_body_rid = ignored_rid
@@ -48,14 +50,21 @@ func _move(delta):
 	var step: Vector2 = dir * move_amount
 	var space_state = get_world_2d().direct_space_state
 	# Проверка коллизии на шаг вперед + запас
-	var ray = PhysicsRayQueryParameters2D.create(global_position, global_position + dir * (move_amount + 14.0))
+	var ray = PhysicsRayQueryParameters2D.create(global_position, global_position + dir * (move_amount + 14.0), 33 if _is_player else 1)
 	ray.exclude = [get_rid()]
 	if _ignored_body_rid.is_valid(): ray.exclude.append(_ignored_body_rid)
+	if _is_player:
+		var shield_ray = PhysicsRayQueryParameters2D.create(global_position, global_position + dir * (move_amount + 30.0), 49)
+		shield_ray.exclude = ray.exclude
+		var shield_hit = space_state.intersect_ray(shield_ray)
+		if shield_hit and shield_hit.collider.has_method("reflect_player_projectile"):
+			shield_hit.collider.reflect_player_projectile(self, shield_hit.position, shield_hit.normal)
+			return
 
 	var hit = space_state.intersect_ray(ray)
 	if hit:
 		var collider = hit.collider
-		if collider is Enemy:
+		if (_is_player and (collider is Enemy or collider.is_in_group("enemy_installations"))) or (not _is_player and collider is Player):
 			collider.take_damage(_damage)
 			_handle_impact(hit.position)
 			return
@@ -65,7 +74,7 @@ func _move(delta):
 				rotation = _velocity.angle() + PI * 0.5
 				_bounces_left -= 1
 				_has_ricocheted = true
-				_damage = int(ceil(_damage * 1.26))
+				_damage += 6
 				_splash_damage = int(ceil(max(1, _splash_damage) * 1.12))
 				global_position = hit.position + hit.normal * 5.0
 				_play_ricochet_fx()
@@ -93,9 +102,26 @@ func _is_wall(collider: Object) -> bool:
 func _on_body_entered(body):
 	if _destroyed: return
 	if _ignored_body_rid.is_valid() and body.get_rid() == _ignored_body_rid: return
-	if body is Enemy:
+	if body.has_method("reflect_player_projectile"):
+		body.reflect_player_projectile(self, global_position, body.surface_normal(global_position))
+		return
+	if (_is_player and (body is Enemy or body.is_in_group("enemy_installations"))) or (not _is_player and body is Player):
 		body.take_damage(_damage)
 		_handle_impact(global_position)
+
+func reflect_from_shield(normal: Vector2, impact: Vector2, shield_rid: RID):
+	_velocity = _velocity.bounce(normal).normalized()
+	rotation = _velocity.angle() + PI / 2
+	global_position = impact + _velocity * 5.0
+	_is_player = false
+	_ignored_body_rid = shield_rid
+	set_collision_mask_value(5, false)
+	set_collision_mask_value(6, false)
+	_bounces_left = maxi(0, _bounces_left - 1)
+	_has_ricocheted = true
+	_damage += 6
+	_splash_damage = int(ceil(max(1, _splash_damage) * 1.12))
+	_play_ricochet_fx()
 
 func _destroy(): _handle_impact(global_position)
 
@@ -113,8 +139,9 @@ func _explode():
 	var results = space_state.intersect_shape(query, 20)
 	for result in results:
 		var c = result.collider
-		if c is Enemy: c.take_damage(_splash_damage)
-		elif c is Base and c.get("type_base") == 1: c.take_damage(_splash_damage)
+		if (_is_player and c is Enemy) or (not _is_player and c is Player): c.take_damage(_splash_damage)
+		elif _is_player and c.is_in_group("enemy_installations"): c.take_damage(_splash_damage)
+		elif c is Base and c.get("type_base") == (1 if _is_player else 0): c.take_damage(_splash_damage)
 	_spawn_explosion_fx()
 	queue_free()
 

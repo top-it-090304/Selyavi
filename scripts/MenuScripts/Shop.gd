@@ -32,6 +32,11 @@ var equip_ammo_btn = null
 var _ammo_preview_icon: TextureRect = null
 var _ammo_preview_name: Label = null
 var _ammo_desc_label: Label = null
+var _ammo_price_label: Label
+var _ammo_stats_label: Label
+var _ammo_page: VBoxContainer
+var _ammo_catalog_buttons: Array[Button] = []
+var _ammo_assign_row: HBoxContainer
 var _slot_panels: Array = []
 var _slot_icons: Array = []
 var _slot_names: Array = []
@@ -83,7 +88,7 @@ var ammo_types = [
 	{"id": 2, "name": "Легкий", "price": 0, "desc": "Быстрый и дальнобойный снаряд с меньшим уроном.", "icon": "res://assets/future_tanks/PNG/Effects/Light_Shell.png"},
 	{"id": 3, "name": "Фугас", "price": 3000, "desc": "Взрывной снаряд: наносит урон по площади вокруг точки попадания.", "icon": "res://assets/future_tanks/PNG/Effects/Granade_Shell.png"},
 	{"id": 4, "name": "БОПС", "price": 4500, "desc": "Бронебойный оперенный снаряд: пробивает не более двух танков по одной линии.", "icon": "res://assets/future_tanks/PNG/Effects/Heavy_Shell.png"},
-	{"id": 5, "name": "Рикошет", "price": 3750, "desc": "Снаряд отскакивает от стен; после каждого рикошета прямой урон и взрыв становятся сильнее.", "icon": "res://assets/future_tanks/PNG/Effects/Laser.png"}
+	{"id": 5, "name": "Рикошет", "price": 3750, "desc": "Снаряд отскакивает от стен до двух раз. При каждом рикошете урон увеличивается на 6. Не взрывается.", "icon": "res://assets/future_tanks/PNG/Effects/Laser.png"}
 ]
 
 # Item Data - Base
@@ -127,6 +132,8 @@ var current_base_feature_idx = 0
 var current_tab = "tank"
 
 var money = 0
+# Display distances and speeds in the same game-world units.
+const PIXELS_PER_SHOP_UNIT := 60.0
 const SHOP_FONT_PATH := "res://assets/fonts/ofont.ru_Shonen.ttf"
 
 func _ready():
@@ -190,188 +197,147 @@ func _setup_ammo_tab():
 		tab_btn.pressed.connect(_on_ammo_tab_pressed)
 		ammo_tab_btn = tab_btn
 
-	var selectors_root = find_child("Selectors", true) as VBoxContainer
-	if selectors_root and ammo_selectors == null:
-		var left_view = find_child("LeftView", true) as VBoxContainer
-		if left_view and _ammo_left_slots_root == null:
-			_ammo_left_margin = MarginContainer.new()
-			_ammo_left_margin.name = "AmmoLoadoutMargin"
-			_ammo_left_margin.visible = false
-			_ammo_left_margin.add_theme_constant_override("margin_left", 18)
-			_ammo_left_margin.add_theme_constant_override("margin_right", 12)
-			_ammo_left_margin.add_theme_constant_override("margin_top", 4)
-			_ammo_left_margin.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-			left_view.add_child(_ammo_left_margin)
-			left_view.move_child(_ammo_left_margin, 0)
+	_ammo_page = VBoxContainer.new()
+	_ammo_page.name = "AmmoPage"
+	_ammo_page.visible = false
+	_ammo_page.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	_ammo_page.anchor_left = 0.07
+	_ammo_page.anchor_top = 0.29
+	_ammo_page.anchor_right = 0.95
+	_ammo_page.anchor_bottom = 0.94
+	_ammo_page.add_theme_constant_override("separation", 12)
+	add_child(_ammo_page)
+	var columns = HBoxContainer.new()
+	columns.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	columns.add_theme_constant_override("separation", 24)
+	_ammo_page.add_child(columns)
+	var catalog_scroll = preload("res://scripts/MenuScripts/ShopSwipeScroll.gd").new()
+	catalog_scroll.name = "AmmoCatalogScroll"
+	catalog_scroll.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_SHOW_NEVER
+	catalog_scroll.custom_minimum_size.x = 360
+	catalog_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	columns.add_child(catalog_scroll)
+	var catalog = VBoxContainer.new()
+	catalog.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	catalog.add_theme_constant_override("separation", 8)
+	catalog_scroll.add_child(catalog)
+	catalog.add_child(_ammo_label("СНАРЯДЫ", 22))
+	for i in range(ammo_types.size()):
+		var button = _create_buy_button()
+		button.name = "AmmoItem" + str(i)
+		button.text = ""
+		button.custom_minimum_size = Vector2(0, 130)
+		var row = HBoxContainer.new()
+		row.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+		row.offset_left = 10
+		row.offset_top = 10
+		row.offset_right = -10
+		row.offset_bottom = -10
+		row.add_theme_constant_override("separation", 12)
+		row.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		button.add_child(row)
+		var preview = TextureRect.new()
+		# Same 110 × 110 texture area as the original 130px preview with 10px padding.
+		preview.custom_minimum_size = Vector2(110, 110)
+		preview.texture = load(ammo_types[i].icon)
+		preview.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		preview.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		preview.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		row.add_child(preview)
+		var title = _ammo_label(ammo_types[i].name, 24)
+		title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		title.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		row.add_child(title)
+		button.alignment = HORIZONTAL_ALIGNMENT_LEFT
+		button.pressed.connect(func():
+			if not catalog_scroll.can_select_item():
+				return
+			current_ammo_idx = i
+			_ammo_assign_row.visible = false
+			update_ui()
+		)
+		catalog.add_child(button)
+		_ammo_catalog_buttons.append(button)
+	var detail_scroll = preload("res://scripts/MenuScripts/ShopSwipeScroll.gd").new()
+	detail_scroll.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_SHOW_NEVER
+	detail_scroll.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	detail_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	detail_scroll.add_theme_stylebox_override("panel", load("res://scenes/MenuScenes/Shop.tscn::StyleBoxFlat_scroll_bg"))
+	columns.add_child(detail_scroll)
+	var details = VBoxContainer.new()
+	details.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	details.add_theme_constant_override("separation", 12)
+	detail_scroll.add_child(details)
+	_ammo_preview_name = _ammo_label("", 28)
+	details.add_child(_ammo_preview_name)
+	_ammo_desc_label = _ammo_label("", 19)
+	details.add_child(_ammo_desc_label)
+	_ammo_stats_label = _ammo_label("", 20)
+	details.add_child(_ammo_stats_label)
+	_ammo_price_label = _ammo_label("", 20)
+	details.add_child(_ammo_price_label)
+	var actions = HBoxContainer.new()
+	actions.add_theme_constant_override("separation", 12)
+	details.add_child(actions)
+	buy_ammo_btn = _create_buy_button()
+	buy_ammo_btn.pressed.connect(_on_buy_ammo_pressed)
+	actions.add_child(buy_ammo_btn)
+	equip_ammo_btn = _create_buy_button()
+	equip_ammo_btn.text = "ПОСТАВИТЬ В СЛОТ"
+	equip_ammo_btn.add_theme_font_size_override("font_size", 20)
+	equip_ammo_btn.pressed.connect(func(): _ammo_assign_row.visible = not _ammo_assign_row.visible)
+	actions.add_child(equip_ammo_btn)
+	_ammo_assign_row = HBoxContainer.new()
+	_ammo_assign_row.visible = false
+	_ammo_assign_row.add_theme_constant_override("separation", 8)
+	details.add_child(_ammo_assign_row)
+	for i in range(3):
+		var assign = _create_buy_button()
+		assign.custom_minimum_size = Vector2(0, 80)
+		assign.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		assign.add_theme_font_size_override("font_size", 26)
+		assign.text = "СЛОТ " + str(i + 1)
+		assign.pressed.connect(func():
+			if not detail_scroll.can_select_item():
+				return
+			_on_equip_to_slot(i)
+			_ammo_assign_row.visible = false
+		)
+		_ammo_assign_row.add_child(assign)
+	var bottom = HBoxContainer.new()
+	bottom.add_theme_constant_override("separation", 16)
+	_ammo_page.add_child(bottom)
+	var loadout_title = _ammo_label("ВАШ\nБОЕЗАПАС", 20)
+	loadout_title.custom_minimum_size.x = 150
+	loadout_title.autowrap_mode = TextServer.AUTOWRAP_OFF
+	bottom.add_child(loadout_title)
+	for i in range(3):
+		var panel = PanelContainer.new()
+		panel.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		panel.add_theme_stylebox_override("panel", load("res://scenes/MenuScenes/Shop.tscn::StyleBoxFlat_scroll_bg"))
+		bottom.add_child(panel)
+		var row = HBoxContainer.new()
+		row.add_theme_constant_override("separation", 10)
+		panel.add_child(row)
+		var icon = TextureRect.new()
+		icon.custom_minimum_size = Vector2(80, 80)
+		icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		row.add_child(icon)
+		_slot_icons.append(icon)
+		var name_label = _ammo_label("", 18)
+		name_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		row.add_child(name_label)
+		_slot_names.append(name_label)
 
-			_ammo_left_slots_root = VBoxContainer.new()
-			_ammo_left_slots_root.name = "AmmoLoadoutPanel"
-			_ammo_left_slots_root.add_theme_constant_override("separation", 12)
-			_ammo_left_slots_root.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-			_ammo_left_margin.add_child(_ammo_left_slots_root)
-
-		var ammo_group = VBoxContainer.new()
-		ammo_group.name = "AmmoSelectors"
-		ammo_group.visible = false
-		ammo_group.add_theme_constant_override("separation", 22)
-		selectors_root.add_child(ammo_group)
-
-		# --- Заголовок просматриваемого снаряда ---
-		# ── Заголовок «просматриваемый снаряд» ──────────────────────────
-		var cat = Label.new()
-		cat.text = "ПРОСМОТР СНАРЯДА"
-		cat.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		cat.label_settings = load("res://scenes/MenuScenes/Shop.tscn::LabelSettings_cat")
-		ammo_group.add_child(cat)
-
-		# ── Главная строка: < | превью | > | купить ──────────────────────
-		var selector = HBoxContainer.new()
-		selector.alignment = BoxContainer.ALIGNMENT_CENTER
-		selector.add_theme_constant_override("separation", 14)
-		ammo_group.add_child(selector)
-
-		var left_btn = _create_selector_button("<")
-		left_btn.pressed.connect(_on_ammo_left_pressed)
-		selector.add_child(left_btn)
-
-		# Панель превью снаряда (фиксированный размер → TextureRect внутри)
-		var preview_panel = Panel.new()
-		preview_panel.custom_minimum_size = Vector2(130, 130)
-		var pst = StyleBoxFlat.new()
-		pst.bg_color = Color(0.07, 0.09, 0.07, 0.9)
-		pst.set_corner_radius_all(12)
-		pst.set_border_width_all(2)
-		pst.border_color = Color(0.35, 0.45, 0.28, 1.0)
-		preview_panel.add_theme_stylebox_override("panel", pst)
-		selector.add_child(preview_panel)
-
-		_ammo_preview_icon = TextureRect.new()
-		_ammo_preview_icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-		_ammo_preview_icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-		_ammo_preview_icon.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-		_ammo_preview_icon.offset_left  = 10
-		_ammo_preview_icon.offset_top   = 10
-		_ammo_preview_icon.offset_right  = -10
-		_ammo_preview_icon.offset_bottom = -10
-		preview_panel.add_child(_ammo_preview_icon)
-
-		var right_btn = _create_selector_button(">")
-		right_btn.pressed.connect(_on_ammo_right_pressed)
-		selector.add_child(right_btn)
-
-		# Правая часть: название + кнопка покупки
-		var info_col = VBoxContainer.new()
-		info_col.add_theme_constant_override("separation", 10)
-		selector.add_child(info_col)
-
-		_ammo_preview_name = Label.new()
-		_ammo_preview_name.add_theme_color_override("font_color", Color(0.85, 0.92, 0.78, 1))
-		_ammo_preview_name.add_theme_font_override("font", load(SHOP_FONT_PATH))
-		_ammo_preview_name.add_theme_font_size_override("font_size", 28)
-		_ammo_preview_name.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		info_col.add_child(_ammo_preview_name)
-
-		var buy_btn = _create_buy_button()
-		buy_btn.name = "BuyAmmo"
-		buy_btn.pressed.connect(_on_buy_ammo_pressed)
-		info_col.add_child(buy_btn)
-
-		# ── Описание ─────────────────────────────────────────────────────
-		var desc_panel = PanelContainer.new()
-		desc_panel.custom_minimum_size = Vector2(650, 0)
-		desc_panel.add_theme_stylebox_override("panel", load("res://scenes/MenuScenes/Shop.tscn::StyleBoxFlat_scroll_bg"))
-		ammo_group.add_child(desc_panel)
-
-		_ammo_desc_label = Label.new()
-		_ammo_desc_label.custom_minimum_size = Vector2(600, 55)
-		_ammo_desc_label.add_theme_color_override("font_color", Color(0.741176, 0.819608, 0.705882, 1))
-		_ammo_desc_label.add_theme_font_override("font", load(SHOP_FONT_PATH))
-		_ammo_desc_label.add_theme_font_size_override("font_size", 17)
-		_ammo_desc_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		_ammo_desc_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-		_ammo_desc_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		desc_panel.add_child(_ammo_desc_label)
-
-		# ── Три слота: слева в LeftView (вместо картинки танка на вкладке «Снаряды») ──
-		var slots_cat = Label.new()
-		slots_cat.text = "СНАРЯЖЕНИЕ В БОЮ"
-		slots_cat.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		slots_cat.label_settings = load("res://scenes/MenuScenes/Shop.tscn::LabelSettings_cat")
-		if _ammo_left_slots_root != null:
-			_ammo_left_slots_root.add_child(slots_cat)
-		else:
-			ammo_group.add_child(slots_cat)
-
-		var slots_row = HBoxContainer.new()
-		slots_row.alignment = BoxContainer.ALIGNMENT_CENTER
-		slots_row.add_theme_constant_override("separation", 8)
-		if _ammo_left_slots_root != null:
-			_ammo_left_slots_root.add_child(slots_row)
-		else:
-			ammo_group.add_child(slots_row)
-
-		_slot_panels.clear(); _slot_icons.clear()
-		_slot_names.clear();  _slot_equip_btns.clear()
-
-		for si in range(3):
-			var slot_vbox = VBoxContainer.new()
-			slot_vbox.custom_minimum_size = Vector2(108, 0)
-			slot_vbox.add_theme_constant_override("separation", 4)
-			slots_row.add_child(slot_vbox)
-
-			# Рамка + иконка (уже по ширине влезает в LeftView с отступами)
-			var slot_panel = Panel.new()
-			slot_panel.custom_minimum_size = Vector2(96, 96)
-			slot_panel.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
-			var sst = StyleBoxFlat.new()
-			sst.bg_color = Color(0.07, 0.09, 0.07, 0.9)
-			sst.set_corner_radius_all(10)
-			sst.set_border_width_all(2)
-			sst.border_color = Color(0.29, 0.34, 0.25, 0.8)
-			slot_panel.add_theme_stylebox_override("panel", sst)
-			slot_vbox.add_child(slot_panel)
-			_slot_panels.append(slot_panel)
-
-			var slot_icon = TextureRect.new()
-			slot_icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-			slot_icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-			slot_icon.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-			slot_icon.offset_left  = 8; slot_icon.offset_top    = 8
-			slot_icon.offset_right = -8; slot_icon.offset_bottom = -8
-			slot_panel.add_child(slot_icon)
-			_slot_icons.append(slot_icon)
-
-			# Подпись «СЛОТ N»
-			var slot_num = Label.new()
-			slot_num.text = "СЛОТ " + str(si + 1)
-			slot_num.add_theme_color_override("font_color", Color(0.44, 0.50, 0.38, 1))
-			slot_num.add_theme_font_override("font", load(SHOP_FONT_PATH))
-			slot_num.add_theme_font_size_override("font_size", 13)
-			slot_num.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-			slot_vbox.add_child(slot_num)
-
-			# Название снаряда в слоте
-			var slot_name_lbl = Label.new()
-			slot_name_lbl.add_theme_color_override("font_color", Color(0.85, 0.92, 0.78, 1))
-			slot_name_lbl.add_theme_font_override("font", load(SHOP_FONT_PATH))
-			slot_name_lbl.add_theme_font_size_override("font_size", 15)
-			slot_name_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-			slot_name_lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-			slot_vbox.add_child(slot_name_lbl)
-			_slot_names.append(slot_name_lbl)
-
-			# Кнопка назначить
-			var equip_slot_btn = _create_buy_button()
-			equip_slot_btn.text = "В СЛОТ"
-			equip_slot_btn.custom_minimum_size = Vector2(104, 48)
-			var _si = si
-			equip_slot_btn.pressed.connect(func(): _on_equip_to_slot(_si))
-			slot_vbox.add_child(equip_slot_btn)
-			_slot_equip_btns.append(equip_slot_btn)
-
-		ammo_selectors = ammo_group
-		buy_ammo_btn = buy_btn
-		equip_ammo_btn = null
+func _ammo_label(value: String, font_size: int) -> Label:
+	var label = Label.new()
+	label.text = value
+	label.add_theme_font_override("font", load(SHOP_FONT_PATH))
+	label.add_theme_font_size_override("font_size", font_size)
+	label.add_theme_color_override("font_color", Color(0.741176, 0.819608, 0.705882, 1))
+	label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	return label
 
 func _create_selector_button(text_value: String) -> Button:
 	var btn = Button.new()
@@ -411,55 +377,42 @@ func _update_ammo_ui():
 	if _ammo_desc_label:
 		_ammo_desc_label.text = ammo_data.desc
 
-	# Левая панель со статами
-	if damage_label:
-		damage_label.text = "СНАРЯД: " + ammo_data.name
-	var effect_text := "СБАЛАНСИРОВАННЫЙ"
-	match current_ammo_idx:
-		0: effect_text = "СБАЛАНСИРОВАННЫЙ"
-		1: effect_text = "ВЫСОКИЙ УРОН"
-		2: effect_text = "ВЫСОКАЯ ДАЛЬНОСТЬ"
-		3: effect_text = "УРОН ПО ОБЛАСТИ"
-		4: effect_text = "ПРОБИТИЕ (2 ТАНКА)"
-		5: effect_text = "РИКОШЕТ + УРОН"
-	if hp_label:    hp_label.text    = "ЭФФЕКТ: " + effect_text
-	if speed_label: speed_label.text = "ПРИМЕНЕНИЕ: В БОЮ"
-	if rof_label:   rof_label.text   = ""
-	if armor_label: armor_label.text = ""
+	var damages = [25, 40, 15, 30, 26, 22]
+	var ranges = [650, 300, 1000, 550, 1100, 1200]
+	var speeds = [540, 240, 420, 300, 480, 540]
+	_ammo_stats_label.text = "БАЗОВЫЙ УРОН: %d\nДАЛЬНОСТЬ: %s ед.\nСКОРОСТЬ: %s ед/с" % [damages[current_ammo_idx], String.num(ranges[current_ammo_idx] / PIXELS_PER_SHOP_UNIT, 1), String.num(speeds[current_ammo_idx] / PIXELS_PER_SHOP_UNIT, 1)]
+	if current_ammo_idx == 3:
+		_ammo_stats_label.text += "\nРАДИУС ВЗРЫВА: %s ед." % String.num(105.0 / PIXELS_PER_SHOP_UNIT, 2)
+	elif current_ammo_idx == 4:
+		_ammo_stats_label.text += "\nПРОБИТИЕ: ДО 2 ТАНКОВ"
+	elif current_ammo_idx == 5:
+		_ammo_stats_label.text += "\nРИКОШЕТЫ: 2"
+	for i in range(_ammo_catalog_buttons.size()):
+		# Preserve the complete button border and dimensions in every state.
+		var item_style = load("res://scenes/MenuScenes/Shop.tscn::StyleBoxFlat_btn_normal").duplicate() as StyleBoxFlat
+		if i == current_ammo_idx:
+			item_style.bg_color = Color(0.290196, 0.341176, 0.25098, 1)
+			item_style.border_color = Color(0.439216, 0.501961, 0.380392, 1)
+		_ammo_catalog_buttons[i].add_theme_stylebox_override("normal", item_style)
 
 	# Кнопка покупки
 	var owned_preview = SaveManager.is_purchased("ammo_types", current_ammo_idx) or ammo_data.price == 0
+	_ammo_price_label.visible = not owned_preview
+	_ammo_price_label.text = "СТОИМОСТЬ: " + str(ammo_data.price) + " монет"
 	if buy_ammo_btn:
 		if owned_preview:
 			buy_ammo_btn.text = "КУПЛЕНО"
 			buy_ammo_btn.disabled = true
 		else:
-			buy_ammo_btn.text = str(ammo_data.price)
+			buy_ammo_btn.text = "КУПИТЬ · " + str(ammo_data.price)
 			buy_ammo_btn.disabled = money < ammo_data.price
 
-	# Три слота: иконка + название + кнопка
-	for si in range(3):
-		if si >= _slot_icons.size(): break
-		var ammo_in_slot = ammo_loadout_slots[si]
-		var slot_data = ammo_types[ammo_in_slot]
-
-		_slot_icons[si].texture = load(slot_data.icon)
-		_slot_names[si].text    = slot_data.name
-
-		# Подсветка активного слота (тот, что совпадает с просматриваемым)
-		var sst: StyleBoxFlat = _slot_panels[si].get_theme_stylebox("panel").duplicate()
-		if ammo_in_slot == current_ammo_idx:
-			sst.border_color = Color(0.55, 0.78, 0.35, 1.0)
-			sst.set_border_width_all(3)
-		else:
-			sst.border_color = Color(0.29, 0.34, 0.25, 0.8)
-			sst.set_border_width_all(2)
-		_slot_panels[si].add_theme_stylebox_override("panel", sst)
-
-		# Кнопка «В СЛОТ»
-		var equip_btn_node: Button = _slot_equip_btns[si]
-		equip_btn_node.disabled = not owned_preview or ammo_in_slot == current_ammo_idx
-		equip_btn_node.text = "НАЗНАЧЕН" if ammo_in_slot == current_ammo_idx else "В СЛОТ"
+	equip_ammo_btn.disabled = not owned_preview
+	buy_ammo_btn.visible = not owned_preview
+	for i in range(3):
+		var slot_data = ammo_types[ammo_loadout_slots[i]]
+		_slot_icons[i].texture = load(slot_data.icon)
+		_slot_names[i].text = "СЛОТ %d\n%s" % [i + 1, slot_data.name]
 
 func _update_tank_ui():
 	var body = bodies[current_body_idx]
@@ -548,6 +501,9 @@ func _update_btn(btn: Button, category: String, id: int, price: int, stat_name: 
 
 func _switch_tab(tab_name: String):
 	current_tab = tab_name
+	$Content.visible = tab_name != "ammo"
+	_ammo_page.visible = tab_name == "ammo"
+	_ammo_assign_row.visible = false
 	var active_style = load("res://scenes/MenuScenes/Shop.tscn::StyleBoxFlat_tab_active")
 	var inactive_style = load("res://scenes/MenuScenes/Shop.tscn::StyleBoxFlat_tab_inactive")
 

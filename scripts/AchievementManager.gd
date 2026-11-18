@@ -6,6 +6,7 @@ const RANK_COLORS := {
 	"bronze": Color("cd7f32"),
 	"silver": Color("c0c0c0"),
 	"gold": Color("ffd700"),
+	"sapphire": Color("4f8fff"),
 	"platinum": Color("b9f2ff"),
 }
 
@@ -13,17 +14,19 @@ const RANK_NAMES := {
 	"bronze": "БРОНЗА",
 	"silver": "СЕРЕБРО",
 	"gold": "ЗОЛОТО",
+	"sapphire": "САПФИР",
 	"platinum": "ПЛАТИНА",
 }
 
 const ACHIEVEMENTS := [
 	{"id": "first_blood", "name": "Первая кровь", "desc": "Уничтожьте первого бота", "rank": "bronze", "event": "enemy_killed", "mode": "sum", "target": 1},
-	{"id": "first_mission", "name": "Разведчик", "desc": "Пройдите первую миссию", "rank": "bronze", "event": "levels_unlocked", "mode": "max", "target": 2},
+	{"id": "first_mission", "name": "Разведчик", "desc": "Пройдите первую миссию", "rank": "bronze", "event": "levels_unlocked", "mode": "max", "target": 2, "progress_offset": 1},
 	{"id": "money_1000", "name": "Первые деньги", "desc": "Заработайте 1000 монет", "rank": "bronze", "event": "money_earned", "mode": "sum", "target": 1000},
 	{"id": "kill_100", "name": "Истребитель танков", "desc": "Уничтожьте 100 ботов", "rank": "silver", "event": "enemy_killed", "mode": "sum", "target": 100},
 	{"id": "bases_20", "name": "Покоритель баз", "desc": "Уничтожьте 20 вражеских баз", "rank": "silver", "event": "base_destroyed", "mode": "sum", "target": 20},
 	{"id": "wave_10", "name": "Волна за волной", "desc": "Продержитесь 10 волн в бесконечном режиме", "rank": "silver", "event": "endless_wave", "mode": "max", "target": 10},
-	{"id": "all_missions", "name": "Победитель", "desc": "Пройдите все 20 миссий", "rank": "gold", "event": "levels_unlocked", "mode": "max", "target": 21},
+	{"id": "all_missions", "name": "Победитель", "desc": "Пройдите 20 миссий", "rank": "gold", "event": "levels_unlocked", "mode": "max", "target": 21, "progress_offset": 1},
+	{"id": "missions_25", "name": "Двойная победа", "desc": "Пройдите все 25 миссий", "rank": "sapphire", "event": "levels_unlocked", "mode": "max", "target": 26, "progress_offset": 1, "hidden": true},
 	{"id": "wave_25", "name": "Легенда бесконечности", "desc": "Продержитесь 25 волн в бесконечном режиме", "rank": "gold", "event": "endless_wave", "mode": "max", "target": 25},
 	{"id": "boss_kills_5", "name": "Убийца боссов", "desc": "Уничтожьте 5 боссов", "rank": "gold", "event": "boss_killed", "mode": "sum", "target": 5},
 	{"id": "bops_double_5", "name": "БОПС-снайпер", "desc": "Убейте 2 противников одним выстрелом БОПС 5 раз", "rank": "silver", "event": "bops_double_kill", "mode": "sum", "target": 5},
@@ -61,6 +64,14 @@ func _ready():
 	_toast_layer.layer = 200
 	_toast_layer.process_mode = Node.PROCESS_MODE_ALWAYS
 	get_tree().root.add_child.call_deferred(_toast_layer)
+	if SaveManager and int(SaveManager.save_data.get("campaign_achievement_version", 0)) < 1:
+		_sync_campaign_achievements.call_deferred()
+
+func _sync_campaign_achievements():
+	# Открытая миссия N означает, что пройдены N - 1 миссий. Учитываем старые сохранения.
+	report("levels_unlocked", maxi(1, int(SaveManager.save_data.get("unlocked_levels", 1))))
+	SaveManager.save_data["campaign_achievement_version"] = 1
+	SaveManager.save_game()
 
 func _get_definition(id: String):
 	for ach in ACHIEVEMENTS:
@@ -94,7 +105,10 @@ func get_progress(id: String) -> Dictionary:
 		current = int(SaveManager.save_data.get("achievements", {}).get(id, 0))
 	if is_unlocked(id):
 		current = ach.target
-	return {"current": min(current, ach.target), "target": ach.target, "unlocked": is_unlocked(id)}
+	# Порог выдачи остаётся номером следующей миссии, в карточке считаем пройденные.
+	var offset = int(ach.get("progress_offset", 0))
+	var target = int(ach.target) - offset
+	return {"current": clampi(current - offset, 0, target), "target": target, "unlocked": is_unlocked(id)}
 
 func report(event: String, amount: int = 1):
 	if not SaveManager or event == "": return

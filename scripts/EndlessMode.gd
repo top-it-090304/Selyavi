@@ -42,8 +42,11 @@ var _spawn_timer: Timer
 var _wave_check_timer: Timer
 var _enemy_scene: PackedScene
 var _current_map_node: Node2D = null
+var _transition_overlay: ColorRect
+var _transition_tween: Tween
 
 func _ready():
+	_setup_transition_overlay()
 	if SaveManager:
 		SaveManager.current_level = 99
 	current_level = 99
@@ -98,17 +101,20 @@ func _pick_without_repeat(pool: Array, last: String) -> String:
 	return options[randi() % options.size()]
 
 func _load_map(path: String):
-	_fade_screen(true)
-	await get_tree().create_timer(0.5).timeout
-
+	# The first frame is already covered; later maps fade out the existing field.
+	if _current_map_node:
+		await _fade_screen(true)
+	# Draw the opaque cover before synchronous resource loading can block a frame.
+	await get_tree().process_frame
+	await RenderingServer.frame_post_draw
+	var map_scene = load(path) as PackedScene
+	if not map_scene:
+		push_error("Unable to load endless map: " + path)
+		await _fade_screen(false)
+		return
 	if _current_map_node:
 		_current_map_node.queue_free()
 		_current_map_node = null
-
-	var map_scene = load(path)
-	if not map_scene:
-		_fade_screen(false)
-		return
 
 	_current_map_node = map_scene.instantiate()
 	var container = get_node_or_null("MapContainer")
@@ -133,9 +139,15 @@ func _load_map(path: String):
 		var start_pos = _current_map_node.get_node_or_null("PlayerStart")
 		if start_pos:
 			player.global_position = start_pos.global_position
+		if cam:
+			cam.reset_smoothing()
+			cam.force_update_scroll()
 
-	_fade_screen(false)
-	await get_tree().create_timer(0.5).timeout
+	# Let TileMaps, navigation and the camera settle underneath the opaque cover.
+	await get_tree().physics_frame
+	await get_tree().process_frame
+	await RenderingServer.frame_post_draw
+	await _fade_screen(false)
 	_begin_wave_logic()
 
 func _begin_wave_logic():
@@ -151,21 +163,24 @@ func _begin_wave_logic():
 	# Босс уже стоит на своей карте; обычные враги спавнятся, только если на карте есть точки спавна
 	_spawn_timer.start()
 
+func _setup_transition_overlay():
+	var canvas = CanvasLayer.new()
+	canvas.name = "MapTransition"
+	canvas.layer = 90
+	add_child(canvas)
+	_transition_overlay = ColorRect.new()
+	_transition_overlay.name = "FadeOverlay"
+	_transition_overlay.color = Color.BLACK
+	_transition_overlay.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	_transition_overlay.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	canvas.add_child(_transition_overlay)
+
 func _fade_screen(out: bool):
-	var hud = get_tree().get_first_node_in_group("hud")
-	if not hud: return
-
-	var overlay = hud.get_node_or_null("FadeOverlay")
-	if not overlay:
-		overlay = ColorRect.new()
-		overlay.name = "FadeOverlay"
-		overlay.color = Color(0, 0, 0, 0)
-		overlay.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-		overlay.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		hud.add_child(overlay)
-
-	var tween = create_tween()
-	tween.tween_property(overlay, "color:a", 1.0 if out else 0.0, 0.4)
+	if _transition_tween and _transition_tween.is_running():
+		_transition_tween.kill()
+	_transition_tween = create_tween()
+	_transition_tween.tween_property(_transition_overlay, "color:a", 1.0 if out else 0.0, 0.4)
+	await _transition_tween.finished
 
 func _on_spawn_tick():
 	if _wave_points_left <= 0 or _spawn_points.is_empty():

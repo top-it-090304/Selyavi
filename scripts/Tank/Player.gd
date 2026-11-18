@@ -29,6 +29,13 @@ var _invul_tween: Tween
 var _controls_inverted: bool = false
 var _inverse_timer: float = 0.0
 
+const RAM_STUN_DURATION: float = 3.0
+const RAM_KNOCKBACK_SPEED: float = 900.0
+const RAM_KNOCKBACK_DECELERATION: float = 3000.0
+var _ram_stun_left: float = 0.0
+var _ram_knockback: Vector2 = Vector2.ZERO
+var _move_input: Vector2 = Vector2.ZERO
+
 # Переменные для эффекта горения
 var _burn_timer: float = 0.0
 var _burn_tick_accum: float = 0.0
@@ -162,11 +169,23 @@ func get_lives() -> int: return _lives
 func get_money() -> int: return _money
 
 func use_move_vector(move_vector: Vector2):
-	var final_vector = -move_vector if _controls_inverted else move_vector
-	velocity = final_vector * _speed
-	if final_vector.length() > 0.01:
-		rotation = final_vector.angle() + PI/2
-	_handle_movement_sound(velocity)
+	_move_input = move_vector
+
+func is_ram_stunned() -> bool:
+	return _ram_stun_left > 0.0
+
+func get_movement_speed() -> float:
+	return _speed * lerpf(1.0, 1.0 / 1.5, clampf(_ram_stun_left / RAM_STUN_DURATION, 0.0, 1.0))
+
+func receive_ram_hit(direction: Vector2, damage: int):
+	var previous_lives = _lives
+	take_damage(damage)
+	# Смертельный удар не должен отбрасывать игрока уже с точки возрождения.
+	if _lives != previous_lives or is_queued_for_deletion():
+		return
+	_ram_stun_left = RAM_STUN_DURATION
+	_ram_knockback = direction.normalized() * RAM_KNOCKBACK_SPEED
+	queue_redraw()
 
 func _get_safe_bullet_spawn_pos() -> Vector2:
 	var start_pos = global_position
@@ -184,7 +203,7 @@ func _get_safe_bullet_spawn_pos() -> Vector2:
 	return end_pos
 
 func fire_touch():
-	if _shoot_timer.time_left > 0: return
+	if is_ram_stunned() or _shoot_timer.time_left > 0: return
 
 	if AudioManager != null:
 		var sound_type = _type_bullet
@@ -265,15 +284,16 @@ func use_move_vector_aim(move_vector: Vector2):
 		var min_angle_diff = deg_to_rad(35.0)
 		var bullet_range = _get_current_bullet_range()
 
-		# Собираем всех потенциальных врагов (танки и вражеские базы)
+		# Собираем танки, установки и вражеские базы.
 		var targets = []
 		targets.append_array(get_tree().get_nodes_in_group("enemies"))
+		targets.append_array(get_tree().get_nodes_in_group("enemy_installations"))
 		for b in get_tree().get_nodes_in_group("bases"):
 			if b.get("type_base") == 1: # 1 == Base.TypeBase.ENEMY
 				targets.append(b)
 
 		for target in targets:
-			if is_instance_valid(target) and _is_target_visible_for_assist(target) and _is_target_on_screen(target):
+			if is_instance_valid(target) and not target.is_queued_for_deletion() and _is_target_visible_for_assist(target) and _is_target_on_screen(target):
 				# Проверка дальности: если враг дальше, чем летит снаряд (с буфером 50), не наводимся
 				var dist = global_position.distance_to(target.global_position)
 				if dist > bullet_range + 50:
@@ -292,7 +312,7 @@ func use_move_vector_aim(move_vector: Vector2):
 func _is_target_visible_for_assist(target: Node) -> bool:
 	var query = PhysicsRayQueryParameters2D.create(global_position, target.global_position)
 	query.exclude = [self]
-	query.collision_mask = 1
+	query.collision_mask = 33 # Стены, танки и уничтожаемые установки.
 	var result = get_world_2d().direct_space_state.intersect_ray(query)
 
 	if result.is_empty():
@@ -310,6 +330,7 @@ func _is_target_on_screen(target: Node) -> bool:
 	return get_viewport().get_visible_rect().has_point(screen_pos)
 
 func _physics_process(delta):
+	_ram_stun_left = maxf(0.0, _ram_stun_left - delta)
 	if _inverse_timer > 0:
 		_inverse_timer -= delta
 		if _inverse_timer <= 0:
@@ -332,22 +353,27 @@ func _physics_process(delta):
 			modulate = Color.WHITE
 			if _burn_particles: _burn_particles.emitting = false
 
+	var input_dir = _move_input
 	if _joystick == null or not _joystick.get_is_joystick_active():
-		var input_dir = Input.get_vector("move_left", "move_right", "move_up", "move_down")
-		if _controls_inverted: input_dir = -input_dir
-		if input_dir.length() > 0:
-			velocity = input_dir * _speed
-			rotation = velocity.angle() + PI/2
-			_handle_movement_sound(velocity)
-		else:
-			velocity = Vector2.ZERO
-			_handle_movement_sound(Vector2.ZERO)
+		input_dir = Input.get_vector("move_left", "move_right", "move_up", "move_down")
+	if _controls_inverted: input_dir = -input_dir
+	var control_velocity = input_dir * get_movement_speed()
+	# Не поворачиваем коллизию корпуса посреди отлёта у стены или второго танка.
+	if input_dir.length() > 0.01 and _ram_knockback.is_zero_approx():
+		rotation = input_dir.angle() + PI / 2
+	velocity = control_velocity + _ram_knockback
+	_handle_movement_sound(velocity)
 
 	if _aim != null and _aim.get_is_joystick_active() and _aim.move_vector.length() > 0.2:
 		fire_touch()
 
 	_check_base_buffs()
 	move_and_slide()
+	for i in range(get_slide_collision_count()):
+		var normal = get_slide_collision(i).get_normal()
+		if _ram_knockback.dot(normal) < 0.0:
+			_ram_knockback = _ram_knockback.slide(normal)
+	_ram_knockback = _ram_knockback.move_toward(Vector2.ZERO, RAM_KNOCKBACK_DECELERATION * delta)
 	queue_redraw()
 
 func _check_base_buffs():
@@ -396,6 +422,10 @@ func _destroy():
 		super._destroy()
 
 func _revive():
+	_ram_stun_left = 0.0
+	_ram_knockback = Vector2.ZERO
+	_move_input = Vector2.ZERO
+	velocity = Vector2.ZERO
 	_hp = _max_hp; global_position = _start_position
 	health_changed.emit(_hp, _max_hp)
 	_update_damage_visuals(); _start_invulnerability(3.0)
@@ -448,7 +478,15 @@ func _update_appearance():
 	var b_name = ["Hull_05", "Hull_02", "Hull_06", "Hull_01", "Hull_03"][_type_body]
 	var g_name = ["Gun_01", "Gun_03", "Gun_08", "Gun_04", "Gun_07"][_type_gun]
 	if _body: _body.texture = load("res://assets/future_tanks/PNG/Hulls_" + color_f + "/" + b_name + ".png")
-	if _gun: _body.get_node("Gun").texture = load("res://assets/future_tanks/PNG/Weapon_" + color_f + "/" + g_name + ".png")
+	if _gun:
+		_gun.texture = load("res://assets/future_tanks/PNG/Weapon_" + color_f + "/" + g_name + ".png")
+		# Align the rotation axis with the hull socket and the solid turret base.
+		var socket_y: float = [24.0, 23.0, 20.0, 47.0, 30.0][_type_body]
+		var turret_y: float = [164.0, 140.0, 112.0, 145.0, 164.0][_type_gun]
+		_gun.position = Vector2(0, socket_y)
+		_gun.offset = Vector2(0, _gun.texture.get_height() * 0.5 - turret_y)
+		if _bullet_position:
+			_bullet_position.position = Vector2(0, 4.0 - turret_y)
 
 func take_heal(amount: int):
 	_hp = min(_hp + amount, _max_hp); health_changed.emit(_hp, _max_hp); _update_damage_visuals()
@@ -467,8 +505,15 @@ func _draw():
 			return
 
 		var range_len = _get_current_bullet_range()
-		draw_line(to_local(_bullet_position.global_position), to_local(_bullet_position.global_position + direction * range_len), _scope_color_main, 2.0)
+		draw_line(to_local(_bullet_position.global_position), to_local(_get_scope_endpoint(direction, range_len)), _scope_color_main, 2.0)
 
+func _get_scope_endpoint(direction: Vector2, range_len: float) -> Vector2:
+	var origin = _bullet_position.global_position
+	var endpoint = origin + direction * range_len
+	var ray = PhysicsRayQueryParameters2D.create(origin, endpoint, 16)
+	ray.hit_from_inside = true
+	var hit = get_world_2d().direct_space_state.intersect_ray(ray)
+	return hit.position if hit else endpoint
 
 func _is_wall_ricochet_preview(c: Object) -> bool:
 	if c == null:
@@ -484,72 +529,58 @@ func _is_wall_ricochet_preview(c: Object) -> bool:
 
 
 func _draw_ricochet_scope_preview(dir: Vector2):
-	const PREVIEW_MAX_RANGE := 2200.0
+	for segment in _get_ricochet_scope_segments(dir):
+		draw_line(to_local(segment.from), to_local(segment.to), _scope_color_bounce if segment.bounced else _scope_color_main, 2.0)
+
+func _get_ricochet_scope_segments(dir: Vector2) -> Array:
+	const PREVIEW_MAX_RANGE := 1200.0
 	const PLAYER_RICOCHET_BOUNCES := 2
 	const RAY_CAP := 6000.0
-
+	var segments: Array = []
 	var pos_g := _bullet_position.global_position
 	var remaining := PREVIEW_MAX_RANGE
 	var bounces_left := PLAYER_RICOCHET_BOUNCES
-	var last_local := to_local(pos_g)
-
+	var hostile := false
+	var excluded: Array[RID] = [get_rid()]
 	var space := get_world_2d().direct_space_state
 	var safety := 0
-	while safety < 12:
+	while safety < 12 and remaining > 0.0:
 		safety += 1
 		var reach := minf(remaining, RAY_CAP)
 		var ray := PhysicsRayQueryParameters2D.create(pos_g, pos_g + dir * reach)
-		ray.exclude = [get_rid()]
+		ray.collision_mask = 1 if hostile else 49
+		ray.exclude = excluded
 		var hit := space.intersect_ray(ray)
-
 		if hit.is_empty():
-			var end_g := pos_g + dir * reach
-			draw_line(last_local, to_local(end_g), _scope_color_main if bounces_left == PLAYER_RICOCHET_BOUNCES else _scope_color_bounce, 2.0)
-			return
-
+			segments.append({"from": pos_g, "to": pos_g + dir * reach, "bounced": hostile or bounces_left < PLAYER_RICOCHET_BOUNCES})
+			break
 		var hit_pos: Vector2 = hit.position
 		var dist := pos_g.distance_to(hit_pos)
-		if dist > remaining:
-			var clip_g := pos_g + dir * remaining
-			draw_line(last_local, to_local(clip_g), _scope_color_main if bounces_left == PLAYER_RICOCHET_BOUNCES else _scope_color_bounce, 2.0)
-			return
-
 		var collider: Object = hit.collider
-		var hit_local := to_local(hit_pos)
-
-		if collider is Enemy:
-			draw_line(last_local, hit_local, _scope_color_main if bounces_left == PLAYER_RICOCHET_BOUNCES else _scope_color_bounce, 2.0)
-			return
-
+		if hostile and collider is Enemy:
+			excluded.append(hit.rid)
+			continue
+		segments.append({"from": pos_g, "to": hit_pos, "bounced": hostile or bounces_left < PLAYER_RICOCHET_BOUNCES})
+		remaining = maxf(0.0, remaining - dist)
+		var shield = collider.has_method("reflect_player_projectile")
+		if (not hostile and (collider is Enemy or collider.is_in_group("enemy_installations"))) or (hostile and collider is Player): break
 		var hit_parent = collider.get_parent() if collider is Node else null
 		if hit_parent and hit_parent.is_in_group("bases"):
-			if hit_parent.get("type_base") == 1: # Enemy Base
-				draw_line(last_local, hit_local, _scope_color_main if bounces_left == PLAYER_RICOCHET_BOUNCES else _scope_color_bounce, 2.0)
-				return
-			# Если это база игрока, она будет обработана ниже в _is_wall_ricochet_preview и отрисует рикошет
-
-		if _is_wall_ricochet_preview(collider):
-			draw_line(last_local, hit_local, _scope_color_main if bounces_left == PLAYER_RICOCHET_BOUNCES else _scope_color_bounce, 2.0)
-			remaining = maxf(0.0, remaining - dist)
-			if bounces_left <= 0:
-				return
-			bounces_left -= 1
+			if hit_parent.get("type_base") == 1: break
+		if shield or _is_wall_ricochet_preview(collider):
+			if not shield and bounces_left <= 0: break
+			bounces_left = maxi(0, bounces_left - 1)
 			var n: Vector2 = hit.get("normal", Vector2.ZERO)
-			if not (n is Vector2):
-				n = Vector2.ZERO
-			if n.length_squared() < 1e-10:
-				return
+			if n.length_squared() < 1e-10: break
 			n = n.normalized()
-			dir = dir.bounce(n)
-			if dir.length_squared() < 1e-10:
-				return
-			dir = dir.normalized()
+			dir = dir.bounce(n).normalized()
 			pos_g = hit_pos + n * 5.0
-			last_local = to_local(pos_g)
+			if shield:
+				hostile = true
+				excluded = [hit.rid]
 			continue
-
-		draw_line(last_local, hit_local, _scope_color_main, 2.0)
-		return
+		break
+	return segments
 
 func _on_sfx_volume_changed(value: float):
 	_normal_movement_volume = linear_to_db(value)
